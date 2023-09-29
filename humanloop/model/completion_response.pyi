@@ -227,4 +227,5 @@ class CompletionResponse(
 
 from humanloop.model.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.model.data_response import DataResponse
+from humanloop.model.tool_result_response import ToolResultResponse
 from humanloop.model.usage import Usage

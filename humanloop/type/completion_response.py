@@ -16,6 +16,7 @@ from typing_extensions import TypedDict, Literal
 
 from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.type.data_response import DataResponse
+from humanloop.type.tool_result_response import ToolResultResponse
 from humanloop.type.usage import Usage
 
 class RequiredCompletionResponse(TypedDict):

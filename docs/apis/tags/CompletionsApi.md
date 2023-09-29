@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 Create
 
-Create a completion by providing details of the model configuration in the request.
+Create a completion by providing details of the model configuration in the request. change
 
 ### Example
 

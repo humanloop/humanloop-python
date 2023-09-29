@@ -277,4 +277,6 @@ class ChatModelConfigRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
 from humanloop.model.provider_api_keys import ProviderApiKeys
+from humanloop.model.tool_call import ToolCall

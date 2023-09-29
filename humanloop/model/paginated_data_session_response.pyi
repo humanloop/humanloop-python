@@ -141,4 +141,5 @@ class PaginatedDataSessionResponse(
             **kwargs,
         )
 
+from humanloop.model.session_project_response import SessionProjectResponse
 from humanloop.model.session_response import SessionResponse

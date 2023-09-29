@@ -271,7 +271,7 @@ Tag | Method | HTTP request | Description
 *Chats* | [**create_deployed**](docs/apis/tags/ChatsApi.md#create_deployed) | **POST** /chat-deployed | Get a chat response using the project&#x27;s active deployment.  The active deployment can be a specific model configuration or an experiment.
 *Chats* | [**create_experiment**](docs/apis/tags/ChatsApi.md#create_experiment) | **POST** /chat-experiment | Get a chat response for a specific experiment.
 *Chats* | [**create_model_config**](docs/apis/tags/ChatsApi.md#create_model_config) | **POST** /chat-model-config | Get chat response for a specific model configuration.
-*Completions* | [**create**](docs/apis/tags/CompletionsApi.md#create) | **POST** /completion | Create a completion by providing details of the model configuration in the request.
+*Completions* | [**create**](docs/apis/tags/CompletionsApi.md#create) | **POST** /completion | Create a completion by providing details of the model configuration in the request. change
 *Completions* | [**create_deployed**](docs/apis/tags/CompletionsApi.md#create_deployed) | **POST** /completion-deployed | Create a completion using the project&#x27;s active deployment.  The active deployment can be a specific model configuration or an experiment.
 *Completions* | [**create_experiment**](docs/apis/tags/CompletionsApi.md#create_experiment) | **POST** /completion-experiment | Create a completion for a specific experiment.
 *Completions* | [**create_model_config**](docs/apis/tags/CompletionsApi.md#create_model_config) | **POST** /completion-model-config | Create a completion for a specific model configuration.

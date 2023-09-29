@@ -127,5 +127,7 @@ class CreateTestcaseRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
 from humanloop.model.create_testcase_request_inputs import CreateTestcaseRequestInputs
 from humanloop.model.create_testcase_request_target import CreateTestcaseRequestTarget
+from humanloop.model.tool_call import ToolCall

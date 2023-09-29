@@ -51,4 +51,6 @@ class EvaluatorsListResponse(
     def __getitem__(self, i: int) -> 'EvaluatorResponse':
         return super().__getitem__(i)
 
+from humanloop.model.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.model.evaluator_response import EvaluatorResponse
+from humanloop.model.evaluator_return_type_enum import EvaluatorReturnTypeEnum

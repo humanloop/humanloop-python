@@ -160,3 +160,4 @@ class FeedbackTypeRequest(
 
 from humanloop.model.feedback_class import FeedbackClass
 from humanloop.model.feedback_label_request import FeedbackLabelRequest
+from humanloop.model.label_sentiment import LabelSentiment

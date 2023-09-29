@@ -154,3 +154,4 @@ class FeedbackTypeModel(
 
 from humanloop.model.categorical_feedback_label import CategoricalFeedbackLabel
 from humanloop.model.feedback_type import FeedbackType
+from humanloop.model.label_sentiment import LabelSentiment

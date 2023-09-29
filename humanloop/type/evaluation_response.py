@@ -16,7 +16,9 @@ from typing_extensions import TypedDict, Literal
 
 from humanloop.type.config_response import ConfigResponse
 from humanloop.type.evaluation_status import EvaluationStatus
+from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_response import EvaluatorResponse
+from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.testset_response import TestsetResponse
 
