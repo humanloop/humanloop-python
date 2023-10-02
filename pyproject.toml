@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "humanloop"
-version = "0.5.15"
+version = "0.5.16"
 description = "Client for Humanloop API"
 authors = ["Konfig <engineering@konfigthis.com>"]
 license = "MIT"
@@ -9,7 +9,7 @@ packages = [{include = "humanloop"}]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-certifi = ">=2023.7.22"
+certifi = "^2022.12.7"
 python-dateutil = "^2.8.2"
 typing_extensions = "^4.3.0"
 urllib3 = "^1.26.7"
