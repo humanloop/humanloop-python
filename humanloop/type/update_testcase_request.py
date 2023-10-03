@@ -15,6 +15,8 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.tool_call import ToolCall
 from humanloop.type.update_testcase_request_inputs import UpdateTestcaseRequestInputs
 from humanloop.type.update_testcase_request_target import UpdateTestcaseRequestTarget
 

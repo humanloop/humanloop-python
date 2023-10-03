@@ -15,8 +15,13 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.model_config_chat_request import ModelConfigChatRequest
+from humanloop.type.model_config_tool_request import ModelConfigToolRequest
+from humanloop.type.model_endpoints import ModelEndpoints
+from humanloop.type.model_providers import ModelProviders
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.tool_call import ToolCall
 
 class RequiredChatRequest(TypedDict):
     # The messages passed to the to provider chat endpoint.
@@ -64,6 +69,9 @@ class OptionalChatRequest(TypedDict, total=False):
 
     # End-user ID passed through to provider call.
     user: str
+
+    # Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+    tool_call: typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]
 
 class ChatRequest(RequiredChatRequest, OptionalChatRequest):
     pass

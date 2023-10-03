@@ -51,4 +51,9 @@ class TestsetsCreateTestcaseResponse(
     def __getitem__(self, i: int) -> 'TestcaseResponse':
         return super().__getitem__(i)
 
+from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
 from humanloop.model.testcase_response import TestcaseResponse
+from humanloop.model.testcase_response_inputs import TestcaseResponseInputs
+from humanloop.model.testcase_response_target import TestcaseResponseTarget
+from humanloop.model.tool_call import ToolCall

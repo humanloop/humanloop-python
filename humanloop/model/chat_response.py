@@ -112,6 +112,45 @@ class ChatResponse(
                         **kwargs,
                     )
             metadata = schemas.DictSchema
+            
+            
+            class tool_call(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    any_of_0 = schemas.StrSchema
+                    any_of_1 = schemas.DictSchema
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def any_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            cls.any_of_0,
+                            cls.any_of_1,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'tool_call':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
             __annotations__ = {
                 "data": data,
                 "provider_responses": provider_responses,
@@ -122,6 +161,7 @@ class ChatResponse(
                 "user": user,
                 "usage": usage,
                 "metadata": metadata,
+                "tool_call": tool_call,
             }
     
     data: MetaOapg.properties.data
@@ -155,9 +195,12 @@ class ChatResponse(
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "tool_call", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -190,9 +233,12 @@ class ChatResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "tool_call", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -208,6 +254,7 @@ class ChatResponse(
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
         usage: typing.Union[MetaOapg.properties.usage, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ChatResponse':
@@ -223,10 +270,15 @@ class ChatResponse(
             user=user,
             usage=usage,
             metadata=metadata,
+            tool_call=tool_call,
             _configuration=_configuration,
             **kwargs,
         )
 
 from humanloop.model.chat_data_response import ChatDataResponse
+from humanloop.model.chat_message import ChatMessage
 from humanloop.model.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.model.chat_role import ChatRole
+from humanloop.model.tool_call import ToolCall
+from humanloop.model.tool_result_response import ToolResultResponse
 from humanloop.model.usage import Usage

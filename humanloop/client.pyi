@@ -28,55 +28,120 @@ from humanloop.apis.tags.sessions_api import SessionsApi
 from humanloop.apis.tags.testcases_api import TestcasesApi
 from humanloop.apis.tags.testsets_api import TestsetsApi
 
-from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_request import ChatRequest
-from humanloop.type.chat_response import ChatResponse
-from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.model_config_tool_request import ModelConfigToolRequest
+from humanloop.type.model_providers import ModelProviders
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.model_config_chat_request import ModelConfigChatRequest
-from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.chat_data_response import ChatDataResponse
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.chat_request import ChatRequest
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.type.tool_call import ToolCall
+from humanloop.type.usage import Usage
+from humanloop.type.chat_response import ChatResponse
+from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.chat_deployed_request import ChatDeployedRequest
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.chat_data_response import ChatDataResponse
+from humanloop.type.chat_message import ChatMessage
+from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.type.tool_call import ToolCall
+from humanloop.type.usage import Usage
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
-from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.chat_data_response import ChatDataResponse
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.type.tool_call import ToolCall
 from humanloop.type.chat_experiment_request import ChatExperimentRequest
+from humanloop.type.usage import Usage
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.chat_model_config_request import ChatModelConfigRequest
-from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.chat_data_response import ChatDataResponse
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.type.tool_call import ToolCall
+from humanloop.type.usage import Usage
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
-from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
-from humanloop.type.completion_request import CompletionRequest
+from humanloop.type.model_providers import ModelProviders
+from humanloop.type.data_response import DataResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.completion_response import CompletionResponse
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
+from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
+from humanloop.type.completion_request import CompletionRequest
+from humanloop.type.usage import Usage
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.completion_deployed_request import CompletionDeployedRequest
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
+from humanloop.type.data_response import DataResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.usage import Usage
 from humanloop.type.completion_response import CompletionResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.tool_result_response import ToolResultResponse
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.type.completion_experiment_request import CompletionExperimentRequest
+from humanloop.type.data_response import DataResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.usage import Usage
 from humanloop.type.completion_response import CompletionResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.tool_result_response import ToolResultResponse
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
+from humanloop.type.data_response import DataResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.completion_model_config_request import CompletionModelConfigRequest
+from humanloop.type.usage import Usage
 from humanloop.type.completion_response import CompletionResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.tool_result_response import ToolResultResponse
 from humanloop.type.feedback_submit_request import FeedbackSubmitRequest
+from humanloop.type.validation_error import ValidationError
 from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.feedback_submit_response import FeedbackSubmitResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.feedback import Feedback
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.agent_config_request import AgentConfigRequest
 from humanloop.type.generic_config_request import GenericConfigRequest
+from humanloop.type.validation_error import ValidationError
 from humanloop.type.tool_config_request import ToolConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.logs_log_response import LogsLogResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.log_datapoint_request import LogDatapointRequest
 from humanloop.type.http_validation_error import HTTPValidationError
 
@@ -121,6 +186,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
     ):
         return await self.chats.acreate(
             messages=messages,
@@ -138,6 +204,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
         )
 
     @copy_signature(ChatsApi.create)
@@ -158,6 +225,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
     ):
         return self.chats.create(
             messages=messages,
@@ -175,6 +243,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
         )
 
     @copy_signature(ChatsApi.acreate_deployed)
@@ -194,6 +263,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
         environment: typing.Optional[str] = None,
     ):
         return await self.chats.acreate_deployed(
@@ -211,6 +281,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
             environment=environment,
         )
 
@@ -231,6 +302,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
         environment: typing.Optional[str] = None,
     ):
         return self.chats.create_deployed(
@@ -248,6 +320,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
             environment=environment,
         )
 
@@ -269,6 +342,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
     ):
         return await self.chats.acreate_experiment(
             messages=messages,
@@ -286,6 +360,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
         )
 
     @copy_signature(ChatsApi.create_experiment)
@@ -306,6 +381,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
     ):
         return self.chats.create_experiment(
             messages=messages,
@@ -323,6 +399,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
         )
 
     @copy_signature(ChatsApi.acreate_model_config)
@@ -343,6 +420,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
     ):
         return await self.chats.acreate_model_config(
             messages=messages,
@@ -360,6 +438,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
         )
 
     @copy_signature(ChatsApi.create_model_config)
@@ -380,6 +459,7 @@ class Humanloop(ClientCustom):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
     ):
         return self.chats.create_model_config(
             messages=messages,
@@ -397,6 +477,7 @@ class Humanloop(ClientCustom):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_call=tool_call,
         )
 
     @copy_signature(CompletionsApi.acreate)

@@ -15,8 +15,10 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.testcase_response_inputs import TestcaseResponseInputs
 from humanloop.type.testcase_response_target import TestcaseResponseTarget
+from humanloop.type.tool_call import ToolCall
 
 class RequiredTestcaseResponse(TypedDict):
     id: str

@@ -33,14 +33,18 @@ from humanloop import schemas  # noqa: F401
 
 from humanloop.model.evaluator_response import EvaluatorResponse as EvaluatorResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypeSchema
 from humanloop.model.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumSchema
 from humanloop.model.update_evaluator_request import UpdateEvaluatorRequest as UpdateEvaluatorRequestSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
+from humanloop.type.validation_error import ValidationError
 from humanloop.type.update_evaluator_request import UpdateEvaluatorRequest
 from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_response import EvaluatorResponse
 from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 # Path params

@@ -88,4 +88,16 @@ class LogDatapointRequest(
             **kwargs,
         )
 
+from humanloop.model.agent_config_request import AgentConfigRequest
+from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
+from humanloop.model.feedback import Feedback
+from humanloop.model.feedback_type import FeedbackType
+from humanloop.model.generic_config_request import GenericConfigRequest
 from humanloop.model.log_request import LogRequest
+from humanloop.model.model_config_request import ModelConfigRequest
+from humanloop.model.model_config_tool_request import ModelConfigToolRequest
+from humanloop.model.model_endpoints import ModelEndpoints
+from humanloop.model.model_providers import ModelProviders
+from humanloop.model.tool_call import ToolCall
+from humanloop.model.tool_config_request import ToolConfigRequest

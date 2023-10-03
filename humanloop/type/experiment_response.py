@@ -15,6 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.base_metric_response import BaseMetricResponse
+from humanloop.type.config_response import ConfigResponse
 from humanloop.type.experiment_config_response import ExperimentConfigResponse
 from humanloop.type.experiment_status import ExperimentStatus
 from humanloop.type.positive_label import PositiveLabel

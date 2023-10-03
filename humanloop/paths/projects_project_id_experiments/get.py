@@ -33,8 +33,12 @@ from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.experiments_list_response import ExperimentsListResponse as ExperimentsListResponseSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.experiments_list_response import ExperimentsListResponse
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from . import path

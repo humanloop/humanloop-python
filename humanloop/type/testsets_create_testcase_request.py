@@ -14,7 +14,13 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal
 
+from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.create_testcase_by_datapoints_request import CreateTestcaseByDatapointsRequest
+from humanloop.type.create_testcase_by_datapoints_request_datapoint_ids import CreateTestcaseByDatapointsRequestDatapointIds
 from humanloop.type.create_testcase_request import CreateTestcaseRequest
+from humanloop.type.create_testcase_request_inputs import CreateTestcaseRequestInputs
+from humanloop.type.create_testcase_request_target import CreateTestcaseRequestTarget
+from humanloop.type.tool_call import ToolCall
 
 TestsetsCreateTestcaseRequest = typing.Union[CreateTestcaseByDatapointsRequest,CreateTestcaseRequest,typing.List[CreateTestcaseRequest]]

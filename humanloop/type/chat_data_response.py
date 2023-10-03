@@ -15,6 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.tool_call import ToolCall
 from humanloop.type.tool_result_response import ToolResultResponse
 
@@ -38,7 +39,7 @@ class OptionalChatDataResponse(TypedDict, total=False):
     # The inputs passed to the chat template.
     inputs: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
-    # Why the completion ended. Usually one of 'stop' (indicating a stop token was encountered), or 'length' (indicating the max tokens limit has been reached). It will be set as null for the intermediary responses during a stream, and will only be set as non-null for the final streamed token.
+    # Why the generation ended. One of 'stop' (indicating a stop token was encountered), or 'length' (indicating the max tokens limit has been reached), or 'tool_call' (indicating that the model has chosen to call a tool - in which case the tool_call parameter of the response will be populated). It will be set as null for the intermediary responses during a stream, and will only be set as non-null for the final streamed token.
     finish_reason: str
 
     # Results of any tools run during the generation.

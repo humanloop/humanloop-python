@@ -32,9 +32,19 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponseSchema
 from humanloop.model.get_model_config_response import GetModelConfigResponse as GetModelConfigResponseSchema
+from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponseSchema
+from humanloop.model.config_response import ConfigResponse as ConfigResponseSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.get_model_config_response import GetModelConfigResponse
+from humanloop.type.config_response import ConfigResponse
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
 # Path params

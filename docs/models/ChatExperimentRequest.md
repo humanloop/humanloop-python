@@ -25,6 +25,7 @@ Key | Input Type | Accessed Type | Description | Notes
 **num_samples** | decimal.Decimal, int,  | decimal.Decimal,  | The number of chat responses, where each chat response will use a model configuration sampled from the experiment. | [optional] if omitted the server will use the default value of 1
 **stream** | bool,  | BoolClass,  | If true, tokens will be sent as data-only server-sent events. If num_samples &gt; 1, samples are streamed back independently. | [optional] if omitted the server will use the default value of False
 **user** | str,  | str,  | End-user ID passed through to provider call. | [optional] 
+**[tool_call](#tool_call)** | dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader,  | frozendict.frozendict, str, decimal.Decimal, BoolClass, NoneClass, tuple, bytes, FileIO | Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: &#x27;none&#x27; forces the model to not call a tool; the default when no tools are provided as part of the model config. &#x27;auto&#x27; the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {&#x27;name&#x27;: &lt;TOOL_NAME&gt;} forces the model to use the provided tool of the same name. | [optional] 
 
 # messages
 
@@ -72,6 +73,36 @@ dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal
 Class Name | Input Type | Accessed Type | Description | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
 [ProviderApiKeys](ProviderApiKeys.md) | [**ProviderApiKeys**](ProviderApiKeys.md) | [**ProviderApiKeys**](ProviderApiKeys.md) |  | 
+
+# tool_call
+
+Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+
+## Model Type Info
+Input Type | Accessed Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader,  | frozendict.frozendict, str, decimal.Decimal, BoolClass, NoneClass, tuple, bytes, FileIO | Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: &#x27;none&#x27; forces the model to not call a tool; the default when no tools are provided as part of the model config. &#x27;auto&#x27; the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {&#x27;name&#x27;: &lt;TOOL_NAME&gt;} forces the model to use the provided tool of the same name. | 
+
+### Composed Schemas (allOf/anyOf/oneOf/not)
+#### anyOf
+Class Name | Input Type | Accessed Type | Description | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+[any_of_0](#any_of_0) | str,  | str,  |  | 
+[any_of_1](#any_of_1) | dict, frozendict.frozendict,  | frozendict.frozendict,  |  | 
+
+# any_of_0
+
+## Model Type Info
+Input Type | Accessed Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+str,  | str,  |  | 
+
+# any_of_1
+
+## Model Type Info
+Input Type | Accessed Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+dict, frozendict.frozendict,  | frozendict.frozendict,  |  | 
 
 [[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
 

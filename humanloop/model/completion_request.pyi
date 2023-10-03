@@ -295,4 +295,6 @@ class CompletionRequest(
         )
 
 from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest
+from humanloop.model.model_endpoints import ModelEndpoints
+from humanloop.model.model_providers import ModelProviders
 from humanloop.model.provider_api_keys import ProviderApiKeys

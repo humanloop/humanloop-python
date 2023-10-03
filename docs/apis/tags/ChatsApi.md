@@ -68,6 +68,7 @@ try:
         num_samples=1,  # optional
         stream=False,  # optional
         user="string_example",  # optional
+        tool_call="string_example",  # optional
     )
     pprint(create_response.body)
     pprint(create_response.body["data"])
@@ -79,6 +80,7 @@ try:
     pprint(create_response.body["user"])
     pprint(create_response.body["usage"])
     pprint(create_response.body["metadata"])
+    pprint(create_response.body["tool_call"])
     pprint(create_response.headers)
     pprint(create_response.status)
     pprint(create_response.round_trip_time)
@@ -201,6 +203,7 @@ try:
         num_samples=1,  # optional
         stream=False,  # optional
         user="string_example",  # optional
+        tool_call="string_example",  # optional
         environment="string_example",  # optional
     )
     pprint(create_deployed_response.body)
@@ -213,6 +216,7 @@ try:
     pprint(create_deployed_response.body["user"])
     pprint(create_deployed_response.body["usage"])
     pprint(create_deployed_response.body["metadata"])
+    pprint(create_deployed_response.body["tool_call"])
     pprint(create_deployed_response.headers)
     pprint(create_deployed_response.status)
     pprint(create_deployed_response.round_trip_time)
@@ -336,6 +340,7 @@ try:
         num_samples=1,  # optional
         stream=False,  # optional
         user="string_example",  # optional
+        tool_call="string_example",  # optional
     )
     pprint(create_experiment_response.body)
     pprint(create_experiment_response.body["data"])
@@ -347,6 +352,7 @@ try:
     pprint(create_experiment_response.body["user"])
     pprint(create_experiment_response.body["usage"])
     pprint(create_experiment_response.body["metadata"])
+    pprint(create_experiment_response.body["tool_call"])
     pprint(create_experiment_response.headers)
     pprint(create_experiment_response.status)
     pprint(create_experiment_response.round_trip_time)
@@ -470,6 +476,7 @@ try:
         num_samples=1,  # optional
         stream=False,  # optional
         user="string_example",  # optional
+        tool_call="string_example",  # optional
     )
     pprint(create_model_config_response.body)
     pprint(create_model_config_response.body["data"])
@@ -481,6 +488,7 @@ try:
     pprint(create_model_config_response.body["user"])
     pprint(create_model_config_response.body["usage"])
     pprint(create_model_config_response.body["metadata"])
+    pprint(create_model_config_response.body["tool_call"])
     pprint(create_model_config_response.headers)
     pprint(create_model_config_response.status)
     pprint(create_model_config_response.round_trip_time)

@@ -34,15 +34,29 @@ from humanloop import schemas  # noqa: F401
 from humanloop.model.model_providers import ModelProviders as ModelProvidersSchema
 from humanloop.model.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestSchema
 from humanloop.model.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponseSchema
+from humanloop.model.chat_role import ChatRole as ChatRoleSchema
+from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponseSchema
+from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
+from humanloop.model.config_response import ConfigResponse as ConfigResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
 from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
+from humanloop.model.tool_call import ToolCall as ToolCallSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.model_config_tool_request import ModelConfigToolRequest
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.config_response import ConfigResponse
 from humanloop.type.project_model_config_request import ProjectModelConfigRequest
+from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.type.model_providers import ModelProviders
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.chat_message import ChatMessage
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.tool_call import ToolCall
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.model_endpoints import ModelEndpoints
