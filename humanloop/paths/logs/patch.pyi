@@ -32,11 +32,33 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.update_log_request import UpdateLogRequest as UpdateLogRequestSchema
+from humanloop.model.feedback import Feedback as FeedbackSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponseSchema
+from humanloop.model.chat_role import ChatRole as ChatRoleSchema
+from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponseSchema
+from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
+from humanloop.model.config_response import ConfigResponse as ConfigResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
+from humanloop.model.tool_call import ToolCall as ToolCallSchema
 from humanloop.model.log_response import LogResponse as LogResponseSchema
+from humanloop.model.feedback_type import FeedbackType as FeedbackTypeSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
+from humanloop.type.config_response import ConfigResponse
+from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.feedback import Feedback
+from humanloop.type.chat_message import ChatMessage
+from humanloop.type.validation_error import ValidationError
 from humanloop.type.update_log_request import UpdateLogRequest
+from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.log_response import LogResponse
+from humanloop.type.tool_call import ToolCall
+from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
 # Query params

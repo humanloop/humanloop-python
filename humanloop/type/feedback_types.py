@@ -14,6 +14,9 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal
 
+from humanloop.type.categorical_feedback_label import CategoricalFeedbackLabel
+from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.feedback_type_model import FeedbackTypeModel
+from humanloop.type.label_sentiment import LabelSentiment
 
 FeedbackTypes = typing.List[FeedbackTypeModel]

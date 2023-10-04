@@ -15,8 +15,13 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.model_config_chat_request import ModelConfigChatRequest
+from humanloop.type.model_config_tool_request import ModelConfigToolRequest
+from humanloop.type.model_endpoints import ModelEndpoints
+from humanloop.type.model_providers import ModelProviders
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.tool_call import ToolCall
 
 class RequiredChatRequest(TypedDict):
     # The messages passed to the to provider chat endpoint.

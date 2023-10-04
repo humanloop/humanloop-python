@@ -36,18 +36,22 @@ from humanloop.model.tool_config_request import ToolConfigRequest as ToolConfigR
 from humanloop.model.log_datapoint_request import LogDatapointRequest as LogDatapointRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.feedback import Feedback as FeedbackSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.model_config_request import ModelConfigRequest as ModelConfigRequestSchema
 from humanloop.model.logs_log_response import LogsLogResponse as LogsLogResponseSchema
 from humanloop.model.generic_config_request import GenericConfigRequest as GenericConfigRequestSchema
 from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.feedback import Feedback
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.agent_config_request import AgentConfigRequest
 from humanloop.type.generic_config_request import GenericConfigRequest
+from humanloop.type.validation_error import ValidationError
 from humanloop.type.tool_config_request import ToolConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.logs_log_response import LogsLogResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.log_datapoint_request import LogDatapointRequest
 from humanloop.type.http_validation_error import HTTPValidationError
 

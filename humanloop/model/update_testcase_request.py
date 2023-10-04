@@ -127,5 +127,7 @@ class UpdateTestcaseRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
+from humanloop.model.tool_call import ToolCall
 from humanloop.model.update_testcase_request_inputs import UpdateTestcaseRequestInputs
 from humanloop.model.update_testcase_request_target import UpdateTestcaseRequestTarget

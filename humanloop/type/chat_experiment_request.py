@@ -15,7 +15,9 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.tool_call import ToolCall
 
 class RequiredChatExperimentRequest(TypedDict):
     # The messages passed to the to provider chat endpoint.

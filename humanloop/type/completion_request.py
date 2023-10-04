@@ -15,6 +15,8 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
+from humanloop.type.model_endpoints import ModelEndpoints
+from humanloop.type.model_providers import ModelProviders
 from humanloop.type.provider_api_keys import ProviderApiKeys
 
 class RequiredCompletionRequest(TypedDict):

@@ -31,17 +31,33 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.completion_response import CompletionResponse as CompletionResponseSchema
+from humanloop.model.model_providers import ModelProviders as ModelProvidersSchema
 from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest as ModelConfigCompletionRequestSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.usage import Usage as UsageSchema
+from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
+from humanloop.model.completion_response_provider_responses import CompletionResponseProviderResponses as CompletionResponseProviderResponsesSchema
+from humanloop.model.completion_response import CompletionResponse as CompletionResponseSchema
+from humanloop.model.data_response import DataResponse as DataResponseSchema
+from humanloop.model.tool_result_response import ToolResultResponse as ToolResultResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.completion_request import CompletionRequest as CompletionRequestSchema
-from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
+from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
-from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
-from humanloop.type.completion_request import CompletionRequest
+from humanloop.type.model_providers import ModelProviders
+from humanloop.type.data_response import DataResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.completion_response import CompletionResponse
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
+from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
+from humanloop.type.completion_request import CompletionRequest
+from humanloop.type.usage import Usage
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.model_endpoints import ModelEndpoints
 
 from . import path
 

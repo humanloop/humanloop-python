@@ -14,6 +14,8 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal
 
+from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_response import EvaluatorResponse
+from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 
 EvaluatorsListResponse = typing.List[EvaluatorResponse]

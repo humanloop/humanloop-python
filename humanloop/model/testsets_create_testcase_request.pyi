@@ -89,5 +89,11 @@ class TestsetsCreateTestcaseRequest(
             **kwargs,
         )
 
+from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
 from humanloop.model.create_testcase_by_datapoints_request import CreateTestcaseByDatapointsRequest
+from humanloop.model.create_testcase_by_datapoints_request_datapoint_ids import CreateTestcaseByDatapointsRequestDatapointIds
 from humanloop.model.create_testcase_request import CreateTestcaseRequest
+from humanloop.model.create_testcase_request_inputs import CreateTestcaseRequestInputs
+from humanloop.model.create_testcase_request_target import CreateTestcaseRequestTarget
+from humanloop.model.tool_call import ToolCall

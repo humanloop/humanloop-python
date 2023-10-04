@@ -32,14 +32,26 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.completion_response import CompletionResponse as CompletionResponseSchema
+from humanloop.model.data_response import DataResponse as DataResponseSchema
+from humanloop.model.tool_result_response import ToolResultResponse as ToolResultResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.usage import Usage as UsageSchema
 from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
 from humanloop.model.completion_experiment_request import CompletionExperimentRequest as CompletionExperimentRequestSchema
+from humanloop.model.completion_response_provider_responses import CompletionResponseProviderResponses as CompletionResponseProviderResponsesSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.provider_api_keys import ProviderApiKeys
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.type.completion_experiment_request import CompletionExperimentRequest
+from humanloop.type.data_response import DataResponse
+from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.usage import Usage
 from humanloop.type.completion_response import CompletionResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.tool_result_response import ToolResultResponse
 
 # body param
 SchemaForRequestBodyApplicationJson = CompletionExperimentRequestSchema

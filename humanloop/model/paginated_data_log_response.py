@@ -141,4 +141,13 @@ class PaginatedDataLogResponse(
             **kwargs,
         )
 
+from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_role import ChatRole
+from humanloop.model.config_response import ConfigResponse
+from humanloop.model.feedback import Feedback
+from humanloop.model.feedback_type import FeedbackType
 from humanloop.model.log_response import LogResponse
+from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.model.project_config_response import ProjectConfigResponse
+from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.model.tool_call import ToolCall

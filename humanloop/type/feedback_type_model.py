@@ -16,6 +16,7 @@ from typing_extensions import TypedDict, Literal
 
 from humanloop.type.categorical_feedback_label import CategoricalFeedbackLabel
 from humanloop.type.feedback_type import FeedbackType
+from humanloop.type.label_sentiment import LabelSentiment
 
 class RequiredFeedbackTypeModel(TypedDict):
     # The type of feedback. The default feedback types available are 'rating', 'action', 'issue', 'correction', and 'comment'.
