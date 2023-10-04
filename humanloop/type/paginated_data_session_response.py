@@ -14,6 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal
 
+from humanloop.type.session_project_response import SessionProjectResponse
 from humanloop.type.session_response import SessionResponse
 
 class RequiredPaginatedDataSessionResponse(TypedDict):

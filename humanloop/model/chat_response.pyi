@@ -228,5 +228,9 @@ class ChatResponse(
         )
 
 from humanloop.model.chat_data_response import ChatDataResponse
+from humanloop.model.chat_message import ChatMessage
 from humanloop.model.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.model.chat_role import ChatRole
+from humanloop.model.tool_call import ToolCall
+from humanloop.model.tool_result_response import ToolResultResponse
 from humanloop.model.usage import Usage

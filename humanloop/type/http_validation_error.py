@@ -15,6 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.validation_error import ValidationError
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 
 class RequiredHTTPValidationError(TypedDict):
     pass

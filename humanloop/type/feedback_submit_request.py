@@ -15,5 +15,6 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.feedback_request import FeedbackRequest
+from humanloop.type.feedback_type import FeedbackType
 
 FeedbackSubmitRequest = typing.Union[typing.List[FeedbackRequest],FeedbackRequest]

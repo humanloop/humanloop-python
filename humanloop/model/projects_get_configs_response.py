@@ -51,4 +51,7 @@ class ProjectsGetConfigsResponse(
     def __getitem__(self, i: int) -> 'ProjectConfigResponse':
         return super().__getitem__(i)
 
+from humanloop.model.config_response import ConfigResponse
+from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.model.project_config_response import ProjectConfigResponse
+from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse

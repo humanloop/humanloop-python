@@ -15,9 +15,14 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal
 
 from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_role import ChatRole
 from humanloop.type.config_response import ConfigResponse
 from humanloop.type.feedback import Feedback
+from humanloop.type.feedback_type import FeedbackType
+from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.project_config_response import ProjectConfigResponse
+from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.type.tool_call import ToolCall
 
 class RequiredLogResponse(TypedDict):
     config: ConfigResponse

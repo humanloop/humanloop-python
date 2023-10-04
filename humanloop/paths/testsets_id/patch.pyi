@@ -33,10 +33,14 @@ from humanloop import schemas  # noqa: F401
 
 from humanloop.model.update_testset_request import UpdateTestsetRequest as UpdateTestsetRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.testset_response import TestsetResponse as TestsetResponseSchema
+from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
+from humanloop.type.validation_error import ValidationError
 from humanloop.type.testset_response import TestsetResponse
 from humanloop.type.update_testset_request import UpdateTestsetRequest
+from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 # Path params
