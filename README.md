@@ -1,6 +1,6 @@
 # humanloop
 
-[![PyPI](https://img.shields.io/badge/PyPI-v0.5.16-blue)](https://pypi.org/project/humanloop/0.5.16)
+[![PyPI](https://img.shields.io/badge/PyPI-v0.5.17-blue)](https://pypi.org/project/humanloop/0.5.17)
 
 
 
@@ -11,7 +11,7 @@ Python >=3.7
 ## Installing
 
 ```sh
-pip install humanloop==0.5.16
+pip install humanloop==0.5.17
 ```
 
 ## Getting Started
