@@ -1,8 +1,14 @@
-# humanloop
+<div align="center">
+
+[![Visit Humanloop](https://raw.githubusercontent.com/humanloop/humanloop-python/HEAD/python/header.png)](https://humanloop.com)
+
+# Humanloop
 
 
 [![PyPI](https://img.shields.io/badge/PyPI-v0.5.16-blue)](https://pypi.org/project/humanloop/0.5.16)
 [![GitHub last commit](https://img.shields.io/github/last-commit/humanloop/humanloop-python.svg)](https://github.com/humanloop/humanloop-python/commits)
+
+</div>
 
 ## Requirements
 
