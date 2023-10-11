@@ -1,8 +1,8 @@
 # humanloop
 
+
 [![PyPI](https://img.shields.io/badge/PyPI-v0.5.16-blue)](https://pypi.org/project/humanloop/0.5.16)
-
-
+[![GitHub last commit](https://img.shields.io/github/last-commit/humanloop/humanloop-python.svg)](https://github.com/humanloop/humanloop-python/commits)
 
 ## Requirements
 
@@ -23,8 +23,6 @@ from humanloop import Humanloop, ApiException
 humanloop = Humanloop(
     api_key="YOUR_API_KEY",
     openai_api_key="YOUR_OPENAI_API_KEY",
-    ai21_api_key="YOUR_AI21_API_KEY",
-    mock_api_key="YOUR_MOCK_API_KEY",
     anthropic_api_key="YOUR_ANTHROPIC_API_KEY",
 )
 
@@ -169,8 +167,6 @@ from humanloop import Humanloop, ApiException
 humanloop = Humanloop(
     api_key="YOUR_API_KEY",
     openai_api_key="YOUR_OPENAI_API_KEY",
-    ai21_api_key="YOUR_AI21_API_KEY",
-    mock_api_key="YOUR_MOCK_API_KEY",
     anthropic_api_key="YOUR_ANTHROPIC_API_KEY",
 )
 
@@ -223,8 +219,6 @@ from humanloop import Humanloop
 humanloop = Humanloop(
     api_key="YOUR_API_KEY",
     openai_api_key="YOUR_OPENAI_API_KEY",
-    ai21_api_key="YOUR_AI21_API_KEY",
-    mock_api_key="YOUR_MOCK_API_KEY",
     anthropic_api_key="YOUR_ANTHROPIC_API_KEY",
 )
 

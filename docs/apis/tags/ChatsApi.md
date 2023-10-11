@@ -1,5 +1,4 @@
-<a name="__pageTop"></a>
-# humanloop.apis.tags.chats_api.ChatsApi
+# humanloop.chats
 
 All URIs are relative to *https://api.humanloop.com/v4*
 
@@ -12,8 +11,6 @@ Method | HTTP request | Description
 
 # **create**
 
-Chat
-
 Get a chat response by providing details of the model configuration in the request.
 
 ### Example
@@ -23,9 +20,6 @@ from pprint import pprint
 from humanloop import Humanloop, ApiException
 
 humanloop = Humanloop(
-    # Defining the host is optional and defaults to https://api.humanloop.com/v4
-    # See configuration.py for a list of all supported configuration parameters.
-    host="https://api.humanloop.com/v4",
     openai_api_key="OPENAI_API_KEY",
     openai_azure_api_key="OPENAI_AZURE_API_KEY",
     openai_azure_endpoint_api_key="OPENAI_AZURE_ENDPOINT_API_KEY",
@@ -33,10 +27,7 @@ humanloop = Humanloop(
     mock_api_key="MOCK_API_KEY",
     anthropic_api_key="ANTHROPIC_API_KEY",
     cohere_api_key="COHERE_API_KEY",
-    # Configure API key authorization: APIKeyHeader
     api_key="YOUR_API_KEY",
-    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-    # api_key_prefix = {'APIKeyHeader': 'Bearer'},
 )
 
 try:
@@ -94,68 +85,10 @@ except ApiException as e:
     pprint(e.reason)
     pprint(e.round_trip_time)
 ```
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-body | typing.Union[SchemaForRequestBodyApplicationJson] | required |
-content_type | str | optional, default is 'application/json' | Selects the schema and serialization of the request body
-accept_content_types | typing.Tuple[str] | default is ('application/json', ) | Tells the server the content type(s) that are accepted by the client
-stream | bool | default is False | if True then the response.content will be streamed and loaded from a file like object. When downloading a file, set this to True to force the code to deserialize the content to a FileSchema file
-timeout | typing.Optional[typing.Union[int, typing.Tuple]] | default is None | the timeout used by the rest client
-skip_deserialization | bool | default is False | when True, headers and body will be unset and an instance of api_client.ApiResponseWithoutDeserialization will be returned
-
-### body
-
-# SchemaForRequestBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatRequest**](../../models/ChatRequest.md) |  | 
-
-
-### Return Types, Responses
-
-Code | Class | Description
-------------- | ------------- | -------------
-n/a | api_client.ApiResponseWithoutDeserialization | When skip_deserialization is True this response is returned
-200 | [ApiResponseFor200](#create.ApiResponseFor200) | Successful Response
-422 | [ApiResponseFor422](#create.ApiResponseFor422) | Validation Error
-
-#### create.ApiResponseFor200
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor200ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor200ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatResponse**](../../models/ChatResponse.md) |  | 
-
-
-#### create.ApiResponseFor422
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor422ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor422ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**HTTPValidationError**](../../models/HTTPValidationError.md) |  | 
-
-
-### Authorization
-
-[APIKeyHeader](../../../README.md#APIKeyHeader)
 
 [[Back to top]](#__pageTop) [[Back to API list]](../../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../../README.md#documentation-for-models) [[Back to README]](../../../README.md)
 
 # **create_deployed**
-
-Chat Deployed
 
 Get a chat response using the project's active deployment.  The active deployment can be a specific model configuration or an experiment.
 
@@ -166,9 +99,6 @@ from pprint import pprint
 from humanloop import Humanloop, ApiException
 
 humanloop = Humanloop(
-    # Defining the host is optional and defaults to https://api.humanloop.com/v4
-    # See configuration.py for a list of all supported configuration parameters.
-    host="https://api.humanloop.com/v4",
     openai_api_key="OPENAI_API_KEY",
     openai_azure_api_key="OPENAI_AZURE_API_KEY",
     openai_azure_endpoint_api_key="OPENAI_AZURE_ENDPOINT_API_KEY",
@@ -176,10 +106,7 @@ humanloop = Humanloop(
     mock_api_key="MOCK_API_KEY",
     anthropic_api_key="ANTHROPIC_API_KEY",
     cohere_api_key="COHERE_API_KEY",
-    # Configure API key authorization: APIKeyHeader
     api_key="YOUR_API_KEY",
-    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-    # api_key_prefix = {'APIKeyHeader': 'Bearer'},
 )
 
 try:
@@ -230,68 +157,10 @@ except ApiException as e:
     pprint(e.reason)
     pprint(e.round_trip_time)
 ```
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-body | typing.Union[SchemaForRequestBodyApplicationJson] | required |
-content_type | str | optional, default is 'application/json' | Selects the schema and serialization of the request body
-accept_content_types | typing.Tuple[str] | default is ('application/json', ) | Tells the server the content type(s) that are accepted by the client
-stream | bool | default is False | if True then the response.content will be streamed and loaded from a file like object. When downloading a file, set this to True to force the code to deserialize the content to a FileSchema file
-timeout | typing.Optional[typing.Union[int, typing.Tuple]] | default is None | the timeout used by the rest client
-skip_deserialization | bool | default is False | when True, headers and body will be unset and an instance of api_client.ApiResponseWithoutDeserialization will be returned
-
-### body
-
-# SchemaForRequestBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatDeployedRequest**](../../models/ChatDeployedRequest.md) |  | 
-
-
-### Return Types, Responses
-
-Code | Class | Description
-------------- | ------------- | -------------
-n/a | api_client.ApiResponseWithoutDeserialization | When skip_deserialization is True this response is returned
-200 | [ApiResponseFor200](#create_deployed.ApiResponseFor200) | Successful Response
-422 | [ApiResponseFor422](#create_deployed.ApiResponseFor422) | Validation Error
-
-#### create_deployed.ApiResponseFor200
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor200ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor200ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatResponse**](../../models/ChatResponse.md) |  | 
-
-
-#### create_deployed.ApiResponseFor422
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor422ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor422ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**HTTPValidationError**](../../models/HTTPValidationError.md) |  | 
-
-
-### Authorization
-
-[APIKeyHeader](../../../README.md#APIKeyHeader)
 
 [[Back to top]](#__pageTop) [[Back to API list]](../../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../../README.md#documentation-for-models) [[Back to README]](../../../README.md)
 
 # **create_experiment**
-
-Chat Experiment
 
 Get a chat response for a specific experiment.
 
@@ -302,9 +171,6 @@ from pprint import pprint
 from humanloop import Humanloop, ApiException
 
 humanloop = Humanloop(
-    # Defining the host is optional and defaults to https://api.humanloop.com/v4
-    # See configuration.py for a list of all supported configuration parameters.
-    host="https://api.humanloop.com/v4",
     openai_api_key="OPENAI_API_KEY",
     openai_azure_api_key="OPENAI_AZURE_API_KEY",
     openai_azure_endpoint_api_key="OPENAI_AZURE_ENDPOINT_API_KEY",
@@ -312,10 +178,7 @@ humanloop = Humanloop(
     mock_api_key="MOCK_API_KEY",
     anthropic_api_key="ANTHROPIC_API_KEY",
     cohere_api_key="COHERE_API_KEY",
-    # Configure API key authorization: APIKeyHeader
     api_key="YOUR_API_KEY",
-    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-    # api_key_prefix = {'APIKeyHeader': 'Bearer'},
 )
 
 try:
@@ -366,68 +229,10 @@ except ApiException as e:
     pprint(e.reason)
     pprint(e.round_trip_time)
 ```
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-body | typing.Union[SchemaForRequestBodyApplicationJson] | required |
-content_type | str | optional, default is 'application/json' | Selects the schema and serialization of the request body
-accept_content_types | typing.Tuple[str] | default is ('application/json', ) | Tells the server the content type(s) that are accepted by the client
-stream | bool | default is False | if True then the response.content will be streamed and loaded from a file like object. When downloading a file, set this to True to force the code to deserialize the content to a FileSchema file
-timeout | typing.Optional[typing.Union[int, typing.Tuple]] | default is None | the timeout used by the rest client
-skip_deserialization | bool | default is False | when True, headers and body will be unset and an instance of api_client.ApiResponseWithoutDeserialization will be returned
-
-### body
-
-# SchemaForRequestBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatExperimentRequest**](../../models/ChatExperimentRequest.md) |  | 
-
-
-### Return Types, Responses
-
-Code | Class | Description
-------------- | ------------- | -------------
-n/a | api_client.ApiResponseWithoutDeserialization | When skip_deserialization is True this response is returned
-200 | [ApiResponseFor200](#create_experiment.ApiResponseFor200) | Successful Response
-422 | [ApiResponseFor422](#create_experiment.ApiResponseFor422) | Validation Error
-
-#### create_experiment.ApiResponseFor200
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor200ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor200ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatResponse**](../../models/ChatResponse.md) |  | 
-
-
-#### create_experiment.ApiResponseFor422
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor422ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor422ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**HTTPValidationError**](../../models/HTTPValidationError.md) |  | 
-
-
-### Authorization
-
-[APIKeyHeader](../../../README.md#APIKeyHeader)
 
 [[Back to top]](#__pageTop) [[Back to API list]](../../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../../README.md#documentation-for-models) [[Back to README]](../../../README.md)
 
 # **create_model_config**
-
-Chat Model Config
 
 Get chat response for a specific model configuration.
 
@@ -438,9 +243,6 @@ from pprint import pprint
 from humanloop import Humanloop, ApiException
 
 humanloop = Humanloop(
-    # Defining the host is optional and defaults to https://api.humanloop.com/v4
-    # See configuration.py for a list of all supported configuration parameters.
-    host="https://api.humanloop.com/v4",
     openai_api_key="OPENAI_API_KEY",
     openai_azure_api_key="OPENAI_AZURE_API_KEY",
     openai_azure_endpoint_api_key="OPENAI_AZURE_ENDPOINT_API_KEY",
@@ -448,10 +250,7 @@ humanloop = Humanloop(
     mock_api_key="MOCK_API_KEY",
     anthropic_api_key="ANTHROPIC_API_KEY",
     cohere_api_key="COHERE_API_KEY",
-    # Configure API key authorization: APIKeyHeader
     api_key="YOUR_API_KEY",
-    # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
-    # api_key_prefix = {'APIKeyHeader': 'Bearer'},
 )
 
 try:
@@ -502,62 +301,6 @@ except ApiException as e:
     pprint(e.reason)
     pprint(e.round_trip_time)
 ```
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-body | typing.Union[SchemaForRequestBodyApplicationJson] | required |
-content_type | str | optional, default is 'application/json' | Selects the schema and serialization of the request body
-accept_content_types | typing.Tuple[str] | default is ('application/json', ) | Tells the server the content type(s) that are accepted by the client
-stream | bool | default is False | if True then the response.content will be streamed and loaded from a file like object. When downloading a file, set this to True to force the code to deserialize the content to a FileSchema file
-timeout | typing.Optional[typing.Union[int, typing.Tuple]] | default is None | the timeout used by the rest client
-skip_deserialization | bool | default is False | when True, headers and body will be unset and an instance of api_client.ApiResponseWithoutDeserialization will be returned
-
-### body
-
-# SchemaForRequestBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatModelConfigRequest**](../../models/ChatModelConfigRequest.md) |  | 
-
-
-### Return Types, Responses
-
-Code | Class | Description
-------------- | ------------- | -------------
-n/a | api_client.ApiResponseWithoutDeserialization | When skip_deserialization is True this response is returned
-200 | [ApiResponseFor200](#create_model_config.ApiResponseFor200) | Successful Response
-422 | [ApiResponseFor422](#create_model_config.ApiResponseFor422) | Validation Error
-
-#### create_model_config.ApiResponseFor200
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor200ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor200ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**ChatResponse**](../../models/ChatResponse.md) |  | 
-
-
-#### create_model_config.ApiResponseFor422
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-response | urllib3.HTTPResponse | Raw response |
-body | typing.Union[SchemaFor422ResponseBodyApplicationJson, ] |  |
-headers | Unset | headers were not defined |
-
-# SchemaFor422ResponseBodyApplicationJson
-Type | Description  | Notes
-------------- | ------------- | -------------
-[**HTTPValidationError**](../../models/HTTPValidationError.md) |  | 
-
-
-### Authorization
-
-[APIKeyHeader](../../../README.md#APIKeyHeader)
 
 [[Back to top]](#__pageTop) [[Back to API list]](../../../README.md#documentation-for-api-endpoints) [[Back to Model list]](../../../README.md#documentation-for-models) [[Back to README]](../../../README.md)
 
