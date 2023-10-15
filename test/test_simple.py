@@ -79,20 +79,6 @@ class TestSimple(unittest.TestCase):
             project="test",
         )
 
-    # Call humanloop.testsets.createTestcase and ensure that required path param
-    # is first and body param is next followed by all optional parameters
-    def test_required_path_param_is_first(self):
-        self.humanloop.testsets.create_testcase(
-            "test", body={"datapoint_ids": ["a", "b"]}
-        )
-        self.humanloop.testsets.create_testcase(
-            "test", body=[{"messages": [{"role": "user"}]}]
-        )
-        self.humanloop.testsets.create_testcase("test", datapoint_ids=["a", "b"])
-        self.humanloop.testsets.create_testcase(
-            testset_id="test", datapoint_ids=["a", "b"]
-        )
-
     # ensures we can either pass
     # 1. flattened kwargs with body properties
     # 2. a dict for body object (as first positional arg)

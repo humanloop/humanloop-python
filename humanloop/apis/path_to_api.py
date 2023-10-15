@@ -31,14 +31,17 @@ from humanloop.apis.paths.sessions import Sessions
 from humanloop.apis.paths.sessions_id import SessionsId
 from humanloop.apis.paths.evaluators import Evaluators
 from humanloop.apis.paths.evaluators_id import EvaluatorsId
-from humanloop.apis.paths.testcases_id import TestcasesId
-from humanloop.apis.paths.testcases import Testcases
-from humanloop.apis.paths.projects_project_id_testsets import ProjectsProjectIdTestsets
-from humanloop.apis.paths.testsets_id import TestsetsId
-from humanloop.apis.paths.testsets_testset_id_testcases import TestsetsTestsetIdTestcases
+from humanloop.apis.paths.datapoints_id import DatapointsId
+from humanloop.apis.paths.datapoints import Datapoints
+from humanloop.apis.paths.projects_project_id_datasets import ProjectsProjectIdDatasets
+from humanloop.apis.paths.datasets_id import DatasetsId
+from humanloop.apis.paths.datasets_dataset_id_datapoints import DatasetsDatasetIdDatapoints
 from humanloop.apis.paths.evaluations_id import EvaluationsId
-from humanloop.apis.paths.evaluations_id_testcases import EvaluationsIdTestcases
+from humanloop.apis.paths.evaluations_id_datapoints import EvaluationsIdDatapoints
 from humanloop.apis.paths.projects_project_id_evaluations import ProjectsProjectIdEvaluations
+from humanloop.apis.paths.projects_project_id_finetunes import ProjectsProjectIdFinetunes
+from humanloop.apis.paths.projects_project_id_finetunes_summary import ProjectsProjectIdFinetunesSummary
+from humanloop.apis.paths.finetunes_id import FinetunesId
 
 PathToApi = typing_extensions.TypedDict(
     'PathToApi',
@@ -73,14 +76,17 @@ PathToApi = typing_extensions.TypedDict(
         PathValues.SESSIONS_ID: SessionsId,
         PathValues.EVALUATORS: Evaluators,
         PathValues.EVALUATORS_ID: EvaluatorsId,
-        PathValues.TESTCASES_ID: TestcasesId,
-        PathValues.TESTCASES: Testcases,
-        PathValues.PROJECTS_PROJECT_ID_TESTSETS: ProjectsProjectIdTestsets,
-        PathValues.TESTSETS_ID: TestsetsId,
-        PathValues.TESTSETS_TESTSET_ID_TESTCASES: TestsetsTestsetIdTestcases,
+        PathValues.DATAPOINTS_ID: DatapointsId,
+        PathValues.DATAPOINTS: Datapoints,
+        PathValues.PROJECTS_PROJECT_ID_DATASETS: ProjectsProjectIdDatasets,
+        PathValues.DATASETS_ID: DatasetsId,
+        PathValues.DATASETS_DATASET_ID_DATAPOINTS: DatasetsDatasetIdDatapoints,
         PathValues.EVALUATIONS_ID: EvaluationsId,
-        PathValues.EVALUATIONS_ID_TESTCASES: EvaluationsIdTestcases,
+        PathValues.EVALUATIONS_ID_DATAPOINTS: EvaluationsIdDatapoints,
         PathValues.PROJECTS_PROJECT_ID_EVALUATIONS: ProjectsProjectIdEvaluations,
+        PathValues.PROJECTS_PROJECT_ID_FINETUNES: ProjectsProjectIdFinetunes,
+        PathValues.PROJECTS_PROJECT_ID_FINETUNES_SUMMARY: ProjectsProjectIdFinetunesSummary,
+        PathValues.FINETUNES_ID: FinetunesId,
     }
 )
 
@@ -116,13 +122,16 @@ path_to_api = PathToApi(
         PathValues.SESSIONS_ID: SessionsId,
         PathValues.EVALUATORS: Evaluators,
         PathValues.EVALUATORS_ID: EvaluatorsId,
-        PathValues.TESTCASES_ID: TestcasesId,
-        PathValues.TESTCASES: Testcases,
-        PathValues.PROJECTS_PROJECT_ID_TESTSETS: ProjectsProjectIdTestsets,
-        PathValues.TESTSETS_ID: TestsetsId,
-        PathValues.TESTSETS_TESTSET_ID_TESTCASES: TestsetsTestsetIdTestcases,
+        PathValues.DATAPOINTS_ID: DatapointsId,
+        PathValues.DATAPOINTS: Datapoints,
+        PathValues.PROJECTS_PROJECT_ID_DATASETS: ProjectsProjectIdDatasets,
+        PathValues.DATASETS_ID: DatasetsId,
+        PathValues.DATASETS_DATASET_ID_DATAPOINTS: DatasetsDatasetIdDatapoints,
         PathValues.EVALUATIONS_ID: EvaluationsId,
-        PathValues.EVALUATIONS_ID_TESTCASES: EvaluationsIdTestcases,
+        PathValues.EVALUATIONS_ID_DATAPOINTS: EvaluationsIdDatapoints,
         PathValues.PROJECTS_PROJECT_ID_EVALUATIONS: ProjectsProjectIdEvaluations,
+        PathValues.PROJECTS_PROJECT_ID_FINETUNES: ProjectsProjectIdFinetunes,
+        PathValues.PROJECTS_PROJECT_ID_FINETUNES_SUMMARY: ProjectsProjectIdFinetunesSummary,
+        PathValues.FINETUNES_ID: FinetunesId,
     }
 )

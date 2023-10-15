@@ -7,15 +7,16 @@ import enum
 
 class TagValues(str, enum.Enum):
     PROJECTS = "Projects"
-    TESTSETS = "Testsets"
+    DATASETS = "Datasets"
     EXPERIMENTS = "Experiments"
     COMPLETIONS = "Completions"
     CHATS = "Chats"
     EVALUATORS = "Evaluators"
     EVALUATIONS = "Evaluations"
+    FINETUNES = "Finetunes"
     LOGS = "Logs"
     SESSIONS = "Sessions"
-    TESTCASES = "Testcases"
+    DATAPOINTS = "Datapoints"
     MODEL_CONFIGS = "Model Configs"
     FEEDBACK = "Feedback"
     AUTHENTICATION = "Authentication"
