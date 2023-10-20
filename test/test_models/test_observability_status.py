@@ -10,32 +10,15 @@
 """
 
 import unittest
-from unittest.mock import patch
-
-import urllib3
 
 import humanloop
-from humanloop.paths.sessions import get
-from humanloop import configuration, schemas, api_client
-
-from .. import ApiTestMixin
+from humanloop.model.observability_status import ObservabilityStatus
+from humanloop import configuration
 
 
-class TestSessions(ApiTestMixin, unittest.TestCase):
-    """
-    Sessions unit test stubs
-        List 
-    """
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    response_status = 200
-
-
+class TestObservabilityStatus(unittest.TestCase):
+    """ObservabilityStatus unit test stubs"""
+    pass
 
 
 if __name__ == '__main__':

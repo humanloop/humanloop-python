@@ -31,32 +31,130 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.evaluators_list_response import EvaluatorsListResponse as EvaluatorsListResponseSchema
-from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.feedback_response import FeedbackResponse as FeedbackResponseSchema
 from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.metric_value_response import MetricValueResponse as MetricValueResponseSchema
+from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponseSchema
+from humanloop.model.chat_role import ChatRole as ChatRoleSchema
+from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponseSchema
+from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse as PaginatedDataLogResponseSchema
+from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
+from humanloop.model.config_response import ConfigResponse as ConfigResponseSchema
+from humanloop.model.tool_result_response import ToolResultResponse as ToolResultResponseSchema
+from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.evaluation_result_response import EvaluationResultResponse as EvaluationResultResponseSchema
+from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
+from humanloop.model.observability_status import ObservabilityStatus as ObservabilityStatusSchema
+from humanloop.model.tool_call import ToolCall as ToolCallSchema
+from humanloop.model.log_response import LogResponse as LogResponseSchema
+from humanloop.model.feedback_type import FeedbackType as FeedbackTypeSchema
 from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
-from humanloop.type.validation_error import ValidationError
-from humanloop.type.evaluators_list_response import EvaluatorsListResponse
+from humanloop.type.config_response import ConfigResponse
+from humanloop.type.paginated_data_log_response import PaginatedDataLogResponse
+from humanloop.type.feedback_response import FeedbackResponse
+from humanloop.type.observability_status import ObservabilityStatus
+from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.type.evaluation_result_response import EvaluationResultResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
+from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.type.tool_result_response import ToolResultResponse
+from humanloop.type.chat_role import ChatRole
+from humanloop.type.chat_message import ChatMessage
+from humanloop.type.validation_error import ValidationError
+from humanloop.type.feedback_type import FeedbackType
+from humanloop.type.log_response import LogResponse
+from humanloop.type.tool_call import ToolCall
+from humanloop.type.metric_value_response import MetricValueResponse
+from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
-from . import path
+# Query params
+ProjectIdSchema = schemas.StrSchema
+SearchSchema = schemas.StrSchema
+MetadataSearchSchema = schemas.StrSchema
+StartDateSchema = schemas.DateSchema
+EndDateSchema = schemas.DateSchema
+SizeSchema = schemas.IntSchema
+PageSchema = schemas.IntSchema
+RequestRequiredQueryParams = typing_extensions.TypedDict(
+    'RequestRequiredQueryParams',
+    {
+        'project_id': typing.Union[ProjectIdSchema, str, ],
+    }
+)
+RequestOptionalQueryParams = typing_extensions.TypedDict(
+    'RequestOptionalQueryParams',
+    {
+        'search': typing.Union[SearchSchema, str, ],
+        'metadata_search': typing.Union[MetadataSearchSchema, str, ],
+        'start_date': typing.Union[StartDateSchema, str, date, ],
+        'end_date': typing.Union[EndDateSchema, str, date, ],
+        'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
+        'page': typing.Union[PageSchema, decimal.Decimal, int, ],
+    },
+    total=False
+)
 
-_auth = [
-    'APIKeyHeader',
-]
-SchemaFor200ResponseBodyApplicationJson = EvaluatorsListResponseSchema
+
+class RequestQueryParams(RequestRequiredQueryParams, RequestOptionalQueryParams):
+    pass
+
+
+request_query_project_id = api_client.QueryParameter(
+    name="project_id",
+    style=api_client.ParameterStyle.FORM,
+    schema=ProjectIdSchema,
+    required=True,
+    explode=True,
+)
+request_query_search = api_client.QueryParameter(
+    name="search",
+    style=api_client.ParameterStyle.FORM,
+    schema=SearchSchema,
+    explode=True,
+)
+request_query_metadata_search = api_client.QueryParameter(
+    name="metadata_search",
+    style=api_client.ParameterStyle.FORM,
+    schema=MetadataSearchSchema,
+    explode=True,
+)
+request_query_start_date = api_client.QueryParameter(
+    name="start_date",
+    style=api_client.ParameterStyle.FORM,
+    schema=StartDateSchema,
+    explode=True,
+)
+request_query_end_date = api_client.QueryParameter(
+    name="end_date",
+    style=api_client.ParameterStyle.FORM,
+    schema=EndDateSchema,
+    explode=True,
+)
+request_query_size = api_client.QueryParameter(
+    name="size",
+    style=api_client.ParameterStyle.FORM,
+    schema=SizeSchema,
+    explode=True,
+)
+request_query_page = api_client.QueryParameter(
+    name="page",
+    style=api_client.ParameterStyle.FORM,
+    schema=PageSchema,
+    explode=True,
+)
+SchemaFor200ResponseBodyApplicationJson = PaginatedDataLogResponseSchema
 
 
 @dataclass
 class ApiResponseFor200(api_client.ApiResponse):
-    body: EvaluatorsListResponse
+    body: PaginatedDataLogResponse
 
 
 @dataclass
 class ApiResponseFor200Async(api_client.AsyncApiResponse):
-    body: EvaluatorsListResponse
+    body: PaginatedDataLogResponse
 
 
 _response_for_200 = api_client.OpenApiResponse(
@@ -88,10 +186,6 @@ _response_for_422 = api_client.OpenApiResponse(
             schema=SchemaFor422ResponseBodyApplicationJson),
     },
 )
-_status_code_to_response = {
-    '200': _response_for_200,
-    '422': _response_for_422,
-}
 _all_accept_content_types = (
     'application/json',
 )
@@ -101,12 +195,36 @@ class BaseApi(api_client.Api):
 
     def _list_mapped_args(
         self,
+        project_id: str,
+        search: typing.Optional[str] = None,
+        metadata_search: typing.Optional[str] = None,
+        start_date: typing.Optional[date] = None,
+        end_date: typing.Optional[date] = None,
+        size: typing.Optional[int] = None,
+        page: typing.Optional[int] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
+        _query_params = {}
+        if project_id is not None:
+            _query_params["project_id"] = project_id
+        if search is not None:
+            _query_params["search"] = search
+        if metadata_search is not None:
+            _query_params["metadata_search"] = metadata_search
+        if start_date is not None:
+            _query_params["start_date"] = start_date
+        if end_date is not None:
+            _query_params["end_date"] = end_date
+        if size is not None:
+            _query_params["size"] = size
+        if page is not None:
+            _query_params["page"] = page
+        args.query = _query_params
         return args
 
     async def _alist_oapg(
         self,
+            query_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[int, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
@@ -117,12 +235,32 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        List 
+        Get Logs
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         used_path = path.value
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_project_id,
+            request_query_search,
+            request_query_metadata_search,
+            request_query_start_date,
+            request_query_end_date,
+            request_query_size,
+            request_query_page,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -143,6 +281,7 @@ class BaseApi(api_client.Api):
             method=method,
             headers=_headers,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -202,6 +341,7 @@ class BaseApi(api_client.Api):
 
     def _list_oapg(
         self,
+            query_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[int, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
@@ -211,12 +351,32 @@ class BaseApi(api_client.Api):
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        List 
+        Get Logs
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         used_path = path.value
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_project_id,
+            request_query_search,
+            request_query_metadata_search,
+            request_query_start_date,
+            request_query_end_date,
+            request_query_size,
+            request_query_page,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -237,6 +397,7 @@ class BaseApi(api_client.Api):
             method=method,
             headers=_headers,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -269,25 +430,55 @@ class List(BaseApi):
 
     async def alist(
         self,
+        project_id: str,
+        search: typing.Optional[str] = None,
+        metadata_search: typing.Optional[str] = None,
+        start_date: typing.Optional[date] = None,
+        end_date: typing.Optional[date] = None,
+        size: typing.Optional[int] = None,
+        page: typing.Optional[int] = None,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
         args = self._list_mapped_args(
+            project_id=project_id,
+            search=search,
+            metadata_search=metadata_search,
+            start_date=start_date,
+            end_date=end_date,
+            size=size,
+            page=page,
         )
         return await self._alist_oapg(
+            query_params=args.query,
         )
     
     def list(
         self,
+        project_id: str,
+        search: typing.Optional[str] = None,
+        metadata_search: typing.Optional[str] = None,
+        start_date: typing.Optional[date] = None,
+        end_date: typing.Optional[date] = None,
+        size: typing.Optional[int] = None,
+        page: typing.Optional[int] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._list_mapped_args(
+            project_id=project_id,
+            search=search,
+            metadata_search=metadata_search,
+            start_date=start_date,
+            end_date=end_date,
+            size=size,
+            page=page,
         )
         return self._list_oapg(
+            query_params=args.query,
         )
 
 class ApiForget(BaseApi):
@@ -295,24 +486,54 @@ class ApiForget(BaseApi):
 
     async def aget(
         self,
+        project_id: str,
+        search: typing.Optional[str] = None,
+        metadata_search: typing.Optional[str] = None,
+        start_date: typing.Optional[date] = None,
+        end_date: typing.Optional[date] = None,
+        size: typing.Optional[int] = None,
+        page: typing.Optional[int] = None,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
         args = self._list_mapped_args(
+            project_id=project_id,
+            search=search,
+            metadata_search=metadata_search,
+            start_date=start_date,
+            end_date=end_date,
+            size=size,
+            page=page,
         )
         return await self._alist_oapg(
+            query_params=args.query,
         )
     
     def get(
         self,
+        project_id: str,
+        search: typing.Optional[str] = None,
+        metadata_search: typing.Optional[str] = None,
+        start_date: typing.Optional[date] = None,
+        end_date: typing.Optional[date] = None,
+        size: typing.Optional[int] = None,
+        page: typing.Optional[int] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._list_mapped_args(
+            project_id=project_id,
+            search=search,
+            metadata_search=metadata_search,
+            start_date=start_date,
+            end_date=end_date,
+            size=size,
+            page=page,
         )
         return self._list_oapg(
+            query_params=args.query,
         )
 

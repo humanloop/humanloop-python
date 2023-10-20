@@ -15,16 +15,16 @@ from unittest.mock import patch
 import urllib3
 
 import humanloop
-from humanloop.paths.sessions import get
+from humanloop.paths.logs import delete
 from humanloop import configuration, schemas, api_client
 
 from .. import ApiTestMixin
 
 
-class TestSessions(ApiTestMixin, unittest.TestCase):
+class TestLogs(ApiTestMixin, unittest.TestCase):
     """
-    Sessions unit test stubs
-        List 
+    Logs unit test stubs
+        Delete Logs
     """
 
     def setUp(self):
@@ -33,9 +33,8 @@ class TestSessions(ApiTestMixin, unittest.TestCase):
     def tearDown(self):
         pass
 
-    response_status = 200
-
-
+    response_status = 204
+    response_body = ''
 
 
 if __name__ == '__main__':

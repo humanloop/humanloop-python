@@ -15,16 +15,16 @@ from unittest.mock import patch
 import urllib3
 
 import humanloop
-from humanloop.paths.sessions import get
+from humanloop.paths.logs import get
 from humanloop import configuration, schemas, api_client
 
 from .. import ApiTestMixin
 
 
-class TestSessions(ApiTestMixin, unittest.TestCase):
+class TestLogs(ApiTestMixin, unittest.TestCase):
     """
-    Sessions unit test stubs
-        List 
+    Logs unit test stubs
+        Get Logs
     """
 
     def setUp(self):

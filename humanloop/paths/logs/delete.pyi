@@ -31,41 +31,77 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.evaluators_list_response import EvaluatorsListResponse as EvaluatorsListResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.validation_error import ValidationError
-from humanloop.type.evaluators_list_response import EvaluatorsListResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
-from . import path
-
-_auth = [
-    'APIKeyHeader',
-]
-SchemaFor200ResponseBodyApplicationJson = EvaluatorsListResponseSchema
+# Query params
 
 
-@dataclass
-class ApiResponseFor200(api_client.ApiResponse):
-    body: EvaluatorsListResponse
+class IdSchema(
+    schemas.ListSchema
+):
 
 
-@dataclass
-class ApiResponseFor200Async(api_client.AsyncApiResponse):
-    body: EvaluatorsListResponse
+    class MetaOapg:
+        items = schemas.StrSchema
 
+    def __new__(
+        cls,
+        arg: typing.Union[typing.Tuple[typing.Union[MetaOapg.items, str, ]], typing.List[typing.Union[MetaOapg.items, str, ]]],
+        _configuration: typing.Optional[schemas.Configuration] = None,
+    ) -> 'IdSchema':
+        return super().__new__(
+            cls,
+            arg,
+            _configuration=_configuration,
+        )
 
-_response_for_200 = api_client.OpenApiResponse(
-    response_cls=ApiResponseFor200,
-    response_cls_async=ApiResponseFor200Async,
-    content={
-        'application/json': api_client.MediaType(
-            schema=SchemaFor200ResponseBodyApplicationJson),
+    def __getitem__(self, i: int) -> MetaOapg.items:
+        return super().__getitem__(i)
+RequestRequiredQueryParams = typing_extensions.TypedDict(
+    'RequestRequiredQueryParams',
+    {
+    }
+)
+RequestOptionalQueryParams = typing_extensions.TypedDict(
+    'RequestOptionalQueryParams',
+    {
+        'id': typing.Union[IdSchema, list, tuple, ],
     },
+    total=False
+)
+
+
+class RequestQueryParams(RequestRequiredQueryParams, RequestOptionalQueryParams):
+    pass
+
+
+request_query_id = api_client.QueryParameter(
+    name="id",
+    style=api_client.ParameterStyle.FORM,
+    schema=IdSchema,
+    explode=True,
+)
+
+
+@dataclass
+class ApiResponseFor204(api_client.ApiResponse):
+    body: schemas.Unset = schemas.unset
+
+
+@dataclass
+class ApiResponseFor204Async(api_client.AsyncApiResponse):
+    body: schemas.Unset = schemas.unset
+
+
+_response_for_204 = api_client.OpenApiResponse(
+    response_cls=ApiResponseFor204,
+    response_cls_async=ApiResponseFor204Async,
 )
 SchemaFor422ResponseBodyApplicationJson = HTTPValidationErrorSchema
 
@@ -88,10 +124,6 @@ _response_for_422 = api_client.OpenApiResponse(
             schema=SchemaFor422ResponseBodyApplicationJson),
     },
 )
-_status_code_to_response = {
-    '200': _response_for_200,
-    '422': _response_for_422,
-}
 _all_accept_content_types = (
     'application/json',
 )
@@ -99,37 +131,57 @@ _all_accept_content_types = (
 
 class BaseApi(api_client.Api):
 
-    def _list_mapped_args(
+    def _delete_mapped_args(
         self,
+        id: typing.Optional[typing.List[str]] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
+        _query_params = {}
+        if id is not None:
+            _query_params["id"] = id
+        args.query = _query_params
         return args
 
-    async def _alist_oapg(
+    async def _adelete_oapg(
         self,
+            query_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[int, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
         stream: bool = False,
     ) -> typing.Union[
-        ApiResponseFor200Async,
+        ApiResponseFor204Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
         """
-        List 
+        Delete Logs
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         used_path = path.value
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_id,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
         if accept_content_types:
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
-        method = 'get'.upper()
+        method = 'delete'.upper()
         request_before_hook(
             resource_path=used_path,
             method=method,
@@ -143,6 +195,7 @@ class BaseApi(api_client.Api):
             method=method,
             headers=_headers,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -200,30 +253,45 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-    def _list_oapg(
+    def _delete_oapg(
         self,
+            query_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[int, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
         stream: bool = False,
     ) -> typing.Union[
-        ApiResponseFor200,
+        ApiResponseFor204,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        List 
+        Delete Logs
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         used_path = path.value
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_id,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
         if accept_content_types:
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
-        method = 'get'.upper()
+        method = 'delete'.upper()
         request_before_hook(
             resource_path=used_path,
             method=method,
@@ -237,6 +305,7 @@ class BaseApi(api_client.Api):
             method=method,
             headers=_headers,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -264,55 +333,67 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class List(BaseApi):
+class Delete(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
-    async def alist(
+    async def adelete(
         self,
+        id: typing.Optional[typing.List[str]] = None,
     ) -> typing.Union[
-        ApiResponseFor200Async,
+        ApiResponseFor204Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._list_mapped_args(
+        args = self._delete_mapped_args(
+            id=id,
         )
-        return await self._alist_oapg(
+        return await self._adelete_oapg(
+            query_params=args.query,
         )
     
-    def list(
+    def delete(
         self,
+        id: typing.Optional[typing.List[str]] = None,
     ) -> typing.Union[
-        ApiResponseFor200,
+        ApiResponseFor204,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._list_mapped_args(
+        args = self._delete_mapped_args(
+            id=id,
         )
-        return self._list_oapg(
+        return self._delete_oapg(
+            query_params=args.query,
         )
 
-class ApiForget(BaseApi):
+class ApiFordelete(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
-    async def aget(
+    async def adelete(
         self,
+        id: typing.Optional[typing.List[str]] = None,
     ) -> typing.Union[
-        ApiResponseFor200Async,
+        ApiResponseFor204Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._list_mapped_args(
+        args = self._delete_mapped_args(
+            id=id,
         )
-        return await self._alist_oapg(
+        return await self._adelete_oapg(
+            query_params=args.query,
         )
     
-    def get(
+    def delete(
         self,
+        id: typing.Optional[typing.List[str]] = None,
     ) -> typing.Union[
-        ApiResponseFor200,
+        ApiResponseFor204,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._list_mapped_args(
+        args = self._delete_mapped_args(
+            id=id,
         )
-        return self._list_oapg(
+        return self._delete_oapg(
+            query_params=args.query,
         )
 

@@ -166,6 +166,7 @@ class BaseApi(api_client.Api):
         active_experiment_id: typing.Optional[str] = None,
         active_config_id: typing.Optional[str] = None,
         positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _path_params = {}
@@ -178,6 +179,8 @@ class BaseApi(api_client.Api):
             _body["active_config_id"] = active_config_id
         if positive_labels is not None:
             _body["positive_labels"] = positive_labels
+        if directory_id is not None:
+            _body["directory_id"] = directory_id
         args.body = _body
         if id is not None:
             _path_params["id"] = id
@@ -419,6 +422,7 @@ class Update(BaseApi):
         active_experiment_id: typing.Optional[str] = None,
         active_config_id: typing.Optional[str] = None,
         positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
@@ -430,6 +434,7 @@ class Update(BaseApi):
             active_experiment_id=active_experiment_id,
             active_config_id=active_config_id,
             positive_labels=positive_labels,
+            directory_id=directory_id,
         )
         return await self._aupdate_oapg(
             body=args.body,
@@ -443,6 +448,7 @@ class Update(BaseApi):
         active_experiment_id: typing.Optional[str] = None,
         active_config_id: typing.Optional[str] = None,
         positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -453,6 +459,7 @@ class Update(BaseApi):
             active_experiment_id=active_experiment_id,
             active_config_id=active_config_id,
             positive_labels=positive_labels,
+            directory_id=directory_id,
         )
         return self._update_oapg(
             body=args.body,
@@ -469,6 +476,7 @@ class ApiForpatch(BaseApi):
         active_experiment_id: typing.Optional[str] = None,
         active_config_id: typing.Optional[str] = None,
         positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
@@ -480,6 +488,7 @@ class ApiForpatch(BaseApi):
             active_experiment_id=active_experiment_id,
             active_config_id=active_config_id,
             positive_labels=positive_labels,
+            directory_id=directory_id,
         )
         return await self._aupdate_oapg(
             body=args.body,
@@ -493,6 +502,7 @@ class ApiForpatch(BaseApi):
         active_experiment_id: typing.Optional[str] = None,
         active_config_id: typing.Optional[str] = None,
         positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -503,6 +513,7 @@ class ApiForpatch(BaseApi):
             active_experiment_id=active_experiment_id,
             active_config_id=active_config_id,
             positive_labels=positive_labels,
+            directory_id=directory_id,
         )
         return self._update_oapg(
             body=args.body,

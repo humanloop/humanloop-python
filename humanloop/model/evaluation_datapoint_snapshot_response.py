@@ -140,10 +140,13 @@ from humanloop.model.datapoint_response import DatapointResponse
 from humanloop.model.datapoint_response_inputs import DatapointResponseInputs
 from humanloop.model.datapoint_response_target import DatapointResponseTarget
 from humanloop.model.evaluation_result_response import EvaluationResultResponse
-from humanloop.model.feedback import Feedback
+from humanloop.model.feedback_response import FeedbackResponse
 from humanloop.model.feedback_type import FeedbackType
 from humanloop.model.log_response import LogResponse
+from humanloop.model.metric_value_response import MetricValueResponse
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.model.observability_status import ObservabilityStatus
 from humanloop.model.project_config_response import ProjectConfigResponse
 from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.model.tool_call import ToolCall
+from humanloop.model.tool_result_response import ToolResultResponse

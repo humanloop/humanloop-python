@@ -154,6 +154,7 @@ class BaseApi(api_client.Api):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -161,6 +162,8 @@ class BaseApi(api_client.Api):
             _body["name"] = name
         if feedback_types is not None:
             _body["feedback_types"] = feedback_types
+        if directory_id is not None:
+            _body["directory_id"] = directory_id
         args.body = _body
         return args
 
@@ -366,6 +369,7 @@ class Create(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
@@ -374,6 +378,7 @@ class Create(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return await self._acreate_oapg(
             body=args.body,
@@ -383,6 +388,7 @@ class Create(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -390,6 +396,7 @@ class Create(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return self._create_oapg(
             body=args.body,
@@ -402,6 +409,7 @@ class ApiForpost(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
@@ -410,6 +418,7 @@ class ApiForpost(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return await self._acreate_oapg(
             body=args.body,
@@ -419,6 +428,7 @@ class ApiForpost(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -426,6 +436,7 @@ class ApiForpost(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return self._create_oapg(
             body=args.body,

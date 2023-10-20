@@ -97,6 +97,7 @@ from humanloop.model.log_datapoint_request import LogDatapointRequest
 from humanloop.model.log_request import LogRequest
 from humanloop.model.log_response import LogResponse
 from humanloop.model.logs_log_response import LogsLogResponse
+from humanloop.model.metric_value_response import MetricValueResponse
 from humanloop.model.model_config_chat_request import ModelConfigChatRequest
 from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
@@ -105,6 +106,7 @@ from humanloop.model.model_config_response import ModelConfigResponse
 from humanloop.model.model_config_tool_request import ModelConfigToolRequest
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders
+from humanloop.model.observability_status import ObservabilityStatus
 from humanloop.model.paginated_data_datapoint_response import PaginatedDataDatapointResponse
 from humanloop.model.paginated_data_evaluation_datapoint_snapshot_response import PaginatedDataEvaluationDatapointSnapshotResponse
 from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse
