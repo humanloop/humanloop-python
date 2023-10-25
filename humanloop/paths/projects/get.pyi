@@ -80,7 +80,6 @@ from humanloop.type.http_validation_error import HTTPValidationError
 # Query params
 PageSchema = schemas.IntSchema
 SizeSchema = schemas.IntSchema
-OrganizationIdSchema = schemas.StrSchema
 FilterSchema = schemas.StrSchema
 UserFilterSchema = schemas.StrSchema
 
@@ -165,7 +164,6 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
     {
         'page': typing.Union[PageSchema, decimal.Decimal, int, ],
         'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
-        'organization_id': typing.Union[OrganizationIdSchema, str, ],
         'filter': typing.Union[FilterSchema, str, ],
         'user_filter': typing.Union[UserFilterSchema, str, ],
         'sort_by': typing.Union[SortBySchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
@@ -189,12 +187,6 @@ request_query_size = api_client.QueryParameter(
     name="size",
     style=api_client.ParameterStyle.FORM,
     schema=SizeSchema,
-    explode=True,
-)
-request_query_organization_id = api_client.QueryParameter(
-    name="organization_id",
-    style=api_client.ParameterStyle.FORM,
-    schema=OrganizationIdSchema,
     explode=True,
 )
 request_query_filter = api_client.QueryParameter(
@@ -274,7 +266,6 @@ class BaseApi(api_client.Api):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -286,8 +277,6 @@ class BaseApi(api_client.Api):
             _query_params["page"] = page
         if size is not None:
             _query_params["size"] = size
-        if organization_id is not None:
-            _query_params["organization_id"] = organization_id
         if filter is not None:
             _query_params["filter"] = filter
         if user_filter is not None:
@@ -324,7 +313,6 @@ class BaseApi(api_client.Api):
         for parameter in (
             request_query_page,
             request_query_size,
-            request_query_organization_id,
             request_query_filter,
             request_query_user_filter,
             request_query_sort_by,
@@ -440,7 +428,6 @@ class BaseApi(api_client.Api):
         for parameter in (
             request_query_page,
             request_query_size,
-            request_query_organization_id,
             request_query_filter,
             request_query_user_filter,
             request_query_sort_by,
@@ -509,7 +496,6 @@ class List(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -522,7 +508,6 @@ class List(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,
@@ -536,7 +521,6 @@ class List(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -548,7 +532,6 @@ class List(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,
@@ -565,7 +548,6 @@ class ApiForget(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -578,7 +560,6 @@ class ApiForget(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,
@@ -592,7 +573,6 @@ class ApiForget(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -604,7 +584,6 @@ class ApiForget(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,

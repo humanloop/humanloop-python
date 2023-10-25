@@ -13,6 +13,7 @@ from humanloop.paths.projects.post import Create
 from humanloop.paths.projects_id_feedback_types.post import CreateFeedbackType
 from humanloop.paths.projects_id_active_config.delete import DeactivateConfig
 from humanloop.paths.projects_id_active_experiment.delete import DeactivateExperiment
+from humanloop.paths.projects_id.delete import Delete
 from humanloop.paths.projects_project_id_deployed_config_environment_id.delete import DeleteDeployedConfig
 from humanloop.paths.projects_project_id_deploy_config.patch import DeployConfig
 from humanloop.paths.projects_id_export.post import Export
@@ -30,6 +31,7 @@ class ProjectsApi(
     CreateFeedbackType,
     DeactivateConfig,
     DeactivateExperiment,
+    Delete,
     DeleteDeployedConfig,
     DeployConfig,
     Export,

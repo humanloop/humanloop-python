@@ -24,7 +24,7 @@ from .. import ApiTestMixin
 class TestEvaluators(ApiTestMixin, unittest.TestCase):
     """
     Evaluators unit test stubs
-        List
+        List 
     """
 
     def setUp(self):

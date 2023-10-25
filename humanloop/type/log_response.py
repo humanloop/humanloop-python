@@ -17,18 +17,28 @@ from typing_extensions import TypedDict, Literal
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.chat_role import ChatRole
 from humanloop.type.config_response import ConfigResponse
-from humanloop.type.feedback import Feedback
+from humanloop.type.evaluation_result_response import EvaluationResultResponse
+from humanloop.type.feedback_response import FeedbackResponse
 from humanloop.type.feedback_type import FeedbackType
+from humanloop.type.metric_value_response import MetricValueResponse
 from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.type.observability_status import ObservabilityStatus
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.type.tool_call import ToolCall
+from humanloop.type.tool_result_response import ToolResultResponse
 
 class RequiredLogResponse(TypedDict):
-    config: ConfigResponse
-
     # String ID of logged datapoint. Starts with `data_`.
     id: str
+
+    config: ConfigResponse
+
+    evaluation_results: typing.List[EvaluationResultResponse]
+
+    observability_status: ObservabilityStatus
+
+    updated_at: datetime
 
 class OptionalLogResponse(TypedDict, total=False):
     # Unique project name. If no project exists with this name, a new project will be created.
@@ -70,8 +80,7 @@ class OptionalLogResponse(TypedDict, total=False):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: str
 
-    # Optional parameter to provide feedback with your logged datapoint.
-    feedback: typing.Union[Feedback, typing.List[Feedback]]
+    feedback: typing.List[FeedbackResponse]
 
     # User defined timestamp for when the log was created. 
     created_at: datetime
@@ -99,6 +108,12 @@ class OptionalLogResponse(TypedDict, total=False):
 
     # Reason the generation finished.
     finish_reason: str
+
+    metric_values: typing.List[MetricValueResponse]
+
+    tools: typing.List[ToolResultResponse]
+
+    tool_call: typing.Union[str, typing.Dict[str, str]]
 
 class LogResponse(RequiredLogResponse, OptionalLogResponse):
     pass

@@ -27,5 +27,8 @@ class OptionalCreateProjectRequest(TypedDict, total=False):
     # Feedback types to be created.
     feedback_types: typing.List[FeedbackTypeRequest]
 
+    # ID of directory to assign project to. Starts with `dir_`. If not provided, the project will be created in the root directory.
+    directory_id: str
+
 class CreateProjectRequest(RequiredCreateProjectRequest, OptionalCreateProjectRequest):
     pass

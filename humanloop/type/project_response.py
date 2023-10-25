@@ -64,5 +64,8 @@ class OptionalProjectResponse(TypedDict, total=False):
     # Evaluators that have been set as active for the project.
     active_evaluators: typing.List[EvaluatorResponse]
 
+    # String ID of the directory the project belongs to. Starts with `dir_`.
+    directory_id: str
+
 class ProjectResponse(RequiredProjectResponse, OptionalProjectResponse):
     pass

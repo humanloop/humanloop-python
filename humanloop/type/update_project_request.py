@@ -32,5 +32,8 @@ class OptionalUpdateProjectRequest(TypedDict, total=False):
     # The full list of labels to treat as positive user feedback.
     positive_labels: typing.List[PositiveLabel]
 
+    # ID of directory to assign project to. Starts with `dir_`.
+    directory_id: str
+
 class UpdateProjectRequest(RequiredUpdateProjectRequest, OptionalUpdateProjectRequest):
     pass

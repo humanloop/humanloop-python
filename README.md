@@ -57,6 +57,8 @@
   * [`humanloop.finetunes.list_all_for_project`](#humanloopfinetuneslist_all_for_project)
   * [`humanloop.finetunes.summary`](#humanloopfinetunessummary)
   * [`humanloop.finetunes.update`](#humanloopfinetunesupdate)
+  * [`humanloop.logs.delete`](#humanlooplogsdelete)
+  * [`humanloop.logs.list`](#humanlooplogslist)
   * [`humanloop.log`](#humanlooplog)
   * [`humanloop.logs.update`](#humanlooplogsupdate)
   * [`humanloop.logs.update_by_ref`](#humanlooplogsupdate_by_ref)
@@ -66,6 +68,7 @@
   * [`humanloop.projects.create_feedback_type`](#humanloopprojectscreate_feedback_type)
   * [`humanloop.projects.deactivate_config`](#humanloopprojectsdeactivate_config)
   * [`humanloop.projects.deactivate_experiment`](#humanloopprojectsdeactivate_experiment)
+  * [`humanloop.projects.delete`](#humanloopprojectsdelete)
   * [`humanloop.projects.delete_deployed_config`](#humanloopprojectsdelete_deployed_config)
   * [`humanloop.projects.deploy_config`](#humanloopprojectsdeploy_config)
   * [`humanloop.projects.export`](#humanloopprojectsexport)
@@ -2357,6 +2360,72 @@ update_response = humanloop.finetunes.update(
 
 ---
 
+### `humanloop.logs.delete`
+
+Delete Logs
+
+#### 🛠️ Usage
+
+```python
+humanloop.logs.delete(
+    id=["string_example"],
+)
+```
+
+#### ⚙️ Parameters
+
+##### id: List[`str`]
+
+#### 🌐 Endpoint
+
+`/logs` `delete`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.logs.list`
+
+Retrieve paginated logs from the server.  Sorting and filtering are supported through query params. See docstring of get_sorted_filtered_project_data_from_query_params for more details.
+
+#### 🛠️ Usage
+
+```python
+list_response = humanloop.logs.list(
+    project_id="project_id_example",
+    search="string_example",
+    metadata_search="string_example",
+    start_date="1970-01-01",
+    end_date="1970-01-01",
+    size=50,
+    page=0,
+)
+```
+
+#### ⚙️ Parameters
+
+##### project_id: `str`
+
+##### search: `str`
+
+##### metadata_search: `str`
+
+##### start_date: `date`
+
+##### end_date: `date`
+
+##### size: `int`
+
+##### page: `int`
+
+#### 🌐 Endpoint
+
+`/logs` `get`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
 ### `humanloop.log`
 
 Log a datapoint or array of datapoints to your Humanloop project.
@@ -2764,6 +2833,7 @@ create_response = humanloop.projects.create(
             "type": "type_example",
         }
     ],
+    directory_id="string_example",
 )
 ```
 
@@ -2776,6 +2846,10 @@ Unique project name.
 ##### feedback_types: List[[`FeedbackTypeRequest`](./humanloop/type/feedback_type_request.py)]
 
 Feedback types to be created.
+
+##### directory_id: `str`
+
+ID of directory to assign project to. Starts with `dir_`. If not provided, the project will be created in the root directory.
 
 #### ⚙️ Request Body
 
@@ -2910,6 +2984,32 @@ Name for the environment. E.g. 'producton'. If not provided, will return the exp
 #### 🌐 Endpoint
 
 `/projects/{id}/active-experiment` `delete`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.projects.delete`
+
+Delete a specific project.
+
+#### 🛠️ Usage
+
+```python
+humanloop.projects.delete(
+    id="id_example",
+)
+```
+
+#### ⚙️ Parameters
+
+##### id: `str`
+
+String ID of project. Starts with `pr_`.
+
+#### 🌐 Endpoint
+
+`/projects/{id}` `delete`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 
@@ -3103,7 +3203,6 @@ Get a paginated list of projects.
 list_response = humanloop.projects.list(
     page=0,
     size=10,
-    organization_id="string_example",
     filter="string_example",
     user_filter="string_example",
     sort_by="string_example",
@@ -3120,10 +3219,6 @@ Page offset for pagination.
 ##### size: `int`
 
 Page size for pagination. Number of projects to fetch.
-
-##### organization_id: `str`
-
-ID of organization that fetched projects belong to. Starts with `org_`.
 
 ##### filter: `str`
 
@@ -3230,6 +3325,7 @@ update_response = humanloop.projects.update(
             "value": "value_example",
         }
     ],
+    directory_id="string_example",
 )
 ```
 
@@ -3254,6 +3350,10 @@ ID for a config to set as the project's active deployment. Starts with 'config_'
 ##### positive_labels: List[[`PositiveLabel`](./humanloop/type/positive_label.py)]
 
 The full list of labels to treat as positive user feedback.
+
+##### directory_id: `str`
+
+ID of directory to assign project to. Starts with `dir_`.
 
 #### ⚙️ Request Body
 
