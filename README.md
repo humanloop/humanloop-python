@@ -5,7 +5,7 @@
 # Humanloop
 
 
-[![PyPI](https://img.shields.io/badge/PyPI-v0.5.17-blue)](https://pypi.org/project/humanloop/0.5.17)
+[![PyPI](https://img.shields.io/badge/PyPI-v0.5.18-blue)](https://pypi.org/project/humanloop/0.5.18)
 [![GitHub last commit](https://img.shields.io/github/last-commit/humanloop/humanloop-python.svg)](https://github.com/humanloop/humanloop-python/commits)
 [![README.md](https://img.shields.io/badge/README-Click%20Here-green)](https://github.com/humanloop/humanloop-python#readme)
 
@@ -89,7 +89,7 @@ Python >=3.7
 ## Installing
 
 ```sh
-pip install humanloop==0.5.17
+pip install humanloop==0.5.18
 ```
 
 ## Getting Started
