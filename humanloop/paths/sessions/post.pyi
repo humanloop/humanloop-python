@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -40,6 +41,12 @@ from humanloop.type.validation_error import ValidationError
 from humanloop.type.create_session_response import CreateSessionResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.create_session_response import CreateSessionResponse as CreateSessionResponsePydantic
 
 SchemaFor201ResponseBodyApplicationJson = CreateSessionResponseSchema
 
@@ -255,7 +262,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Create(BaseApi):
+class CreateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate(
@@ -280,6 +287,30 @@ class Create(BaseApi):
         )
         return self._create_oapg(
         )
+
+class Create(BaseApi):
+
+    async def acreate(
+        self,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate(
+        )
+        if validate:
+            return CreateSessionResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CreateSessionResponsePydantic, raw_response.body)
+    
+    
+    def create(
+        self,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create(
+        )
+        if validate:
+            return CreateSessionResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CreateSessionResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -50,6 +51,17 @@ from humanloop.type.model_providers import ModelProviders
 from humanloop.type.finetune_config import FinetuneConfig
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.finetune_config import FinetuneConfig as FinetuneConfigPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.finetune_response import FinetuneResponse as FinetuneResponsePydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.dataset_response import DatasetResponse as DatasetResponsePydantic
+from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
+from humanloop.pydantic.finetune_request import FinetuneRequest as FinetuneRequestPydantic
+from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
 
 # Path params
 ProjectIdSchema = schemas.StrSchema
@@ -390,7 +402,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Create(BaseApi):
+class CreateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate(
@@ -443,6 +455,54 @@ class Create(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Create(BaseApi):
+
+    async def acreate(
+        self,
+        name: str,
+        dataset_id: str,
+        config: FinetuneConfig,
+        project_id: str,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate(
+            name=name,
+            dataset_id=dataset_id,
+            config=config,
+            project_id=project_id,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+        )
+        if validate:
+            return FinetuneResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(FinetuneResponsePydantic, raw_response.body)
+    
+    
+    def create(
+        self,
+        name: str,
+        dataset_id: str,
+        config: FinetuneConfig,
+        project_id: str,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create(
+            name=name,
+            dataset_id=dataset_id,
+            config=config,
+            project_id=project_id,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+        )
+        if validate:
+            return FinetuneResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(FinetuneResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -54,6 +55,19 @@ from humanloop.type.logs_log_response import LogsLogResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.log_datapoint_request import LogDatapointRequest
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.log_datapoint_request import LogDatapointRequest as LogDatapointRequestPydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.feedback import Feedback as FeedbackPydantic
+from humanloop.pydantic.agent_config_request import AgentConfigRequest as AgentConfigRequestPydantic
+from humanloop.pydantic.tool_config_request import ToolConfigRequest as ToolConfigRequestPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.model_config_request import ModelConfigRequest as ModelConfigRequestPydantic
+from humanloop.pydantic.generic_config_request import GenericConfigRequest as GenericConfigRequestPydantic
+from humanloop.pydantic.logs_log_response import LogsLogResponse as LogsLogResponsePydantic
 
 # body param
 SchemaForRequestBodyApplicationJson = LogDatapointRequestSchema
@@ -373,7 +387,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Log(BaseApi):
+class LogRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def alog(
@@ -476,6 +490,106 @@ class Log(BaseApi):
         return self._log_oapg(
             body=args.body,
         )
+
+class Log(BaseApi):
+
+    async def alog(
+        self,
+        body: typing.Optional[LogDatapointRequest] = None,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        session_reference_id: typing.Optional[str] = None,
+        parent_id: typing.Optional[str] = None,
+        parent_reference_id: typing.Optional[str] = None,
+        inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source: typing.Optional[str] = None,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        reference_id: typing.Optional[str] = None,
+        trial_id: typing.Optional[str] = None,
+        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        output: typing.Optional[str] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
+        created_at: typing.Optional[datetime] = None,
+        error: typing.Optional[str] = None,
+        duration: typing.Optional[typing.Union[int, float]] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.alog(
+            body=body,
+            project=project,
+            project_id=project_id,
+            session_id=session_id,
+            session_reference_id=session_reference_id,
+            parent_id=parent_id,
+            parent_reference_id=parent_reference_id,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            reference_id=reference_id,
+            trial_id=trial_id,
+            messages=messages,
+            output=output,
+            config=config,
+            feedback=feedback,
+            created_at=created_at,
+            error=error,
+            duration=duration,
+        )
+        if validate:
+            return RootModel[LogsLogResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(LogsLogResponsePydantic, raw_response.body)
+    
+    
+    def log(
+        self,
+        body: typing.Optional[LogDatapointRequest] = None,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        session_reference_id: typing.Optional[str] = None,
+        parent_id: typing.Optional[str] = None,
+        parent_reference_id: typing.Optional[str] = None,
+        inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source: typing.Optional[str] = None,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        reference_id: typing.Optional[str] = None,
+        trial_id: typing.Optional[str] = None,
+        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        output: typing.Optional[str] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
+        created_at: typing.Optional[datetime] = None,
+        error: typing.Optional[str] = None,
+        duration: typing.Optional[typing.Union[int, float]] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.log(
+            body=body,
+            project=project,
+            project_id=project_id,
+            session_id=session_id,
+            session_reference_id=session_reference_id,
+            parent_id=parent_id,
+            parent_reference_id=parent_reference_id,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            reference_id=reference_id,
+            trial_id=trial_id,
+            messages=messages,
+            output=output,
+            config=config,
+            feedback=feedback,
+            created_at=created_at,
+            error=error,
+            duration=duration,
+        )
+        if validate:
+            return RootModel[LogsLogResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(LogsLogResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -46,6 +47,15 @@ from humanloop.type.project_model_config_feedback_stats_response import ProjectM
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.get_model_config_response import GetModelConfigResponse as GetModelConfigResponsePydantic
+from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponsePydantic
 
 # Query params
 EnvironmentSchema = schemas.StrSchema
@@ -385,7 +395,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class GetActiveConfig(BaseApi):
+class GetActiveConfigRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aget_active_config(
@@ -422,6 +432,38 @@ class GetActiveConfig(BaseApi):
             query_params=args.query,
             path_params=args.path,
         )
+
+class GetActiveConfig(BaseApi):
+
+    async def aget_active_config(
+        self,
+        id: str,
+        environment: typing.Optional[str] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aget_active_config(
+            id=id,
+            environment=environment,
+        )
+        if validate:
+            return GetModelConfigResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(GetModelConfigResponsePydantic, raw_response.body)
+    
+    
+    def get_active_config(
+        self,
+        id: str,
+        environment: typing.Optional[str] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.get_active_config(
+            id=id,
+            environment=environment,
+        )
+        if validate:
+            return GetModelConfigResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(GetModelConfigResponsePydantic, raw_response.body)
+
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

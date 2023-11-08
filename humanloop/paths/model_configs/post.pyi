@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -60,6 +61,22 @@ from humanloop.type.tool_call import ToolCall
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.model_endpoints import ModelEndpoints
+
+from ...api_client import Dictionary
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestPydantic
+from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
+from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponsePydantic
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
 
 # body param
 SchemaForRequestBodyApplicationJson = ProjectModelConfigRequestSchema
@@ -378,7 +395,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Register(BaseApi):
+class RegisterRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aregister(
@@ -477,6 +494,102 @@ class Register(BaseApi):
         return self._register_oapg(
             body=args.body,
         )
+
+class Register(BaseApi):
+
+    async def aregister(
+        self,
+        model: str,
+        description: typing.Optional[str] = None,
+        name: typing.Optional[str] = None,
+        provider: typing.Optional[ModelProviders] = None,
+        max_tokens: typing.Optional[int] = None,
+        temperature: typing.Optional[typing.Union[int, float]] = None,
+        top_p: typing.Optional[typing.Union[int, float]] = None,
+        stop: typing.Optional[typing.Union[str, typing.List[str]]] = None,
+        presence_penalty: typing.Optional[typing.Union[int, float]] = None,
+        frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
+        other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        experiment: typing.Optional[str] = None,
+        prompt_template: typing.Optional[str] = None,
+        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        endpoint: typing.Optional[ModelEndpoints] = None,
+        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aregister(
+            model=model,
+            description=description,
+            name=name,
+            provider=provider,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            stop=stop,
+            presence_penalty=presence_penalty,
+            frequency_penalty=frequency_penalty,
+            other=other,
+            project=project,
+            project_id=project_id,
+            experiment=experiment,
+            prompt_template=prompt_template,
+            chat_template=chat_template,
+            endpoint=endpoint,
+            tools=tools,
+        )
+        if validate:
+            return ProjectConfigResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ProjectConfigResponsePydantic, raw_response.body)
+    
+    
+    def register(
+        self,
+        model: str,
+        description: typing.Optional[str] = None,
+        name: typing.Optional[str] = None,
+        provider: typing.Optional[ModelProviders] = None,
+        max_tokens: typing.Optional[int] = None,
+        temperature: typing.Optional[typing.Union[int, float]] = None,
+        top_p: typing.Optional[typing.Union[int, float]] = None,
+        stop: typing.Optional[typing.Union[str, typing.List[str]]] = None,
+        presence_penalty: typing.Optional[typing.Union[int, float]] = None,
+        frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
+        other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        experiment: typing.Optional[str] = None,
+        prompt_template: typing.Optional[str] = None,
+        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        endpoint: typing.Optional[ModelEndpoints] = None,
+        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.register(
+            model=model,
+            description=description,
+            name=name,
+            provider=provider,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            stop=stop,
+            presence_penalty=presence_penalty,
+            frequency_penalty=frequency_penalty,
+            other=other,
+            project=project,
+            project_id=project_id,
+            experiment=experiment,
+            prompt_template=prompt_template,
+            chat_template=chat_template,
+            endpoint=endpoint,
+            tools=tools,
+        )
+        if validate:
+            return ProjectConfigResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ProjectConfigResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

@@ -59,6 +59,15 @@ class TestSimple(unittest.TestCase):
             ],
         )
 
+    def test_log_delete(self):
+        response = self.humanloop.logs.delete(id=["test"])
+        self.assertIsNone(response)
+
+    def test_log_delete_raw(self):
+        response = self.humanloop.logs.raw.delete(id=["test"])
+        self.assertIsNotNone(response)
+
+
     def test_complete(self):
         response: AsyncGeneratorResponse = self.humanloop.complete(
             project="konfig-dev-001",
@@ -69,6 +78,33 @@ class TestSimple(unittest.TestCase):
             },
         )  # type: ignore
 
+    def test_experiment_create(self):
+        response = self.humanloop.experiments.create(
+            name='test',
+            positive_labels=[{"type": 'test', "value": 'test'}],
+            project_id="test"
+        )
+        self.assertIsNotNone(response.id)
+
+    def test_experiment_delete(self):
+        response = self.humanloop.experiments.delete(
+            experiment_id="test"
+        )
+        self.assertIsNone(response)
+
+    def test_chat_model_config(self):
+        response = self.humanloop.chat_model_config(
+            model_config_id="test",
+            messages=[
+                {"role": "system"}
+            ]
+        )
+        self.assertIsNotNone(response.provider_responses)
+
+    def test_projects_create(self):
+        response = self.humanloop.projects.create("test")
+        self.assertIsNotNone(response.id)
+
     def test_projects_list(self):
         self.humanloop.projects.list(page=1, size=10)
 
@@ -77,66 +113,6 @@ class TestSimple(unittest.TestCase):
             model_config={"model": "test", "prompt_template": "{{question}}"},
             inputs={},
             project="test",
-        )
-
-    # ensures we can either pass
-    # 1. flattened kwargs with body properties
-    # 2. a dict for body object (as first positional arg)
-    # 3. a list for body object (as first positional arg)
-    # 4. a dict for body object (as "body" named arg)
-    # 4. a list for body object (as "body" named arg)
-    def test_log(self):
-        api_call = MagicMock()
-        self.humanloop.logs._log_oapg = api_call
-        self.humanloop.logs.log(output="example", project="test")
-        self.humanloop.logs.log({"output": "example", "project": "test"})
-        self.humanloop.logs.log([{"output": "example", "project": "test"}])
-        self.humanloop.logs.log(body={"output": "example", "project": "test"})
-        self.humanloop.logs.log(body=[{"output": "example", "project": "test"}])
-
-        self.humanloop.log(output="example", project="test")
-        self.humanloop.log({"output": "example", "project": "test"})
-        self.humanloop.log([{"output": "example", "project": "test"}])
-        self.humanloop.log(body={"output": "example", "project": "test"})
-        self.humanloop.log(body=[{"output": "example", "project": "test"}])
-
-        api_call.assert_has_calls(
-            [
-                call(body={"output": "example", "project": "test"}),
-                call(body={"output": "example", "project": "test"}),
-                call(body=[{"output": "example", "project": "test"}]),
-                call(body={"output": "example", "project": "test"}),
-                call(body=[{"output": "example", "project": "test"}]),
-                call(body={"output": "example", "project": "test"}),
-                call(body={"output": "example", "project": "test"}),
-                call(body=[{"output": "example", "project": "test"}]),
-                call(body={"output": "example", "project": "test"}),
-                call(body=[{"output": "example", "project": "test"}] ),
-            ]
-        )
-
-    # ensure id gets passed as path parameter and page/size get passed as query parameters
-    def test_get_sessions(self):
-        api_call = MagicMock()
-        self.humanloop.sessions._list_oapg = api_call
-        self.humanloop.sessions.list(project_id="test", page=2, size=100)
-        api_call.assert_called_with(
-            query_params={"page": 2, "size": 100, "project_id": "test"}
-        )
-
-    # ensure we can pass
-    # 1. list for body parameter and string for path parameter
-    # 2. list for body parameter (as first positional arg) and string for path parameter
-    def test_projects_update_feedback_type_mock(self):
-        api_call = MagicMock()
-        self.humanloop.projects._update_feedback_types_oapg = api_call
-        self.humanloop.projects.update_feedback_types(body=[], id="test")
-        self.humanloop.projects.update_feedback_types([], id="test")
-        api_call.assert_has_calls(
-            [
-                call(body=[], path_params={"id": "test"}),
-                call(body=[], path_params={"id": "test"}),
-            ]
         )
 
     def test_projects_update_feedback_type(self):
@@ -212,21 +188,18 @@ async def test_complete_stream():
 @pytest.mark.asyncio
 async def test_projects_list_async():
     response = await humanloop.projects.alist(page=1, size=10)
-    assert response.status == 200
-    assert response is not None
+    assert response.records is not None
 
 
 @pytest.mark.asyncio
 async def test_projects_update_async():
     response = await humanloop.projects.aupdate(id="project_id")
-    assert response.status == 200
-    assert response is not None
+    assert response.id is not None
 
 
 @pytest.mark.asyncio
 async def test_projects_delete_async():
     response = await humanloop.projects.adeactivate_experiment(id="project_id")
-    assert response.status == 200
     assert response is not None
 
 
@@ -234,7 +207,6 @@ async def test_projects_delete_async():
 async def test_log_async():
     response = humanloop.log(output="example", project="test")
     response = await humanloop.alog(output="example", project="test")
-    assert response.status == 200
     assert response is not None
 
 

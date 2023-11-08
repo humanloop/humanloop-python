@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -52,6 +53,18 @@ from humanloop.type.feedback_type_model import FeedbackTypeModel
 from humanloop.type.categorical_feedback_label import CategoricalFeedbackLabel
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.feedback_type_request import FeedbackTypeRequest
+
+from ...api_client import Dictionary
+from humanloop.pydantic.feedback_class import FeedbackClass as FeedbackClassPydantic
+from humanloop.pydantic.categorical_feedback_label import CategoricalFeedbackLabel as CategoricalFeedbackLabelPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.feedback_type import FeedbackType as FeedbackTypePydantic
+from humanloop.pydantic.feedback_type_model import FeedbackTypeModel as FeedbackTypeModelPydantic
+from humanloop.pydantic.feedback_type_request import FeedbackTypeRequest as FeedbackTypeRequestPydantic
+from humanloop.pydantic.label_sentiment import LabelSentiment as LabelSentimentPydantic
+from humanloop.pydantic.feedback_label_request import FeedbackLabelRequest as FeedbackLabelRequestPydantic
 
 # Path params
 IdSchema = schemas.StrSchema
@@ -386,7 +399,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class CreateFeedbackType(BaseApi):
+class CreateFeedbackTypeRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate_feedback_type(
@@ -431,6 +444,46 @@ class CreateFeedbackType(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class CreateFeedbackType(BaseApi):
+
+    async def acreate_feedback_type(
+        self,
+        type: str,
+        id: str,
+        values: typing.Optional[typing.List[FeedbackLabelRequest]] = None,
+        _class: typing.Optional[FeedbackClass] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate_feedback_type(
+            type=type,
+            id=id,
+            values=values,
+            _class=_class,
+        )
+        if validate:
+            return FeedbackTypeModelPydantic(**raw_response.body)
+        return api_client.construct_model_instance(FeedbackTypeModelPydantic, raw_response.body)
+    
+    
+    def create_feedback_type(
+        self,
+        type: str,
+        id: str,
+        values: typing.Optional[typing.List[FeedbackLabelRequest]] = None,
+        _class: typing.Optional[FeedbackClass] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create_feedback_type(
+            type=type,
+            id=id,
+            values=values,
+            _class=_class,
+        )
+        if validate:
+            return FeedbackTypeModelPydantic(**raw_response.body)
+        return api_client.construct_model_instance(FeedbackTypeModelPydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

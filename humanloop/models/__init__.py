@@ -46,6 +46,8 @@ from humanloop.model.create_experiment_request_config_ids import CreateExperimen
 from humanloop.model.create_log_response import CreateLogResponse
 from humanloop.model.create_project_request import CreateProjectRequest
 from humanloop.model.create_session_response import CreateSessionResponse
+from humanloop.model.dashboard_configuration import DashboardConfiguration
+from humanloop.model.dashboard_configuration_model_config_ids import DashboardConfigurationModelConfigIds
 from humanloop.model.data_response import DataResponse
 from humanloop.model.datapoint_response import DatapointResponse
 from humanloop.model.datapoint_response_inputs import DatapointResponseInputs
@@ -97,6 +99,7 @@ from humanloop.model.log_datapoint_request import LogDatapointRequest
 from humanloop.model.log_request import LogRequest
 from humanloop.model.log_response import LogResponse
 from humanloop.model.logs_log_response import LogsLogResponse
+from humanloop.model.metric_value_response import MetricValueResponse
 from humanloop.model.model_config_chat_request import ModelConfigChatRequest
 from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
@@ -105,6 +108,7 @@ from humanloop.model.model_config_response import ModelConfigResponse
 from humanloop.model.model_config_tool_request import ModelConfigToolRequest
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders
+from humanloop.model.observability_status import ObservabilityStatus
 from humanloop.model.paginated_data_datapoint_response import PaginatedDataDatapointResponse
 from humanloop.model.paginated_data_evaluation_datapoint_snapshot_response import PaginatedDataEvaluationDatapointSnapshotResponse
 from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse
@@ -112,6 +116,7 @@ from humanloop.model.paginated_data_project_response import PaginatedDataProject
 from humanloop.model.paginated_data_session_response import PaginatedDataSessionResponse
 from humanloop.model.positive_label import PositiveLabel
 from humanloop.model.project_config_response import ProjectConfigResponse
+from humanloop.model.project_input_response import ProjectInputResponse
 from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.model.project_model_config_request import ProjectModelConfigRequest
 from humanloop.model.project_response import ProjectResponse
@@ -125,6 +130,7 @@ from humanloop.model.provider_api_keys import ProviderApiKeys
 from humanloop.model.session_project_response import SessionProjectResponse
 from humanloop.model.session_response import SessionResponse
 from humanloop.model.sort_order import SortOrder
+from humanloop.model.time_unit import TimeUnit
 from humanloop.model.tool_call import ToolCall
 from humanloop.model.tool_config_request import ToolConfigRequest
 from humanloop.model.tool_config_response import ToolConfigResponse

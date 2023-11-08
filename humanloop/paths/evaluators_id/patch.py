@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -46,6 +47,15 @@ from humanloop.type.evaluator_response import EvaluatorResponse
 from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.update_evaluator_request import UpdateEvaluatorRequest as UpdateEvaluatorRequestPydantic
+from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumPydantic
+from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.evaluator_response import EvaluatorResponse as EvaluatorResponsePydantic
 
 from . import path
 
@@ -395,7 +405,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Update(BaseApi):
+class UpdateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aupdate(
@@ -448,6 +458,54 @@ class Update(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Update(BaseApi):
+
+    async def aupdate(
+        self,
+        id: str,
+        description: typing.Optional[str] = None,
+        name: typing.Optional[str] = None,
+        code: typing.Optional[str] = None,
+        arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
+        return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aupdate(
+            id=id,
+            description=description,
+            name=name,
+            code=code,
+            arguments_type=arguments_type,
+            return_type=return_type,
+        )
+        if validate:
+            return EvaluatorResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(EvaluatorResponsePydantic, raw_response.body)
+    
+    
+    def update(
+        self,
+        id: str,
+        description: typing.Optional[str] = None,
+        name: typing.Optional[str] = None,
+        code: typing.Optional[str] = None,
+        arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
+        return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.update(
+            id=id,
+            description=description,
+            name=name,
+            code=code,
+            arguments_type=arguments_type,
+            return_type=return_type,
+        )
+        if validate:
+            return EvaluatorResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(EvaluatorResponsePydantic, raw_response.body)
+
 
 class ApiForpatch(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -50,6 +51,17 @@ from humanloop.type.datapoint_response_target import DatapointResponseTarget
 from humanloop.type.tool_call import ToolCall
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget as DatapointResponseTargetPydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
+from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs as DatapointResponseInputsPydantic
+from humanloop.pydantic.datapoint_response import DatapointResponse as DatapointResponsePydantic
 
 # Path params
 IdSchema = schemas.StrSchema
@@ -326,7 +338,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Get(BaseApi):
+class GetRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aget(
@@ -357,6 +369,34 @@ class Get(BaseApi):
         return self._get_oapg(
             path_params=args.path,
         )
+
+class Get(BaseApi):
+
+    async def aget(
+        self,
+        id: str,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aget(
+            id=id,
+        )
+        if validate:
+            return DatapointResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(DatapointResponsePydantic, raw_response.body)
+    
+    
+    def get(
+        self,
+        id: str,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.get(
+            id=id,
+        )
+        if validate:
+            return DatapointResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(DatapointResponsePydantic, raw_response.body)
+
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

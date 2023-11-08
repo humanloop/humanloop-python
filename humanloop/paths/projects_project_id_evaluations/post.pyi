@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -60,6 +61,22 @@ from humanloop.type.validation_error import ValidationError
 from humanloop.type.evaluator_response import EvaluatorResponse
 from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.evaluation_response import EvaluationResponse as EvaluationResponsePydantic
+from humanloop.pydantic.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds as CreateEvaluationRequestEvaluatorIdsPydantic
+from humanloop.pydantic.evaluation_status import EvaluationStatus as EvaluationStatusPydantic
+from humanloop.pydantic.create_evaluation_request import CreateEvaluationRequest as CreateEvaluationRequestPydantic
+from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypePydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.dataset_response import DatasetResponse as DatasetResponsePydantic
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.evaluator_response import EvaluatorResponse as EvaluatorResponsePydantic
+from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
 
 # Path params
 ProjectIdSchema = schemas.StrSchema
@@ -397,7 +414,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Create(BaseApi):
+class CreateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate(
@@ -446,6 +463,50 @@ class Create(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Create(BaseApi):
+
+    async def acreate(
+        self,
+        config_id: str,
+        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
+        dataset_id: str,
+        project_id: str,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate(
+            config_id=config_id,
+            evaluator_ids=evaluator_ids,
+            dataset_id=dataset_id,
+            project_id=project_id,
+            provider_api_keys=provider_api_keys,
+        )
+        if validate:
+            return EvaluationResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(EvaluationResponsePydantic, raw_response.body)
+    
+    
+    def create(
+        self,
+        config_id: str,
+        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
+        dataset_id: str,
+        project_id: str,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create(
+            config_id=config_id,
+            evaluator_ids=evaluator_ids,
+            dataset_id=dataset_id,
+            project_id=project_id,
+            provider_api_keys=provider_api_keys,
+        )
+        if validate:
+            return EvaluationResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(EvaluationResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

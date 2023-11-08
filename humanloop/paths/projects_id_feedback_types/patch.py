@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -42,6 +43,13 @@ from humanloop.type.projects_update_feedback_types_request import ProjectsUpdate
 from humanloop.type.feedback_types import FeedbackTypes
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.feedback_types import FeedbackTypes as FeedbackTypesPydantic
+from humanloop.pydantic.projects_update_feedback_types_request import ProjectsUpdateFeedbackTypesRequest as ProjectsUpdateFeedbackTypesRequestPydantic
 
 from . import path
 
@@ -377,7 +385,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class UpdateFeedbackTypes(BaseApi):
+class UpdateFeedbackTypesRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aupdate_feedback_types(
@@ -414,6 +422,38 @@ class UpdateFeedbackTypes(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class UpdateFeedbackTypes(BaseApi):
+
+    async def aupdate_feedback_types(
+        self,
+        body: ProjectsUpdateFeedbackTypesRequest,
+        id: str,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aupdate_feedback_types(
+            body=body,
+            id=id,
+        )
+        if validate:
+            return RootModel[FeedbackTypesPydantic](raw_response.body).root
+        return api_client.construct_model_instance(FeedbackTypesPydantic, raw_response.body)
+    
+    
+    def update_feedback_types(
+        self,
+        body: ProjectsUpdateFeedbackTypesRequest,
+        id: str,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.update_feedback_types(
+            body=body,
+            id=id,
+        )
+        if validate:
+            return RootModel[FeedbackTypesPydantic](raw_response.body).root
+        return api_client.construct_model_instance(FeedbackTypesPydantic, raw_response.body)
+
 
 class ApiForpatch(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

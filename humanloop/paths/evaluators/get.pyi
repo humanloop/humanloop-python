@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -40,6 +41,12 @@ from humanloop.type.validation_error import ValidationError
 from humanloop.type.evaluators_list_response import EvaluatorsListResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.evaluators_list_response import EvaluatorsListResponse as EvaluatorsListResponsePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 
 SchemaFor200ResponseBodyApplicationJson = EvaluatorsListResponseSchema
 
@@ -108,7 +115,7 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        List
+        List 
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -202,7 +209,7 @@ class BaseApi(api_client.Api):
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        List
+        List 
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -255,7 +262,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class List(BaseApi):
+class ListRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def alist(
@@ -280,6 +287,30 @@ class List(BaseApi):
         )
         return self._list_oapg(
         )
+
+class List(BaseApi):
+
+    async def alist(
+        self,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.alist(
+        )
+        if validate:
+            return RootModel[EvaluatorsListResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(EvaluatorsListResponsePydantic, raw_response.body)
+    
+    
+    def list(
+        self,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.list(
+        )
+        if validate:
+            return RootModel[EvaluatorsListResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(EvaluatorsListResponsePydantic, raw_response.body)
+
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

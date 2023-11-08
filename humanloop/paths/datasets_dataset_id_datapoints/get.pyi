@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -52,6 +53,18 @@ from humanloop.type.tool_call import ToolCall
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.paginated_data_datapoint_response import PaginatedDataDatapointResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget as DatapointResponseTargetPydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
+from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.paginated_data_datapoint_response import PaginatedDataDatapointResponse as PaginatedDataDatapointResponsePydantic
+from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs as DatapointResponseInputsPydantic
+from humanloop.pydantic.datapoint_response import DatapointResponse as DatapointResponsePydantic
 
 # Query params
 PageSchema = schemas.IntSchema
@@ -404,7 +417,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class ListDatapoints(BaseApi):
+class ListDatapointsRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def alist_datapoints(
@@ -445,6 +458,42 @@ class ListDatapoints(BaseApi):
             query_params=args.query,
             path_params=args.path,
         )
+
+class ListDatapoints(BaseApi):
+
+    async def alist_datapoints(
+        self,
+        dataset_id: str,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.alist_datapoints(
+            dataset_id=dataset_id,
+            page=page,
+            size=size,
+        )
+        if validate:
+            return PaginatedDataDatapointResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(PaginatedDataDatapointResponsePydantic, raw_response.body)
+    
+    
+    def list_datapoints(
+        self,
+        dataset_id: str,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.list_datapoints(
+            dataset_id=dataset_id,
+            page=page,
+            size=size,
+        )
+        if validate:
+            return PaginatedDataDatapointResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(PaginatedDataDatapointResponsePydantic, raw_response.body)
+
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

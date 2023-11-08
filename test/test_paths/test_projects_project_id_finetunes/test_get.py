@@ -24,7 +24,7 @@ from .. import ApiTestMixin
 class TestProjectsProjectIdFinetunes(ApiTestMixin, unittest.TestCase):
     """
     ProjectsProjectIdFinetunes unit test stubs
-        List
+        List 
     """
 
     def setUp(self):

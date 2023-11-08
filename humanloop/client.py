@@ -405,7 +405,7 @@ class Humanloop(ClientCustom):
         )
 
     @copy_signature(ChatsApi.acreate_model_config)
-    async def achat_model_configuration(
+    async def achat_model_config(
         self,
         messages: typing.List[ChatMessage],
         model_config_id: str,
@@ -444,7 +444,7 @@ class Humanloop(ClientCustom):
         )
 
     @copy_signature(ChatsApi.create_model_config)
-    def chat_model_configuration(
+    def chat_model_config(
         self,
         messages: typing.List[ChatMessage],
         model_config_id: str,

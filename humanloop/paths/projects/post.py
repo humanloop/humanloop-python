@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -80,6 +81,32 @@ from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.feedback_type_request import FeedbackTypeRequest
+
+from ...api_client import Dictionary
+from humanloop.pydantic.base_metric_response import BaseMetricResponse as BaseMetricResponsePydantic
+from humanloop.pydantic.positive_label import PositiveLabel as PositiveLabelPydantic
+from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypePydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.experiment_status import ExperimentStatus as ExperimentStatusPydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.feedback_type_request import FeedbackTypeRequest as FeedbackTypeRequestPydantic
+from humanloop.pydantic.config_type import ConfigType as ConfigTypePydantic
+from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponsePydantic
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
+from humanloop.pydantic.create_project_request import CreateProjectRequest as CreateProjectRequestPydantic
+from humanloop.pydantic.feedback_class import FeedbackClass as FeedbackClassPydantic
+from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumPydantic
+from humanloop.pydantic.experiment_response import ExperimentResponse as ExperimentResponsePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.evaluator_response import EvaluatorResponse as EvaluatorResponsePydantic
+from humanloop.pydantic.project_user_response import ProjectUserResponse as ProjectUserResponsePydantic
+from humanloop.pydantic.feedback_types import FeedbackTypes as FeedbackTypesPydantic
+from humanloop.pydantic.label_sentiment import LabelSentiment as LabelSentimentPydantic
+from humanloop.pydantic.project_response import ProjectResponse as ProjectResponsePydantic
+from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse as ExperimentConfigResponsePydantic
+from humanloop.pydantic.feedback_label_request import FeedbackLabelRequest as FeedbackLabelRequestPydantic
 
 from . import path
 
@@ -154,6 +181,7 @@ class BaseApi(api_client.Api):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -161,6 +189,8 @@ class BaseApi(api_client.Api):
             _body["name"] = name
         if feedback_types is not None:
             _body["feedback_types"] = feedback_types
+        if directory_id is not None:
+            _body["directory_id"] = directory_id
         args.body = _body
         return args
 
@@ -359,13 +389,14 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Create(BaseApi):
+class CreateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate(
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
@@ -374,6 +405,7 @@ class Create(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return await self._acreate_oapg(
             body=args.body,
@@ -383,6 +415,7 @@ class Create(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -390,10 +423,47 @@ class Create(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return self._create_oapg(
             body=args.body,
         )
+
+class Create(BaseApi):
+
+    async def acreate(
+        self,
+        name: str,
+        feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate(
+            name=name,
+            feedback_types=feedback_types,
+            directory_id=directory_id,
+        )
+        if validate:
+            return ProjectResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ProjectResponsePydantic, raw_response.body)
+    
+    
+    def create(
+        self,
+        name: str,
+        feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create(
+            name=name,
+            feedback_types=feedback_types,
+            directory_id=directory_id,
+        )
+        if validate:
+            return ProjectResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ProjectResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
@@ -402,6 +472,7 @@ class ApiForpost(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
@@ -410,6 +481,7 @@ class ApiForpost(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return await self._acreate_oapg(
             body=args.body,
@@ -419,6 +491,7 @@ class ApiForpost(BaseApi):
         self,
         name: str,
         feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = None,
+        directory_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -426,6 +499,7 @@ class ApiForpost(BaseApi):
         args = self._create_mapped_args(
             name=name,
             feedback_types=feedback_types,
+            directory_id=directory_id,
         )
         return self._create_oapg(
             body=args.body,
