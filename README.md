@@ -5,17 +5,17 @@
 # Humanloop<a id="humanloop"></a>
 
 
-[![PyPI](https://img.shields.io/badge/PyPI-v0.5.18-blue)](https://pypi.org/project/humanloop/0.5.18)
+[![PyPI](https://img.shields.io/badge/PyPI-v0.5.19-blue)](https://pypi.org/project/humanloop/0.5.19)
 [![GitHub last commit](https://img.shields.io/github/last-commit/humanloop/humanloop-python.svg)](https://github.com/humanloop/humanloop-python/commits)
 [![README.md](https://img.shields.io/badge/README-Click%20Here-green)](https://github.com/humanloop/humanloop-python#readme)
 
 </div>
 
 > [!WARNING]
-> This SDK has breaking changes from `< 1.0.0` versions.
+> This SDK has breaking changes in `>= 0.6.0` versions.
 > All methods now return Pydantic models.
 >
-> ### Before (`< 1.0.0`)
+> ### Before (`< 0.6.0`)
 >
 > Previously, you had to use the `[]` syntax to access response values. This
 > required a little more code for every property access.
@@ -27,7 +27,7 @@
 > print(chat_response.body["project_id"])
 > ```
 >
-> ### After (`>= 1.0.0`)
+> ### After (`>= 0.6.0`)
 >
 > With Pydantic-based response values, you can use the `.` syntax to access. This
 > is slightly less verbose and looks more Pythonic.
@@ -39,7 +39,7 @@
 > print(chat_response.project_id)
 > ```
 >
-> To reuse existing implementations, use the `.raw` namespace as specified in the [Raw HTTP Response](#raw-http-response) section.
+> To reuse existing implementations from `< 0.6.0`, use the `.raw` namespace as specified in the [Raw HTTP Response](#raw-http-response) section.
 
 ## Table of Contents<a id="table-of-contents"></a>
 
@@ -123,7 +123,7 @@ Python >=3.7
 ## Installing<a id="installing"></a>
 
 ```sh
-pip install humanloop==0.5.18
+pip install humanloop==0.5.19
 ```
 
 ## Getting Started<a id="getting-started"></a>
@@ -247,6 +247,7 @@ except ApiException as e:
     pprint(e.status)
     pprint(e.reason)
     pprint(e.round_trip_time)
+
 ```
 
 ## Async<a id="async"></a>
@@ -293,6 +294,7 @@ async def main():
 
 
 asyncio.run(main())
+
 ```
 
 ## Raw HTTP Response<a id="raw-http-response"></a>
@@ -304,32 +306,33 @@ from pprint import pprint
 from humanloop import Humanloop, ApiException
 
 humanloop = Humanloop(
-    openai_api_key="OPENAI_API_KEY",
-    openai_azure_api_key="OPENAI_AZURE_API_KEY",
-    openai_azure_endpoint_api_key="OPENAI_AZURE_ENDPOINT_API_KEY",
-    ai21_api_key="AI21_API_KEY",
-    mock_api_key="MOCK_API_KEY",
-    anthropic_api_key="ANTHROPIC_API_KEY",
-    cohere_api_key="COHERE_API_KEY",
-    api_key="YOUR_API_KEY",
+    openai_api_key = 'OPENAI_API_KEY',
+    openai_azure_api_key = 'OPENAI_AZURE_API_KEY',
+    openai_azure_endpoint_api_key = 'OPENAI_AZURE_ENDPOINT_API_KEY',
+    ai21_api_key = 'AI21_API_KEY',
+    mock_api_key = 'MOCK_API_KEY',
+    anthropic_api_key = 'ANTHROPIC_API_KEY',
+    cohere_api_key = 'COHERE_API_KEY',
+
+    api_key = 'YOUR_API_KEY',
 )
 
 try:
     # Chat
     create_response = humanloop.chats.raw.create(
         messages=[
-            {
-                "role": "user",
-            }
-        ],
+        {
+            "role": "user",
+        }
+    ],
         model_config={
-            "model": "model_example",
-            "max_tokens": -1,
-            "temperature": 1,
-            "top_p": 1,
-            "presence_penalty": 0,
-            "frequency_penalty": 0,
-        },
+        "model": "model_example",
+        "max_tokens": -1,
+        "temperature": 1,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+    },
         project="string_example",
         project_id="string_example",
         session_id="string_example",
@@ -339,7 +342,8 @@ try:
         inputs={},
         source="string_example",
         metadata={},
-        provider_api_keys={},
+        provider_api_keys={
+    },
         num_samples=1,
         stream=False,
         user="string_example",
@@ -385,7 +389,6 @@ humanloop = Humanloop(
     anthropic_api_key="YOUR_ANTHROPIC_API_KEY",
 )
 
-
 async def main():
     response = await humanloop.chat_stream(
         project="sdk-example",
@@ -412,7 +415,6 @@ async def main():
     )
     async for token in response.content:
         print(token)
-
 
 asyncio.run(main())
 ```
@@ -449,7 +451,8 @@ create_response = humanloop.chat(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -563,7 +566,8 @@ create_deployed_response = humanloop.chat_deployed(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -678,7 +682,8 @@ create_experiment_response = humanloop.chat_experiment(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -792,7 +797,8 @@ create_model_config_response = humanloop.chat_model_config(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -909,7 +915,8 @@ create_response = humanloop.complete(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     logprobs=1,
     stream=False,
@@ -1018,7 +1025,8 @@ create_deployed_response = humanloop.complete_deployed(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     logprobs=1,
     stream=False,
@@ -1128,7 +1136,8 @@ create_experiment_response = humanloop.complete_experiment(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     logprobs=1,
     stream=False,
@@ -1237,7 +1246,8 @@ create_model_config_response = humanloop.complete_model_configuration(
     inputs={},
     source="string_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     logprobs=1,
     stream=False,
@@ -1336,7 +1346,9 @@ Delete a list of testsets by their IDs.
 
 ```python
 humanloop.datapoints.delete(
-    body=["datapoints_delete_request_example"],
+    body=[
+        "datapoints_delete_request_example"
+    ],
 )
 ```
 
@@ -1483,10 +1495,14 @@ Create a new testcase for a testset.
 ```python
 create_datapoint_response = humanloop.datasets.create_datapoint(
     body={
-        "log_ids": ["log_ids_example"],
+        "log_ids": [
+            "log_ids_example"
+        ],
     },
     dataset_id="dataset_id_example",
-    log_ids=["string_example"],
+    log_ids=[
+        "string_example"
+    ],
     inputs={
         "key": "string_example",
     },
@@ -1693,10 +1709,13 @@ Create an evaluation.
 ```python
 create_response = humanloop.evaluations.create(
     config_id="string_example",
-    evaluator_ids=["string_example"],
+    evaluator_ids=[
+        "string_example"
+    ],
     dataset_id="string_example",
     project_id="project_id_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
 )
 ```
 
@@ -2013,7 +2032,9 @@ create_response = humanloop.experiments.create(
         }
     ],
     project_id="project_id_example",
-    config_ids=["string_example"],
+    config_ids=[
+        "string_example"
+    ],
     set_active=False,
 )
 ```
@@ -2155,8 +2176,12 @@ update_response = humanloop.experiments.update(
             "value": "value_example",
         }
     ],
-    config_ids_to_register=["string_example"],
-    config_ids_to_deregister=["string_example"],
+    config_ids_to_register=[
+        "string_example"
+    ],
+    config_ids_to_deregister=[
+        "string_example"
+    ],
 )
 ```
 
@@ -2272,7 +2297,8 @@ create_response = humanloop.finetunes.create(
     },
     project_id="project_id_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
 )
 ```
 
@@ -2360,7 +2386,8 @@ summary_response = humanloop.finetunes.summary(
     },
     project_id="project_id_example",
     metadata={},
-    provider_api_keys={},
+    provider_api_keys={
+    },
 )
 ```
 
@@ -2450,7 +2477,9 @@ Delete Logs
 
 ```python
 humanloop.logs.delete(
-    id=["string_example"],
+    id=[
+        "string_example"
+    ],
 )
 ```
 
@@ -2516,7 +2545,10 @@ Log a datapoint or array of datapoints to your Humanloop project.
 
 ```python
 log_response = humanloop.log(
-    body=[{}],
+    body=[
+        {
+        }
+    ],
     project="string_example",
     project_id="string_example",
     session_id="string_example",
