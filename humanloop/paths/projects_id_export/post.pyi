@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -31,16 +32,20 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.feedback import Feedback as FeedbackSchema
+from humanloop.model.feedback_response import FeedbackResponse as FeedbackResponseSchema
 from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
+from humanloop.model.metric_value_response import MetricValueResponse as MetricValueResponseSchema
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponseSchema
 from humanloop.model.chat_role import ChatRole as ChatRoleSchema
 from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponseSchema
 from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse as PaginatedDataLogResponseSchema
 from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 from humanloop.model.config_response import ConfigResponse as ConfigResponseSchema
+from humanloop.model.tool_result_response import ToolResultResponse as ToolResultResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.evaluation_result_response import EvaluationResultResponse as EvaluationResultResponseSchema
 from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
+from humanloop.model.observability_status import ObservabilityStatus as ObservabilityStatusSchema
 from humanloop.model.tool_call import ToolCall as ToolCallSchema
 from humanloop.model.log_response import LogResponse as LogResponseSchema
 from humanloop.model.feedback_type import FeedbackType as FeedbackTypeSchema
@@ -48,18 +53,42 @@ from humanloop.model.validation_error import ValidationError as ValidationErrorS
 
 from humanloop.type.config_response import ConfigResponse
 from humanloop.type.paginated_data_log_response import PaginatedDataLogResponse
+from humanloop.type.feedback_response import FeedbackResponse
+from humanloop.type.observability_status import ObservabilityStatus
 from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.type.evaluation_result_response import EvaluationResultResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.type.tool_result_response import ToolResultResponse
 from humanloop.type.chat_role import ChatRole
-from humanloop.type.feedback import Feedback
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.validation_error import ValidationError
 from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.log_response import LogResponse
 from humanloop.type.tool_call import ToolCall
+from humanloop.type.metric_value_response import MetricValueResponse
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse as EvaluationResultResponsePydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.paginated_data_log_response import PaginatedDataLogResponse as PaginatedDataLogResponsePydantic
+from humanloop.pydantic.observability_status import ObservabilityStatus as ObservabilityStatusPydantic
+from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.feedback_type import FeedbackType as FeedbackTypePydantic
+from humanloop.pydantic.log_response import LogResponse as LogResponsePydantic
+from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponsePydantic
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.feedback_response import FeedbackResponse as FeedbackResponsePydantic
+from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.tool_result_response import ToolResultResponse as ToolResultResponsePydantic
+from humanloop.pydantic.metric_value_response import MetricValueResponse as MetricValueResponsePydantic
 
 # Query params
 PageSchema = schemas.IntSchema
@@ -412,7 +441,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Export(BaseApi):
+class ExportRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aexport(
@@ -453,6 +482,42 @@ class Export(BaseApi):
             query_params=args.query,
             path_params=args.path,
         )
+
+class Export(BaseApi):
+
+    async def aexport(
+        self,
+        id: str,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aexport(
+            id=id,
+            page=page,
+            size=size,
+        )
+        if validate:
+            return PaginatedDataLogResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(PaginatedDataLogResponsePydantic, raw_response.body)
+    
+    
+    def export(
+        self,
+        id: str,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.export(
+            id=id,
+            page=page,
+            size=size,
+        )
+        if validate:
+            return PaginatedDataLogResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(PaginatedDataLogResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

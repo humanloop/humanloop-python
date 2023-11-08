@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -54,6 +55,19 @@ from humanloop.type.positive_label import PositiveLabel
 from humanloop.type.experiment_status import ExperimentStatus
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.create_experiment_request import CreateExperimentRequest as CreateExperimentRequestPydantic
+from humanloop.pydantic.base_metric_response import BaseMetricResponse as BaseMetricResponsePydantic
+from humanloop.pydantic.experiment_response import ExperimentResponse as ExperimentResponsePydantic
+from humanloop.pydantic.positive_label import PositiveLabel as PositiveLabelPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.experiment_status import ExperimentStatus as ExperimentStatusPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.create_experiment_request_config_ids import CreateExperimentRequestConfigIds as CreateExperimentRequestConfigIdsPydantic
+from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse as ExperimentConfigResponsePydantic
 
 # Path params
 ProjectIdSchema = schemas.StrSchema
@@ -391,7 +405,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Create(BaseApi):
+class CreateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate(
@@ -440,6 +454,50 @@ class Create(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Create(BaseApi):
+
+    async def acreate(
+        self,
+        name: str,
+        positive_labels: typing.List[PositiveLabel],
+        project_id: str,
+        config_ids: typing.Optional[CreateExperimentRequestConfigIds] = None,
+        set_active: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate(
+            name=name,
+            positive_labels=positive_labels,
+            project_id=project_id,
+            config_ids=config_ids,
+            set_active=set_active,
+        )
+        if validate:
+            return ExperimentResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ExperimentResponsePydantic, raw_response.body)
+    
+    
+    def create(
+        self,
+        name: str,
+        positive_labels: typing.List[PositiveLabel],
+        project_id: str,
+        config_ids: typing.Optional[CreateExperimentRequestConfigIds] = None,
+        set_active: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create(
+            name=name,
+            positive_labels=positive_labels,
+            project_id=project_id,
+            config_ids=config_ids,
+            set_active=set_active,
+        )
+        if validate:
+            return ExperimentResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ExperimentResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

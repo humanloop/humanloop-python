@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -56,6 +57,20 @@ from humanloop.type.tool_call import ToolCall
 from humanloop.type.update_datapoint_request_target import UpdateDatapointRequestTarget
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget as DatapointResponseTargetPydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetPydantic
+from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
+from humanloop.pydantic.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestPydantic
+from humanloop.pydantic.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsPydantic
+from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs as DatapointResponseInputsPydantic
+from humanloop.pydantic.datapoint_response import DatapointResponse as DatapointResponsePydantic
 
 from . import path
 
@@ -399,7 +414,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Update(BaseApi):
+class UpdateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aupdate(
@@ -444,6 +459,46 @@ class Update(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Update(BaseApi):
+
+    async def aupdate(
+        self,
+        id: str,
+        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
+        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        target: typing.Optional[UpdateDatapointRequestTarget] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aupdate(
+            id=id,
+            inputs=inputs,
+            messages=messages,
+            target=target,
+        )
+        if validate:
+            return DatapointResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(DatapointResponsePydantic, raw_response.body)
+    
+    
+    def update(
+        self,
+        id: str,
+        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
+        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        target: typing.Optional[UpdateDatapointRequestTarget] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.update(
+            id=id,
+            inputs=inputs,
+            messages=messages,
+            target=target,
+        )
+        if validate:
+            return DatapointResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(DatapointResponsePydantic, raw_response.body)
+
 
 class ApiForpatch(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

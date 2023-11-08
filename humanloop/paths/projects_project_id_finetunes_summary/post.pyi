@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -50,6 +51,17 @@ from humanloop.type.finetune_data_summary import FinetuneDataSummary
 from humanloop.type.finetune_config import FinetuneConfig
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.finetune_config import FinetuneConfig as FinetuneConfigPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.finetune_data_summary_errors import FinetuneDataSummaryErrors as FinetuneDataSummaryErrorsPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.finetune_data_summary import FinetuneDataSummary as FinetuneDataSummaryPydantic
+from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
+from humanloop.pydantic.finetune_request import FinetuneRequest as FinetuneRequestPydantic
+from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
 
 # Path params
 ProjectIdSchema = schemas.StrSchema
@@ -390,7 +402,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Summary(BaseApi):
+class SummaryRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def asummary(
@@ -443,6 +455,54 @@ class Summary(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Summary(BaseApi):
+
+    async def asummary(
+        self,
+        name: str,
+        dataset_id: str,
+        config: FinetuneConfig,
+        project_id: str,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.asummary(
+            name=name,
+            dataset_id=dataset_id,
+            config=config,
+            project_id=project_id,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+        )
+        if validate:
+            return FinetuneDataSummaryPydantic(**raw_response.body)
+        return api_client.construct_model_instance(FinetuneDataSummaryPydantic, raw_response.body)
+    
+    
+    def summary(
+        self,
+        name: str,
+        dataset_id: str,
+        config: FinetuneConfig,
+        project_id: str,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.summary(
+            name=name,
+            dataset_id=dataset_id,
+            config=config,
+            project_id=project_id,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+        )
+        if validate:
+            return FinetuneDataSummaryPydantic(**raw_response.body)
+        return api_client.construct_model_instance(FinetuneDataSummaryPydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

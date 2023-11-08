@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -38,6 +39,11 @@ from humanloop.model.validation_error import ValidationError as ValidationErrorS
 from humanloop.type.validation_error import ValidationError
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 
 from . import path
 
@@ -336,7 +342,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class DeleteDeployedConfig(BaseApi):
+class DeleteDeployedConfigRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def adelete_deployed_config(
@@ -371,6 +377,38 @@ class DeleteDeployedConfig(BaseApi):
         return self._delete_deployed_config_oapg(
             path_params=args.path,
         )
+
+class DeleteDeployedConfig(BaseApi):
+
+    async def adelete_deployed_config(
+        self,
+        project_id: str,
+        environment_id: str,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.adelete_deployed_config(
+            project_id=project_id,
+            environment_id=environment_id,
+        )
+        if validate:
+            return Dictionary(**raw_response.body)
+        return api_client.construct_model_instance(Dictionary, raw_response.body)
+    
+    
+    def delete_deployed_config(
+        self,
+        project_id: str,
+        environment_id: str,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.delete_deployed_config(
+            project_id=project_id,
+            environment_id=environment_id,
+        )
+        if validate:
+            return Dictionary(**raw_response.body)
+        return api_client.construct_model_instance(Dictionary, raw_response.body)
+
 
 class ApiFordelete(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

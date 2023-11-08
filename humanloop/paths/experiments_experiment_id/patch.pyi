@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -56,6 +57,20 @@ from humanloop.type.experiment_status import ExperimentStatus
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.update_experiment_request import UpdateExperimentRequest
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.base_metric_response import BaseMetricResponse as BaseMetricResponsePydantic
+from humanloop.pydantic.experiment_response import ExperimentResponse as ExperimentResponsePydantic
+from humanloop.pydantic.positive_label import PositiveLabel as PositiveLabelPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.update_experiment_request import UpdateExperimentRequest as UpdateExperimentRequestPydantic
+from humanloop.pydantic.experiment_status import ExperimentStatus as ExperimentStatusPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.update_experiment_request_config_ids_to_deregister import UpdateExperimentRequestConfigIdsToDeregister as UpdateExperimentRequestConfigIdsToDeregisterPydantic
+from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse as ExperimentConfigResponsePydantic
+from humanloop.pydantic.update_experiment_request_config_ids_to_register import UpdateExperimentRequestConfigIdsToRegister as UpdateExperimentRequestConfigIdsToRegisterPydantic
 
 # Path params
 ExperimentIdSchema = schemas.StrSchema
@@ -393,7 +408,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Update(BaseApi):
+class UpdateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aupdate(
@@ -442,6 +457,50 @@ class Update(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class Update(BaseApi):
+
+    async def aupdate(
+        self,
+        experiment_id: str,
+        name: typing.Optional[str] = None,
+        positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        config_ids_to_register: typing.Optional[UpdateExperimentRequestConfigIdsToRegister] = None,
+        config_ids_to_deregister: typing.Optional[UpdateExperimentRequestConfigIdsToDeregister] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aupdate(
+            experiment_id=experiment_id,
+            name=name,
+            positive_labels=positive_labels,
+            config_ids_to_register=config_ids_to_register,
+            config_ids_to_deregister=config_ids_to_deregister,
+        )
+        if validate:
+            return ExperimentResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ExperimentResponsePydantic, raw_response.body)
+    
+    
+    def update(
+        self,
+        experiment_id: str,
+        name: typing.Optional[str] = None,
+        positive_labels: typing.Optional[typing.List[PositiveLabel]] = None,
+        config_ids_to_register: typing.Optional[UpdateExperimentRequestConfigIdsToRegister] = None,
+        config_ids_to_deregister: typing.Optional[UpdateExperimentRequestConfigIdsToDeregister] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.update(
+            experiment_id=experiment_id,
+            name=name,
+            positive_labels=positive_labels,
+            config_ids_to_register=config_ids_to_register,
+            config_ids_to_deregister=config_ids_to_deregister,
+        )
+        if validate:
+            return ExperimentResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ExperimentResponsePydantic, raw_response.body)
+
 
 class ApiForpatch(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

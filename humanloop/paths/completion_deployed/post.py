@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -52,6 +53,18 @@ from humanloop.type.usage import Usage
 from humanloop.type.completion_response import CompletionResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.tool_result_response import ToolResultResponse
+
+from ...api_client import Dictionary
+from humanloop.pydantic.completion_deployed_request import CompletionDeployedRequest as CompletionDeployedRequestPydantic
+from humanloop.pydantic.usage import Usage as UsagePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.data_response import DataResponse as DataResponsePydantic
+from humanloop.pydantic.completion_response import CompletionResponse as CompletionResponsePydantic
+from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
+from humanloop.pydantic.tool_result_response import ToolResultResponse as ToolResultResponsePydantic
+from humanloop.pydantic.completion_response_provider_responses import CompletionResponseProviderResponses as CompletionResponseProviderResponsesPydantic
 
 from . import path
 
@@ -373,7 +386,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class CreateDeployed(BaseApi):
+class CreateDeployedRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate_deployed(
@@ -464,6 +477,94 @@ class CreateDeployed(BaseApi):
         return self._create_deployed_oapg(
             body=args.body,
         )
+
+class CreateDeployed(BaseApi):
+
+    async def acreate_deployed(
+        self,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        session_reference_id: typing.Optional[str] = None,
+        parent_id: typing.Optional[str] = None,
+        parent_reference_id: typing.Optional[str] = None,
+        inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source: typing.Optional[str] = None,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        num_samples: typing.Optional[int] = None,
+        logprobs: typing.Optional[int] = None,
+        stream: typing.Optional[bool] = None,
+        suffix: typing.Optional[str] = None,
+        user: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate_deployed(
+            project=project,
+            project_id=project_id,
+            session_id=session_id,
+            session_reference_id=session_reference_id,
+            parent_id=parent_id,
+            parent_reference_id=parent_reference_id,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+            num_samples=num_samples,
+            logprobs=logprobs,
+            stream=stream,
+            suffix=suffix,
+            user=user,
+            environment=environment,
+        )
+        if validate:
+            return CompletionResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CompletionResponsePydantic, raw_response.body)
+    
+    
+    def create_deployed(
+        self,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        session_reference_id: typing.Optional[str] = None,
+        parent_id: typing.Optional[str] = None,
+        parent_reference_id: typing.Optional[str] = None,
+        inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source: typing.Optional[str] = None,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        num_samples: typing.Optional[int] = None,
+        logprobs: typing.Optional[int] = None,
+        stream: typing.Optional[bool] = None,
+        suffix: typing.Optional[str] = None,
+        user: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create_deployed(
+            project=project,
+            project_id=project_id,
+            session_id=session_id,
+            session_reference_id=session_reference_id,
+            parent_id=parent_id,
+            parent_reference_id=parent_reference_id,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+            num_samples=num_samples,
+            logprobs=logprobs,
+            stream=stream,
+            suffix=suffix,
+            user=user,
+            environment=environment,
+        )
+        if validate:
+            return CompletionResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CompletionResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -44,6 +45,14 @@ from humanloop.type.environment_request import EnvironmentRequest
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.environment_project_config_request import EnvironmentProjectConfigRequest
+
+from ...api_client import Dictionary
+from humanloop.pydantic.environment_project_config_request import EnvironmentProjectConfigRequest as EnvironmentProjectConfigRequestPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.environment_request import EnvironmentRequest as EnvironmentRequestPydantic
+from humanloop.pydantic.projects_deploy_config_to_environments_response import ProjectsDeployConfigToEnvironmentsResponse as ProjectsDeployConfigToEnvironmentsResponsePydantic
 
 # Path params
 ProjectIdSchema = schemas.StrSchema
@@ -378,7 +387,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class DeployConfig(BaseApi):
+class DeployConfigRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def adeploy_config(
@@ -423,6 +432,46 @@ class DeployConfig(BaseApi):
             body=args.body,
             path_params=args.path,
         )
+
+class DeployConfig(BaseApi):
+
+    async def adeploy_config(
+        self,
+        project_id: str,
+        config_id: typing.Optional[str] = None,
+        experiment_id: typing.Optional[str] = None,
+        environments: typing.Optional[typing.List[EnvironmentRequest]] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.adeploy_config(
+            project_id=project_id,
+            config_id=config_id,
+            experiment_id=experiment_id,
+            environments=environments,
+        )
+        if validate:
+            return RootModel[ProjectsDeployConfigToEnvironmentsResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(ProjectsDeployConfigToEnvironmentsResponsePydantic, raw_response.body)
+    
+    
+    def deploy_config(
+        self,
+        project_id: str,
+        config_id: typing.Optional[str] = None,
+        experiment_id: typing.Optional[str] = None,
+        environments: typing.Optional[typing.List[EnvironmentRequest]] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.deploy_config(
+            project_id=project_id,
+            config_id=config_id,
+            experiment_id=experiment_id,
+            environments=environments,
+        )
+        if validate:
+            return RootModel[ProjectsDeployConfigToEnvironmentsResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(ProjectsDeployConfigToEnvironmentsResponsePydantic, raw_response.body)
+
 
 class ApiForpatch(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

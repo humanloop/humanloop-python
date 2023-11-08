@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -54,6 +55,19 @@ from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.evaluation_response import EvaluationResponse
 from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.evaluation_response import EvaluationResponse as EvaluationResponsePydantic
+from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumPydantic
+from humanloop.pydantic.evaluation_status import EvaluationStatus as EvaluationStatusPydantic
+from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.evaluator_response import EvaluatorResponse as EvaluatorResponsePydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.dataset_response import DatasetResponse as DatasetResponsePydantic
 
 from . import path
 
@@ -402,7 +416,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Get(BaseApi):
+class GetRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def aget(
@@ -439,6 +453,38 @@ class Get(BaseApi):
             query_params=args.query,
             path_params=args.path,
         )
+
+class Get(BaseApi):
+
+    async def aget(
+        self,
+        id: str,
+        evaluator_aggregates: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.aget(
+            id=id,
+            evaluator_aggregates=evaluator_aggregates,
+        )
+        if validate:
+            return EvaluationResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(EvaluationResponsePydantic, raw_response.body)
+    
+    
+    def get(
+        self,
+        id: str,
+        evaluator_aggregates: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.get(
+            id=id,
+            evaluator_aggregates=evaluator_aggregates,
+        )
+        if validate:
+            return EvaluationResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(EvaluationResponsePydantic, raw_response.body)
+
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

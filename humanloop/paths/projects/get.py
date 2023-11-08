@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -77,12 +78,35 @@ from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
+from ...api_client import Dictionary
+from humanloop.pydantic.base_metric_response import BaseMetricResponse as BaseMetricResponsePydantic
+from humanloop.pydantic.positive_label import PositiveLabel as PositiveLabelPydantic
+from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypePydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.experiment_status import ExperimentStatus as ExperimentStatusPydantic
+from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
+from humanloop.pydantic.config_type import ConfigType as ConfigTypePydantic
+from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponsePydantic
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
+from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumPydantic
+from humanloop.pydantic.sort_order import SortOrder as SortOrderPydantic
+from humanloop.pydantic.experiment_response import ExperimentResponse as ExperimentResponsePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.evaluator_response import EvaluatorResponse as EvaluatorResponsePydantic
+from humanloop.pydantic.project_user_response import ProjectUserResponse as ProjectUserResponsePydantic
+from humanloop.pydantic.project_sort_by import ProjectSortBy as ProjectSortByPydantic
+from humanloop.pydantic.feedback_types import FeedbackTypes as FeedbackTypesPydantic
+from humanloop.pydantic.paginated_data_project_response import PaginatedDataProjectResponse as PaginatedDataProjectResponsePydantic
+from humanloop.pydantic.project_response import ProjectResponse as ProjectResponsePydantic
+from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse as ExperimentConfigResponsePydantic
+
 from . import path
 
 # Query params
 PageSchema = schemas.IntSchema
 SizeSchema = schemas.IntSchema
-OrganizationIdSchema = schemas.StrSchema
 FilterSchema = schemas.StrSchema
 UserFilterSchema = schemas.StrSchema
 
@@ -167,7 +191,6 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
     {
         'page': typing.Union[PageSchema, decimal.Decimal, int, ],
         'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
-        'organization_id': typing.Union[OrganizationIdSchema, str, ],
         'filter': typing.Union[FilterSchema, str, ],
         'user_filter': typing.Union[UserFilterSchema, str, ],
         'sort_by': typing.Union[SortBySchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
@@ -191,12 +214,6 @@ request_query_size = api_client.QueryParameter(
     name="size",
     style=api_client.ParameterStyle.FORM,
     schema=SizeSchema,
-    explode=True,
-)
-request_query_organization_id = api_client.QueryParameter(
-    name="organization_id",
-    style=api_client.ParameterStyle.FORM,
-    schema=OrganizationIdSchema,
     explode=True,
 )
 request_query_filter = api_client.QueryParameter(
@@ -283,7 +300,6 @@ class BaseApi(api_client.Api):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -295,8 +311,6 @@ class BaseApi(api_client.Api):
             _query_params["page"] = page
         if size is not None:
             _query_params["size"] = size
-        if organization_id is not None:
-            _query_params["organization_id"] = organization_id
         if filter is not None:
             _query_params["filter"] = filter
         if user_filter is not None:
@@ -333,7 +347,6 @@ class BaseApi(api_client.Api):
         for parameter in (
             request_query_page,
             request_query_size,
-            request_query_organization_id,
             request_query_filter,
             request_query_user_filter,
             request_query_sort_by,
@@ -449,7 +462,6 @@ class BaseApi(api_client.Api):
         for parameter in (
             request_query_page,
             request_query_size,
-            request_query_organization_id,
             request_query_filter,
             request_query_user_filter,
             request_query_sort_by,
@@ -511,14 +523,13 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class List(BaseApi):
+class ListRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def alist(
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -531,7 +542,6 @@ class List(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,
@@ -545,7 +555,6 @@ class List(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -557,7 +566,6 @@ class List(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,
@@ -567,6 +575,54 @@ class List(BaseApi):
             query_params=args.query,
         )
 
+class List(BaseApi):
+
+    async def alist(
+        self,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        filter: typing.Optional[str] = None,
+        user_filter: typing.Optional[str] = None,
+        sort_by: typing.Optional[ProjectSortBy] = None,
+        order: typing.Optional[SortOrder] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.alist(
+            page=page,
+            size=size,
+            filter=filter,
+            user_filter=user_filter,
+            sort_by=sort_by,
+            order=order,
+        )
+        if validate:
+            return PaginatedDataProjectResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(PaginatedDataProjectResponsePydantic, raw_response.body)
+    
+    
+    def list(
+        self,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        filter: typing.Optional[str] = None,
+        user_filter: typing.Optional[str] = None,
+        sort_by: typing.Optional[ProjectSortBy] = None,
+        order: typing.Optional[SortOrder] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.list(
+            page=page,
+            size=size,
+            filter=filter,
+            user_filter=user_filter,
+            sort_by=sort_by,
+            order=order,
+        )
+        if validate:
+            return PaginatedDataProjectResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(PaginatedDataProjectResponsePydantic, raw_response.body)
+
+
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
@@ -574,7 +630,6 @@ class ApiForget(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -587,7 +642,6 @@ class ApiForget(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,
@@ -601,7 +655,6 @@ class ApiForget(BaseApi):
         self,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
-        organization_id: typing.Optional[str] = None,
         filter: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
@@ -613,7 +666,6 @@ class ApiForget(BaseApi):
         args = self._list_mapped_args(
             page=page,
             size=size,
-            organization_id=organization_id,
             filter=filter,
             user_filter=user_filter,
             sort_by=sort_by,

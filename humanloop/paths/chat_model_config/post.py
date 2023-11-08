@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -58,6 +59,21 @@ from humanloop.type.tool_call import ToolCall
 from humanloop.type.usage import Usage
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.chat_response import ChatResponse as ChatResponsePydantic
+from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
+from humanloop.pydantic.chat_response_provider_responses import ChatResponseProviderResponses as ChatResponseProviderResponsesPydantic
+from humanloop.pydantic.chat_data_response import ChatDataResponse as ChatDataResponsePydantic
+from humanloop.pydantic.chat_model_config_request import ChatModelConfigRequest as ChatModelConfigRequestPydantic
+from humanloop.pydantic.usage import Usage as UsagePydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
+from humanloop.pydantic.tool_result_response import ToolResultResponse as ToolResultResponsePydantic
 
 from . import path
 
@@ -379,7 +395,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class CreateModelConfig(BaseApi):
+class CreateModelConfigRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def acreate_model_config(
@@ -470,6 +486,94 @@ class CreateModelConfig(BaseApi):
         return self._create_model_config_oapg(
             body=args.body,
         )
+
+class CreateModelConfig(BaseApi):
+
+    async def acreate_model_config(
+        self,
+        messages: typing.List[ChatMessage],
+        model_config_id: str,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        session_reference_id: typing.Optional[str] = None,
+        parent_id: typing.Optional[str] = None,
+        parent_reference_id: typing.Optional[str] = None,
+        inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source: typing.Optional[str] = None,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        num_samples: typing.Optional[int] = None,
+        stream: typing.Optional[bool] = None,
+        user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.acreate_model_config(
+            messages=messages,
+            model_config_id=model_config_id,
+            project=project,
+            project_id=project_id,
+            session_id=session_id,
+            session_reference_id=session_reference_id,
+            parent_id=parent_id,
+            parent_reference_id=parent_reference_id,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+            num_samples=num_samples,
+            stream=stream,
+            user=user,
+            tool_call=tool_call,
+        )
+        if validate:
+            return ChatResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ChatResponsePydantic, raw_response.body)
+    
+    
+    def create_model_config(
+        self,
+        messages: typing.List[ChatMessage],
+        model_config_id: str,
+        project: typing.Optional[str] = None,
+        project_id: typing.Optional[str] = None,
+        session_id: typing.Optional[str] = None,
+        session_reference_id: typing.Optional[str] = None,
+        parent_id: typing.Optional[str] = None,
+        parent_reference_id: typing.Optional[str] = None,
+        inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source: typing.Optional[str] = None,
+        metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
+        num_samples: typing.Optional[int] = None,
+        stream: typing.Optional[bool] = None,
+        user: typing.Optional[str] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.create_model_config(
+            messages=messages,
+            model_config_id=model_config_id,
+            project=project,
+            project_id=project_id,
+            session_id=session_id,
+            session_reference_id=session_reference_id,
+            parent_id=parent_id,
+            parent_reference_id=parent_reference_id,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            provider_api_keys=provider_api_keys,
+            num_samples=num_samples,
+            stream=stream,
+            user=user,
+            tool_call=tool_call,
+        )
+        if validate:
+            return ChatResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(ChatResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

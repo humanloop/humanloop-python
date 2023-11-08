@@ -24,7 +24,7 @@ from .. import ApiTestMixin
 class TestSessions(ApiTestMixin, unittest.TestCase):
     """
     Sessions unit test stubs
-        List
+        List 
     """
 
     def setUp(self):

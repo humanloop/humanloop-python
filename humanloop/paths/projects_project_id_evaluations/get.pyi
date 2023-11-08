@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -40,6 +41,12 @@ from humanloop.type.validation_error import ValidationError
 from humanloop.type.evaluations_get_for_project_response import EvaluationsGetForProjectResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.evaluations_get_for_project_response import EvaluationsGetForProjectResponse as EvaluationsGetForProjectResponsePydantic
 
 # Query params
 EvaluatorAggregatesSchema = schemas.BoolSchema
@@ -379,7 +386,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class ListAllForProject(BaseApi):
+class ListAllForProjectRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def alist_all_for_project(
@@ -416,6 +423,38 @@ class ListAllForProject(BaseApi):
             query_params=args.query,
             path_params=args.path,
         )
+
+class ListAllForProject(BaseApi):
+
+    async def alist_all_for_project(
+        self,
+        project_id: str,
+        evaluator_aggregates: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.alist_all_for_project(
+            project_id=project_id,
+            evaluator_aggregates=evaluator_aggregates,
+        )
+        if validate:
+            return RootModel[EvaluationsGetForProjectResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(EvaluationsGetForProjectResponsePydantic, raw_response.body)
+    
+    
+    def list_all_for_project(
+        self,
+        project_id: str,
+        evaluator_aggregates: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.list_all_for_project(
+            project_id=project_id,
+            evaluator_aggregates=evaluator_aggregates,
+        )
+        if validate:
+            return RootModel[EvaluationsGetForProjectResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(EvaluationsGetForProjectResponsePydantic, raw_response.body)
+
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

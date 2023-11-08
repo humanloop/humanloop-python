@@ -24,6 +24,7 @@ import typing
 import typing_extensions
 import aiohttp
 import urllib3
+from pydantic import BaseModel, RootModel, ValidationError
 from urllib3._collections import HTTPHeaderDict
 from urllib.parse import urlparse, quote
 from urllib3.fields import RequestField as RequestFieldBase
@@ -64,6 +65,97 @@ class RequestField(RequestFieldBase):
         if not isinstance(other, RequestField):
             return False
         return self.__dict__ == other.__dict__
+
+
+T = typing.TypeVar('T')
+
+
+def closest_type_match(value: typing.Any, types: typing.List[typing.Type]) -> typing.Type:
+    best_match = None
+
+    for t in types:
+        # Check for generic types
+        origin = typing_extensions.get_origin(t)
+        args = typing_extensions.get_args(t)
+
+        # Check for Literal types
+        if origin == typing_extensions.Literal:
+            if value in args:
+                best_match = t
+                continue
+
+        # Check for Pydantic models and non-generic types
+        if isinstance(t, type):  # Ensure t is a class
+            if issubclass(t, BaseModel):
+                if isinstance(value, dict):
+                    try:
+                        t(**value)
+                        best_match = t
+                    except ValidationError:
+                        continue
+            else:  # This is a non-generic type
+                if isinstance(value, t):
+                    if best_match is None or issubclass(best_match, t):
+                        best_match = t
+                continue
+
+        # Check for generic list type
+        if origin == list and isinstance(value, list):
+            if args and issubclass(args[0], BaseModel):
+                try:
+                    [args[0](**item) for item in value]
+                    best_match = t
+                except ValidationError:
+                    continue
+            elif best_match is None or (typing_extensions.get_origin(best_match) == list and len(
+                    typing_extensions.get_args(best_match)) < len(args)):
+                if args and all(isinstance(item, args[0]) for item in value):
+                    best_match = t
+
+    return best_match
+
+
+def construct_model_instance(model: typing.Type[T], data: typing.Any) -> T:
+    """
+    Recursively construct an instance of a Pydantic model along with its nested models.
+    """
+
+    # if model is Union,
+    if typing_extensions.get_origin(model) is typing.Union:
+        best_type = closest_type_match(data, model.__args__)
+        return construct_model_instance(best_type, data)
+    # if model is scalar value like str, number, etc., use RootModel to construct
+    elif isinstance(model, type):
+        model = RootModel[model]
+        # try to coerce value to model type
+        try:
+            return model(data).root
+        except ValidationError as e:
+            pass
+        # if not possible, give  up
+        return model.model_construct(data).root
+    # if model is list, iterate over list and recursively call
+    elif typing_extensions.get_origin(model) is list:
+        item_model = typing_extensions.get_args(model)[0]
+        return [construct_model_instance(item_model, item) for item in data]
+    # if model is BaseModel, iterate over fields and recursively call
+    elif issubclass(model, BaseModel):
+        new_data = {}
+        for field_name, field_type in model.__annotations__.items():
+            if field_name in data:
+                new_data[field_name] = construct_model_instance(field_type, data[field_name])
+        return model.model_construct(**data)
+    raise ApiTypeError(f"Unable to construct model instance of type {model}")
+
+
+class Dictionary(BaseModel):
+    """
+    For free-form objects that can have any keys and values
+    (i.e. "type: object" with no properties)
+    """
+    class Config:
+        extra = 'allow'
+
 
 def DeprecationWarningOnce(func=None, *, prefix=None):
     def decorator(func):

@@ -63,11 +63,13 @@ class UpdateProjectRequest(
             
                 def __getitem__(self, i: int) -> 'PositiveLabel':
                     return super().__getitem__(i)
+            directory_id = schemas.StrSchema
             __annotations__ = {
                 "name": name,
                 "active_experiment_id": active_experiment_id,
                 "active_config_id": active_config_id,
                 "positive_labels": positive_labels,
+                "directory_id": directory_id,
             }
     
     @typing.overload
@@ -83,9 +85,12 @@ class UpdateProjectRequest(
     def __getitem__(self, name: typing_extensions.Literal["positive_labels"]) -> MetaOapg.properties.positive_labels: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["directory_id"]) -> MetaOapg.properties.directory_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "active_experiment_id", "active_config_id", "positive_labels", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "active_experiment_id", "active_config_id", "positive_labels", "directory_id", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -103,9 +108,12 @@ class UpdateProjectRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["positive_labels"]) -> typing.Union[MetaOapg.properties.positive_labels, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["directory_id"]) -> typing.Union[MetaOapg.properties.directory_id, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "active_experiment_id", "active_config_id", "positive_labels", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "active_experiment_id", "active_config_id", "positive_labels", "directory_id", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -116,6 +124,7 @@ class UpdateProjectRequest(
         active_experiment_id: typing.Union[MetaOapg.properties.active_experiment_id, str, schemas.Unset] = schemas.unset,
         active_config_id: typing.Union[MetaOapg.properties.active_config_id, str, schemas.Unset] = schemas.unset,
         positive_labels: typing.Union[MetaOapg.properties.positive_labels, list, tuple, schemas.Unset] = schemas.unset,
+        directory_id: typing.Union[MetaOapg.properties.directory_id, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'UpdateProjectRequest':
@@ -126,6 +135,7 @@ class UpdateProjectRequest(
             active_experiment_id=active_experiment_id,
             active_config_id=active_config_id,
             positive_labels=positive_labels,
+            directory_id=directory_id,
             _configuration=_configuration,
             **kwargs,
         )

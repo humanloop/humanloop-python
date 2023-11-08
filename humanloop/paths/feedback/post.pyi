@@ -12,6 +12,7 @@
 from dataclasses import dataclass
 import typing_extensions
 import urllib3
+from pydantic import RootModel
 from humanloop.request_before_hook import request_before_hook
 import json
 from urllib3._collections import HTTPHeaderDict
@@ -44,6 +45,14 @@ from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.feedback_submit_response import FeedbackSubmitResponse
 from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
+
+from ...api_client import Dictionary
+from humanloop.pydantic.feedback_submit_request import FeedbackSubmitRequest as FeedbackSubmitRequestPydantic
+from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.feedback_type import FeedbackType as FeedbackTypePydantic
+from humanloop.pydantic.feedback_submit_response import FeedbackSubmitResponse as FeedbackSubmitResponsePydantic
 
 # body param
 SchemaForRequestBodyApplicationJson = FeedbackSubmitRequestSchema
@@ -327,7 +336,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class Feedback(BaseApi):
+class FeedbackRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
     async def afeedback(
@@ -382,6 +391,58 @@ class Feedback(BaseApi):
         return self._feedback_oapg(
             body=args.body,
         )
+
+class Feedback(BaseApi):
+
+    async def afeedback(
+        self,
+        body: typing.Optional[FeedbackSubmitRequest] = None,
+        type: typing.Optional[typing.Union[FeedbackType, str]] = None,
+        value: typing.Optional[str] = None,
+        data_id: typing.Optional[str] = None,
+        user: typing.Optional[str] = None,
+        created_at: typing.Optional[datetime] = None,
+        unset: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = await self.raw.afeedback(
+            body=body,
+            type=type,
+            value=value,
+            data_id=data_id,
+            user=user,
+            created_at=created_at,
+            unset=unset,
+        )
+        if validate:
+            return RootModel[FeedbackSubmitResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(FeedbackSubmitResponsePydantic, raw_response.body)
+    
+    
+    def feedback(
+        self,
+        body: typing.Optional[FeedbackSubmitRequest] = None,
+        type: typing.Optional[typing.Union[FeedbackType, str]] = None,
+        value: typing.Optional[str] = None,
+        data_id: typing.Optional[str] = None,
+        user: typing.Optional[str] = None,
+        created_at: typing.Optional[datetime] = None,
+        unset: typing.Optional[bool] = None,
+        validate: bool = False,
+    ):
+        raw_response = self.raw.feedback(
+            body=body,
+            type=type,
+            value=value,
+            data_id=data_id,
+            user=user,
+            created_at=created_at,
+            unset=unset,
+        )
+        if validate:
+            return RootModel[FeedbackSubmitResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(FeedbackSubmitResponsePydantic, raw_response.body)
+
 
 class ApiForpost(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names

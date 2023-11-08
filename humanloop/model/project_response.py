@@ -182,6 +182,7 @@ class ProjectResponse(
             
                 def __getitem__(self, i: int) -> 'EvaluatorResponse':
                     return super().__getitem__(i)
+            directory_id = schemas.StrSchema
             __annotations__ = {
                 "id": id,
                 "name": name,
@@ -195,6 +196,7 @@ class ProjectResponse(
                 "active_config": active_config,
                 "config_type": config_type,
                 "active_evaluators": active_evaluators,
+                "directory_id": directory_id,
             }
     
     feedback_types: 'FeedbackTypes'
@@ -243,9 +245,12 @@ class ProjectResponse(
     def __getitem__(self, name: typing_extensions.Literal["active_evaluators"]) -> MetaOapg.properties.active_evaluators: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["directory_id"]) -> MetaOapg.properties.directory_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "name", "users", "data_count", "feedback_types", "team_id", "created_at", "updated_at", "active_experiment", "active_config", "config_type", "active_evaluators", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "name", "users", "data_count", "feedback_types", "team_id", "created_at", "updated_at", "active_experiment", "active_config", "config_type", "active_evaluators", "directory_id", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -287,9 +292,12 @@ class ProjectResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["active_evaluators"]) -> typing.Union[MetaOapg.properties.active_evaluators, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["directory_id"]) -> typing.Union[MetaOapg.properties.directory_id, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "name", "users", "data_count", "feedback_types", "team_id", "created_at", "updated_at", "active_experiment", "active_config", "config_type", "active_evaluators", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "name", "users", "data_count", "feedback_types", "team_id", "created_at", "updated_at", "active_experiment", "active_config", "config_type", "active_evaluators", "directory_id", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -308,6 +316,7 @@ class ProjectResponse(
         active_config: typing.Union[MetaOapg.properties.active_config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         config_type: typing.Union['ConfigType', schemas.Unset] = schemas.unset,
         active_evaluators: typing.Union[MetaOapg.properties.active_evaluators, list, tuple, schemas.Unset] = schemas.unset,
+        directory_id: typing.Union[MetaOapg.properties.directory_id, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ProjectResponse':
@@ -326,6 +335,7 @@ class ProjectResponse(
             active_config=active_config,
             config_type=config_type,
             active_evaluators=active_evaluators,
+            directory_id=directory_id,
             _configuration=_configuration,
             **kwargs,
         )
