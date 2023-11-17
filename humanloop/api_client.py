@@ -1242,7 +1242,7 @@ class ApiClient:
             self.default_headers[header_name] = header_value
         self.cookie = cookie
         # Set default User-Agent.
-        self.user_agent = 'Konfig/0.6.0-rc.1/python'
+        self.user_agent = 'Konfig/0.6.0-rc.2/python'
 
     def __enter__(self):
         return self
@@ -1559,8 +1559,6 @@ class ApiClient:
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         **kwargs
     ) -> AsyncResponseWrapper:
-        if timeout is None:
-            timeout = 600
         if body and fields:
             raise ApiValueError("body parameter cannot be used with fields parameter")
         data = None
