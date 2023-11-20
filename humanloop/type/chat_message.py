@@ -16,6 +16,8 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_role import ChatRole
 from humanloop.type.function_tool import FunctionTool
+from humanloop.type.image_chat_content import ImageChatContent
+from humanloop.type.text_chat_content import TextChatContent
 from humanloop.type.tool_call import ToolCall
 
 class RequiredChatMessage(TypedDict):
@@ -24,7 +26,7 @@ class RequiredChatMessage(TypedDict):
 
 class OptionalChatMessage(TypedDict, total=False):
     # The content of the message.
-    content: typing.Optional[str]
+    content: typing.Union[str, typing.List[typing.Union[typing.List[TextChatContent], typing.List[ImageChatContent]]]]
 
     # Optional name of the message author.
     name: typing.Optional[str]

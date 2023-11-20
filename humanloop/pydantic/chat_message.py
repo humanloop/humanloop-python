@@ -17,6 +17,8 @@ from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.function_tool import FunctionTool
+from humanloop.pydantic.image_chat_content import ImageChatContent
+from humanloop.pydantic.text_chat_content import TextChatContent
 from humanloop.pydantic.tool_call import ToolCall
 
 class ChatMessage(BaseModel):
@@ -24,7 +26,7 @@ class ChatMessage(BaseModel):
     role: ChatRole = Field(alias='role')
 
     # The content of the message.
-    content: typing.Optional[typing.Optional[str]] = Field(None, alias='content')
+    content: typing.Optional[typing.Union[str, typing.List[typing.Union[typing.List[TextChatContent], typing.List[ImageChatContent]]]]] = Field(None, alias='content')
 
     # Optional name of the message author.
     name: typing.Optional[typing.Optional[str]] = Field(None, alias='name')

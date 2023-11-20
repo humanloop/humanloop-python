@@ -97,6 +97,8 @@ from humanloop.model.generic_config_request import GenericConfigRequest
 from humanloop.model.generic_config_response import GenericConfigResponse
 from humanloop.model.get_model_config_response import GetModelConfigResponse
 from humanloop.model.http_validation_error import HTTPValidationError
+from humanloop.model.image_chat_content import ImageChatContent
+from humanloop.model.image_url import ImageUrl
 from humanloop.model.label_sentiment import LabelSentiment
 from humanloop.model.log_datapoint_request import LogDatapointRequest
 from humanloop.model.log_request import LogRequest
@@ -134,6 +136,7 @@ from humanloop.model.response_format import ResponseFormat
 from humanloop.model.session_project_response import SessionProjectResponse
 from humanloop.model.session_response import SessionResponse
 from humanloop.model.sort_order import SortOrder
+from humanloop.model.text_chat_content import TextChatContent
 from humanloop.model.time_unit import TimeUnit
 from humanloop.model.tool_call import ToolCall
 from humanloop.model.tool_choice import ToolChoice
