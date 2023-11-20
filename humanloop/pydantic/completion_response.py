@@ -12,12 +12,11 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.pydantic.data_response import DataResponse
-from humanloop.pydantic.tool_result_response import ToolResultResponse
 from humanloop.pydantic.usage import Usage
 
 class CompletionResponse(BaseModel):
@@ -27,22 +26,22 @@ class CompletionResponse(BaseModel):
     provider_responses: CompletionResponseProviderResponses = Field(alias='provider_responses')
 
     # Unique identifier of the parent project. Will not be provided if the request was made without providing a project name or id
-    project_id: str = Field(None, alias='project_id')
+    project_id: typing.Optional[str] = Field(None, alias='project_id')
 
     # How many completions to make for each set of inputs.
-    num_samples: int = Field(None, alias='num_samples')
+    num_samples: typing.Optional[int] = Field(None, alias='num_samples')
 
     # Include the log probabilities of the top n tokens in the provider_response
-    logprobs: int = Field(None, alias='logprobs')
+    logprobs: typing.Optional[int] = Field(None, alias='logprobs')
 
     # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
-    suffix: str = Field(None, alias='suffix')
+    suffix: typing.Optional[str] = Field(None, alias='suffix')
 
     # End-user ID passed through to provider call.
-    user: str = Field(None, alias='user')
+    user: typing.Optional[str] = Field(None, alias='user')
 
     # Counts of the number of tokens used and related stats.
-    usage: Usage = Field(None, alias='usage')
+    usage: typing.Optional[Usage] = Field(None, alias='usage')
 
     # Any additional metadata to record.
-    metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='metadata')
+    metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')

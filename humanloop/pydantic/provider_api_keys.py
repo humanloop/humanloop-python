@@ -12,21 +12,21 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
 class ProviderApiKeys(BaseModel):
-    openai: str = Field(None, alias='openai')
+    openai: typing.Optional[str] = Field(None, alias='openai')
 
-    ai21: str = Field(None, alias='ai21')
+    ai21: typing.Optional[str] = Field(None, alias='ai21')
 
-    mock: str = Field(None, alias='mock')
+    mock: typing.Optional[str] = Field(None, alias='mock')
 
-    anthropic: str = Field(None, alias='anthropic')
+    anthropic: typing.Optional[str] = Field(None, alias='anthropic')
 
-    cohere: str = Field(None, alias='cohere')
+    cohere: typing.Optional[str] = Field(None, alias='cohere')
 
-    openai_azure: str = Field(None, alias='openai_azure')
+    openai_azure: typing.Optional[str] = Field(None, alias='openai_azure')
 
-    openai_azure_endpoint: str = Field(None, alias='openai_azure_endpoint')
+    openai_azure_endpoint: typing.Optional[str] = Field(None, alias='openai_azure_endpoint')

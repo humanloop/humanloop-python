@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.config_response import ConfigResponse
@@ -38,7 +38,7 @@ class ExperimentConfigResponse(BaseModel):
     updated_at: datetime = Field(alias='updated_at')
 
     # The mean performance of the model config.
-    mean: typing.Union[int, float] = Field(None, alias='mean')
+    mean: typing.Optional[typing.Union[int, float]] = Field(None, alias='mean')
 
     # The spread of performance of the model config.
-    spread: typing.Union[int, float] = Field(None, alias='spread')
+    spread: typing.Optional[typing.Union[int, float]] = Field(None, alias='spread')

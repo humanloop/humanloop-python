@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -25,8 +25,8 @@ class EvaluationResultResponse(BaseModel):
 
     updated_at: datetime = Field(alias='updated_at')
 
-    evaluation_id: str = Field(None, alias='evaluation_id')
+    evaluation_id: typing.Optional[str] = Field(None, alias='evaluation_id')
 
-    value: typing.Union[bool, typing.Union[int, float]] = Field(None, alias='value')
+    value: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = Field(None, alias='value')
 
-    error: str = Field(None, alias='error')
+    error: typing.Optional[str] = Field(None, alias='error')

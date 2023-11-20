@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -20,10 +20,10 @@ class GenericConfigRequest(BaseModel):
     type: str = Field(alias='type')
 
     # A description of the model config.
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # A friendly display name for the model config. If not provided, a name will be generated.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')
 
     # Other parameters that define the config.
-    other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
+    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')

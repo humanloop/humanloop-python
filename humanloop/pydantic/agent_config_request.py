@@ -12,16 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.model_config_request import ModelConfigRequest
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
-from humanloop.pydantic.model_endpoints import ModelEndpoints
-from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
 from humanloop.pydantic.tool_config_request import ToolConfigRequest
 
 class AgentConfigRequest(BaseModel):
@@ -34,13 +28,13 @@ class AgentConfigRequest(BaseModel):
     model_config_: ModelConfigRequest = Field(alias='model_config')
 
     # A description of the model config.
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # A friendly display name for the model config. If not provided, a name will be generated.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')
 
     # Tools to associate with the agent.
-    tools: typing.List[ToolConfigRequest] = Field(None, alias='tools')
+    tools: typing.Optional[typing.List[ToolConfigRequest]] = Field(None, alias='tools')
 
     # Other parameters that define the config.
-    other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
+    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')

@@ -12,11 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.base_metric_response import BaseMetricResponse
-from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse
 from humanloop.pydantic.experiment_status import ExperimentStatus
 from humanloop.pydantic.positive_label import PositiveLabel
@@ -45,4 +44,4 @@ class ExperimentResponse(BaseModel):
     updated_at: datetime = Field(alias='updated_at')
 
     # List of configs associated to the experiment.
-    configs: typing.List[ExperimentConfigResponse] = Field(None, alias='configs')
+    configs: typing.Optional[typing.List[ExperimentConfigResponse]] = Field(None, alias='configs')

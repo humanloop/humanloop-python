@@ -12,13 +12,12 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
-from humanloop.type.tool_call import ToolCall
+from humanloop.type.response_format import ResponseFormat
 from humanloop.type.tool_config_response import ToolConfigResponse
 
 class RequiredModelConfigResponse(TypedDict):
@@ -61,6 +60,9 @@ class OptionalModelConfigResponse(TypedDict, total=False):
     # Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
     frequency_penalty: typing.Union[int, float]
 
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int
+
     # Prompt template that will take your specified inputs to form your final request to the model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
     prompt_template: str
 
@@ -72,6 +74,9 @@ class OptionalModelConfigResponse(TypedDict, total=False):
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat
 
 class ModelConfigResponse(RequiredModelConfigResponse, OptionalModelConfigResponse):
     pass

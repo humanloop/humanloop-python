@@ -12,12 +12,11 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.dataset_response import DatasetResponse
 from humanloop.pydantic.finetune_config import FinetuneConfig
-from humanloop.pydantic.model_providers import ModelProviders
 
 class FinetuneResponse(BaseModel):
     # Unique identifier for fine-tuned model.
@@ -39,16 +38,16 @@ class FinetuneResponse(BaseModel):
     updated_at: datetime = Field(alias='updated_at')
 
     # Unique reference for the fine-tuned required to make calls to the provider.
-    model_name_: str = Field(None, alias='model_name')
+    model_name_: typing.Optional[str] = Field(None, alias='model_name')
 
     # Any additional metadata that you would like to log for reference.
-    metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='metadata')
+    metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
 
     # Unique ID for the fine-tuned model required to make calls to the provider's API.
-    provider_id: str = Field(None, alias='provider_id')
+    provider_id: typing.Optional[str] = Field(None, alias='provider_id')
 
     # Provider specific fine-tuning results.
-    provider_details: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='provider_details')
+    provider_details: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='provider_details')
 
     # Summary stats about the data used for finetuning.
-    data_summary: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='data_summary')
+    data_summary: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='data_summary')

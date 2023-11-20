@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.config_response import ConfigResponse
@@ -35,13 +35,13 @@ class ProjectConfigResponse(BaseModel):
     config: ConfigResponse = Field(alias='config')
 
     # Feedback statistics for the project model config.
-    feedback_stats: typing.List[ProjectModelConfigFeedbackStatsResponse] = Field(None, alias='feedback_stats')
+    feedback_stats: typing.Optional[typing.List[ProjectModelConfigFeedbackStatsResponse]] = Field(None, alias='feedback_stats')
 
     # Number of datapoints associated with this project model config.
-    num_datapoints: int = Field(None, alias='num_datapoints')
+    num_datapoints: typing.Optional[int] = Field(None, alias='num_datapoints')
 
     # The ID of the experiment the model config has been registered to. Only populated when registering a model config to an experiment.
-    experiment_id: str = Field(None, alias='experiment_id')
+    experiment_id: typing.Optional[str] = Field(None, alias='experiment_id')
 
     # Aggregates of evaluators for the model config.
-    evaluation_aggregates: typing.List[ModelConfigEvaluatorAggregateResponse] = Field(None, alias='evaluation_aggregates')
+    evaluation_aggregates: typing.Optional[typing.List[ModelConfigEvaluatorAggregateResponse]] = Field(None, alias='evaluation_aggregates')

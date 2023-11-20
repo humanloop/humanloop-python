@@ -12,19 +12,18 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.feedback_class import FeedbackClass
 from humanloop.pydantic.feedback_label_request import FeedbackLabelRequest
-from humanloop.pydantic.label_sentiment import LabelSentiment
 
 class FeedbackTypeRequest(BaseModel):
     # The type of feedback to update.
     type: str = Field(alias='type')
 
     # The feedback values to be available. This field should only be populated when updating a 'select' or 'multi_select' feedback class.
-    values: typing.List[FeedbackLabelRequest] = Field(None, alias='values')
+    values: typing.Optional[typing.List[FeedbackLabelRequest]] = Field(None, alias='values')
 
     # The data type associated to this feedback type; whether it is a 'text'/'select'/'multi_select'. This is optional when updating the default feedback types (i.e. when `type` is 'rating', 'action' or 'issue').
-    class_: FeedbackClass = Field(None, alias='class')
+    class_: typing.Optional[FeedbackClass] = Field(None, alias='class')

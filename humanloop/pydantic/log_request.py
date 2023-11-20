@@ -12,73 +12,67 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.agent_config_request import AgentConfigRequest
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.feedback import Feedback
-from humanloop.pydantic.feedback_type import FeedbackType
 from humanloop.pydantic.generic_config_request import GenericConfigRequest
 from humanloop.pydantic.model_config_request import ModelConfigRequest
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
-from humanloop.pydantic.model_endpoints import ModelEndpoints
-from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
 from humanloop.pydantic.tool_config_request import ToolConfigRequest
 
 class LogRequest(BaseModel):
     # Unique project name. If no project exists with this name, a new project will be created.
-    project: str = Field(None, alias='project')
+    project: typing.Optional[str] = Field(None, alias='project')
 
     # Unique ID of a project to associate to the log. Either this or `project` must be provided.
-    project_id: str = Field(None, alias='project_id')
+    project_id: typing.Optional[str] = Field(None, alias='project_id')
 
     # ID of the session to associate the datapoint.
-    session_id: str = Field(None, alias='session_id')
+    session_id: typing.Optional[str] = Field(None, alias='session_id')
 
     # A unique string identifying the session to associate the datapoint to. Allows you to log multiple datapoints to a session (using an ID kept by your internal systems) by passing the same `session_reference_id` in subsequent log requests. Specify at most one of this or `session_id`.
-    session_reference_id: str = Field(None, alias='session_reference_id')
+    session_reference_id: typing.Optional[str] = Field(None, alias='session_reference_id')
 
     # ID associated to the parent datapoint in a session.
-    parent_id: str = Field(None, alias='parent_id')
+    parent_id: typing.Optional[str] = Field(None, alias='parent_id')
 
     # A unique string identifying the previously-logged parent datapoint in a session. Allows you to log nested datapoints with your internal system IDs by passing the same reference ID as `parent_id` in a prior log request. Specify at most one of this or `parent_id`. Note that this cannot refer to a datapoint being logged in the same request.
-    parent_reference_id: str = Field(None, alias='parent_reference_id')
+    parent_reference_id: typing.Optional[str] = Field(None, alias='parent_reference_id')
 
     # The inputs passed to the prompt template.
-    inputs: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='inputs')
+    inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='inputs')
 
     # Identifies where the model was called from.
-    source: str = Field(None, alias='source')
+    source: typing.Optional[str] = Field(None, alias='source')
 
     # Any additional metadata to record.
-    metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='metadata')
+    metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
 
     # A unique string to reference the datapoint. Allows you to log nested datapoints with your internal system IDs by passing the same reference ID as `parent_id` in a subsequent log request.
-    reference_id: str = Field(None, alias='reference_id')
+    reference_id: typing.Optional[str] = Field(None, alias='reference_id')
 
     # Unique ID of an experiment trial to associate to the log.
-    trial_id: str = Field(None, alias='trial_id')
+    trial_id: typing.Optional[str] = Field(None, alias='trial_id')
 
     # The messages passed to the to provider chat endpoint.
-    messages: typing.List[ChatMessage] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
 
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
-    output: str = Field(None, alias='output')
+    output: typing.Optional[str] = Field(None, alias='output')
 
     # The model config used for this generation. Required unless `trial_id` is provided.
-    config: typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest] = Field(None, alias='config')
+    config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = Field(None, alias='config')
 
     # Optional parameter to provide feedback with your logged datapoint.
-    feedback: typing.Union[Feedback, typing.List[Feedback]] = Field(None, alias='feedback')
+    feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = Field(None, alias='feedback')
 
     # User defined timestamp for when the log was created. 
-    created_at: datetime = Field(None, alias='created_at')
+    created_at: typing.Optional[datetime] = Field(None, alias='created_at')
 
     # Error message if the log is an error.
-    error: str = Field(None, alias='error')
+    error: typing.Optional[str] = Field(None, alias='error')
 
     # Duration of the logged event in seconds.
-    duration: typing.Union[int, float] = Field(None, alias='duration')
+    duration: typing.Optional[typing.Union[int, float]] = Field(None, alias='duration')

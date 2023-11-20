@@ -12,14 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
+from humanloop.pydantic.response_format import ResponseFormat
 from humanloop.pydantic.tool_config_response import ToolConfigResponse
 
 class ModelConfigResponse(BaseModel):
@@ -32,43 +31,49 @@ class ModelConfigResponse(BaseModel):
     model: str = Field(alias='model')
 
     # A description of the model config.
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # Other parameter values to be passed to the provider call.
-    other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
+    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
 
     # A friendly display name for the model config. If not provided, a name will be generated.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')
 
     # The company providing the underlying model service.
-    provider: ModelProviders = Field(None, alias='provider')
+    provider: typing.Optional[ModelProviders] = Field(None, alias='provider')
 
     # The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
-    max_tokens: int = Field(None, alias='max_tokens')
+    max_tokens: typing.Optional[int] = Field(None, alias='max_tokens')
 
     # What sampling temperature to use when making a generation. Higher values means the model will be more creative.
-    temperature: typing.Union[int, float] = Field(None, alias='temperature')
+    temperature: typing.Optional[typing.Union[int, float]] = Field(None, alias='temperature')
 
     # An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
-    top_p: typing.Union[int, float] = Field(None, alias='top_p')
+    top_p: typing.Optional[typing.Union[int, float]] = Field(None, alias='top_p')
 
     # The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
-    stop: typing.Union[str, typing.List[str]] = Field(None, alias='stop')
+    stop: typing.Optional[typing.Union[str, typing.List[str]]] = Field(None, alias='stop')
 
     # Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
-    presence_penalty: typing.Union[int, float] = Field(None, alias='presence_penalty')
+    presence_penalty: typing.Optional[typing.Union[int, float]] = Field(None, alias='presence_penalty')
 
     # Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
-    frequency_penalty: typing.Union[int, float] = Field(None, alias='frequency_penalty')
+    frequency_penalty: typing.Optional[typing.Union[int, float]] = Field(None, alias='frequency_penalty')
+
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: typing.Optional[int] = Field(None, alias='seed')
 
     # Prompt template that will take your specified inputs to form your final request to the model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
-    prompt_template: str = Field(None, alias='prompt_template')
+    prompt_template: typing.Optional[str] = Field(None, alias='prompt_template')
 
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. NB: Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
-    chat_template: typing.List[ChatMessage] = Field(None, alias='chat_template')
+    chat_template: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='chat_template')
 
     # Definition of tools shown to the model.
-    tool_configs: typing.List[ToolConfigResponse] = Field(None, alias='tool_configs')
+    tool_configs: typing.Optional[typing.List[ToolConfigResponse]] = Field(None, alias='tool_configs')
 
     # The provider model endpoint used.
-    endpoint: ModelEndpoints = Field(None, alias='endpoint')
+    endpoint: typing.Optional[ModelEndpoints] = Field(None, alias='endpoint')
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')

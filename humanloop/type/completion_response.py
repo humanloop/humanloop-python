@@ -12,11 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.type.data_response import DataResponse
-from humanloop.type.tool_result_response import ToolResultResponse
 from humanloop.type.usage import Usage
 
 class RequiredCompletionResponse(TypedDict):

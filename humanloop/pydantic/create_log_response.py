@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -24,4 +24,4 @@ class CreateLogResponse(BaseModel):
     project_id: str = Field(alias='project_id')
 
     # String ID of session the datapoint belongs to. Populated only if the datapoint was logged with `session_id` or `session_reference_id`, and is `None` otherwise. Starts with `sesh_`.
-    session_id: str = Field(None, alias='session_id')
+    session_id: typing.Optional[str] = Field(None, alias='session_id')

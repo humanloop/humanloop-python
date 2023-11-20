@@ -12,19 +12,17 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.create_datapoint_request_inputs import CreateDatapointRequestInputs
 from humanloop.pydantic.create_datapoint_request_target import CreateDatapointRequestTarget
-from humanloop.pydantic.tool_call import ToolCall
 
 class CreateDatapointRequest(BaseModel):
-    inputs: CreateDatapointRequestInputs = Field(None, alias='inputs')
+    inputs: typing.Optional[CreateDatapointRequestInputs] = Field(None, alias='inputs')
 
     # The chat messages for this datapoint.
-    messages: typing.List[ChatMessage] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
 
-    target: CreateDatapointRequestTarget = Field(None, alias='target')
+    target: typing.Optional[CreateDatapointRequestTarget] = Field(None, alias='target')

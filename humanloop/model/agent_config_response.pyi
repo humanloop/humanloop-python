@@ -227,11 +227,5 @@ class AgentConfigResponse(
             **kwargs,
         )
 
-from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
 from humanloop.model.model_config_request import ModelConfigRequest
-from humanloop.model.model_config_tool_request import ModelConfigToolRequest
-from humanloop.model.model_endpoints import ModelEndpoints
-from humanloop.model.model_providers import ModelProviders
-from humanloop.model.tool_call import ToolCall
 from humanloop.model.tool_config_request import ToolConfigRequest

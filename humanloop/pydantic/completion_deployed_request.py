@@ -12,56 +12,59 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.provider_api_keys import ProviderApiKeys
 
 class CompletionDeployedRequest(BaseModel):
     # Unique project name. If no project exists with this name, a new project will be created.
-    project: str = Field(None, alias='project')
+    project: typing.Optional[str] = Field(None, alias='project')
 
     # Unique ID of a project to associate to the log. Either this or `project` must be provided.
-    project_id: str = Field(None, alias='project_id')
+    project_id: typing.Optional[str] = Field(None, alias='project_id')
 
     # ID of the session to associate the datapoint.
-    session_id: str = Field(None, alias='session_id')
+    session_id: typing.Optional[str] = Field(None, alias='session_id')
 
     # A unique string identifying the session to associate the datapoint to. Allows you to log multiple datapoints to a session (using an ID kept by your internal systems) by passing the same `session_reference_id` in subsequent log requests. Specify at most one of this or `session_id`.
-    session_reference_id: str = Field(None, alias='session_reference_id')
+    session_reference_id: typing.Optional[str] = Field(None, alias='session_reference_id')
 
     # ID associated to the parent datapoint in a session.
-    parent_id: str = Field(None, alias='parent_id')
+    parent_id: typing.Optional[str] = Field(None, alias='parent_id')
 
     # A unique string identifying the previously-logged parent datapoint in a session. Allows you to log nested datapoints with your internal system IDs by passing the same reference ID as `parent_id` in a prior log request. Specify at most one of this or `parent_id`. Note that this cannot refer to a datapoint being logged in the same request.
-    parent_reference_id: str = Field(None, alias='parent_reference_id')
+    parent_reference_id: typing.Optional[str] = Field(None, alias='parent_reference_id')
 
     # The inputs passed to the prompt template.
-    inputs: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='inputs')
+    inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='inputs')
 
     # Identifies where the model was called from.
-    source: str = Field(None, alias='source')
+    source: typing.Optional[str] = Field(None, alias='source')
 
     # Any additional metadata to record.
-    metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='metadata')
+    metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
 
     # API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
-    provider_api_keys: ProviderApiKeys = Field(None, alias='provider_api_keys')
+    provider_api_keys: typing.Optional[ProviderApiKeys] = Field(None, alias='provider_api_keys')
 
     # The number of generations.
-    num_samples: int = Field(None, alias='num_samples')
+    num_samples: typing.Optional[int] = Field(None, alias='num_samples')
 
     # Include the log probabilities of the top n tokens in the provider_response
-    logprobs: int = Field(None, alias='logprobs')
+    logprobs: typing.Optional[int] = Field(None, alias='logprobs')
 
     # If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
-    stream: bool = Field(None, alias='stream')
+    stream: typing.Optional[bool] = Field(None, alias='stream')
 
     # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
-    suffix: str = Field(None, alias='suffix')
+    suffix: typing.Optional[str] = Field(None, alias='suffix')
+
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: typing.Optional[int] = Field(None, alias='seed')
 
     # End-user ID passed through to provider call.
-    user: str = Field(None, alias='user')
+    user: typing.Optional[str] = Field(None, alias='user')
 
     # The environment name used to create a chat response. If not specified, the default environment will be used.
-    environment: str = Field(None, alias='environment')
+    environment: typing.Optional[str] = Field(None, alias='environment')

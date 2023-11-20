@@ -12,9 +12,8 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.feedback_response import FeedbackResponse
-from humanloop.type.feedback_type import FeedbackType
 
 FeedbackSubmitResponse = typing.Union[typing.List[FeedbackResponse],FeedbackResponse]

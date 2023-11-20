@@ -12,23 +12,14 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.base_metric_response import BaseMetricResponse
-from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.config_type import ConfigType
-from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.pydantic.evaluator_response import EvaluatorResponse
-from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum
-from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse
 from humanloop.pydantic.experiment_response import ExperimentResponse
-from humanloop.pydantic.experiment_status import ExperimentStatus
 from humanloop.pydantic.feedback_types import FeedbackTypes
-from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
-from humanloop.pydantic.positive_label import PositiveLabel
 from humanloop.pydantic.project_config_response import ProjectConfigResponse
-from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.pydantic.project_user_response import ProjectUserResponse
 
 class ProjectResponse(BaseModel):
@@ -54,15 +45,15 @@ class ProjectResponse(BaseModel):
     updated_at: datetime = Field(alias='updated_at')
 
     # Experiment that has been set as the project's active deployment. At most one of active_experiment and active_model_config can be set.
-    active_experiment: ExperimentResponse = Field(None, alias='active_experiment')
+    active_experiment: typing.Optional[ExperimentResponse] = Field(None, alias='active_experiment')
 
     # Config that has been set as the project's active deployment. At most one of active_experiment and active_model_config can be set.
-    active_config: ProjectConfigResponse = Field(None, alias='active_config')
+    active_config: typing.Optional[ProjectConfigResponse] = Field(None, alias='active_config')
 
-    config_type: ConfigType = Field(None, alias='config_type')
+    config_type: typing.Optional[ConfigType] = Field(None, alias='config_type')
 
     # Evaluators that have been set as active for the project.
-    active_evaluators: typing.List[EvaluatorResponse] = Field(None, alias='active_evaluators')
+    active_evaluators: typing.Optional['typing.List[EvaluatorResponse]'] = Field(None, alias='active_evaluators')
 
     # String ID of the directory the project belongs to. Starts with `dir_`.
-    directory_id: str = Field(None, alias='directory_id')
+    directory_id: typing.Optional[str] = Field(None, alias='directory_id')

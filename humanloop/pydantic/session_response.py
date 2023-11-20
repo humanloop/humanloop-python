@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.session_project_response import SessionProjectResponse
@@ -30,10 +30,10 @@ class SessionResponse(BaseModel):
     created_at: datetime = Field(alias='created_at')
 
     # Unique user-provided string identifying the session.
-    reference_id: str = Field(None, alias='reference_id')
+    reference_id: typing.Optional[str] = Field(None, alias='reference_id')
 
     # Inputs for the first datapoint in the session.
-    first_inputs: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='first_inputs')
+    first_inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='first_inputs')
 
     # Output for the last datapoint in the session.
-    last_output: str = Field(None, alias='last_output')
+    last_output: typing.Optional[str] = Field(None, alias='last_output')

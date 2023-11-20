@@ -12,23 +12,23 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.positive_label import PositiveLabel
 
 class UpdateProjectRequest(BaseModel):
     # The new unique project name. Caution, if you are using the project name as the unique identifier in your API calls, changing the name will break the calls.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')
 
     # ID for an experiment to set as the project's active deployment. Starts with 'exp_'. At most one of 'active_experiment_id' and 'active_model_config_id' can be set.
-    active_experiment_id: str = Field(None, alias='active_experiment_id')
+    active_experiment_id: typing.Optional[str] = Field(None, alias='active_experiment_id')
 
     # ID for a config to set as the project's active deployment. Starts with 'config_'. At most one of 'active_experiment_id' and 'active_config_id' can be set.
-    active_config_id: str = Field(None, alias='active_config_id')
+    active_config_id: typing.Optional[str] = Field(None, alias='active_config_id')
 
     # The full list of labels to treat as positive user feedback.
-    positive_labels: typing.List[PositiveLabel] = Field(None, alias='positive_labels')
+    positive_labels: typing.Optional[typing.List[PositiveLabel]] = Field(None, alias='positive_labels')
 
     # ID of directory to assign project to. Starts with `dir_`.
-    directory_id: str = Field(None, alias='directory_id')
+    directory_id: typing.Optional[str] = Field(None, alias='directory_id')

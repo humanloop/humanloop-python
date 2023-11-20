@@ -12,10 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.feedback_request import FeedbackRequest
-from humanloop.pydantic.feedback_type import FeedbackType
 
 FeedbackSubmitRequest = typing.Union[typing.List[FeedbackRequest],FeedbackRequest]

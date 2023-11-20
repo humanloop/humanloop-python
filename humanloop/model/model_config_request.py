@@ -145,6 +145,7 @@ class ModelConfigRequest(
             presence_penalty = schemas.NumberSchema
             frequency_penalty = schemas.NumberSchema
             other = schemas.DictSchema
+            seed = schemas.IntSchema
             
             
             class endpoint(
@@ -262,6 +263,7 @@ class ModelConfigRequest(
                 "presence_penalty": presence_penalty,
                 "frequency_penalty": frequency_penalty,
                 "other": other,
+                "seed": seed,
                 "endpoint": endpoint,
                 "prompt_template": prompt_template,
                 "chat_template": chat_template,
@@ -306,6 +308,9 @@ class ModelConfigRequest(
     def __getitem__(self, name: typing_extensions.Literal["other"]) -> MetaOapg.properties.other: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["endpoint"]) -> MetaOapg.properties.endpoint: ...
     
     @typing.overload
@@ -320,7 +325,7 @@ class ModelConfigRequest(
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["prompt_template"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], typing_extensions.Literal["type"], ]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["prompt_template"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], typing_extensions.Literal["type"], ]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -358,6 +363,9 @@ class ModelConfigRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["other"]) -> typing.Union[MetaOapg.properties.other, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["endpoint"]) -> typing.Union[MetaOapg.properties.endpoint, schemas.Unset]: ...
     
     @typing.overload
@@ -372,7 +380,7 @@ class ModelConfigRequest(
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> typing.Union[MetaOapg.properties.type, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["prompt_template"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], typing_extensions.Literal["type"], ]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["prompt_template"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], typing_extensions.Literal["type"], ]):
         return super().get_item_oapg(name)
 
     def __new__(
@@ -389,6 +397,7 @@ class ModelConfigRequest(
         presence_penalty: typing.Union[MetaOapg.properties.presence_penalty, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         frequency_penalty: typing.Union[MetaOapg.properties.frequency_penalty, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         endpoint: typing.Union[MetaOapg.properties.endpoint, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         prompt_template: typing.Union[MetaOapg.properties.prompt_template, str, schemas.Unset] = schemas.unset,
         chat_template: typing.Union[MetaOapg.properties.chat_template, list, tuple, schemas.Unset] = schemas.unset,
@@ -411,6 +420,7 @@ class ModelConfigRequest(
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             endpoint=endpoint,
             prompt_template=prompt_template,
             chat_template=chat_template,
@@ -420,8 +430,6 @@ class ModelConfigRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
 from humanloop.model.model_config_tool_request import ModelConfigToolRequest
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders
-from humanloop.model.tool_call import ToolCall

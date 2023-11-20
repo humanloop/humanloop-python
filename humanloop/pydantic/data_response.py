@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.tool_result_response import ToolResultResponse
@@ -37,7 +37,7 @@ class DataResponse(BaseModel):
     model_config_id_: str = Field(alias='model_config_id')
 
     # Why the generation ended. One of 'stop' (indicating a stop token was encountered), or 'length' (indicating the max tokens limit has been reached), or 'tool_call' (indicating that the model has chosen to call a tool - in which case the tool_call parameter of the response will be populated). It will be set as null for the intermediary responses during a stream, and will only be set as non-null for the final streamed token.
-    finish_reason: str = Field(None, alias='finish_reason')
+    finish_reason: typing.Optional[str] = Field(None, alias='finish_reason')
 
     # Results of any tools run during the generation.
-    tool_results: typing.List[ToolResultResponse] = Field(None, alias='tool_results')
+    tool_results: typing.Optional[typing.List[ToolResultResponse]] = Field(None, alias='tool_results')

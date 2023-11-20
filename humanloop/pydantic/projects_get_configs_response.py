@@ -12,12 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.config_response import ConfigResponse
-from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.pydantic.project_config_response import ProjectConfigResponse
-from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 
 ProjectsGetConfigsResponse = typing.List[ProjectConfigResponse]

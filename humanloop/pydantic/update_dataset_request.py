@@ -12,13 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
 class UpdateDatasetRequest(BaseModel):
     # The description of the dataset.
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # The name of the dataset.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')

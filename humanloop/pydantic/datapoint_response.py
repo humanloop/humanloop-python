@@ -12,14 +12,12 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs
 from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget
-from humanloop.pydantic.tool_call import ToolCall
 
 class DatapointResponse(BaseModel):
     id: str = Field(alias='id')
@@ -30,10 +28,10 @@ class DatapointResponse(BaseModel):
 
     updated_at: datetime = Field(alias='updated_at')
 
-    inputs: DatapointResponseInputs = Field(None, alias='inputs')
+    inputs: typing.Optional[DatapointResponseInputs] = Field(None, alias='inputs')
 
-    messages: typing.List[ChatMessage] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
 
-    target: DatapointResponseTarget = Field(None, alias='target')
+    target: typing.Optional[DatapointResponseTarget] = Field(None, alias='target')
 
-    source_project_data_id: str = Field(None, alias='source_project_data_id')
+    source_project_data_id: typing.Optional[str] = Field(None, alias='source_project_data_id')

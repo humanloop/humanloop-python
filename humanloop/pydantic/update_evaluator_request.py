@@ -12,24 +12,28 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from humanloop.pydantic.model_config_completion_request import ModelConfigCompletionRequest
 
 class UpdateEvaluatorRequest(BaseModel):
     # The description of the evaluator.
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # The name of the evaluator.
-    name: str = Field(None, alias='name')
-
-    # The code for the evaluator. This code will be executed in a sandboxed environment.
-    code: str = Field(None, alias='code')
+    name: typing.Optional[str] = Field(None, alias='name')
 
     # Whether this evaluator is target-free or target-required.
-    arguments_type: EvaluatorArgumentsType = Field(None, alias='arguments_type')
+    arguments_type: typing.Optional[EvaluatorArgumentsType] = Field(None, alias='arguments_type')
 
     # The type of the return value of the evaluator.
-    return_type: EvaluatorReturnTypeEnum = Field(None, alias='return_type')
+    return_type: typing.Optional[EvaluatorReturnTypeEnum] = Field(None, alias='return_type')
+
+    # The code for the evaluator. This code will be executed in a sandboxed environment.
+    code: typing.Optional[str] = Field(None, alias='code')
+
+    # The model configuration used to generate.
+    model_config_: typing.Optional[ModelConfigCompletionRequest] = Field(None, alias='model_config')

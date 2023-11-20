@@ -12,20 +12,16 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.config_response import ConfigResponse
 from humanloop.type.evaluation_result_response import EvaluationResultResponse
 from humanloop.type.feedback_response import FeedbackResponse
-from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.metric_value_response import MetricValueResponse
-from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.observability_status import ObservabilityStatus
 from humanloop.type.project_config_response import ProjectConfigResponse
-from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
-from humanloop.type.tool_call import ToolCall
+from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.tool_result_response import ToolResultResponse
 
 class RequiredLogResponse(TypedDict):
@@ -113,7 +109,8 @@ class OptionalLogResponse(TypedDict, total=False):
 
     tools: typing.List[ToolResultResponse]
 
-    tool_call: typing.Union[str, typing.Dict[str, str]]
+    # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+    tool_choice: typing.Union[str, str, ToolChoice]
 
 class LogResponse(RequiredLogResponse, OptionalLogResponse):
     pass

@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.label_sentiment import LabelSentiment
@@ -20,4 +20,4 @@ from humanloop.pydantic.label_sentiment import LabelSentiment
 class FeedbackLabelRequest(BaseModel):
     value: str = Field(alias='value')
 
-    sentiment: LabelSentiment = Field(None, alias='sentiment')
+    sentiment: typing.Optional[LabelSentiment] = Field(None, alias='sentiment')

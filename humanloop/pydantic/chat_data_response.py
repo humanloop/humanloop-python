@@ -12,11 +12,11 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
+from humanloop.pydantic.function_tool import FunctionTool
 from humanloop.pydantic.tool_call import ToolCall
 from humanloop.pydantic.tool_result_response import ToolResultResponse
 
@@ -37,16 +37,19 @@ class ChatDataResponse(BaseModel):
     model_config_id_: str = Field(alias='model_config_id')
 
     # The inputs passed to the chat template.
-    inputs: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='inputs')
+    inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='inputs')
 
     # Why the generation ended. One of 'stop' (indicating a stop token was encountered), or 'length' (indicating the max tokens limit has been reached), or 'tool_call' (indicating that the model has chosen to call a tool - in which case the tool_call parameter of the response will be populated). It will be set as null for the intermediary responses during a stream, and will only be set as non-null for the final streamed token.
-    finish_reason: str = Field(None, alias='finish_reason')
+    finish_reason: typing.Optional[str] = Field(None, alias='finish_reason')
 
     # Results of any tools run during the generation.
-    tool_results: typing.List[ToolResultResponse] = Field(None, alias='tool_results')
+    tool_results: typing.Optional[typing.List[ToolResultResponse]] = Field(None, alias='tool_results')
 
     # The messages passed to the to provider chat endpoint.
-    messages: typing.List[ChatMessage] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
 
     # JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
-    tool_call: ToolCall = Field(None, alias='tool_call')
+    tool_call: typing.Optional[FunctionTool] = Field(None, alias='tool_call')
+
+    # JSON definition of the tools to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
+    tool_calls: typing.Optional[typing.List[ToolCall]] = Field(None, alias='tool_calls')

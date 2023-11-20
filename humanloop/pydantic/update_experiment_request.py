@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.positive_label import PositiveLabel
@@ -21,11 +21,11 @@ from humanloop.pydantic.update_experiment_request_config_ids_to_register import 
 
 class UpdateExperimentRequest(BaseModel):
     # Name of experiment.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')
 
     # Feedback labels to treat as positive user feedback. Used to monitor the performance of model configs in the experiment.
-    positive_labels: typing.List[PositiveLabel] = Field(None, alias='positive_labels')
+    positive_labels: typing.Optional[typing.List[PositiveLabel]] = Field(None, alias='positive_labels')
 
-    config_ids_to_register: UpdateExperimentRequestConfigIdsToRegister = Field(None, alias='config_ids_to_register')
+    config_ids_to_register: typing.Optional[UpdateExperimentRequestConfigIdsToRegister] = Field(None, alias='config_ids_to_register')
 
-    config_ids_to_deregister: UpdateExperimentRequestConfigIdsToDeregister = Field(None, alias='config_ids_to_deregister')
+    config_ids_to_deregister: typing.Optional[UpdateExperimentRequestConfigIdsToDeregister] = Field(None, alias='config_ids_to_deregister')

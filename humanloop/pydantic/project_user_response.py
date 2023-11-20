@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -24,4 +24,4 @@ class ProjectUserResponse(BaseModel):
     email_address: str = Field(alias='email_address')
 
     # The user's full name.
-    full_name: str = Field(None, alias='full_name')
+    full_name: typing.Optional[str] = Field(None, alias='full_name')

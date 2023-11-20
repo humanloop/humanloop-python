@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -21,4 +21,4 @@ class EnvironmentRequest(BaseModel):
     id: str = Field(alias='id')
 
     # The environment name.
-    name: str = Field(None, alias='name')
+    name: typing.Optional[str] = Field(None, alias='name')

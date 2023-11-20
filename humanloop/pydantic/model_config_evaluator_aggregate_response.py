@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -21,4 +21,4 @@ class ModelConfigEvaluatorAggregateResponse(BaseModel):
 
     evaluator_id: str = Field(alias='evaluator_id')
 
-    aggregate_value: typing.Union[bool, date, datetime, dict, float, int, list, str, None] = Field(None, alias='aggregate_value')
+    aggregate_value: typing.Optional[typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='aggregate_value')

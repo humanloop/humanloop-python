@@ -12,20 +12,17 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.feedback_class import FeedbackClass
-from humanloop.pydantic.feedback_label_request import FeedbackLabelRequest
 from humanloop.pydantic.feedback_type_request import FeedbackTypeRequest
-from humanloop.pydantic.label_sentiment import LabelSentiment
 
 class CreateProjectRequest(BaseModel):
     # Unique project name.
     name: str = Field(alias='name')
 
     # Feedback types to be created.
-    feedback_types: typing.List[FeedbackTypeRequest] = Field(None, alias='feedback_types')
+    feedback_types: typing.Optional[typing.List[FeedbackTypeRequest]] = Field(None, alias='feedback_types')
 
     # ID of directory to assign project to. Starts with `dir_`. If not provided, the project will be created in the root directory.
-    directory_id: str = Field(None, alias='directory_id')
+    directory_id: typing.Optional[str] = Field(None, alias='directory_id')

@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -23,16 +23,16 @@ class ToolConfigRequest(BaseModel):
     type: str = Field(alias='type')
 
     # The description of the tool shown to the model.
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
-    parameters: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='parameters')
+    parameters: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='parameters')
 
     # Code source of the tool.
-    source: str = Field(None, alias='source')
+    source: typing.Optional[str] = Field(None, alias='source')
 
     # Other parameters that define the config.
-    other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
+    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
 
     # If is_preset = true, this is the name of the preset tool on Humanloop. This is used as the key to look up the Humanloop runtime of the tool
-    preset_name: str = Field(None, alias='preset_name')
+    preset_name: typing.Optional[str] = Field(None, alias='preset_name')

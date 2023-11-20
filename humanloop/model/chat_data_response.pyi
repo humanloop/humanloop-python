@@ -122,7 +122,7 @@ class ChatDataResponse(
                         # classes don't exist yet because their module has not finished
                         # loading
                         return [
-                            ToolCall,
+                            FunctionTool,
                         ]
             
             
@@ -138,6 +138,32 @@ class ChatDataResponse(
                         _configuration=_configuration,
                         **kwargs,
                     )
+            
+            
+            class tool_calls(
+                schemas.ListSchema
+            ):
+            
+            
+                class MetaOapg:
+                    
+                    @staticmethod
+                    def items() -> typing.Type['ToolCall']:
+                        return ToolCall
+            
+                def __new__(
+                    cls,
+                    arg: typing.Union[typing.Tuple['ToolCall'], typing.List['ToolCall']],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                ) -> 'tool_calls':
+                    return super().__new__(
+                        cls,
+                        arg,
+                        _configuration=_configuration,
+                    )
+            
+                def __getitem__(self, i: int) -> 'ToolCall':
+                    return super().__getitem__(i)
             __annotations__ = {
                 "id": id,
                 "index": index,
@@ -149,6 +175,7 @@ class ChatDataResponse(
                 "tool_results": tool_results,
                 "messages": messages,
                 "tool_call": tool_call,
+                "tool_calls": tool_calls,
             }
     
     output: MetaOapg.properties.output
@@ -188,9 +215,12 @@ class ChatDataResponse(
     def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["tool_calls"]) -> MetaOapg.properties.tool_calls: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "index", "output", "raw_output", "model_config_id", "inputs", "finish_reason", "tool_results", "messages", "tool_call", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "index", "output", "raw_output", "model_config_id", "inputs", "finish_reason", "tool_results", "messages", "tool_call", "tool_calls", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -226,9 +256,12 @@ class ChatDataResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_calls"]) -> typing.Union[MetaOapg.properties.tool_calls, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "index", "output", "raw_output", "model_config_id", "inputs", "finish_reason", "tool_results", "messages", "tool_call", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "index", "output", "raw_output", "model_config_id", "inputs", "finish_reason", "tool_results", "messages", "tool_call", "tool_calls", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -245,6 +278,7 @@ class ChatDataResponse(
         tool_results: typing.Union[MetaOapg.properties.tool_results, list, tuple, schemas.Unset] = schemas.unset,
         messages: typing.Union[MetaOapg.properties.messages, list, tuple, schemas.Unset] = schemas.unset,
         tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        tool_calls: typing.Union[MetaOapg.properties.tool_calls, list, tuple, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ChatDataResponse':
@@ -261,11 +295,12 @@ class ChatDataResponse(
             tool_results=tool_results,
             messages=messages,
             tool_call=tool_call,
+            tool_calls=tool_calls,
             _configuration=_configuration,
             **kwargs,
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
+from humanloop.model.function_tool import FunctionTool
 from humanloop.model.tool_call import ToolCall
 from humanloop.model.tool_result_response import ToolResultResponse

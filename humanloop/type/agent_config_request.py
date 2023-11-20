@@ -12,15 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.model_config_request import ModelConfigRequest
-from humanloop.type.model_config_tool_request import ModelConfigToolRequest
-from humanloop.type.model_endpoints import ModelEndpoints
-from humanloop.type.model_providers import ModelProviders
-from humanloop.type.tool_call import ToolCall
 from humanloop.type.tool_config_request import ToolConfigRequest
 
 class RequiredAgentConfigRequest(TypedDict):

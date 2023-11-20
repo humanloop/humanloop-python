@@ -12,14 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.model_config_tool_request import ModelConfigToolRequest
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
-from humanloop.type.tool_call import ToolCall
+from humanloop.type.response_format import ResponseFormat
 
 class RequiredModelConfigChatRequest(TypedDict):
     # The model instance used. E.g. text-davinci-002.
@@ -56,6 +55,9 @@ class OptionalModelConfigChatRequest(TypedDict, total=False):
     # Other parameter values to be passed to the provider call.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int
+
     # The provider model endpoint used.
     endpoint: ModelEndpoints
 
@@ -64,6 +66,9 @@ class OptionalModelConfigChatRequest(TypedDict, total=False):
 
     # Make tools available to OpenAIs chat model as functions.
     tools: typing.List[ModelConfigToolRequest]
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat
 
 class ModelConfigChatRequest(RequiredModelConfigChatRequest, OptionalModelConfigChatRequest):
     pass

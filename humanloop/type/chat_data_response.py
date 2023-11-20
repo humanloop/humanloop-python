@@ -12,10 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
+from humanloop.type.function_tool import FunctionTool
 from humanloop.type.tool_call import ToolCall
 from humanloop.type.tool_result_response import ToolResultResponse
 
@@ -49,7 +49,10 @@ class OptionalChatDataResponse(TypedDict, total=False):
     messages: typing.List[ChatMessage]
 
     # JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
-    tool_call: ToolCall
+    tool_call: FunctionTool
+
+    # JSON definition of the tools to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
+    tool_calls: typing.List[ToolCall]
 
 class ChatDataResponse(RequiredChatDataResponse, OptionalChatDataResponse):
     pass

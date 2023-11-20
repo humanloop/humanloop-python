@@ -101,4 +101,3 @@ class HTTPValidationError(
         )
 
 from humanloop.model.validation_error import ValidationError
-from humanloop.model.validation_error_loc import ValidationErrorLoc

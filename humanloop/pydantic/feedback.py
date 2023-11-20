@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.feedback_type import FeedbackType
@@ -25,10 +25,10 @@ class Feedback(BaseModel):
     value: typing.Union[typing.Union[int, float], str] = Field(alias='value')
 
     # ID to associate the feedback to a previously logged datapoint.
-    data_id: str = Field(None, alias='data_id')
+    data_id: typing.Optional[str] = Field(None, alias='data_id')
 
     # A unique identifier to who provided the feedback.
-    user: str = Field(None, alias='user')
+    user: typing.Optional[str] = Field(None, alias='user')
 
     # User defined timestamp for when the feedback was created. 
-    created_at: datetime = Field(None, alias='created_at')
+    created_at: typing.Optional[datetime] = Field(None, alias='created_at')

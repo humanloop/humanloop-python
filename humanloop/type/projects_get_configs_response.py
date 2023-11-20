@@ -12,11 +12,8 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.config_response import ConfigResponse
-from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.type.project_config_response import ProjectConfigResponse
-from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 
 ProjectsGetConfigsResponse = typing.List[ProjectConfigResponse]

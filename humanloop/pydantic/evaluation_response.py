@@ -12,15 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.dataset_response import DatasetResponse
 from humanloop.pydantic.evaluation_status import EvaluationStatus
-from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.pydantic.evaluator_response import EvaluatorResponse
-from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 
 class EvaluationResponse(BaseModel):
@@ -39,6 +37,6 @@ class EvaluationResponse(BaseModel):
 
     dataset: DatasetResponse = Field(alias='dataset')
 
-    dataset_snapshot: DatasetResponse = Field(None, alias='dataset_snapshot')
+    dataset_snapshot: typing.Optional[DatasetResponse] = Field(None, alias='dataset_snapshot')
 
-    evaluator_aggregates: typing.List[ModelConfigEvaluatorAggregateResponse] = Field(None, alias='evaluator_aggregates')
+    evaluator_aggregates: typing.Optional[typing.List[ModelConfigEvaluatorAggregateResponse]] = Field(None, alias='evaluator_aggregates')

@@ -12,22 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.base_metric_response import BaseMetricResponse
-from humanloop.type.config_response import ConfigResponse
 from humanloop.type.config_type import ConfigType
-from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_response import EvaluatorResponse
-from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
-from humanloop.type.experiment_config_response import ExperimentConfigResponse
 from humanloop.type.experiment_response import ExperimentResponse
-from humanloop.type.experiment_status import ExperimentStatus
 from humanloop.type.feedback_types import FeedbackTypes
-from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
-from humanloop.type.positive_label import PositiveLabel
 from humanloop.type.project_config_response import ProjectConfigResponse
-from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.type.project_user_response import ProjectUserResponse
 
 class RequiredProjectResponse(TypedDict):
@@ -62,7 +53,7 @@ class OptionalProjectResponse(TypedDict, total=False):
     config_type: ConfigType
 
     # Evaluators that have been set as active for the project.
-    active_evaluators: typing.List[EvaluatorResponse]
+    active_evaluators: 'typing.List[EvaluatorResponse]'
 
     # String ID of the directory the project belongs to. Starts with `dir_`.
     directory_id: str

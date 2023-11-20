@@ -12,15 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.create_datapoint_request import CreateDatapointRequest
-from humanloop.type.create_datapoint_request_inputs import CreateDatapointRequestInputs
-from humanloop.type.create_datapoint_request_target import CreateDatapointRequestTarget
 from humanloop.type.create_datapoints_by_logs_request import CreateDatapointsByLogsRequest
-from humanloop.type.create_datapoints_by_logs_request_log_ids import CreateDatapointsByLogsRequestLogIds
-from humanloop.type.tool_call import ToolCall
 
 DatasetsCreateDatapointRequest = typing.Union[CreateDatapointsByLogsRequest,CreateDatapointRequest,typing.List[CreateDatapointRequest]]

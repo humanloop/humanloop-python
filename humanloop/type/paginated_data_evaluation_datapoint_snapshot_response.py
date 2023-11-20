@@ -12,26 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
-from humanloop.type.config_response import ConfigResponse
-from humanloop.type.datapoint_response import DatapointResponse
-from humanloop.type.datapoint_response_inputs import DatapointResponseInputs
-from humanloop.type.datapoint_response_target import DatapointResponseTarget
 from humanloop.type.evaluation_datapoint_snapshot_response import EvaluationDatapointSnapshotResponse
-from humanloop.type.evaluation_result_response import EvaluationResultResponse
-from humanloop.type.feedback_response import FeedbackResponse
-from humanloop.type.feedback_type import FeedbackType
-from humanloop.type.log_response import LogResponse
-from humanloop.type.metric_value_response import MetricValueResponse
-from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
-from humanloop.type.observability_status import ObservabilityStatus
-from humanloop.type.project_config_response import ProjectConfigResponse
-from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
-from humanloop.type.tool_call import ToolCall
-from humanloop.type.tool_result_response import ToolResultResponse
 
 class RequiredPaginatedDataEvaluationDatapointSnapshotResponse(TypedDict):
     records: typing.List[EvaluationDatapointSnapshotResponse]

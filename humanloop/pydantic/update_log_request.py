@@ -12,16 +12,16 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
 class UpdateLogRequest(BaseModel):
     # Generated output from your model for the provided inputs.
-    output: str = Field(None, alias='output')
+    output: typing.Optional[str] = Field(None, alias='output')
 
     # Error message if the log is an error.
-    error: str = Field(None, alias='error')
+    error: typing.Optional[str] = Field(None, alias='error')
 
     # Duration of the logged event in seconds.
-    duration: typing.Union[int, float] = Field(None, alias='duration')
+    duration: typing.Optional[typing.Union[int, float]] = Field(None, alias='duration')

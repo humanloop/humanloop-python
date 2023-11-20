@@ -12,11 +12,15 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
+from humanloop.pydantic.function_tool import FunctionTool
+from humanloop.pydantic.tool_type import ToolType
 
 class ToolCall(BaseModel):
-    name: str = Field(alias='name')
+    id: str = Field(alias='id')
 
-    arguments: typing.Union[bool, date, datetime, dict, float, int, list, str, None] = Field(None, alias='arguments')
+    type: ToolType = Field(alias='type')
+
+    function: FunctionTool = Field(alias='function')

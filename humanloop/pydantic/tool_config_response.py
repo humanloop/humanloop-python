@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
@@ -26,25 +26,25 @@ class ToolConfigResponse(BaseModel):
     name: str = Field(alias='name')
 
     # Description of the tool referenced by the model
-    description: str = Field(None, alias='description')
+    description: typing.Optional[str] = Field(None, alias='description')
 
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
-    parameters: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='parameters')
+    parameters: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='parameters')
 
     # Other parameters that define the config.
-    other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
+    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
 
     # Code source of the tool.
-    source: str = Field(None, alias='source')
+    source: typing.Optional[str] = Field(None, alias='source')
 
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
-    setup_schema: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='setup_schema')
+    setup_schema: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='setup_schema')
 
     # The function signature of the tool when being called.
-    signature: str = Field(None, alias='signature')
+    signature: typing.Optional[str] = Field(None, alias='signature')
 
     # Whether the tool is one where Humanloop defines runtime or not.
-    is_preset: bool = Field(None, alias='is_preset')
+    is_preset: typing.Optional[bool] = Field(None, alias='is_preset')
 
     # If is_preset = true, this is the name of the preset tool on Humanloop. This is used as the key to lookup the Humanloop runtime of the tool
-    preset_name: str = Field(None, alias='preset_name')
+    preset_name: typing.Optional[str] = Field(None, alias='preset_name')

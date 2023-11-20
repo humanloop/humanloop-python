@@ -12,11 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.validation_error import ValidationError
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc
 
 class HTTPValidationError(BaseModel):
-    detail: typing.List[ValidationError] = Field(None, alias='detail')
+    detail: typing.Optional[typing.List[ValidationError]] = Field(None, alias='detail')

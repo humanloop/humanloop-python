@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds
@@ -28,4 +28,4 @@ class CreateEvaluationRequest(BaseModel):
     dataset_id: str = Field(alias='dataset_id')
 
     # API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization. Ensure you provide an API key for the provider for the model config you are evaluating, or have one saved to your organization.
-    provider_api_keys: ProviderApiKeys = Field(None, alias='provider_api_keys')
+    provider_api_keys: typing.Optional[ProviderApiKeys] = Field(None, alias='provider_api_keys')

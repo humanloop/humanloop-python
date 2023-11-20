@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.model_providers import ModelProviders
@@ -22,7 +22,7 @@ class FinetuneConfig(BaseModel):
     base_model: str = Field(alias='base_model')
 
     # Provider specific hyper-parameter settings that along with your base model will configure the fine-tuning process with the provider.
-    parameters: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='parameters')
+    parameters: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='parameters')
 
     # The company who is hosting the target model.This is used only if an existing experiment_id or model_config_id are not provided.
-    provider: ModelProviders = Field(None, alias='provider')
+    provider: typing.Optional[ModelProviders] = Field(None, alias='provider')

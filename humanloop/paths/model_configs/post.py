@@ -35,47 +35,29 @@ from humanloop import schemas  # noqa: F401
 from humanloop.model.model_providers import ModelProviders as ModelProvidersSchema
 from humanloop.model.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestSchema
 from humanloop.model.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
-from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponseSchema
-from humanloop.model.chat_role import ChatRole as ChatRoleSchema
-from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponseSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
-from humanloop.model.config_response import ConfigResponse as ConfigResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
 from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
 from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
-from humanloop.model.tool_call import ToolCall as ToolCallSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
+from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
 from humanloop.type.model_config_tool_request import ModelConfigToolRequest
-from humanloop.type.config_response import ConfigResponse
-from humanloop.type.project_model_config_request import ProjectModelConfigRequest
-from humanloop.type.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
-from humanloop.type.model_providers import ModelProviders
-from humanloop.type.validation_error_loc import ValidationErrorLoc
-from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.validation_error import ValidationError
-from humanloop.type.tool_call import ToolCall
+from humanloop.type.response_format import ResponseFormat
+from humanloop.type.project_model_config_request import ProjectModelConfigRequest
+from humanloop.type.model_providers import ModelProviders
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.model_endpoints import ModelEndpoints
 
 from ...api_client import Dictionary
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
-from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
-from humanloop.pydantic.config_response import ConfigResponse as ConfigResponsePydantic
-from humanloop.pydantic.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestPydantic
-from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
-from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse as ProjectModelConfigFeedbackStatsResponsePydantic
-from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse as ModelConfigEvaluatorAggregateResponsePydantic
+from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
 from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
 from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestPydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
+from humanloop.pydantic.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestPydantic
+from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
 from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
 
 from . import path
@@ -160,6 +142,7 @@ class BaseApi(api_client.Api):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -167,6 +150,7 @@ class BaseApi(api_client.Api):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -192,6 +176,8 @@ class BaseApi(api_client.Api):
             _body["frequency_penalty"] = frequency_penalty
         if other is not None:
             _body["other"] = other
+        if seed is not None:
+            _body["seed"] = seed
         if project is not None:
             _body["project"] = project
         if project_id is not None:
@@ -206,6 +192,8 @@ class BaseApi(api_client.Api):
             _body["endpoint"] = endpoint
         if tools is not None:
             _body["tools"] = tools
+        if response_format is not None:
+            _body["response_format"] = response_format
         args.body = _body
         return args
 
@@ -422,6 +410,7 @@ class RegisterRaw(BaseApi):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -429,6 +418,7 @@ class RegisterRaw(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -447,6 +437,7 @@ class RegisterRaw(BaseApi):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -454,6 +445,7 @@ class RegisterRaw(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
+            response_format=response_format,
         )
         return await self._aregister_oapg(
             body=args.body,
@@ -473,6 +465,7 @@ class RegisterRaw(BaseApi):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -480,6 +473,7 @@ class RegisterRaw(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -496,6 +490,7 @@ class RegisterRaw(BaseApi):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -503,6 +498,7 @@ class RegisterRaw(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
+            response_format=response_format,
         )
         return self._register_oapg(
             body=args.body,
@@ -523,6 +519,7 @@ class Register(BaseApi):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -530,6 +527,7 @@ class Register(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
         **kwargs,
     ):
@@ -545,6 +543,7 @@ class Register(BaseApi):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -552,6 +551,7 @@ class Register(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
+            response_format=response_format,
             **kwargs,
         )
         if validate:
@@ -572,6 +572,7 @@ class Register(BaseApi):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -579,6 +580,7 @@ class Register(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
     ):
         raw_response = self.raw.register(
@@ -593,6 +595,7 @@ class Register(BaseApi):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -600,6 +603,7 @@ class Register(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
+            response_format=response_format,
         )
         if validate:
             return ProjectConfigResponsePydantic(**raw_response.body)
@@ -622,6 +626,7 @@ class ApiForpost(BaseApi):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -629,6 +634,7 @@ class ApiForpost(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -647,6 +653,7 @@ class ApiForpost(BaseApi):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -654,6 +661,7 @@ class ApiForpost(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
+            response_format=response_format,
         )
         return await self._aregister_oapg(
             body=args.body,
@@ -673,6 +681,7 @@ class ApiForpost(BaseApi):
         presence_penalty: typing.Optional[typing.Union[int, float]] = None,
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        seed: typing.Optional[int] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -680,6 +689,7 @@ class ApiForpost(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -696,6 +706,7 @@ class ApiForpost(BaseApi):
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
             other=other,
+            seed=seed,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -703,6 +714,7 @@ class ApiForpost(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
+            response_format=response_format,
         )
         return self._register_oapg(
             body=args.body,

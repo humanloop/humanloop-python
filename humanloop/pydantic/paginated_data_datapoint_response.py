@@ -12,15 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.datapoint_response import DatapointResponse
-from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs
-from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget
-from humanloop.pydantic.tool_call import ToolCall
 
 class PaginatedDataDatapointResponse(BaseModel):
     records: typing.List[DatapointResponse] = Field(alias='records')

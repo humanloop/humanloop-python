@@ -12,16 +12,15 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.categorical_feedback_label import CategoricalFeedbackLabel
 from humanloop.pydantic.feedback_type import FeedbackType
-from humanloop.pydantic.label_sentiment import LabelSentiment
 
 class FeedbackTypeModel(BaseModel):
     # The type of feedback. The default feedback types available are 'rating', 'action', 'issue', 'correction', and 'comment'.
     type: typing.Union[FeedbackType, str] = Field(alias='type')
 
     # The allowed values for categorical feedback types. Not populated for `correction` and `comment`.
-    values: typing.List[CategoricalFeedbackLabel] = Field(None, alias='values')
+    values: typing.Optional[typing.List[CategoricalFeedbackLabel]] = Field(None, alias='values')

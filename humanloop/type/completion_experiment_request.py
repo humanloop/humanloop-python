@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.provider_api_keys import ProviderApiKeys
 
@@ -62,6 +62,9 @@ class OptionalCompletionExperimentRequest(TypedDict, total=False):
 
     # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
     suffix: str
+
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int
 
     # End-user ID passed through to provider call.
     user: str

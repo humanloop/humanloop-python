@@ -35,59 +35,82 @@ class ToolCall(
 
     class MetaOapg:
         required = {
-            "name",
+            "function",
+            "id",
+            "type",
         }
         
         class properties:
-            name = schemas.StrSchema
-            arguments = schemas.AnyTypeSchema
+            id = schemas.StrSchema
+        
+            @staticmethod
+            def type() -> typing.Type['ToolType']:
+                return ToolType
+        
+            @staticmethod
+            def function() -> typing.Type['FunctionTool']:
+                return FunctionTool
             __annotations__ = {
-                "name": name,
-                "arguments": arguments,
+                "id": id,
+                "type": type,
+                "function": function,
             }
     
-    name: MetaOapg.properties.name
+    function: 'FunctionTool'
+    id: MetaOapg.properties.id
+    type: 'ToolType'
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
+    def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["arguments"]) -> MetaOapg.properties.arguments: ...
+    def __getitem__(self, name: typing_extensions.Literal["type"]) -> 'ToolType': ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["function"]) -> 'FunctionTool': ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "arguments", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "function", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["arguments"]) -> typing.Union[MetaOapg.properties.arguments, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> 'ToolType': ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["function"]) -> 'FunctionTool': ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "arguments", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "function", ], str]):
         return super().get_item_oapg(name)
     
 
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
-        name: typing.Union[MetaOapg.properties.name, str, ],
-        arguments: typing.Union[MetaOapg.properties.arguments, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        function: 'FunctionTool',
+        id: typing.Union[MetaOapg.properties.id, str, ],
+        type: 'ToolType',
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ToolCall':
         return super().__new__(
             cls,
             *args,
-            name=name,
-            arguments=arguments,
+            function=function,
+            id=id,
+            type=type,
             _configuration=_configuration,
             **kwargs,
         )
+
+from humanloop.model.function_tool import FunctionTool
+from humanloop.model.tool_type import ToolType
