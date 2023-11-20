@@ -12,20 +12,12 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.agent_config_response import AgentConfigResponse
-from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.generic_config_response import GenericConfigResponse
-from humanloop.pydantic.model_config_request import ModelConfigRequest
 from humanloop.pydantic.model_config_response import ModelConfigResponse
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
-from humanloop.pydantic.model_endpoints import ModelEndpoints
-from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
-from humanloop.pydantic.tool_config_request import ToolConfigRequest
 from humanloop.pydantic.tool_config_response import ToolConfigResponse
 
 ConfigResponse = typing.Union[ModelConfigResponse,ToolConfigResponse,AgentConfigResponse,GenericConfigResponse]

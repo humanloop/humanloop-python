@@ -12,21 +12,17 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse
 from humanloop.pydantic.feedback_response import FeedbackResponse
-from humanloop.pydantic.feedback_type import FeedbackType
 from humanloop.pydantic.metric_value_response import MetricValueResponse
-from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.pydantic.observability_status import ObservabilityStatus
 from humanloop.pydantic.project_config_response import ProjectConfigResponse
-from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
-from humanloop.pydantic.tool_call import ToolCall
+from humanloop.pydantic.tool_choice import ToolChoice
 from humanloop.pydantic.tool_result_response import ToolResultResponse
 
 class LogResponse(BaseModel):
@@ -113,4 +109,5 @@ class LogResponse(BaseModel):
 
     tools: typing.List[ToolResultResponse] = Field(None, alias='tools')
 
-    tool_call: typing.Union[str, typing.Dict[str, str]] = Field(None, alias='tool_call')
+    # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+    tool_choice: typing.Union[str, str, ToolChoice] = Field(None, alias='tool_choice')

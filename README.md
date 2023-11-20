@@ -76,6 +76,7 @@
   * [`humanloop.evaluations.list_datapoints`](#humanloopevaluationslist_datapoints)
   * [`humanloop.evaluators.create`](#humanloopevaluatorscreate)
   * [`humanloop.evaluators.delete`](#humanloopevaluatorsdelete)
+  * [`humanloop.evaluators.get`](#humanloopevaluatorsget)
   * [`humanloop.evaluators.list`](#humanloopevaluatorslist)
   * [`humanloop.evaluators.update`](#humanloopevaluatorsupdate)
   * [`humanloop.experiments.create`](#humanloopexperimentscreate)
@@ -319,7 +320,7 @@ try:
     create_response = humanloop.chats.raw.create(
         messages=[
             {
-                "role": "user",
+                "role": "string_example",
             }
         ],
         model_config={
@@ -343,7 +344,12 @@ try:
         num_samples=1,
         stream=False,
         user="string_example",
+        tool_choice="string_example",
         tool_call="string_example",
+        seed=1,
+        response_format={
+            "type": "json_object",
+        },
     )
     pprint(create_response.body)
     pprint(create_response.body["data"])
@@ -355,7 +361,7 @@ try:
     pprint(create_response.body["user"])
     pprint(create_response.body["usage"])
     pprint(create_response.body["metadata"])
-    pprint(create_response.body["tool_call"])
+    pprint(create_response.body["tool_choice"])
     pprint(create_response.headers)
     pprint(create_response.status)
     pprint(create_response.round_trip_time)
@@ -429,7 +435,7 @@ Get a chat response by providing details of the model configuration in the reque
 create_response = humanloop.chat(
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     model_config={
@@ -453,13 +459,18 @@ create_response = humanloop.chat(
     num_samples=1,
     stream=False,
     user="string_example",
+    tool_choice="string_example",
     tool_call="string_example",
+    seed=1,
+    response_format={
+        "type": "json_object",
+    },
 )
 ```
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="messages-listchatmessagehumanlooptypechat_messagepy"></a>
+##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -521,10 +532,24 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 End-user ID passed through to provider call.
 
-##### tool_call: Union[`str`, `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`]<a id="tool_call-unionstr-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
 
-Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+
+##### tool_call: Union[`str`, [`Dict[str, str]`](./humanloop/type/typing_dict_str_str.py)]<a id="tool_call-unionstr-dictstr-strhumanlooptypetyping_dict_str_strpy"></a>
+
+
+NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -551,7 +576,7 @@ Get a chat response using the project's active deployment.  The active deploymen
 create_deployed_response = humanloop.chat_deployed(
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     project="string_example",
@@ -567,14 +592,19 @@ create_deployed_response = humanloop.chat_deployed(
     num_samples=1,
     stream=False,
     user="string_example",
+    tool_choice="string_example",
     tool_call="string_example",
+    seed=1,
+    response_format={
+        "type": "json_object",
+    },
     environment="string_example",
 )
 ```
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="messages-listchatmessagehumanlooptypechat_messagepy"></a>
+##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -631,10 +661,24 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 End-user ID passed through to provider call.
 
-##### tool_call: Union[`str`, `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`]<a id="tool_call-unionstr-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
 
-Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+
+##### tool_call: Union[`str`, [`Dict[str, str]`](./humanloop/type/typing_dict_str_str.py)]<a id="tool_call-unionstr-dictstr-strhumanlooptypetyping_dict_str_strpy"></a>
+
+
+NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
 
 ##### environment: `str`<a id="environment-str"></a>
 
@@ -665,7 +709,7 @@ Get a chat response for a specific experiment.
 create_experiment_response = humanloop.chat_experiment(
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     experiment_id="string_example",
@@ -682,13 +726,18 @@ create_experiment_response = humanloop.chat_experiment(
     num_samples=1,
     stream=False,
     user="string_example",
+    tool_choice="string_example",
     tool_call="string_example",
+    seed=1,
+    response_format={
+        "type": "json_object",
+    },
 )
 ```
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="messages-listchatmessagehumanlooptypechat_messagepy"></a>
+##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -749,10 +798,24 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 End-user ID passed through to provider call.
 
-##### tool_call: Union[`str`, `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`]<a id="tool_call-unionstr-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
 
-Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+
+##### tool_call: Union[`str`, [`Dict[str, str]`](./humanloop/type/typing_dict_str_str.py)]<a id="tool_call-unionstr-dictstr-strhumanlooptypetyping_dict_str_strpy"></a>
+
+
+NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -779,7 +842,7 @@ Get chat response for a specific model configuration.
 create_model_config_response = humanloop.chat_model_config(
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     model_config_id="string_example",
@@ -796,13 +859,18 @@ create_model_config_response = humanloop.chat_model_config(
     num_samples=1,
     stream=False,
     user="string_example",
+    tool_choice="string_example",
     tool_call="string_example",
+    seed=1,
+    response_format={
+        "type": "json_object",
+    },
 )
 ```
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="messages-listchatmessagehumanlooptypechat_messagepy"></a>
+##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -863,10 +931,24 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 End-user ID passed through to provider call.
 
-##### tool_call: Union[`str`, `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`]<a id="tool_call-unionstr-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
 
-Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+
+##### tool_call: Union[`str`, [`Dict[str, str]`](./humanloop/type/typing_dict_str_str.py)]<a id="tool_call-unionstr-dictstr-strhumanlooptypetyping_dict_str_strpy"></a>
+
+
+NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -914,6 +996,7 @@ create_response = humanloop.complete(
     logprobs=1,
     stream=False,
     suffix="string_example",
+    seed=1,
     user="string_example",
 )
 ```
@@ -982,6 +1065,10 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
 ##### user: `str`<a id="user-str"></a>
 
 End-user ID passed through to provider call.
@@ -1023,6 +1110,7 @@ create_deployed_response = humanloop.complete_deployed(
     logprobs=1,
     stream=False,
     suffix="string_example",
+    seed=1,
     user="string_example",
     environment="string_example",
 )
@@ -1087,6 +1175,10 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
 ##### user: `str`<a id="user-str"></a>
 
 End-user ID passed through to provider call.
@@ -1133,6 +1225,7 @@ create_experiment_response = humanloop.complete_experiment(
     logprobs=1,
     stream=False,
     suffix="string_example",
+    seed=1,
     user="string_example",
 )
 ```
@@ -1200,6 +1293,10 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
 ##### user: `str`<a id="user-str"></a>
 
 End-user ID passed through to provider call.
@@ -1242,6 +1339,7 @@ create_model_config_response = humanloop.complete_model_configuration(
     logprobs=1,
     stream=False,
     suffix="string_example",
+    seed=1,
     user="string_example",
 )
 ```
@@ -1308,6 +1406,10 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 ##### suffix: `str`<a id="suffix-str"></a>
 
 The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
 ##### user: `str`<a id="user-str"></a>
 
@@ -1395,7 +1497,7 @@ update_response = humanloop.datapoints.update(
     },
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     target={
@@ -1412,7 +1514,7 @@ String ID of datapoint. Starts with `evtc_`.
 
 ##### inputs: [`UpdateDatapointRequestInputs`](./humanloop/type/update_datapoint_request_inputs.py)<a id="inputs-updatedatapointrequestinputshumanlooptypeupdate_datapoint_request_inputspy"></a>
 
-##### messages: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="messages-listchatmessagehumanlooptypechat_messagepy"></a>
+##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
 
 The chat messages for this datapoint.
 
@@ -1492,7 +1594,7 @@ create_datapoint_response = humanloop.datasets.create_datapoint(
     },
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     target={
@@ -1851,10 +1953,20 @@ Create an evaluator within your organization.
 ```python
 create_response = humanloop.evaluators.create(
     description="string_example",
-    name="string_example",
-    code="string_example",
+    name="a",
     arguments_type="string_example",
     return_type="string_example",
+    type="string_example",
+    code="string_example",
+    model_config={
+        "model": "model_example",
+        "max_tokens": -1,
+        "temperature": 1,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "prompt_template": "{{question}}",
+    },
 )
 ```
 
@@ -1868,10 +1980,6 @@ The description of the evaluator.
 
 The name of the evaluator.
 
-##### code: `str`<a id="code-str"></a>
-
-The code for the evaluator. This code will be executed in a sandboxed environment.
-
 ##### arguments_type: [`EvaluatorArgumentsType`](./humanloop/type/evaluator_arguments_type.py)<a id="arguments_type-evaluatorargumentstypehumanlooptypeevaluator_arguments_typepy"></a>
 
 Whether this evaluator is target-free or target-required.
@@ -1879,6 +1987,19 @@ Whether this evaluator is target-free or target-required.
 ##### return_type: [`EvaluatorReturnTypeEnum`](./humanloop/type/evaluator_return_type_enum.py)<a id="return_type-evaluatorreturntypeenumhumanlooptypeevaluator_return_type_enumpy"></a>
 
 The type of the return value of the evaluator.
+
+##### type: [`EvaluatorType`](./humanloop/type/evaluator_type.py)<a id="type-evaluatortypehumanlooptypeevaluator_typepy"></a>
+
+The type of the evaluator.
+
+##### code: `str`<a id="code-str"></a>
+
+The code for the evaluator. This code will be executed in a sandboxed environment.
+
+##### model_config: [`ModelConfigCompletionRequest`](./humanloop/type/model_config_completion_request.py)<a id="model_config-modelconfigcompletionrequesthumanlooptypemodel_config_completion_requestpy"></a>
+
+
+The model configuration used to generate.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -1919,6 +2040,34 @@ humanloop.evaluators.delete(
 
 ---
 
+### `humanloop.evaluators.get`<a id="humanloopevaluatorsget"></a>
+
+Get an evaluator within your organization.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+get_response = humanloop.evaluators.get(
+    id="id_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### id: `str`<a id="id-str"></a>
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`EvaluatorResponse`](./humanloop/pydantic/evaluator_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/evaluators/{id}` `get`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
 ### `humanloop.evaluators.list`<a id="humanloopevaluatorslist"></a>
 
 Get all evaluators within your organization.
@@ -1952,9 +2101,18 @@ update_response = humanloop.evaluators.update(
     id="id_example",
     description="string_example",
     name="string_example",
-    code="string_example",
     arguments_type="string_example",
     return_type="string_example",
+    code="string_example",
+    model_config={
+        "model": "model_example",
+        "max_tokens": -1,
+        "temperature": 1,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "prompt_template": "{{question}}",
+    },
 )
 ```
 
@@ -1970,10 +2128,6 @@ The description of the evaluator.
 
 The name of the evaluator.
 
-##### code: `str`<a id="code-str"></a>
-
-The code for the evaluator. This code will be executed in a sandboxed environment.
-
 ##### arguments_type: [`EvaluatorArgumentsType`](./humanloop/type/evaluator_arguments_type.py)<a id="arguments_type-evaluatorargumentstypehumanlooptypeevaluator_arguments_typepy"></a>
 
 Whether this evaluator is target-free or target-required.
@@ -1981,6 +2135,15 @@ Whether this evaluator is target-free or target-required.
 ##### return_type: [`EvaluatorReturnTypeEnum`](./humanloop/type/evaluator_return_type_enum.py)<a id="return_type-evaluatorreturntypeenumhumanlooptypeevaluator_return_type_enumpy"></a>
 
 The type of the return value of the evaluator.
+
+##### code: `str`<a id="code-str"></a>
+
+The code for the evaluator. This code will be executed in a sandboxed environment.
+
+##### model_config: [`ModelConfigCompletionRequest`](./humanloop/type/model_config_completion_request.py)<a id="model_config-modelconfigcompletionrequesthumanlooptypemodel_config_completion_requestpy"></a>
+
+
+The model configuration used to generate.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -2024,7 +2187,7 @@ create_response = humanloop.experiments.create(
 
 Name of experiment.
 
-##### positive_labels: List[[`PositiveLabel`](./humanloop/type/positive_label.py)]<a id="positive_labels-listpositivelabelhumanlooptypepositive_labelpy"></a>
+##### positive_labels: List[`PositiveLabel`]<a id="positive_labels-listpositivelabel"></a>
 
 Feedback labels to treat as positive user feedback. Used to monitor the performance of model configs in the experiment.
 
@@ -2170,7 +2333,7 @@ String ID of experiment. Starts with `exp_`.
 
 Name of experiment.
 
-##### positive_labels: List[[`PositiveLabel`](./humanloop/type/positive_label.py)]<a id="positive_labels-listpositivelabelhumanlooptypepositive_labelpy"></a>
+##### positive_labels: List[`PositiveLabel`]<a id="positive_labels-listpositivelabel"></a>
 
 Feedback labels to treat as positive user feedback. Used to monitor the performance of model configs in the experiment.
 
@@ -2530,7 +2693,7 @@ log_response = humanloop.log(
     trial_id="string_example",
     messages=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     output="string_example",
@@ -2603,7 +2766,7 @@ A unique string to reference the datapoint. Allows you to log nested datapoints 
 
 Unique ID of an experiment trial to associate to the log.
 
-##### messages: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="messages-listchatmessagehumanlooptypechat_messagepy"></a>
+##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -2611,12 +2774,12 @@ The messages passed to the to provider chat endpoint.
 
 Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
 
-##### config: Union[[`ModelConfigRequest`](./humanloop/type/model_config_request.py), [`ToolConfigRequest`](./humanloop/type/tool_config_request.py), [`GenericConfigRequest`](./humanloop/type/generic_config_request.py), [`AgentConfigRequest`](./humanloop/type/agent_config_request.py)]<a id="config-unionmodelconfigrequesthumanlooptypemodel_config_requestpy-toolconfigrequesthumanlooptypetool_config_requestpy-genericconfigrequesthumanlooptypegeneric_config_requestpy-agentconfigrequesthumanlooptypeagent_config_requestpy"></a>
+##### config: Union[`ModelConfigRequest`, `ToolConfigRequest`, `GenericConfigRequest`, `AgentConfigRequest`]<a id="config-unionmodelconfigrequest-toolconfigrequest-genericconfigrequest-agentconfigrequest"></a>
 
 
 The model config used for this generation. Required unless `trial_id` is provided.
 
-##### feedback: Union[[`Feedback`](./humanloop/type/feedback.py), List[[`Feedback`](./humanloop/type/feedback.py)]]<a id="feedback-unionfeedbackhumanlooptypefeedbackpy-listfeedbackhumanlooptypefeedbackpy"></a>
+##### feedback: Union[`Feedback`, List[`Feedback`]]<a id="feedback-unionfeedback-listfeedback"></a>
 
 
 Optional parameter to provide feedback with your logged datapoint.
@@ -2793,13 +2956,14 @@ register_response = humanloop.model_configs.register(
     presence_penalty=0,
     frequency_penalty=0,
     other={},
+    seed=1,
     project="string_example",
     project_id="string_example",
     experiment="string_example",
     prompt_template="string_example",
     chat_template=[
         {
-            "role": "user",
+            "role": "string_example",
         }
     ],
     endpoint="string_example",
@@ -2808,6 +2972,9 @@ register_response = humanloop.model_configs.register(
             "name": "name_example",
         }
     ],
+    response_format={
+        "type": "json_object",
+    },
 )
 ```
 
@@ -2858,6 +3025,10 @@ Number between -2.0 and 2.0. Positive values penalize new tokens based on how fr
 
 Other parameter values to be passed to the provider call.
 
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
 ##### project: `str`<a id="project-str"></a>
 
 Unique project name. If it does not exist, a new project will be created.
@@ -2874,7 +3045,7 @@ If specified, the model config will be added to this experiment. Experiments are
 
 Prompt template that will take your specified inputs to form your final request to the provider model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
 
-##### chat_template: List[[`ChatMessage`](./humanloop/type/chat_message.py)]<a id="chat_template-listchatmessagehumanlooptypechat_messagepy"></a>
+##### chat_template: List[`ChatMessage`]<a id="chat_template-listchatmessage"></a>
 
 Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
 
@@ -2882,9 +3053,14 @@ Messages prepended to the list of messages sent to the provider. These messages 
 
 Which of the providers model endpoints to use. For example Complete or Edit.
 
-##### tools: List[[`ModelConfigToolRequest`](./humanloop/type/model_config_tool_request.py)]<a id="tools-listmodelconfigtoolrequesthumanlooptypemodel_config_tool_requestpy"></a>
+##### tools: List[`ModelConfigToolRequest`]<a id="tools-listmodelconfigtoolrequest"></a>
 
 Make tools available to OpenAIs chat model as functions.
+
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -2925,7 +3101,7 @@ create_response = humanloop.projects.create(
 
 Unique project name.
 
-##### feedback_types: List[[`FeedbackTypeRequest`](./humanloop/type/feedback_type_request.py)]<a id="feedback_types-listfeedbacktyperequesthumanlooptypefeedback_type_requestpy"></a>
+##### feedback_types: List[`FeedbackTypeRequest`]<a id="feedback_types-listfeedbacktyperequest"></a>
 
 Feedback types to be created.
 
@@ -2978,7 +3154,7 @@ The type of feedback to update.
 
 String ID of project. Starts with `pr_`.
 
-##### values: List[[`FeedbackLabelRequest`](./humanloop/type/feedback_label_request.py)]<a id="values-listfeedbacklabelrequesthumanlooptypefeedback_label_requestpy"></a>
+##### values: List[`FeedbackLabelRequest`]<a id="values-listfeedbacklabelrequest"></a>
 
 The feedback values to be available. This field should only be populated when updating a 'select' or 'multi_select' feedback class.
 
@@ -3155,7 +3331,7 @@ Model config unique identifier generated by Humanloop.
 
 String ID of experiment. Starts with `exp_`.
 
-##### environments: List[[`EnvironmentRequest`](./humanloop/type/environment_request.py)]<a id="environments-listenvironmentrequesthumanlooptypeenvironment_requestpy"></a>
+##### environments: List[`EnvironmentRequest`]<a id="environments-listenvironmentrequest"></a>
 
 List of environments to associate with the model config.
 
@@ -3429,7 +3605,7 @@ ID for an experiment to set as the project's active deployment. Starts with 'exp
 
 ID for a config to set as the project's active deployment. Starts with 'config_'. At most one of 'active_experiment_id' and 'active_config_id' can be set.
 
-##### positive_labels: List[[`PositiveLabel`](./humanloop/type/positive_label.py)]<a id="positive_labels-listpositivelabelhumanlooptypepositive_labelpy"></a>
+##### positive_labels: List[`PositiveLabel`]<a id="positive_labels-listpositivelabel"></a>
 
 The full list of labels to treat as positive user feedback.
 

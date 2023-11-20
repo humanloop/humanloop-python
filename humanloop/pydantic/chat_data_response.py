@@ -12,11 +12,11 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
+from humanloop.pydantic.function_tool import FunctionTool
 from humanloop.pydantic.tool_call import ToolCall
 from humanloop.pydantic.tool_result_response import ToolResultResponse
 
@@ -49,4 +49,7 @@ class ChatDataResponse(BaseModel):
     messages: typing.List[ChatMessage] = Field(None, alias='messages')
 
     # JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
-    tool_call: ToolCall = Field(None, alias='tool_call')
+    tool_call: FunctionTool = Field(None, alias='tool_call')
+
+    # JSON definition of the tools to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
+    tool_calls: typing.List[ToolCall] = Field(None, alias='tool_calls')

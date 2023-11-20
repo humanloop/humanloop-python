@@ -12,13 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.provider_api_keys import ProviderApiKeys
-from humanloop.pydantic.tool_call import ToolCall
+from humanloop.pydantic.response_format import ResponseFormat
+from humanloop.pydantic.tool_choice import ToolChoice
 
 class ChatModelConfigRequest(BaseModel):
     # The messages passed to the to provider chat endpoint.
@@ -66,5 +66,14 @@ class ChatModelConfigRequest(BaseModel):
     # End-user ID passed through to provider call.
     user: str = Field(None, alias='user')
 
-    # Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
-    tool_call: typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='tool_call')
+    # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+    tool_choice: typing.Union[str, str, ToolChoice] = Field(None, alias='tool_choice')
+
+    # NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
+    tool_call: typing.Union[str, typing.Dict[str, str]] = Field(None, alias='tool_call')
+
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int = Field(None, alias='seed')
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat = Field(None, alias='response_format')

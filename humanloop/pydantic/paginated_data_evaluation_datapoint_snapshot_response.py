@@ -12,27 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
-from humanloop.pydantic.config_response import ConfigResponse
-from humanloop.pydantic.datapoint_response import DatapointResponse
-from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs
-from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget
 from humanloop.pydantic.evaluation_datapoint_snapshot_response import EvaluationDatapointSnapshotResponse
-from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse
-from humanloop.pydantic.feedback_response import FeedbackResponse
-from humanloop.pydantic.feedback_type import FeedbackType
-from humanloop.pydantic.log_response import LogResponse
-from humanloop.pydantic.metric_value_response import MetricValueResponse
-from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
-from humanloop.pydantic.observability_status import ObservabilityStatus
-from humanloop.pydantic.project_config_response import ProjectConfigResponse
-from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
-from humanloop.pydantic.tool_call import ToolCall
-from humanloop.pydantic.tool_result_response import ToolResultResponse
 
 class PaginatedDataEvaluationDatapointSnapshotResponse(BaseModel):
     records: typing.List[EvaluationDatapointSnapshotResponse] = Field(alias='records')

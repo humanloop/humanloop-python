@@ -33,38 +33,20 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.completion_response import CompletionResponse as CompletionResponseSchema
-from humanloop.model.data_response import DataResponse as DataResponseSchema
-from humanloop.model.tool_result_response import ToolResultResponse as ToolResultResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
-from humanloop.model.usage import Usage as UsageSchema
 from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
 from humanloop.model.completion_deployed_request import CompletionDeployedRequest as CompletionDeployedRequestSchema
-from humanloop.model.completion_response_provider_responses import CompletionResponseProviderResponses as CompletionResponseProviderResponsesSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.completion_deployed_request import CompletionDeployedRequest
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.validation_error import ValidationError
-from humanloop.type.completion_response_provider_responses import CompletionResponseProviderResponses
-from humanloop.type.data_response import DataResponse
-from humanloop.type.validation_error_loc import ValidationErrorLoc
-from humanloop.type.usage import Usage
 from humanloop.type.completion_response import CompletionResponse
 from humanloop.type.http_validation_error import HTTPValidationError
-from humanloop.type.tool_result_response import ToolResultResponse
 
 from ...api_client import Dictionary
 from humanloop.pydantic.completion_deployed_request import CompletionDeployedRequest as CompletionDeployedRequestPydantic
-from humanloop.pydantic.usage import Usage as UsagePydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.data_response import DataResponse as DataResponsePydantic
 from humanloop.pydantic.completion_response import CompletionResponse as CompletionResponsePydantic
 from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
-from humanloop.pydantic.tool_result_response import ToolResultResponse as ToolResultResponsePydantic
-from humanloop.pydantic.completion_response_provider_responses import CompletionResponseProviderResponses as CompletionResponseProviderResponsesPydantic
 
 from . import path
 
@@ -151,6 +133,7 @@ class BaseApi(api_client.Api):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
@@ -184,6 +167,8 @@ class BaseApi(api_client.Api):
             _body["stream"] = stream
         if suffix is not None:
             _body["suffix"] = suffix
+        if seed is not None:
+            _body["seed"] = seed
         if user is not None:
             _body["user"] = user
         if environment is not None:
@@ -407,6 +392,7 @@ class CreateDeployedRaw(BaseApi):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         **kwargs,
@@ -430,6 +416,7 @@ class CreateDeployedRaw(BaseApi):
             logprobs=logprobs,
             stream=stream,
             suffix=suffix,
+            seed=seed,
             user=user,
             environment=environment,
         )
@@ -454,6 +441,7 @@ class CreateDeployedRaw(BaseApi):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
     ) -> typing.Union[
@@ -475,6 +463,7 @@ class CreateDeployedRaw(BaseApi):
             logprobs=logprobs,
             stream=stream,
             suffix=suffix,
+            seed=seed,
             user=user,
             environment=environment,
         )
@@ -500,6 +489,7 @@ class CreateDeployed(BaseApi):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         validate: bool = False,
@@ -520,6 +510,7 @@ class CreateDeployed(BaseApi):
             logprobs=logprobs,
             stream=stream,
             suffix=suffix,
+            seed=seed,
             user=user,
             environment=environment,
             **kwargs,
@@ -545,6 +536,7 @@ class CreateDeployed(BaseApi):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         validate: bool = False,
@@ -564,6 +556,7 @@ class CreateDeployed(BaseApi):
             logprobs=logprobs,
             stream=stream,
             suffix=suffix,
+            seed=seed,
             user=user,
             environment=environment,
         )
@@ -591,6 +584,7 @@ class ApiForpost(BaseApi):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         **kwargs,
@@ -614,6 +608,7 @@ class ApiForpost(BaseApi):
             logprobs=logprobs,
             stream=stream,
             suffix=suffix,
+            seed=seed,
             user=user,
             environment=environment,
         )
@@ -638,6 +633,7 @@ class ApiForpost(BaseApi):
         logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         suffix: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
     ) -> typing.Union[
@@ -659,6 +655,7 @@ class ApiForpost(BaseApi):
             logprobs=logprobs,
             stream=stream,
             suffix=suffix,
+            seed=seed,
             user=user,
             environment=environment,
         )

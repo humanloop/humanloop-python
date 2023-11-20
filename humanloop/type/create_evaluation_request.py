@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds
 from humanloop.type.provider_api_keys import ProviderApiKeys

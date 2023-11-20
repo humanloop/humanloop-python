@@ -125,7 +125,4 @@ class CreateProjectRequest(
             **kwargs,
         )
 
-from humanloop.model.feedback_class import FeedbackClass
-from humanloop.model.feedback_label_request import FeedbackLabelRequest
 from humanloop.model.feedback_type_request import FeedbackTypeRequest
-from humanloop.model.label_sentiment import LabelSentiment

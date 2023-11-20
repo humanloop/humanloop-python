@@ -11,6 +11,7 @@
 
 from humanloop.paths.evaluators.post import CreateRaw
 from humanloop.paths.evaluators_id.delete import DeleteRaw
+from humanloop.paths.evaluators_id.get import GetRaw
 from humanloop.paths.evaluators.get import ListRaw
 from humanloop.paths.evaluators_id.patch import UpdateRaw
 
@@ -18,6 +19,7 @@ from humanloop.paths.evaluators_id.patch import UpdateRaw
 class EvaluatorsApiRaw(
     CreateRaw,
     DeleteRaw,
+    GetRaw,
     ListRaw,
     UpdateRaw,
 ):

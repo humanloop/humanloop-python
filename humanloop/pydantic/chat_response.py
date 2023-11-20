@@ -12,15 +12,12 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_data_response import ChatDataResponse
-from humanloop.pydantic.chat_message import ChatMessage
 from humanloop.pydantic.chat_response_provider_responses import ChatResponseProviderResponses
-from humanloop.pydantic.chat_role import ChatRole
-from humanloop.pydantic.tool_call import ToolCall
-from humanloop.pydantic.tool_result_response import ToolResultResponse
+from humanloop.pydantic.tool_choice import ToolChoice
 from humanloop.pydantic.usage import Usage
 
 class ChatResponse(BaseModel):
@@ -50,5 +47,5 @@ class ChatResponse(BaseModel):
     # Any additional metadata to record.
     metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='metadata')
 
-    # Controls how the model uses tools - has the same behaviour as OpenAIs function_call parameter. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
-    tool_call: typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='tool_call')
+    # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
+    tool_choice: typing.Union[str, str, ToolChoice] = Field(None, alias='tool_choice')

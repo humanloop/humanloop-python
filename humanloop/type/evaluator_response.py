@@ -12,10 +12,14 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from humanloop.type.evaluator_type import EvaluatorType
+from humanloop.type.model_config_response import ModelConfigResponse
+if TYPE_CHECKING:
+    from humanloop.type.project_response import ProjectResponse
 
 class RequiredEvaluatorResponse(TypedDict):
     # The description of the evaluator.
@@ -24,14 +28,14 @@ class RequiredEvaluatorResponse(TypedDict):
     # The name of the evaluator.
     name: str
 
-    # The code for the evaluator. This code will be executed in a sandboxed environment.
-    code: str
-
     # Whether this evaluator is target-free or target-required.
     arguments_type: EvaluatorArgumentsType
 
     # The type of the return value of the evaluator.
     return_type: EvaluatorReturnTypeEnum
+
+    # The type of the evaluator.
+    type: EvaluatorType
 
     # Unique ID for the evaluator. Starts with `evfn_`.
     id: str
@@ -41,7 +45,14 @@ class RequiredEvaluatorResponse(TypedDict):
     updated_at: datetime
 
 class OptionalEvaluatorResponse(TypedDict, total=False):
-    pass
+    # The code for the evaluator. This code will be executed in a sandboxed environment.
+    code: str
+
+    # The model config defining the LLM evaluator.
+    model_config: ModelConfigResponse
+
+    # The project where the evaluator logs are stored.
+    logging_project: 'ProjectResponse'
 
 class EvaluatorResponse(RequiredEvaluatorResponse, OptionalEvaluatorResponse):
     pass

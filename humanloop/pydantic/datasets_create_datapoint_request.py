@@ -12,16 +12,10 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.create_datapoint_request import CreateDatapointRequest
-from humanloop.pydantic.create_datapoint_request_inputs import CreateDatapointRequestInputs
-from humanloop.pydantic.create_datapoint_request_target import CreateDatapointRequestTarget
 from humanloop.pydantic.create_datapoints_by_logs_request import CreateDatapointsByLogsRequest
-from humanloop.pydantic.create_datapoints_by_logs_request_log_ids import CreateDatapointsByLogsRequestLogIds
-from humanloop.pydantic.tool_call import ToolCall
 
 DatasetsCreateDatapointRequest = typing.Union[CreateDatapointsByLogsRequest,CreateDatapointRequest,typing.List[CreateDatapointRequest]]

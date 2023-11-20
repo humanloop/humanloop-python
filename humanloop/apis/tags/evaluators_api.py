@@ -11,6 +11,7 @@
 
 from humanloop.paths.evaluators.post import Create
 from humanloop.paths.evaluators_id.delete import Delete
+from humanloop.paths.evaluators_id.get import Get
 from humanloop.paths.evaluators.get import List
 from humanloop.paths.evaluators_id.patch import Update
 from humanloop.apis.tags.evaluators_api_raw import EvaluatorsApiRaw
@@ -19,6 +20,7 @@ from humanloop.apis.tags.evaluators_api_raw import EvaluatorsApiRaw
 class EvaluatorsApi(
     Create,
     Delete,
+    Get,
     List,
     Update,
 ):

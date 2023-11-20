@@ -295,7 +295,6 @@ class ExperimentResponse(
         )
 
 from humanloop.model.base_metric_response import BaseMetricResponse
-from humanloop.model.config_response import ConfigResponse
 from humanloop.model.experiment_config_response import ExperimentConfigResponse
 from humanloop.model.experiment_status import ExperimentStatus
 from humanloop.model.positive_label import PositiveLabel

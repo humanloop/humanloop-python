@@ -51,9 +51,4 @@ class DatasetsCreateDatapointResponse(
     def __getitem__(self, i: int) -> 'DatapointResponse':
         return super().__getitem__(i)
 
-from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
 from humanloop.model.datapoint_response import DatapointResponse
-from humanloop.model.datapoint_response_inputs import DatapointResponseInputs
-from humanloop.model.datapoint_response_target import DatapointResponseTarget
-from humanloop.model.tool_call import ToolCall

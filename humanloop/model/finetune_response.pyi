@@ -274,4 +274,3 @@ class FinetuneResponse(
 
 from humanloop.model.dataset_response import DatasetResponse
 from humanloop.model.finetune_config import FinetuneConfig
-from humanloop.model.model_providers import ModelProviders

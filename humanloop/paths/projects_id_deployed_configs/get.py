@@ -33,19 +33,13 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.projects_get_deployed_configs_response import ProjectsGetDeployedConfigsResponse as ProjectsGetDeployedConfigsResponseSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
-from humanloop.type.validation_error import ValidationError
 from humanloop.type.projects_get_deployed_configs_response import ProjectsGetDeployedConfigsResponse
-from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.projects_get_deployed_configs_response import ProjectsGetDeployedConfigsResponse as ProjectsGetDeployedConfigsResponsePydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 
 from . import path

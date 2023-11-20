@@ -89,4 +89,3 @@ class FeedbackSubmitRequest(
         )
 
 from humanloop.model.feedback_request import FeedbackRequest
-from humanloop.model.feedback_type import FeedbackType

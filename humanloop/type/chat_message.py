@@ -12,20 +12,31 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_role import ChatRole
+from humanloop.type.function_tool import FunctionTool
 from humanloop.type.tool_call import ToolCall
 
 class RequiredChatMessage(TypedDict):
+    # Role of the message author.
     role: ChatRole
 
 class OptionalChatMessage(TypedDict, total=False):
-    content: str
+    # The content of the message.
+    content: typing.Optional[str]
 
+    # Optional name of the message author.
     name: typing.Optional[str]
 
-    tool_call: ToolCall
+    # Tool call that this message is responding to.
+    tool_call_id: typing.Optional[str]
+
+    # NB: Deprecated in favour of tool_calls. A tool call requested by the assistant.
+    tool_call: FunctionTool
+
+    # A list of tool calls requested by the assistant.
+    tool_calls: typing.Optional[typing.List[ToolCall]]
 
 class ChatMessage(RequiredChatMessage, OptionalChatMessage):
     pass

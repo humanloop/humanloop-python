@@ -12,12 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.dataset_response import DatasetResponse
-from humanloop.pydantic.finetune_config import FinetuneConfig
 from humanloop.pydantic.finetune_response import FinetuneResponse
-from humanloop.pydantic.model_providers import ModelProviders
 
 FinetunesListAllForProjectResponse = typing.List[FinetuneResponse]

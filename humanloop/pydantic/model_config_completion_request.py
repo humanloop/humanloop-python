@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.model_endpoints import ModelEndpoints
@@ -54,6 +54,9 @@ class ModelConfigCompletionRequest(BaseModel):
 
     # Other parameter values to be passed to the provider call.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
+
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int = Field(None, alias='seed')
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints = Field(None, alias='endpoint')

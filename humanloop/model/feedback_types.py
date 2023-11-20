@@ -51,7 +51,4 @@ class FeedbackTypes(
     def __getitem__(self, i: int) -> 'FeedbackTypeModel':
         return super().__getitem__(i)
 
-from humanloop.model.categorical_feedback_label import CategoricalFeedbackLabel
-from humanloop.model.feedback_type import FeedbackType
 from humanloop.model.feedback_type_model import FeedbackTypeModel
-from humanloop.model.label_sentiment import LabelSentiment

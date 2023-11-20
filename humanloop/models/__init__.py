@@ -68,6 +68,7 @@ from humanloop.model.evaluations_get_for_project_response import EvaluationsGetF
 from humanloop.model.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.model.evaluator_response import EvaluatorResponse
 from humanloop.model.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from humanloop.model.evaluator_type import EvaluatorType
 from humanloop.model.evaluators_list_response import EvaluatorsListResponse
 from humanloop.model.experiment_config_response import ExperimentConfigResponse
 from humanloop.model.experiment_response import ExperimentResponse
@@ -90,6 +91,8 @@ from humanloop.model.finetune_data_summary_errors import FinetuneDataSummaryErro
 from humanloop.model.finetune_request import FinetuneRequest
 from humanloop.model.finetune_response import FinetuneResponse
 from humanloop.model.finetunes_list_all_for_project_response import FinetunesListAllForProjectResponse
+from humanloop.model.function_tool import FunctionTool
+from humanloop.model.function_tool_choice import FunctionToolChoice
 from humanloop.model.generic_config_request import GenericConfigRequest
 from humanloop.model.generic_config_response import GenericConfigResponse
 from humanloop.model.get_model_config_response import GetModelConfigResponse
@@ -127,14 +130,17 @@ from humanloop.model.projects_get_configs_response import ProjectsGetConfigsResp
 from humanloop.model.projects_get_deployed_configs_response import ProjectsGetDeployedConfigsResponse
 from humanloop.model.projects_update_feedback_types_request import ProjectsUpdateFeedbackTypesRequest
 from humanloop.model.provider_api_keys import ProviderApiKeys
+from humanloop.model.response_format import ResponseFormat
 from humanloop.model.session_project_response import SessionProjectResponse
 from humanloop.model.session_response import SessionResponse
 from humanloop.model.sort_order import SortOrder
 from humanloop.model.time_unit import TimeUnit
 from humanloop.model.tool_call import ToolCall
+from humanloop.model.tool_choice import ToolChoice
 from humanloop.model.tool_config_request import ToolConfigRequest
 from humanloop.model.tool_config_response import ToolConfigResponse
 from humanloop.model.tool_result_response import ToolResultResponse
+from humanloop.model.tool_type import ToolType
 from humanloop.model.update_datapoint_request import UpdateDatapointRequest
 from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs
 from humanloop.model.update_datapoint_request_target import UpdateDatapointRequestTarget

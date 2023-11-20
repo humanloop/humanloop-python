@@ -114,14 +114,44 @@ class ChatResponse(
             metadata = schemas.DictSchema
             
             
-            class tool_call(
+            class tool_choice(
                 schemas.ComposedSchema,
             ):
             
             
                 class MetaOapg:
-                    any_of_0 = schemas.StrSchema
-                    any_of_1 = schemas.DictSchema
+                    
+                    
+                    class any_of_0(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "none": "NONE",
+                            }
+                        
+                        @schemas.classproperty
+                        def NONE(cls):
+                            return cls("none")
+                    
+                    
+                    class any_of_1(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "auto": "AUTO",
+                            }
+                        
+                        @schemas.classproperty
+                        def AUTO(cls):
+                            return cls("auto")
                     
                     @classmethod
                     @functools.lru_cache()
@@ -136,6 +166,7 @@ class ChatResponse(
                         return [
                             cls.any_of_0,
                             cls.any_of_1,
+                            ToolChoice,
                         ]
             
             
@@ -144,7 +175,7 @@ class ChatResponse(
                     *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                     **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'tool_call':
+                ) -> 'tool_choice':
                     return super().__new__(
                         cls,
                         *args,
@@ -161,7 +192,7 @@ class ChatResponse(
                 "user": user,
                 "usage": usage,
                 "metadata": metadata,
-                "tool_call": tool_call,
+                "tool_choice": tool_choice,
             }
     
     data: MetaOapg.properties.data
@@ -195,12 +226,12 @@ class ChatResponse(
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
+    def __getitem__(self, name: typing_extensions.Literal["tool_choice"]) -> MetaOapg.properties.tool_choice: ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "tool_call", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "tool_choice", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -233,12 +264,12 @@ class ChatResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_choice"]) -> typing.Union[MetaOapg.properties.tool_choice, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "tool_call", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "tool_choice", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -254,7 +285,7 @@ class ChatResponse(
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
         usage: typing.Union[MetaOapg.properties.usage, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
-        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        tool_choice: typing.Union[MetaOapg.properties.tool_choice, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ChatResponse':
@@ -270,15 +301,12 @@ class ChatResponse(
             user=user,
             usage=usage,
             metadata=metadata,
-            tool_call=tool_call,
+            tool_choice=tool_choice,
             _configuration=_configuration,
             **kwargs,
         )
 
 from humanloop.model.chat_data_response import ChatDataResponse
-from humanloop.model.chat_message import ChatMessage
 from humanloop.model.chat_response_provider_responses import ChatResponseProviderResponses
-from humanloop.model.chat_role import ChatRole
-from humanloop.model.tool_call import ToolCall
-from humanloop.model.tool_result_response import ToolResultResponse
+from humanloop.model.tool_choice import ToolChoice
 from humanloop.model.usage import Usage

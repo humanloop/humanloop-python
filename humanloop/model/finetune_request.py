@@ -195,5 +195,4 @@ class FinetuneRequest(
         )
 
 from humanloop.model.finetune_config import FinetuneConfig
-from humanloop.model.model_providers import ModelProviders
 from humanloop.model.provider_api_keys import ProviderApiKeys
