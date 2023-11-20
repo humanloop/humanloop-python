@@ -33,18 +33,12 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.datapoints_delete_request import DatapointsDeleteRequest as DatapointsDeleteRequestSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
 from humanloop.type.datapoints_delete_request import DatapointsDeleteRequest
-from humanloop.type.validation_error import ValidationError
-from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.datapoints_delete_request import DatapointsDeleteRequest as DatapointsDeleteRequestPydantic
 

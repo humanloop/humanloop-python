@@ -12,17 +12,28 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_role import ChatRole
+from humanloop.pydantic.function_tool import FunctionTool
 from humanloop.pydantic.tool_call import ToolCall
 
 class ChatMessage(BaseModel):
+    # Role of the message author.
     role: ChatRole = Field(alias='role')
 
-    content: str = Field(None, alias='content')
+    # The content of the message.
+    content: typing.Optional[str] = Field(None, alias='content')
 
+    # Optional name of the message author.
     name: typing.Optional[str] = Field(None, alias='name')
 
-    tool_call: ToolCall = Field(None, alias='tool_call')
+    # Tool call that this message is responding to.
+    tool_call_id: typing.Optional[str] = Field(None, alias='tool_call_id')
+
+    # NB: Deprecated in favour of tool_calls. A tool call requested by the assistant.
+    tool_call: FunctionTool = Field(None, alias='tool_call')
+
+    # A list of tool calls requested by the assistant.
+    tool_calls: typing.Optional[typing.List[ToolCall]] = Field(None, alias='tool_calls')

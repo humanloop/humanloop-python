@@ -12,21 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.agent_config_request import AgentConfigRequest
-from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
-from humanloop.pydantic.feedback import Feedback
-from humanloop.pydantic.feedback_type import FeedbackType
-from humanloop.pydantic.generic_config_request import GenericConfigRequest
 from humanloop.pydantic.log_request import LogRequest
-from humanloop.pydantic.model_config_request import ModelConfigRequest
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
-from humanloop.pydantic.model_endpoints import ModelEndpoints
-from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
-from humanloop.pydantic.tool_config_request import ToolConfigRequest
 
 LogDatapointRequest = typing.Union[typing.List[LogRequest],LogRequest]

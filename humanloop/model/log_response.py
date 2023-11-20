@@ -279,42 +279,44 @@ class LogResponse(
                     return super().__getitem__(i)
             
             
-            class tool_call(
+            class tool_choice(
                 schemas.ComposedSchema,
             ):
             
             
                 class MetaOapg:
-                    any_of_0 = schemas.StrSchema
                     
                     
-                    class any_of_1(
-                        schemas.DictSchema
+                    class any_of_0(
+                        schemas.EnumBase,
+                        schemas.StrSchema
                     ):
                     
                     
                         class MetaOapg:
-                            additional_properties = schemas.StrSchema
+                            enum_value_to_name = {
+                                "none": "NONE",
+                            }
                         
-                        def __getitem__(self, name: typing.Union[str, ]) -> MetaOapg.additional_properties:
-                            # dict_instance[name] accessor
-                            return super().__getitem__(name)
-                        
-                        def get_item_oapg(self, name: typing.Union[str, ]) -> MetaOapg.additional_properties:
-                            return super().get_item_oapg(name)
+                        @schemas.classproperty
+                        def NONE(cls):
+                            return cls("none")
                     
-                        def __new__(
-                            cls,
-                            *args: typing.Union[dict, frozendict.frozendict, ],
-                            _configuration: typing.Optional[schemas.Configuration] = None,
-                            **kwargs: typing.Union[MetaOapg.additional_properties, str, ],
-                        ) -> 'any_of_1':
-                            return super().__new__(
-                                cls,
-                                *args,
-                                _configuration=_configuration,
-                                **kwargs,
-                            )
+                    
+                    class any_of_1(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "auto": "AUTO",
+                            }
+                        
+                        @schemas.classproperty
+                        def AUTO(cls):
+                            return cls("auto")
                     
                     @classmethod
                     @functools.lru_cache()
@@ -329,6 +331,7 @@ class LogResponse(
                         return [
                             cls.any_of_0,
                             cls.any_of_1,
+                            ToolChoice,
                         ]
             
             
@@ -337,7 +340,7 @@ class LogResponse(
                     *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                     **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'tool_call':
+                ) -> 'tool_choice':
                     return super().__new__(
                         cls,
                         *args,
@@ -375,7 +378,7 @@ class LogResponse(
                 "finish_reason": finish_reason,
                 "metric_values": metric_values,
                 "tools": tools,
-                "tool_call": tool_call,
+                "tool_choice": tool_choice,
             }
     
     observability_status: 'ObservabilityStatus'
@@ -475,12 +478,12 @@ class LogResponse(
     def __getitem__(self, name: typing_extensions.Literal["tools"]) -> MetaOapg.properties.tools: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
+    def __getitem__(self, name: typing_extensions.Literal["tool_choice"]) -> MetaOapg.properties.tool_choice: ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "reference_id", "trial_id", "messages", "output", "feedback", "created_at", "error", "duration", "model_config", "user", "provider_response", "provider_latency", "raw_output", "finish_reason", "metric_values", "tools", "tool_call", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "reference_id", "trial_id", "messages", "output", "feedback", "created_at", "error", "duration", "model_config", "user", "provider_response", "provider_latency", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -576,12 +579,12 @@ class LogResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union[MetaOapg.properties.tools, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_choice"]) -> typing.Union[MetaOapg.properties.tool_choice, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "reference_id", "trial_id", "messages", "output", "feedback", "created_at", "error", "duration", "model_config", "user", "provider_response", "provider_latency", "raw_output", "finish_reason", "metric_values", "tools", "tool_call", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "reference_id", "trial_id", "messages", "output", "feedback", "created_at", "error", "duration", "model_config", "user", "provider_response", "provider_latency", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -618,7 +621,7 @@ class LogResponse(
         finish_reason: typing.Union[MetaOapg.properties.finish_reason, str, schemas.Unset] = schemas.unset,
         metric_values: typing.Union[MetaOapg.properties.metric_values, list, tuple, schemas.Unset] = schemas.unset,
         tools: typing.Union[MetaOapg.properties.tools, list, tuple, schemas.Unset] = schemas.unset,
-        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        tool_choice: typing.Union[MetaOapg.properties.tool_choice, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'LogResponse':
@@ -655,21 +658,17 @@ class LogResponse(
             finish_reason=finish_reason,
             metric_values=metric_values,
             tools=tools,
-            tool_call=tool_call,
+            tool_choice=tool_choice,
             _configuration=_configuration,
             **kwargs,
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
 from humanloop.model.config_response import ConfigResponse
 from humanloop.model.evaluation_result_response import EvaluationResultResponse
 from humanloop.model.feedback_response import FeedbackResponse
-from humanloop.model.feedback_type import FeedbackType
 from humanloop.model.metric_value_response import MetricValueResponse
-from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.model.observability_status import ObservabilityStatus
 from humanloop.model.project_config_response import ProjectConfigResponse
-from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
-from humanloop.model.tool_call import ToolCall
+from humanloop.model.tool_choice import ToolChoice
 from humanloop.model.tool_result_response import ToolResultResponse

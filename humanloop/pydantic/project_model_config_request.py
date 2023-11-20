@@ -12,15 +12,14 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
+from humanloop.pydantic.response_format import ResponseFormat
 
 class ProjectModelConfigRequest(BaseModel):
     # The model instance used. E.g. text-davinci-002.
@@ -56,6 +55,9 @@ class ProjectModelConfigRequest(BaseModel):
     # Other parameter values to be passed to the provider call.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='other')
 
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int = Field(None, alias='seed')
+
     # Unique project name. If it does not exist, a new project will be created.
     project: str = Field(None, alias='project')
 
@@ -76,3 +78,6 @@ class ProjectModelConfigRequest(BaseModel):
 
     # Make tools available to OpenAIs chat model as functions.
     tools: typing.List[ModelConfigToolRequest] = Field(None, alias='tools')
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat = Field(None, alias='response_format')

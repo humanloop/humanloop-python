@@ -51,7 +51,4 @@ class FinetunesListAllForProjectResponse(
     def __getitem__(self, i: int) -> 'FinetuneResponse':
         return super().__getitem__(i)
 
-from humanloop.model.dataset_response import DatasetResponse
-from humanloop.model.finetune_config import FinetuneConfig
 from humanloop.model.finetune_response import FinetuneResponse
-from humanloop.model.model_providers import ModelProviders

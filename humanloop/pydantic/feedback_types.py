@@ -12,12 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.categorical_feedback_label import CategoricalFeedbackLabel
-from humanloop.pydantic.feedback_type import FeedbackType
 from humanloop.pydantic.feedback_type_model import FeedbackTypeModel
-from humanloop.pydantic.label_sentiment import LabelSentiment
 
 FeedbackTypes = typing.List[FeedbackTypeModel]

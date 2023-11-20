@@ -12,14 +12,13 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.chat_role import ChatRole
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
-from humanloop.pydantic.tool_call import ToolCall
+from humanloop.pydantic.response_format import ResponseFormat
 from humanloop.pydantic.tool_config_response import ToolConfigResponse
 
 class ModelConfigResponse(BaseModel):
@@ -61,6 +60,9 @@ class ModelConfigResponse(BaseModel):
     # Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
     frequency_penalty: typing.Union[int, float] = Field(None, alias='frequency_penalty')
 
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int = Field(None, alias='seed')
+
     # Prompt template that will take your specified inputs to form your final request to the model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
     prompt_template: str = Field(None, alias='prompt_template')
 
@@ -72,3 +74,6 @@ class ModelConfigResponse(BaseModel):
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints = Field(None, alias='endpoint')
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat = Field(None, alias='response_format')

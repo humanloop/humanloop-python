@@ -152,6 +152,76 @@ class ChatRequest(
             user = schemas.StrSchema
             
             
+            class tool_choice(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    
+                    
+                    class any_of_0(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "none": "NONE",
+                            }
+                        
+                        @schemas.classproperty
+                        def NONE(cls):
+                            return cls("none")
+                    
+                    
+                    class any_of_1(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "auto": "AUTO",
+                            }
+                        
+                        @schemas.classproperty
+                        def AUTO(cls):
+                            return cls("auto")
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def any_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            cls.any_of_0,
+                            cls.any_of_1,
+                            ToolChoice,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'tool_choice':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
+            
+            
             class tool_call(
                 schemas.ComposedSchema,
             ):
@@ -159,7 +229,35 @@ class ChatRequest(
             
                 class MetaOapg:
                     any_of_0 = schemas.StrSchema
-                    any_of_1 = schemas.DictSchema
+                    
+                    
+                    class any_of_1(
+                        schemas.DictSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            additional_properties = schemas.StrSchema
+                        
+                        def __getitem__(self, name: typing.Union[str, ]) -> MetaOapg.additional_properties:
+                            # dict_instance[name] accessor
+                            return super().__getitem__(name)
+                        
+                        def get_item_oapg(self, name: typing.Union[str, ]) -> MetaOapg.additional_properties:
+                            return super().get_item_oapg(name)
+                    
+                        def __new__(
+                            cls,
+                            *args: typing.Union[dict, frozendict.frozendict, ],
+                            _configuration: typing.Optional[schemas.Configuration] = None,
+                            **kwargs: typing.Union[MetaOapg.additional_properties, str, ],
+                        ) -> 'any_of_1':
+                            return super().__new__(
+                                cls,
+                                *args,
+                                _configuration=_configuration,
+                                **kwargs,
+                            )
                     
                     @classmethod
                     @functools.lru_cache()
@@ -189,6 +287,43 @@ class ChatRequest(
                         _configuration=_configuration,
                         **kwargs,
                     )
+            seed = schemas.IntSchema
+            
+            
+            class response_format(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def all_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            ResponseFormat,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'response_format':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
             __annotations__ = {
                 "messages": messages,
                 "model_config": model_config,
@@ -205,7 +340,10 @@ class ChatRequest(
                 "num_samples": num_samples,
                 "stream": stream,
                 "user": user,
+                "tool_choice": tool_choice,
                 "tool_call": tool_call,
+                "seed": seed,
+                "response_format": response_format,
             }
         additional_properties = schemas.NotAnyTypeSchema
     
@@ -258,9 +396,18 @@ class ChatRequest(
     def __getitem__(self, name: typing_extensions.Literal["user"]) -> MetaOapg.properties.user: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["tool_choice"]) -> MetaOapg.properties.tool_choice: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["tool_call"], ]):
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> MetaOapg.properties.response_format: ...
+    
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], ]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -310,9 +457,18 @@ class ChatRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["user"]) -> typing.Union[MetaOapg.properties.user, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_choice"]) -> typing.Union[MetaOapg.properties.tool_choice, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["tool_call"], ]):
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union[MetaOapg.properties.response_format, schemas.Unset]: ...
+    
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], ]):
         return super().get_item_oapg(name)
 
     def __new__(
@@ -333,7 +489,10 @@ class ChatRequest(
         num_samples: typing.Union[MetaOapg.properties.num_samples, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         stream: typing.Union[MetaOapg.properties.stream, bool, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
+        tool_choice: typing.Union[MetaOapg.properties.tool_choice, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs,
     ) -> 'ChatRequest':
@@ -355,15 +514,15 @@ class ChatRequest(
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
             _configuration=_configuration,
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
 from humanloop.model.model_config_chat_request import ModelConfigChatRequest
-from humanloop.model.model_config_tool_request import ModelConfigToolRequest
-from humanloop.model.model_endpoints import ModelEndpoints
-from humanloop.model.model_providers import ModelProviders
 from humanloop.model.provider_api_keys import ProviderApiKeys
-from humanloop.model.tool_call import ToolCall
+from humanloop.model.response_format import ResponseFormat
+from humanloop.model.tool_choice import ToolChoice

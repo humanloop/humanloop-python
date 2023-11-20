@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
 ValidationErrorLoc = typing.List[typing.Union[typing.List[str], typing.List[int]]]

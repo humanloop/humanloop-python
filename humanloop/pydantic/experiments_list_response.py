@@ -12,14 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.base_metric_response import BaseMetricResponse
-from humanloop.pydantic.config_response import ConfigResponse
-from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse
 from humanloop.pydantic.experiment_response import ExperimentResponse
-from humanloop.pydantic.experiment_status import ExperimentStatus
-from humanloop.pydantic.positive_label import PositiveLabel
 
 ExperimentsListResponse = typing.List[ExperimentResponse]

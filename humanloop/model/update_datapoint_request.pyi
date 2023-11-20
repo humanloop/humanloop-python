@@ -127,7 +127,5 @@ class UpdateDatapointRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
-from humanloop.model.tool_call import ToolCall
 from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs
 from humanloop.model.update_datapoint_request_target import UpdateDatapointRequestTarget

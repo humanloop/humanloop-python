@@ -34,18 +34,12 @@ from humanloop import schemas  # noqa: F401
 
 from humanloop.model.evaluators_list_response import EvaluatorsListResponse as EvaluatorsListResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
-from humanloop.type.validation_error import ValidationError
 from humanloop.type.evaluators_list_response import EvaluatorsListResponse
-from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.evaluators_list_response import EvaluatorsListResponse as EvaluatorsListResponsePydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 
 from . import path

@@ -12,10 +12,12 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from humanloop.type.evaluator_type import EvaluatorType
+from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
 
 class RequiredCreateEvaluatorRequest(TypedDict):
     # The description of the evaluator.
@@ -24,17 +26,21 @@ class RequiredCreateEvaluatorRequest(TypedDict):
     # The name of the evaluator.
     name: str
 
-    # The code for the evaluator. This code will be executed in a sandboxed environment.
-    code: str
-
     # Whether this evaluator is target-free or target-required.
     arguments_type: EvaluatorArgumentsType
 
     # The type of the return value of the evaluator.
     return_type: EvaluatorReturnTypeEnum
 
+    # The type of the evaluator.
+    type: EvaluatorType
+
 class OptionalCreateEvaluatorRequest(TypedDict, total=False):
-    pass
+    # The code for the evaluator. This code will be executed in a sandboxed environment.
+    code: str
+
+    # The model configuration used to generate.
+    model_config: ModelConfigCompletionRequest
 
 class CreateEvaluatorRequest(RequiredCreateEvaluatorRequest, OptionalCreateEvaluatorRequest):
     pass

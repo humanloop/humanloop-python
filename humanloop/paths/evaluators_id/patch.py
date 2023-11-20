@@ -33,27 +33,24 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.evaluator_response import EvaluatorResponse as EvaluatorResponseSchema
+from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest as ModelConfigCompletionRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
 from humanloop.model.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypeSchema
 from humanloop.model.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumSchema
 from humanloop.model.update_evaluator_request import UpdateEvaluatorRequest as UpdateEvaluatorRequestSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
 
-from humanloop.type.validation_error import ValidationError
+from humanloop.type.model_config_completion_request import ModelConfigCompletionRequest
 from humanloop.type.update_evaluator_request import UpdateEvaluatorRequest
 from humanloop.type.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.type.evaluator_response import EvaluatorResponse
 from humanloop.type.evaluator_return_type_enum import EvaluatorReturnTypeEnum
-from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.update_evaluator_request import UpdateEvaluatorRequest as UpdateEvaluatorRequestPydantic
+from humanloop.pydantic.model_config_completion_request import ModelConfigCompletionRequest as ModelConfigCompletionRequestPydantic
 from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum as EvaluatorReturnTypeEnumPydantic
 from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType as EvaluatorArgumentsTypePydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.evaluator_response import EvaluatorResponse as EvaluatorResponsePydantic
 
@@ -157,9 +154,10 @@ class BaseApi(api_client.Api):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _path_params = {}
@@ -168,12 +166,14 @@ class BaseApi(api_client.Api):
             _body["description"] = description
         if name is not None:
             _body["name"] = name
-        if code is not None:
-            _body["code"] = code
         if arguments_type is not None:
             _body["arguments_type"] = arguments_type
         if return_type is not None:
             _body["return_type"] = return_type
+        if code is not None:
+            _body["code"] = code
+        if model_config is not None:
+            _body["model_config"] = model_config
         args.body = _body
         if id is not None:
             _path_params["id"] = id
@@ -415,9 +415,10 @@ class UpdateRaw(BaseApi):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -428,9 +429,10 @@ class UpdateRaw(BaseApi):
             id=id,
             description=description,
             name=name,
-            code=code,
             arguments_type=arguments_type,
             return_type=return_type,
+            code=code,
+            model_config=model_config,
         )
         return await self._aupdate_oapg(
             body=args.body,
@@ -443,9 +445,10 @@ class UpdateRaw(BaseApi):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -454,9 +457,10 @@ class UpdateRaw(BaseApi):
             id=id,
             description=description,
             name=name,
-            code=code,
             arguments_type=arguments_type,
             return_type=return_type,
+            code=code,
+            model_config=model_config,
         )
         return self._update_oapg(
             body=args.body,
@@ -470,9 +474,10 @@ class Update(BaseApi):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
         validate: bool = False,
         **kwargs,
     ):
@@ -480,9 +485,10 @@ class Update(BaseApi):
             id=id,
             description=description,
             name=name,
-            code=code,
             arguments_type=arguments_type,
             return_type=return_type,
+            code=code,
+            model_config=model_config,
             **kwargs,
         )
         if validate:
@@ -495,18 +501,20 @@ class Update(BaseApi):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
         validate: bool = False,
     ):
         raw_response = self.raw.update(
             id=id,
             description=description,
             name=name,
-            code=code,
             arguments_type=arguments_type,
             return_type=return_type,
+            code=code,
+            model_config=model_config,
         )
         if validate:
             return EvaluatorResponsePydantic(**raw_response.body)
@@ -521,9 +529,10 @@ class ApiForpatch(BaseApi):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -534,9 +543,10 @@ class ApiForpatch(BaseApi):
             id=id,
             description=description,
             name=name,
-            code=code,
             arguments_type=arguments_type,
             return_type=return_type,
+            code=code,
+            model_config=model_config,
         )
         return await self._aupdate_oapg(
             body=args.body,
@@ -549,9 +559,10 @@ class ApiForpatch(BaseApi):
         id: str,
         description: typing.Optional[str] = None,
         name: typing.Optional[str] = None,
-        code: typing.Optional[str] = None,
         arguments_type: typing.Optional[EvaluatorArgumentsType] = None,
         return_type: typing.Optional[EvaluatorReturnTypeEnum] = None,
+        code: typing.Optional[str] = None,
+        model_config: typing.Optional[ModelConfigCompletionRequest] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -560,9 +571,10 @@ class ApiForpatch(BaseApi):
             id=id,
             description=description,
             name=name,
-            code=code,
             arguments_type=arguments_type,
             return_type=return_type,
+            code=code,
+            model_config=model_config,
         )
         return self._update_oapg(
             body=args.body,

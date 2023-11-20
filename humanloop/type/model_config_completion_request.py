@@ -12,7 +12,7 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
@@ -54,6 +54,9 @@ class OptionalModelConfigCompletionRequest(TypedDict, total=False):
 
     # Other parameter values to be passed to the provider call.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
+
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: int
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints

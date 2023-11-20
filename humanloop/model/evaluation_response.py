@@ -237,7 +237,5 @@ class EvaluationResponse(
 from humanloop.model.config_response import ConfigResponse
 from humanloop.model.dataset_response import DatasetResponse
 from humanloop.model.evaluation_status import EvaluationStatus
-from humanloop.model.evaluator_arguments_type import EvaluatorArgumentsType
 from humanloop.model.evaluator_response import EvaluatorResponse
-from humanloop.model.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse

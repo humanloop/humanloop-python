@@ -12,11 +12,8 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.feedback_class import FeedbackClass
-from humanloop.type.feedback_label_request import FeedbackLabelRequest
 from humanloop.type.feedback_type_request import FeedbackTypeRequest
-from humanloop.type.label_sentiment import LabelSentiment
 
 ProjectsUpdateFeedbackTypesRequest = typing.List[FeedbackTypeRequest]

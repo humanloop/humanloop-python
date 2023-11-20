@@ -35,41 +35,23 @@ from humanloop import schemas  # noqa: F401
 from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsSchema
 from humanloop.model.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
-from humanloop.model.datapoint_response_target import DatapointResponseTarget as DatapointResponseTargetSchema
-from humanloop.model.datapoint_response_inputs import DatapointResponseInputs as DatapointResponseInputsSchema
-from humanloop.model.tool_call import ToolCall as ToolCallSchema
-from humanloop.model.chat_role import ChatRole as ChatRoleSchema
 from humanloop.model.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 from humanloop.model.datapoint_response import DatapointResponse as DatapointResponseSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
+from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.update_datapoint_request import UpdateDatapointRequest
 from humanloop.type.update_datapoint_request_inputs import UpdateDatapointRequestInputs
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.validation_error import ValidationError
 from humanloop.type.datapoint_response import DatapointResponse
-from humanloop.type.datapoint_response_inputs import DatapointResponseInputs
-from humanloop.type.datapoint_response_target import DatapointResponseTarget
-from humanloop.type.tool_call import ToolCall
 from humanloop.type.update_datapoint_request_target import UpdateDatapointRequestTarget
-from humanloop.type.validation_error_loc import ValidationErrorLoc
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
-from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget as DatapointResponseTargetPydantic
 from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetPydantic
-from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
 from humanloop.pydantic.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestPydantic
 from humanloop.pydantic.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsPydantic
-from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
-from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs as DatapointResponseInputsPydantic
 from humanloop.pydantic.datapoint_response import DatapointResponse as DatapointResponsePydantic
 
 # Path params

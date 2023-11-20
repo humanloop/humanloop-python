@@ -12,14 +12,9 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
-from humanloop.type.chat_role import ChatRole
 from humanloop.type.datapoint_response import DatapointResponse
-from humanloop.type.datapoint_response_inputs import DatapointResponseInputs
-from humanloop.type.datapoint_response_target import DatapointResponseTarget
-from humanloop.type.tool_call import ToolCall
 
 class RequiredPaginatedDataDatapointResponse(TypedDict):
     records: typing.List[DatapointResponse]

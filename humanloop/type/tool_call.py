@@ -12,14 +12,20 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+from humanloop.type.function_tool import FunctionTool
+from humanloop.type.tool_type import ToolType
 
 class RequiredToolCall(TypedDict):
-    name: str
+    id: str
+
+    type: ToolType
+
+    function: FunctionTool
 
 class OptionalToolCall(TypedDict, total=False):
-    arguments: typing.Union[bool, date, datetime, dict, float, int, list, str, None]
+    pass
 
 class ToolCall(RequiredToolCall, OptionalToolCall):
     pass

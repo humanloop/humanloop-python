@@ -12,12 +12,11 @@
 from datetime import datetime, date
 import typing
 from enum import Enum
-from typing_extensions import TypedDict, Literal
+from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.completion_response_provider_responses import CompletionResponseProviderResponses
 from humanloop.pydantic.data_response import DataResponse
-from humanloop.pydantic.tool_result_response import ToolResultResponse
 from humanloop.pydantic.usage import Usage
 
 class CompletionResponse(BaseModel):

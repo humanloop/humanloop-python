@@ -127,7 +127,5 @@ class CreateDatapointRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.chat_role import ChatRole
 from humanloop.model.create_datapoint_request_inputs import CreateDatapointRequestInputs
 from humanloop.model.create_datapoint_request_target import CreateDatapointRequestTarget
-from humanloop.model.tool_call import ToolCall

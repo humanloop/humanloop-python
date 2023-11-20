@@ -32,48 +32,30 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.chat_response_provider_responses import ChatResponseProviderResponses as ChatResponseProviderResponsesSchema
-from humanloop.model.chat_experiment_request import ChatExperimentRequest as ChatExperimentRequestSchema
-from humanloop.model.validation_error_loc import ValidationErrorLoc as ValidationErrorLocSchema
-from humanloop.model.usage import Usage as UsageSchema
-from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
-from humanloop.model.chat_role import ChatRole as ChatRoleSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
-from humanloop.model.chat_data_response import ChatDataResponse as ChatDataResponseSchema
-from humanloop.model.tool_result_response import ToolResultResponse as ToolResultResponseSchema
+from humanloop.model.tool_choice import ToolChoice as ToolChoiceSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.tool_call import ToolCall as ToolCallSchema
+from humanloop.model.chat_experiment_request import ChatExperimentRequest as ChatExperimentRequestSchema
+from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
+from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
 from humanloop.model.chat_response import ChatResponse as ChatResponseSchema
-from humanloop.model.validation_error import ValidationError as ValidationErrorSchema
+from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
-from humanloop.type.validation_error_loc import ValidationErrorLoc
-from humanloop.type.tool_result_response import ToolResultResponse
-from humanloop.type.chat_role import ChatRole
-from humanloop.type.chat_data_response import ChatDataResponse
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.validation_error import ValidationError
-from humanloop.type.chat_response_provider_responses import ChatResponseProviderResponses
-from humanloop.type.tool_call import ToolCall
+from humanloop.type.chat_message import ChatMessage
+from humanloop.type.response_format import ResponseFormat
+from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.chat_experiment_request import ChatExperimentRequest
-from humanloop.type.usage import Usage
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
-from humanloop.pydantic.validation_error_loc import ValidationErrorLoc as ValidationErrorLocPydantic
+from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
+from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.chat_experiment_request import ChatExperimentRequest as ChatExperimentRequestPydantic
 from humanloop.pydantic.chat_response import ChatResponse as ChatResponsePydantic
-from humanloop.pydantic.chat_role import ChatRole as ChatRolePydantic
-from humanloop.pydantic.chat_response_provider_responses import ChatResponseProviderResponses as ChatResponseProviderResponsesPydantic
-from humanloop.pydantic.chat_data_response import ChatDataResponse as ChatDataResponsePydantic
-from humanloop.pydantic.usage import Usage as UsagePydantic
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
-from humanloop.pydantic.validation_error import ValidationError as ValidationErrorPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.tool_call import ToolCall as ToolCallPydantic
 from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
-from humanloop.pydantic.tool_result_response import ToolResultResponse as ToolResultResponsePydantic
+from humanloop.pydantic.tool_choice import ToolChoice as ToolChoicePydantic
 
 from . import path
 
@@ -161,7 +143,10 @@ class BaseApi(api_client.Api):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -193,8 +178,14 @@ class BaseApi(api_client.Api):
             _body["stream"] = stream
         if user is not None:
             _body["user"] = user
+        if tool_choice is not None:
+            _body["tool_choice"] = tool_choice
         if tool_call is not None:
             _body["tool_call"] = tool_call
+        if seed is not None:
+            _body["seed"] = seed
+        if response_format is not None:
+            _body["response_format"] = response_format
         if experiment_id is not None:
             _body["experiment_id"] = experiment_id
         args.body = _body
@@ -417,7 +408,10 @@ class CreateExperimentRaw(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -440,7 +434,10 @@ class CreateExperimentRaw(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
         )
         return await self._acreate_experiment_oapg(
             body=args.body,
@@ -464,7 +461,10 @@ class CreateExperimentRaw(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -485,7 +485,10 @@ class CreateExperimentRaw(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
         )
         return self._create_experiment_oapg(
             body=args.body,
@@ -510,7 +513,10 @@ class CreateExperiment(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
         **kwargs,
     ):
@@ -530,7 +536,10 @@ class CreateExperiment(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
             **kwargs,
         )
         if validate:
@@ -555,7 +564,10 @@ class CreateExperiment(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
     ):
         raw_response = self.raw.create_experiment(
@@ -574,7 +586,10 @@ class CreateExperiment(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
         )
         if validate:
             return ChatResponsePydantic(**raw_response.body)
@@ -601,7 +616,10 @@ class ApiForpost(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -624,7 +642,10 @@ class ApiForpost(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
         )
         return await self._acreate_experiment_oapg(
             body=args.body,
@@ -648,7 +669,10 @@ class ApiForpost(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
-        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]]] = None,
+        tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
+        tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
+        seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -669,7 +693,10 @@ class ApiForpost(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            tool_choice=tool_choice,
             tool_call=tool_call,
+            seed=seed,
+            response_format=response_format,
         )
         return self._create_experiment_oapg(
             body=args.body,
