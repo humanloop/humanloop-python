@@ -58,6 +58,9 @@ class OptionalProjectModelConfigRequest(TypedDict, total=False):
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: int
 
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat
+
     # Unique project name. If it does not exist, a new project will be created.
     project: str
 
@@ -78,9 +81,6 @@ class OptionalProjectModelConfigRequest(TypedDict, total=False):
 
     # Make tools available to OpenAIs chat model as functions.
     tools: typing.List[ModelConfigToolRequest]
-
-    # The format of the response. Only type json_object is currently supported for chat.
-    response_format: ResponseFormat
 
 class ProjectModelConfigRequest(RequiredProjectModelConfigRequest, OptionalProjectModelConfigRequest):
     pass

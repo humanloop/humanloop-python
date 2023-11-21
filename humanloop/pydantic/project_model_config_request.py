@@ -58,6 +58,9 @@ class ProjectModelConfigRequest(BaseModel):
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: typing.Optional[int] = Field(None, alias='seed')
 
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')
+
     # Unique project name. If it does not exist, a new project will be created.
     project: typing.Optional[str] = Field(None, alias='project')
 
@@ -78,6 +81,3 @@ class ProjectModelConfigRequest(BaseModel):
 
     # Make tools available to OpenAIs chat model as functions.
     tools: typing.Optional[typing.List[ModelConfigToolRequest]] = Field(None, alias='tools')
-
-    # The format of the response. Only type json_object is currently supported for chat.
-    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')

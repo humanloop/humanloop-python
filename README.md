@@ -2957,6 +2957,9 @@ register_response = humanloop.model_configs.register(
     frequency_penalty=0,
     other={},
     seed=1,
+    response_format={
+        "type": "json_object",
+    },
     project="string_example",
     project_id="string_example",
     experiment="string_example",
@@ -2972,9 +2975,6 @@ register_response = humanloop.model_configs.register(
             "name": "name_example",
         }
     ],
-    response_format={
-        "type": "json_object",
-    },
 )
 ```
 
@@ -3029,6 +3029,11 @@ Other parameter values to be passed to the provider call.
 
 If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
+
 ##### project: `str`<a id="project-str"></a>
 
 Unique project name. If it does not exist, a new project will be created.
@@ -3056,11 +3061,6 @@ Which of the providers model endpoints to use. For example Complete or Edit.
 ##### tools: List[`ModelConfigToolRequest`]<a id="tools-listmodelconfigtoolrequest"></a>
 
 Make tools available to OpenAIs chat model as functions.
-
-##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
-
-
-The format of the response. Only type json_object is currently supported for chat.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 

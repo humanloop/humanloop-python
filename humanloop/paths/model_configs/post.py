@@ -143,6 +143,7 @@ class BaseApi(api_client.Api):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -150,7 +151,6 @@ class BaseApi(api_client.Api):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -178,6 +178,8 @@ class BaseApi(api_client.Api):
             _body["other"] = other
         if seed is not None:
             _body["seed"] = seed
+        if response_format is not None:
+            _body["response_format"] = response_format
         if project is not None:
             _body["project"] = project
         if project_id is not None:
@@ -192,8 +194,6 @@ class BaseApi(api_client.Api):
             _body["endpoint"] = endpoint
         if tools is not None:
             _body["tools"] = tools
-        if response_format is not None:
-            _body["response_format"] = response_format
         args.body = _body
         return args
 
@@ -411,6 +411,7 @@ class RegisterRaw(BaseApi):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -418,7 +419,6 @@ class RegisterRaw(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -438,6 +438,7 @@ class RegisterRaw(BaseApi):
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -445,7 +446,6 @@ class RegisterRaw(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
-            response_format=response_format,
         )
         return await self._aregister_oapg(
             body=args.body,
@@ -466,6 +466,7 @@ class RegisterRaw(BaseApi):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -473,7 +474,6 @@ class RegisterRaw(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -491,6 +491,7 @@ class RegisterRaw(BaseApi):
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -498,7 +499,6 @@ class RegisterRaw(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
-            response_format=response_format,
         )
         return self._register_oapg(
             body=args.body,
@@ -520,6 +520,7 @@ class Register(BaseApi):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -527,7 +528,6 @@ class Register(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
         **kwargs,
     ):
@@ -544,6 +544,7 @@ class Register(BaseApi):
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -551,7 +552,6 @@ class Register(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
-            response_format=response_format,
             **kwargs,
         )
         if validate:
@@ -573,6 +573,7 @@ class Register(BaseApi):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -580,7 +581,6 @@ class Register(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
     ):
         raw_response = self.raw.register(
@@ -596,6 +596,7 @@ class Register(BaseApi):
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -603,7 +604,6 @@ class Register(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
-            response_format=response_format,
         )
         if validate:
             return ProjectConfigResponsePydantic(**raw_response.body)
@@ -627,6 +627,7 @@ class ApiForpost(BaseApi):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -634,7 +635,6 @@ class ApiForpost(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -654,6 +654,7 @@ class ApiForpost(BaseApi):
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -661,7 +662,6 @@ class ApiForpost(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
-            response_format=response_format,
         )
         return await self._aregister_oapg(
             body=args.body,
@@ -682,6 +682,7 @@ class ApiForpost(BaseApi):
         frequency_penalty: typing.Optional[typing.Union[int, float]] = None,
         other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         seed: typing.Optional[int] = None,
+        response_format: typing.Optional[ResponseFormat] = None,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
@@ -689,7 +690,6 @@ class ApiForpost(BaseApi):
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
-        response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -707,6 +707,7 @@ class ApiForpost(BaseApi):
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             project=project,
             project_id=project_id,
             experiment=experiment,
@@ -714,7 +715,6 @@ class ApiForpost(BaseApi):
             chat_template=chat_template,
             endpoint=endpoint,
             tools=tools,
-            response_format=response_format,
         )
         return self._register_oapg(
             body=args.body,

@@ -58,6 +58,9 @@ class OptionalModelConfigChatRequest(TypedDict, total=False):
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: int
 
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat
+
     # The provider model endpoint used.
     endpoint: ModelEndpoints
 
@@ -66,9 +69,6 @@ class OptionalModelConfigChatRequest(TypedDict, total=False):
 
     # Make tools available to OpenAIs chat model as functions.
     tools: typing.List[ModelConfigToolRequest]
-
-    # The format of the response. Only type json_object is currently supported for chat.
-    response_format: ResponseFormat
 
 class ModelConfigChatRequest(RequiredModelConfigChatRequest, OptionalModelConfigChatRequest):
     pass

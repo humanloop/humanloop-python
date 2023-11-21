@@ -63,6 +63,9 @@ class OptionalModelConfigResponse(TypedDict, total=False):
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: int
 
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat
+
     # Prompt template that will take your specified inputs to form your final request to the model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
     prompt_template: str
 
@@ -74,9 +77,6 @@ class OptionalModelConfigResponse(TypedDict, total=False):
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints
-
-    # The format of the response. Only type json_object is currently supported for chat.
-    response_format: ResponseFormat
 
 class ModelConfigResponse(RequiredModelConfigResponse, OptionalModelConfigResponse):
     pass

@@ -148,6 +148,42 @@ class ModelConfigChatRequest(
             seed = schemas.IntSchema
             
             
+            class response_format(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def all_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            ResponseFormat,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'response_format':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
+            
+            
             class endpoint(
                 schemas.ComposedSchema,
             ):
@@ -234,42 +270,6 @@ class ModelConfigChatRequest(
             
                 def __getitem__(self, i: int) -> 'ModelConfigToolRequest':
                     return super().__getitem__(i)
-            
-            
-            class response_format(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ResponseFormat,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'response_format':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
             __annotations__ = {
                 "model": model,
                 "description": description,
@@ -283,10 +283,10 @@ class ModelConfigChatRequest(
                 "frequency_penalty": frequency_penalty,
                 "other": other,
                 "seed": seed,
+                "response_format": response_format,
                 "endpoint": endpoint,
                 "chat_template": chat_template,
                 "tools": tools,
-                "response_format": response_format,
             }
         additional_properties = schemas.NotAnyTypeSchema
     
@@ -329,6 +329,9 @@ class ModelConfigChatRequest(
     def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> MetaOapg.properties.response_format: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["endpoint"]) -> MetaOapg.properties.endpoint: ...
     
     @typing.overload
@@ -337,10 +340,7 @@ class ModelConfigChatRequest(
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tools"]) -> MetaOapg.properties.tools: ...
     
-    @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> MetaOapg.properties.response_format: ...
-    
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], typing_extensions.Literal["response_format"], ]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], ]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -381,6 +381,9 @@ class ModelConfigChatRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union[MetaOapg.properties.response_format, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["endpoint"]) -> typing.Union[MetaOapg.properties.endpoint, schemas.Unset]: ...
     
     @typing.overload
@@ -389,10 +392,7 @@ class ModelConfigChatRequest(
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union[MetaOapg.properties.tools, schemas.Unset]: ...
     
-    @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union[MetaOapg.properties.response_format, schemas.Unset]: ...
-    
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], typing_extensions.Literal["response_format"], ]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], ]):
         return super().get_item_oapg(name)
 
     def __new__(
@@ -410,10 +410,10 @@ class ModelConfigChatRequest(
         frequency_penalty: typing.Union[MetaOapg.properties.frequency_penalty, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         endpoint: typing.Union[MetaOapg.properties.endpoint, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         chat_template: typing.Union[MetaOapg.properties.chat_template, list, tuple, schemas.Unset] = schemas.unset,
         tools: typing.Union[MetaOapg.properties.tools, list, tuple, schemas.Unset] = schemas.unset,
-        response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs,
     ) -> 'ModelConfigChatRequest':
@@ -432,10 +432,10 @@ class ModelConfigChatRequest(
             frequency_penalty=frequency_penalty,
             other=other,
             seed=seed,
+            response_format=response_format,
             endpoint=endpoint,
             chat_template=chat_template,
             tools=tools,
-            response_format=response_format,
             _configuration=_configuration,
         )
 

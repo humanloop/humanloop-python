@@ -19,6 +19,7 @@ from humanloop.pydantic.chat_message import ChatMessage
 from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
+from humanloop.pydantic.response_format import ResponseFormat
 
 class ModelConfigRequest(BaseModel):
     # The model instance used. E.g. text-davinci-002.
@@ -56,6 +57,9 @@ class ModelConfigRequest(BaseModel):
 
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: typing.Optional[int] = Field(None, alias='seed')
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')
 
     # The provider model endpoint used.
     endpoint: typing.Optional[ModelEndpoints] = Field(None, alias='endpoint')

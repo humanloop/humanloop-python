@@ -63,6 +63,9 @@ class ModelConfigResponse(BaseModel):
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: typing.Optional[int] = Field(None, alias='seed')
 
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')
+
     # Prompt template that will take your specified inputs to form your final request to the model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
     prompt_template: typing.Optional[str] = Field(None, alias='prompt_template')
 
@@ -74,6 +77,3 @@ class ModelConfigResponse(BaseModel):
 
     # The provider model endpoint used.
     endpoint: typing.Optional[ModelEndpoints] = Field(None, alias='endpoint')
-
-    # The format of the response. Only type json_object is currently supported for chat.
-    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')

@@ -58,6 +58,9 @@ class ModelConfigChatRequest(BaseModel):
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: typing.Optional[int] = Field(None, alias='seed')
 
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')
+
     # The provider model endpoint used.
     endpoint: typing.Optional[ModelEndpoints] = Field(None, alias='endpoint')
 
@@ -66,6 +69,3 @@ class ModelConfigChatRequest(BaseModel):
 
     # Make tools available to OpenAIs chat model as functions.
     tools: typing.Optional[typing.List[ModelConfigToolRequest]] = Field(None, alias='tools')
-
-    # The format of the response. Only type json_object is currently supported for chat.
-    response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')

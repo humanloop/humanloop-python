@@ -16,6 +16,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
+from humanloop.type.response_format import ResponseFormat
 
 class RequiredModelConfigCompletionRequest(TypedDict):
     # The model instance used. E.g. text-davinci-002.
@@ -57,6 +58,9 @@ class OptionalModelConfigCompletionRequest(TypedDict, total=False):
 
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: int
+
+    # The format of the response. Only type json_object is currently supported for chat.
+    response_format: ResponseFormat
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints
