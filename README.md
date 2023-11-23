@@ -1501,7 +1501,7 @@ update_response = humanloop.datapoints.update(
         }
     ],
     target={
-        "key": {},
+        "key": "string_example",
     },
 )
 ```
@@ -1598,7 +1598,7 @@ create_datapoint_response = humanloop.datasets.create_datapoint(
         }
     ],
     target={
-        "key": {},
+        "key": "string_example",
     },
 )
 ```
@@ -1734,6 +1734,10 @@ String ID of dataset. Starts with `evts_`.
 ##### page: `int`<a id="page-int"></a>
 
 ##### size: `int`<a id="size-int"></a>
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataDatapointResponse`](./humanloop/pydantic/paginated_data_datapoint_response.py)
 
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
@@ -1935,6 +1939,10 @@ Page to fetch. Starts from 1.
 ##### size: `int`<a id="size-int"></a>
 
 Number of evaluation results to retrieve.
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataEvaluationDatapointSnapshotResponse`](./humanloop/pydantic/paginated_data_evaluation_datapoint_snapshot_response.py)
 
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
@@ -2663,6 +2671,10 @@ list_response = humanloop.logs.list(
 
 ##### page: `int`<a id="page-int"></a>
 
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataLogResponse`](./humanloop/pydantic/paginated_data_log_response.py)
+
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/logs` `get`
@@ -3378,6 +3390,10 @@ Page offset for pagination.
 
 Page size for pagination. Number of logs to export.
 
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataLogResponse`](./humanloop/pydantic/paginated_data_log_response.py)
+
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/projects/{id}/export` `post`
@@ -3493,6 +3509,10 @@ Field to sort projects by
 ##### order: [`SortOrder`](./humanloop/type/sort_order.py)<a id="order-sortorderhumanlooptypesort_orderpy"></a>
 
 Direction to sort by.
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataProjectResponse`](./humanloop/pydantic/paginated_data_project_response.py)
 
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
@@ -3744,6 +3764,10 @@ Page to fetch. Starts from 1.
 ##### size: `int`<a id="size-int"></a>
 
 Number of sessions to retrieve.
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataSessionResponse`](./humanloop/pydantic/paginated_data_session_response.py)
 
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 

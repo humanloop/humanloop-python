@@ -67,6 +67,44 @@ class TestSimple(unittest.TestCase):
         response = self.humanloop.logs.raw.delete(id=["test"])
         self.assertIsNotNone(response)
 
+    def test_sessions_list(self):
+        response = self.humanloop.sessions.list("test")
+        self.assertIsNotNone(response)
+        self.assertIsNotNone(response.page)
+
+    def test_chat(self):
+        response = self.humanloop.chat(
+            project="konfig-dev-001",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
+                },
+                {"role": "user", "content": "Hello!"},
+            ],
+            model_config={
+                "model": "gpt-3.5-turbo",
+                "max_tokens": 1000,
+                "temperature": 1,
+            },
+        )
+        self.assertIsNotNone(response)
+        self.assertIsNotNone(response.data[0].id)
+
+    def test_datapoints_delete(self):
+        response = self.humanloop.datapoints.delete(["test"])
+        self.assertIsNone(response)
+
+    def test_datapoints_get(self):
+        response = self.humanloop.datapoints.get("test")
+        self.assertIsNotNone(response)
+        self.assertIsNotNone(response.id)
+        self.assertIsNotNone(response.messages[0].content)
+
+    def test_datasets_list_for_all_projects(self):
+        response = self.humanloop.datasets.list_all_for_project("test")
+        self.assertIsNotNone(response)
+        self.assertIsNotNone(response[0].id)
 
     def test_complete(self):
         response: AsyncGeneratorResponse = self.humanloop.complete(
@@ -78,7 +116,6 @@ class TestSimple(unittest.TestCase):
             },
         )  # type: ignore
 
-    @pytest.mark.skip(reason="unstable test")
     def test_experiment_create(self):
         response = self.humanloop.experiments.create(
             name='test',
@@ -87,14 +124,12 @@ class TestSimple(unittest.TestCase):
         )
         self.assertIsNotNone(response.id)
 
-    @pytest.mark.skip(reason="circular reference is not supported for mock server")
     def test_experiment_delete(self):
         response = self.humanloop.experiments.delete(
             experiment_id="test"
         )
         self.assertIsNone(response)
 
-    @pytest.mark.skip(reason="mock server is not returning valid response")
     def test_chat_model_config(self):
         response = self.humanloop.chat_model_config(
             model_config_id="test",
