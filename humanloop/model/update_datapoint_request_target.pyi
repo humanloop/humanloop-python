@@ -42,10 +42,14 @@ class UpdateDatapointRequestTarget(
         
         
             class MetaOapg:
-                any_of_0 = schemas.DictSchema
+                any_of_0 = schemas.StrSchema
+                any_of_1 = schemas.IntSchema
+                any_of_2 = schemas.NumberSchema
+                any_of_3 = schemas.BoolSchema
+                any_of_4 = schemas.DictSchema
                 
                 
-                class any_of_1(
+                class any_of_5(
                     schemas.ListSchema
                 ):
                 
@@ -57,7 +61,7 @@ class UpdateDatapointRequestTarget(
                         cls,
                         arg: typing.Union[typing.Tuple[typing.Union[MetaOapg.items, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ]], typing.List[typing.Union[MetaOapg.items, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ]]],
                         _configuration: typing.Optional[schemas.Configuration] = None,
-                    ) -> 'any_of_1':
+                    ) -> 'any_of_5':
                         return super().__new__(
                             cls,
                             arg,
@@ -66,10 +70,6 @@ class UpdateDatapointRequestTarget(
                 
                     def __getitem__(self, i: int) -> MetaOapg.items:
                         return super().__getitem__(i)
-                any_of_2 = schemas.BoolSchema
-                any_of_3 = schemas.NumberSchema
-                any_of_4 = schemas.IntSchema
-                any_of_5 = schemas.StrSchema
                 
                 @classmethod
                 @functools.lru_cache()
