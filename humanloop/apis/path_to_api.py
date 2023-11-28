@@ -39,6 +39,8 @@ from humanloop.apis.paths.datasets_dataset_id_datapoints import DatasetsDatasetI
 from humanloop.apis.paths.evaluations_id import EvaluationsId
 from humanloop.apis.paths.evaluations_id_datapoints import EvaluationsIdDatapoints
 from humanloop.apis.paths.projects_project_id_evaluations import ProjectsProjectIdEvaluations
+from humanloop.apis.paths.evaluations_evaluation_run_external_id_result import EvaluationsEvaluationRunExternalIdResult
+from humanloop.apis.paths.evaluations_id_status import EvaluationsIdStatus
 from humanloop.apis.paths.projects_project_id_finetunes import ProjectsProjectIdFinetunes
 from humanloop.apis.paths.projects_project_id_finetunes_summary import ProjectsProjectIdFinetunesSummary
 from humanloop.apis.paths.finetunes_id import FinetunesId
@@ -84,6 +86,8 @@ PathToApi = typing_extensions.TypedDict(
         PathValues.EVALUATIONS_ID: EvaluationsId,
         PathValues.EVALUATIONS_ID_DATAPOINTS: EvaluationsIdDatapoints,
         PathValues.PROJECTS_PROJECT_ID_EVALUATIONS: ProjectsProjectIdEvaluations,
+        PathValues.EVALUATIONS_EVALUATION_RUN_EXTERNAL_ID_RESULT: EvaluationsEvaluationRunExternalIdResult,
+        PathValues.EVALUATIONS_ID_STATUS: EvaluationsIdStatus,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES: ProjectsProjectIdFinetunes,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES_SUMMARY: ProjectsProjectIdFinetunesSummary,
         PathValues.FINETUNES_ID: FinetunesId,
@@ -130,6 +134,8 @@ path_to_api = PathToApi(
         PathValues.EVALUATIONS_ID: EvaluationsId,
         PathValues.EVALUATIONS_ID_DATAPOINTS: EvaluationsIdDatapoints,
         PathValues.PROJECTS_PROJECT_ID_EVALUATIONS: ProjectsProjectIdEvaluations,
+        PathValues.EVALUATIONS_EVALUATION_RUN_EXTERNAL_ID_RESULT: EvaluationsEvaluationRunExternalIdResult,
+        PathValues.EVALUATIONS_ID_STATUS: EvaluationsIdStatus,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES: ProjectsProjectIdFinetunes,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES_SUMMARY: ProjectsProjectIdFinetunesSummary,
         PathValues.FINETUNES_ID: FinetunesId,

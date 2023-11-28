@@ -64,6 +64,9 @@ class OptionalLogResponse(TypedDict, total=False):
     # Any additional metadata to record.
     metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # ID of the source datapoint if this is a log derived from a datapoint in a dataset.
+    source_datapoint_id: str
+
     # Unique user-provided string identifying the datapoint.
     reference_id: str
 

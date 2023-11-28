@@ -50,6 +50,9 @@ class LogRequest(BaseModel):
     # Any additional metadata to record.
     metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
 
+    # ID of the source datapoint if this is a log derived from a datapoint in a dataset.
+    source_datapoint_id: typing.Optional[str] = Field(None, alias='source_datapoint_id')
+
     # A unique string to reference the datapoint. Allows you to log nested datapoints with your internal system IDs by passing the same reference ID as `parent_id` in a subsequent log request.
     reference_id: typing.Optional[str] = Field(None, alias='reference_id')
 
