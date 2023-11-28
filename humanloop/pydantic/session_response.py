@@ -29,6 +29,8 @@ class SessionResponse(BaseModel):
 
     created_at: datetime = Field(alias='created_at')
 
+    updated_at: datetime = Field(alias='updated_at')
+
     # Unique user-provided string identifying the session.
     reference_id: typing.Optional[str] = Field(None, alias='reference_id')
 

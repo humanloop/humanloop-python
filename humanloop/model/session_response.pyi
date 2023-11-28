@@ -34,6 +34,7 @@ class SessionResponse(
     class MetaOapg:
         required = {
             "projects",
+            "updated_at",
             "created_at",
             "datapoints_count",
             "id",
@@ -69,6 +70,7 @@ class SessionResponse(
                     return super().__getitem__(i)
             datapoints_count = schemas.IntSchema
             created_at = schemas.DateTimeSchema
+            updated_at = schemas.DateTimeSchema
             reference_id = schemas.StrSchema
             first_inputs = schemas.DictSchema
             last_output = schemas.StrSchema
@@ -77,12 +79,14 @@ class SessionResponse(
                 "projects": projects,
                 "datapoints_count": datapoints_count,
                 "created_at": created_at,
+                "updated_at": updated_at,
                 "reference_id": reference_id,
                 "first_inputs": first_inputs,
                 "last_output": last_output,
             }
     
     projects: MetaOapg.properties.projects
+    updated_at: MetaOapg.properties.updated_at
     created_at: MetaOapg.properties.created_at
     datapoints_count: MetaOapg.properties.datapoints_count
     id: MetaOapg.properties.id
@@ -100,6 +104,9 @@ class SessionResponse(
     def __getitem__(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["reference_id"]) -> MetaOapg.properties.reference_id: ...
     
     @typing.overload
@@ -111,7 +118,7 @@ class SessionResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "projects", "datapoints_count", "created_at", "reference_id", "first_inputs", "last_output", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "projects", "datapoints_count", "created_at", "updated_at", "reference_id", "first_inputs", "last_output", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -129,6 +136,9 @@ class SessionResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["reference_id"]) -> typing.Union[MetaOapg.properties.reference_id, schemas.Unset]: ...
     
     @typing.overload
@@ -140,7 +150,7 @@ class SessionResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "projects", "datapoints_count", "created_at", "reference_id", "first_inputs", "last_output", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "projects", "datapoints_count", "created_at", "updated_at", "reference_id", "first_inputs", "last_output", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -148,6 +158,7 @@ class SessionResponse(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
         projects: typing.Union[MetaOapg.properties.projects, list, tuple, ],
+        updated_at: typing.Union[MetaOapg.properties.updated_at, str, datetime, ],
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         datapoints_count: typing.Union[MetaOapg.properties.datapoints_count, decimal.Decimal, int, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
@@ -161,6 +172,7 @@ class SessionResponse(
             cls,
             *args,
             projects=projects,
+            updated_at=updated_at,
             created_at=created_at,
             datapoints_count=datapoints_count,
             id=id,

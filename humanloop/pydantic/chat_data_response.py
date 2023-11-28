@@ -36,6 +36,9 @@ class ChatDataResponse(BaseModel):
     # The model configuration used to create the generation.
     model_config_id_: str = Field(alias='model_config_id')
 
+    # The message returned by the provider.
+    output_message: ChatMessage = Field(alias='output_message')
+
     # The inputs passed to the chat template.
     inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='inputs')
 

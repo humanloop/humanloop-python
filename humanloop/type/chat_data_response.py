@@ -35,6 +35,9 @@ class RequiredChatDataResponse(TypedDict):
     # The model configuration used to create the generation.
     model_config_id: str
 
+    # The message returned by the provider.
+    output_message: ChatMessage
+
 class OptionalChatDataResponse(TypedDict, total=False):
     # The inputs passed to the chat template.
     inputs: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
