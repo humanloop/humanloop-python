@@ -48,6 +48,9 @@ class OptionalCompletionModelConfigRequest(TypedDict, total=False):
     # Any additional metadata to record.
     metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # ID of the source datapoint if this is a log derived from a datapoint in a dataset.
+    source_datapoint_id: str
+
     # API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
     provider_api_keys: ProviderApiKeys
 

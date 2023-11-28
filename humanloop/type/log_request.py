@@ -52,6 +52,9 @@ class OptionalLogRequest(TypedDict, total=False):
     # Any additional metadata to record.
     metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # ID of the source datapoint if this is a log derived from a datapoint in a dataset.
+    source_datapoint_id: str
+
     # A unique string to reference the datapoint. Allows you to log nested datapoints with your internal system IDs by passing the same reference ID as `parent_id` in a subsequent log request.
     reference_id: str
 

@@ -74,6 +74,8 @@
   * [`humanloop.evaluations.get`](#humanloopevaluationsget)
   * [`humanloop.evaluations.list_all_for_project`](#humanloopevaluationslist_all_for_project)
   * [`humanloop.evaluations.list_datapoints`](#humanloopevaluationslist_datapoints)
+  * [`humanloop.evaluations.log_result`](#humanloopevaluationslog_result)
+  * [`humanloop.evaluations.update_status`](#humanloopevaluationsupdate_status)
   * [`humanloop.evaluators.create`](#humanloopevaluatorscreate)
   * [`humanloop.evaluators.delete`](#humanloopevaluatorsdelete)
   * [`humanloop.evaluators.get`](#humanloopevaluatorsget)
@@ -340,6 +342,7 @@ try:
         inputs={},
         source="string_example",
         metadata={},
+        source_datapoint_id="string_example",
         provider_api_keys={},
         num_samples=1,
         stream=False,
@@ -455,6 +458,7 @@ create_response = humanloop.chat(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     stream=False,
@@ -514,6 +518,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -588,6 +596,7 @@ create_deployed_response = humanloop.chat_deployed(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     stream=False,
@@ -643,6 +652,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -722,6 +735,7 @@ create_experiment_response = humanloop.chat_experiment(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     stream=False,
@@ -780,6 +794,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -855,6 +873,7 @@ create_model_config_response = humanloop.chat_model_config(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     stream=False,
@@ -913,6 +932,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -991,6 +1014,7 @@ create_response = humanloop.complete(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     logprobs=1,
@@ -1043,6 +1067,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -1105,6 +1133,7 @@ create_deployed_response = humanloop.complete_deployed(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     logprobs=1,
@@ -1153,6 +1182,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -1220,6 +1253,7 @@ create_experiment_response = humanloop.complete_experiment(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     logprobs=1,
@@ -1271,6 +1305,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -1334,6 +1372,7 @@ create_model_config_response = humanloop.complete_model_configuration(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
     logprobs=1,
@@ -1385,6 +1424,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### provider_api_keys: [`ProviderApiKeys`](./humanloop/type/provider_api_keys.py)<a id="provider_api_keys-providerapikeyshumanlooptypeprovider_api_keyspy"></a>
 
@@ -1947,6 +1990,98 @@ Number of evaluation results to retrieve.
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/evaluations/{id}/datapoints` `get`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.evaluations.log_result`<a id="humanloopevaluationslog_result"></a>
+
+Log an evaluation result to an evaluation run.  The run must have status 'running' and the `evaluator_id` of the result must be one of the `evaluator_id`s associated with the run.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+log_result_response = humanloop.evaluations.log_result(
+    log_id="string_example",
+    evaluator_id="string_example",
+    evaluation_run_external_id="evaluation_run_external_id_example",
+    result=True,
+    error="string_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### log_id: `str`<a id="log_id-str"></a>
+
+The log that was evaluated. Must have as its `source_datapoint_id` one of the datapoints in the dataset being evaluated.
+
+##### evaluator_id: `str`<a id="evaluator_id-str"></a>
+
+ID of the evaluator that evaluated the log. Starts with `evfn_`. Must be one of the evaluator IDs associated with the evaluation run being logged to.
+
+##### evaluation_run_external_id: `str`<a id="evaluation_run_external_id-str"></a>
+
+ID of the evaluation run. Starts with `evrun_`.
+
+##### result: Union[`bool`, `int`, `Union[int, float]`]<a id="result-unionbool-int-unionint-float"></a>
+
+
+The result value of the evaluation.
+
+##### error: `str`<a id="error-str"></a>
+
+An error that occurred during evaluation.
+
+#### ⚙️ Request Body<a id="⚙️-request-body"></a>
+
+[`CreateEvaluationResultLogRequest`](./humanloop/type/create_evaluation_result_log_request.py)
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`EvaluationResultResponse`](./humanloop/pydantic/evaluation_result_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/evaluations/{evaluation_run_external_id}/result` `post`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.evaluations.update_status`<a id="humanloopevaluationsupdate_status"></a>
+
+Update the status of an evaluation run.  Can only be used to update the status of an evaluation run that uses external evaluators. The evaluation must currently have status 'running'.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+update_status_response = humanloop.evaluations.update_status(
+    status="string_example",
+    id="id_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### status: [`EvaluationStatus`](./humanloop/type/evaluation_status.py)<a id="status-evaluationstatushumanlooptypeevaluation_statuspy"></a>
+
+The new status of the evaluation.
+
+##### id: `str`<a id="id-str"></a>
+
+String ID of evaluation run. Starts with `ev_`.
+
+#### ⚙️ Request Body<a id="⚙️-request-body"></a>
+
+[`UpdateEvaluationStatusRequest`](./humanloop/type/update_evaluation_status_request.py)
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`EvaluationResponse`](./humanloop/pydantic/evaluation_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/evaluations/{id}/status` `patch`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 
@@ -2701,6 +2836,7 @@ log_response = humanloop.log(
     inputs={},
     source="string_example",
     metadata={},
+    source_datapoint_id="string_example",
     reference_id="string_example",
     trial_id="string_example",
     messages=[
@@ -2769,6 +2905,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
+
+ID of the source datapoint if this is a log derived from a datapoint in a dataset.
 
 ##### reference_id: `str`<a id="reference_id-str"></a>
 

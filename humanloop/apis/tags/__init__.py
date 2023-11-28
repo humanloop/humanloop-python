@@ -8,12 +8,12 @@ import enum
 class TagValues(str, enum.Enum):
     PROJECTS = "Projects"
     DATASETS = "Datasets"
+    EVALUATIONS = "Evaluations"
     LOGS = "Logs"
     EXPERIMENTS = "Experiments"
     EVALUATORS = "Evaluators"
     COMPLETIONS = "Completions"
     CHATS = "Chats"
-    EVALUATIONS = "Evaluations"
     FINETUNES = "Finetunes"
     SESSIONS = "Sessions"
     DATAPOINTS = "Datapoints"

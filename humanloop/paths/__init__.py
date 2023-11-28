@@ -44,6 +44,8 @@ class PathValues(str, enum.Enum):
     EVALUATIONS_ID = "/evaluations/{id}"
     EVALUATIONS_ID_DATAPOINTS = "/evaluations/{id}/datapoints"
     PROJECTS_PROJECT_ID_EVALUATIONS = "/projects/{project_id}/evaluations"
+    EVALUATIONS_EVALUATION_RUN_EXTERNAL_ID_RESULT = "/evaluations/{evaluation_run_external_id}/result"
+    EVALUATIONS_ID_STATUS = "/evaluations/{id}/status"
     PROJECTS_PROJECT_ID_FINETUNES = "/projects/{project_id}/finetunes"
     PROJECTS_PROJECT_ID_FINETUNES_SUMMARY = "/projects/{project_id}/finetunes/summary"
     FINETUNES_ID = "/finetunes/{id}"

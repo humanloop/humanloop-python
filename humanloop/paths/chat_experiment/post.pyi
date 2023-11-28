@@ -130,6 +130,7 @@ class BaseApi(api_client.Api):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -159,6 +160,8 @@ class BaseApi(api_client.Api):
             _body["source"] = source
         if metadata is not None:
             _body["metadata"] = metadata
+        if source_datapoint_id is not None:
+            _body["source_datapoint_id"] = source_datapoint_id
         if messages is not None:
             _body["messages"] = messages
         if provider_api_keys is not None:
@@ -395,6 +398,7 @@ class CreateExperimentRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -421,6 +425,7 @@ class CreateExperimentRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             stream=stream,
@@ -448,6 +453,7 @@ class CreateExperimentRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -472,6 +478,7 @@ class CreateExperimentRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             stream=stream,
@@ -500,6 +507,7 @@ class CreateExperiment(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -523,6 +531,7 @@ class CreateExperiment(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             stream=stream,
@@ -551,6 +560,7 @@ class CreateExperiment(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -573,6 +583,7 @@ class CreateExperiment(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             stream=stream,
@@ -603,6 +614,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -629,6 +641,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             stream=stream,
@@ -656,6 +669,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
@@ -680,6 +694,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             stream=stream,

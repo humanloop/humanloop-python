@@ -64,6 +64,9 @@ class LogResponse(BaseModel):
     # Any additional metadata to record.
     metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
 
+    # ID of the source datapoint if this is a log derived from a datapoint in a dataset.
+    source_datapoint_id: typing.Optional[str] = Field(None, alias='source_datapoint_id')
+
     # Unique user-provided string identifying the datapoint.
     reference_id: typing.Optional[str] = Field(None, alias='reference_id')
 

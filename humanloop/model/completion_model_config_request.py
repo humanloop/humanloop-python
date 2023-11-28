@@ -49,6 +49,7 @@ class CompletionModelConfigRequest(
             inputs = schemas.DictSchema
             source = schemas.StrSchema
             metadata = schemas.DictSchema
+            source_datapoint_id = schemas.StrSchema
             
             
             class provider_api_keys(
@@ -102,6 +103,7 @@ class CompletionModelConfigRequest(
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
+                "source_datapoint_id": source_datapoint_id,
                 "provider_api_keys": provider_api_keys,
                 "num_samples": num_samples,
                 "logprobs": logprobs,
@@ -145,6 +147,9 @@ class CompletionModelConfigRequest(
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["source_datapoint_id"]) -> MetaOapg.properties.source_datapoint_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["provider_api_keys"]) -> MetaOapg.properties.provider_api_keys: ...
     
     @typing.overload
@@ -165,7 +170,7 @@ class CompletionModelConfigRequest(
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["user"]) -> MetaOapg.properties.user: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["stream"], typing_extensions.Literal["suffix"], typing_extensions.Literal["seed"], typing_extensions.Literal["user"], ]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["stream"], typing_extensions.Literal["suffix"], typing_extensions.Literal["seed"], typing_extensions.Literal["user"], ]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -200,6 +205,9 @@ class CompletionModelConfigRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["source_datapoint_id"]) -> typing.Union[MetaOapg.properties.source_datapoint_id, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["provider_api_keys"]) -> typing.Union[MetaOapg.properties.provider_api_keys, schemas.Unset]: ...
     
     @typing.overload
@@ -220,7 +228,7 @@ class CompletionModelConfigRequest(
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["user"]) -> typing.Union[MetaOapg.properties.user, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["stream"], typing_extensions.Literal["suffix"], typing_extensions.Literal["seed"], typing_extensions.Literal["user"], ]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["stream"], typing_extensions.Literal["suffix"], typing_extensions.Literal["seed"], typing_extensions.Literal["user"], ]):
         return super().get_item_oapg(name)
 
     def __new__(
@@ -236,6 +244,7 @@ class CompletionModelConfigRequest(
         inputs: typing.Union[MetaOapg.properties.inputs, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         source: typing.Union[MetaOapg.properties.source, str, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        source_datapoint_id: typing.Union[MetaOapg.properties.source_datapoint_id, str, schemas.Unset] = schemas.unset,
         provider_api_keys: typing.Union[MetaOapg.properties.provider_api_keys, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         num_samples: typing.Union[MetaOapg.properties.num_samples, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         logprobs: typing.Union[MetaOapg.properties.logprobs, decimal.Decimal, int, schemas.Unset] = schemas.unset,
@@ -259,6 +268,7 @@ class CompletionModelConfigRequest(
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
             logprobs=logprobs,

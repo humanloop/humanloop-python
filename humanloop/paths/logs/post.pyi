@@ -135,6 +135,7 @@ class BaseApi(api_client.Api):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -165,6 +166,8 @@ class BaseApi(api_client.Api):
             _body["source"] = source
         if metadata is not None:
             _body["metadata"] = metadata
+        if source_datapoint_id is not None:
+            _body["source_datapoint_id"] = source_datapoint_id
         if reference_id is not None:
             _body["reference_id"] = reference_id
         if trial_id is not None:
@@ -398,6 +401,7 @@ class LogRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -424,6 +428,7 @@ class LogRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
             messages=messages,
@@ -451,6 +456,7 @@ class LogRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -475,6 +481,7 @@ class LogRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
             messages=messages,
@@ -503,6 +510,7 @@ class Log(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -526,6 +534,7 @@ class Log(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
             messages=messages,
@@ -554,6 +563,7 @@ class Log(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -576,6 +586,7 @@ class Log(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
             messages=messages,
@@ -606,6 +617,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -632,6 +644,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
             messages=messages,
@@ -659,6 +672,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
@@ -683,6 +697,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
             messages=messages,
