@@ -24,6 +24,9 @@ from humanloop.apis.paths.projects_project_id_deploy_config import ProjectsProje
 from humanloop.apis.paths.projects_project_id_deployed_config_environment_id import ProjectsProjectIdDeployedConfigEnvironmentId
 from humanloop.apis.paths.model_configs import ModelConfigs
 from humanloop.apis.paths.model_configs_id import ModelConfigsId
+from humanloop.apis.paths.model_configs_id_export import ModelConfigsIdExport
+from humanloop.apis.paths.model_configs_serialize import ModelConfigsSerialize
+from humanloop.apis.paths.model_configs_deserialize import ModelConfigsDeserialize
 from humanloop.apis.paths.projects_project_id_experiments import ProjectsProjectIdExperiments
 from humanloop.apis.paths.experiments_experiment_id import ExperimentsExperimentId
 from humanloop.apis.paths.experiments_experiment_id_model_config import ExperimentsExperimentIdModelConfig
@@ -71,6 +74,9 @@ PathToApi = typing_extensions.TypedDict(
         PathValues.PROJECTS_PROJECT_ID_DEPLOYEDCONFIG_ENVIRONMENT_ID: ProjectsProjectIdDeployedConfigEnvironmentId,
         PathValues.MODELCONFIGS: ModelConfigs,
         PathValues.MODELCONFIGS_ID: ModelConfigsId,
+        PathValues.MODELCONFIGS_ID_EXPORT: ModelConfigsIdExport,
+        PathValues.MODELCONFIGS_SERIALIZE: ModelConfigsSerialize,
+        PathValues.MODELCONFIGS_DESERIALIZE: ModelConfigsDeserialize,
         PathValues.PROJECTS_PROJECT_ID_EXPERIMENTS: ProjectsProjectIdExperiments,
         PathValues.EXPERIMENTS_EXPERIMENT_ID: ExperimentsExperimentId,
         PathValues.EXPERIMENTS_EXPERIMENT_ID_MODELCONFIG: ExperimentsExperimentIdModelConfig,
@@ -119,6 +125,9 @@ path_to_api = PathToApi(
         PathValues.PROJECTS_PROJECT_ID_DEPLOYEDCONFIG_ENVIRONMENT_ID: ProjectsProjectIdDeployedConfigEnvironmentId,
         PathValues.MODELCONFIGS: ModelConfigs,
         PathValues.MODELCONFIGS_ID: ModelConfigsId,
+        PathValues.MODELCONFIGS_ID_EXPORT: ModelConfigsIdExport,
+        PathValues.MODELCONFIGS_SERIALIZE: ModelConfigsSerialize,
+        PathValues.MODELCONFIGS_DESERIALIZE: ModelConfigsDeserialize,
         PathValues.PROJECTS_PROJECT_ID_EXPERIMENTS: ProjectsProjectIdExperiments,
         PathValues.EXPERIMENTS_EXPERIMENT_ID: ExperimentsExperimentId,
         PathValues.EXPERIMENTS_EXPERIMENT_ID_MODELCONFIG: ExperimentsExperimentIdModelConfig,

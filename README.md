@@ -96,8 +96,11 @@
   * [`humanloop.log`](#humanlooplog)
   * [`humanloop.logs.update`](#humanlooplogsupdate)
   * [`humanloop.logs.update_by_ref`](#humanlooplogsupdate_by_ref)
+  * [`humanloop.model_configs.deserialize`](#humanloopmodel_configsdeserialize)
+  * [`humanloop.model_configs.export`](#humanloopmodel_configsexport)
   * [`humanloop.model_configs.get`](#humanloopmodel_configsget)
   * [`humanloop.model_configs.register`](#humanloopmodel_configsregister)
+  * [`humanloop.model_configs.serialize`](#humanloopmodel_configsserialize)
   * [`humanloop.projects.create`](#humanloopprojectscreate)
   * [`humanloop.projects.create_feedback_type`](#humanloopprojectscreate_feedback_type)
   * [`humanloop.projects.deactivate_config`](#humanloopprojectsdeactivate_config)
@@ -3059,6 +3062,63 @@ Duration of the logged event in seconds.
 
 ---
 
+### `humanloop.model_configs.deserialize`<a id="humanloopmodel_configsdeserialize"></a>
+
+Deserialize a model config from a .prompt file format.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+deserialize_response = humanloop.model_configs.deserialize(
+    config="string_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### config: `str`<a id="config-str"></a>
+
+#### ⚙️ Request Body<a id="⚙️-request-body"></a>
+
+[`BodyModelConfigsDeserialize`](./humanloop/type/body_model_configs_deserialize.py)
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`ModelConfigResponse`](./humanloop/pydantic/model_config_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/model-configs/deserialize` `post`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.model_configs.export`<a id="humanloopmodel_configsexport"></a>
+
+Export a model config to a .prompt file by ID.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+export_response = humanloop.model_configs.export(
+    id="id_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### id: `str`<a id="id-str"></a>
+
+String ID of the model config. Starts with `config_`.
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/model-configs/{id}/export` `post`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
 ### `humanloop.model_configs.get`<a id="humanloopmodel_configsget"></a>
 
 Get a specific model config by ID.
@@ -3224,6 +3284,135 @@ Make tools available to OpenAIs chat model as functions.
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/model-configs` `post`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.model_configs.serialize`<a id="humanloopmodel_configsserialize"></a>
+
+Serialize a model config to a .prompt file format.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+serialize_response = humanloop.model_configs.serialize(
+    body={
+        "model": "model_example",
+        "max_tokens": -1,
+        "temperature": 1,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+    },
+    description="string_example",
+    name="string_example",
+    provider="string_example",
+    model="string_example",
+    max_tokens=-1,
+    temperature=1,
+    top_p=1,
+    stop="string_example",
+    presence_penalty=0,
+    frequency_penalty=0,
+    other={},
+    seed=1,
+    response_format={
+        "type": "json_object",
+    },
+    endpoint="string_example",
+    chat_template=[
+        {
+            "role": "string_example",
+        }
+    ],
+    tools=[
+        {
+            "name": "name_example",
+        }
+    ],
+    prompt_template="{{question}}",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### description: `str`<a id="description-str"></a>
+
+A description of the model config.
+
+##### name: `str`<a id="name-str"></a>
+
+A friendly display name for the model config. If not provided, a name will be generated.
+
+##### provider: [`ModelProviders`](./humanloop/type/model_providers.py)<a id="provider-modelprovidershumanlooptypemodel_providerspy"></a>
+
+The company providing the underlying model service.
+
+##### model: `str`<a id="model-str"></a>
+
+The model instance used. E.g. text-davinci-002.
+
+##### max_tokens: `int`<a id="max_tokens-int"></a>
+
+The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
+
+##### temperature: `Union[int, float]`<a id="temperature-unionint-float"></a>
+
+What sampling temperature to use when making a generation. Higher values means the model will be more creative.
+
+##### top_p: `Union[int, float]`<a id="top_p-unionint-float"></a>
+
+An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
+
+##### stop: Union[`str`, `List[str]`]<a id="stop-unionstr-liststr"></a>
+
+
+The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
+
+##### presence_penalty: `Union[int, float]`<a id="presence_penalty-unionint-float"></a>
+
+Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
+
+##### frequency_penalty: `Union[int, float]`<a id="frequency_penalty-unionint-float"></a>
+
+Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
+
+##### other: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="other-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+
+Other parameter values to be passed to the provider call.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
+
+
+The format of the response. Only type json_object is currently supported for chat.
+
+##### endpoint: [`ModelEndpoints`](./humanloop/type/model_endpoints.py)<a id="endpoint-modelendpointshumanlooptypemodel_endpointspy"></a>
+
+The provider model endpoint used.
+
+##### chat_template: List[`ChatMessage`]<a id="chat_template-listchatmessage"></a>
+
+Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
+
+##### tools: List[`ModelConfigToolRequest`]<a id="tools-listmodelconfigtoolrequest"></a>
+
+Make tools available to OpenAIs chat model as functions.
+
+##### prompt_template: `str`<a id="prompt_template-str"></a>
+
+Prompt template that will take your specified inputs to form your final request to the model. Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
+
+#### ⚙️ Request Body<a id="⚙️-request-body"></a>
+
+[`ModelConfigsSerializeRequest`](./humanloop/type/model_configs_serialize_request.py)
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/model-configs/serialize` `post`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 
