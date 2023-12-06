@@ -5,7 +5,7 @@
 # Humanloop<a id="humanloop"></a>
 
 
-[![PyPI](https://img.shields.io/badge/PyPI-v0.6.0rc.10-blue)](https://pypi.org/project/humanloop/0.6.0-rc.10)
+[![PyPI](https://img.shields.io/badge/PyPI-v0.6.0rc.11-blue)](https://pypi.org/project/humanloop/0.6.0-rc.11)
 [![GitHub last commit](https://img.shields.io/github/last-commit/humanloop/humanloop-python.svg)](https://github.com/humanloop/humanloop-python/commits)
 [![README.md](https://img.shields.io/badge/README-Click%20Here-green)](https://github.com/humanloop/humanloop-python#readme)
 
@@ -129,7 +129,7 @@ Python >=3.7
 ## Installing<a id="installing"></a>
 
 ```sh
-pip install humanloop==0.6.0-rc.10
+pip install humanloop==0.6.0-rc.11
 ```
 
 ## Getting Started<a id="getting-started"></a>

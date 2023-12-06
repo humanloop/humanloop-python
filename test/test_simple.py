@@ -195,6 +195,7 @@ async def test_chat_stream():
     lines = []
     async for line in response.content:
         lines.append(line)
+        assert "project_id" in line
 
     assert len(lines) > 1
     assert response.status == 200

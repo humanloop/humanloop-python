@@ -421,7 +421,7 @@ conf = humanloop.Configuration(
                "OS: {env}\n"\
                "Python Version: {pyversion}\n"\
                "Version of the API: 4.0.1\n"\
-               "SDK Package Version: 0.6.0-rc.10".\
+               "SDK Package Version: 0.6.0-rc.11".\
                format(env=sys.platform, pyversion=sys.version)
 
     def get_host_settings(self):

@@ -46,10 +46,28 @@ class ClientCustom:
                 continue
             try:
                 as_json = json.loads(parsed)
+                chunk = as_json["data"][0]
+                output = chunk["output"] if "output" in chunk else None
+                id = chunk["id"] if "id" in chunk else None
+                index = chunk["index"] if "index" in chunk else None
+                finish_reason = chunk["finish_reason"] if "finish_reason" in chunk else None
+                model_config_id = chunk["model_config_id"] if "model_config_id" in chunk else None
+                tool_calls = chunk["tool_calls"] if "tool_calls" in chunk else None
+                output_message = chunk["output_message"] if "output_message" in chunk else None
+                tool_results = chunk["tool_results"] if "tool_results" in chunk else None
+                project_id = as_json["project_id"] if "project_id" in as_json else None
 
-                output = as_json["data"][0]["output"]
-                id = as_json["data"][0]["id"]
-                yield {"output": output, "id": id}
+                yield {
+                    "output": output,
+                    "id": id,
+                    "index": index,
+                    "finish_reason": finish_reason,
+                    "model_config_id": model_config_id,
+                    "tool_calls": tool_calls,
+                    "output_message": output_message,
+                    "project_id": project_id,
+                    "tool_results": tool_results
+                }
             except Exception as e:
                 # move on silently
                 pass
