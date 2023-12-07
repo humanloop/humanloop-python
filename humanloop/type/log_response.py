@@ -37,10 +37,10 @@ class RequiredLogResponse(TypedDict):
     updated_at: datetime
 
 class OptionalLogResponse(TypedDict, total=False):
-    # Unique project name. If no project exists with this name, a new project will be created.
+    # The name of the project associated with this log
     project: str
 
-    # Unique ID of a project to associate to the log. Either this or `project` must be provided.
+    # The unique ID of the project associated with this log.
     project_id: str
 
     # ID of the session to associate the datapoint.

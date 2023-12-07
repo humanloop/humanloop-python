@@ -102,15 +102,18 @@ from humanloop.model.http_validation_error import HTTPValidationError
 from humanloop.model.image_chat_content import ImageChatContent
 from humanloop.model.image_url import ImageUrl
 from humanloop.model.label_sentiment import LabelSentiment
+from humanloop.model.linked_tool_request import LinkedToolRequest
 from humanloop.model.log_datapoint_request import LogDatapointRequest
 from humanloop.model.log_request import LogRequest
 from humanloop.model.log_response import LogResponse
 from humanloop.model.logs_log_response import LogsLogResponse
 from humanloop.model.metric_value_response import MetricValueResponse
 from humanloop.model.model_config_chat_request import ModelConfigChatRequest
+from humanloop.model.model_config_chat_request_tools import ModelConfigChatRequestTools
 from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 from humanloop.model.model_config_request import ModelConfigRequest
+from humanloop.model.model_config_request_tools import ModelConfigRequestTools
 from humanloop.model.model_config_response import ModelConfigResponse
 from humanloop.model.model_config_tool_request import ModelConfigToolRequest
 from humanloop.model.model_configs_export200_response import ModelConfigsExport200Response
@@ -130,6 +133,7 @@ from humanloop.model.project_config_response import ProjectConfigResponse
 from humanloop.model.project_input_response import ProjectInputResponse
 from humanloop.model.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
 from humanloop.model.project_model_config_request import ProjectModelConfigRequest
+from humanloop.model.project_model_config_request_tools import ProjectModelConfigRequestTools
 from humanloop.model.project_response import ProjectResponse
 from humanloop.model.project_sort_by import ProjectSortBy
 from humanloop.model.project_user_response import ProjectUserResponse
@@ -148,7 +152,9 @@ from humanloop.model.tool_call import ToolCall
 from humanloop.model.tool_choice import ToolChoice
 from humanloop.model.tool_config_request import ToolConfigRequest
 from humanloop.model.tool_config_response import ToolConfigResponse
+from humanloop.model.tool_response import ToolResponse
 from humanloop.model.tool_result_response import ToolResultResponse
+from humanloop.model.tool_source import ToolSource
 from humanloop.model.tool_type import ToolType
 from humanloop.model.update_datapoint_request import UpdateDatapointRequest
 from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs

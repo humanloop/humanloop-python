@@ -15,7 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.model_config_tool_request import ModelConfigToolRequest
+from humanloop.type.model_config_chat_request_tools import ModelConfigChatRequestTools
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
 from humanloop.type.response_format import ResponseFormat
@@ -67,8 +67,7 @@ class OptionalModelConfigChatRequest(TypedDict, total=False):
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
     chat_template: typing.List[ChatMessage]
 
-    # Make tools available to OpenAIs chat model as functions.
-    tools: typing.List[ModelConfigToolRequest]
+    tools: ModelConfigChatRequestTools
 
 class ModelConfigChatRequest(RequiredModelConfigChatRequest, OptionalModelConfigChatRequest):
     pass

@@ -15,9 +15,9 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.model_config_tool_request import ModelConfigToolRequest
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
+from humanloop.type.project_model_config_request_tools import ProjectModelConfigRequestTools
 from humanloop.type.response_format import ResponseFormat
 
 class RequiredProjectModelConfigRequest(TypedDict):
@@ -79,8 +79,7 @@ class OptionalProjectModelConfigRequest(TypedDict, total=False):
     # Which of the providers model endpoints to use. For example Complete or Edit.
     endpoint: ModelEndpoints
 
-    # Make tools available to OpenAIs chat model as functions.
-    tools: typing.List[ModelConfigToolRequest]
+    tools: ProjectModelConfigRequestTools
 
 class ProjectModelConfigRequest(RequiredProjectModelConfigRequest, OptionalProjectModelConfigRequest):
     pass

@@ -244,32 +244,10 @@ class ModelConfigChatRequest(
             
                 def __getitem__(self, i: int) -> 'ChatMessage':
                     return super().__getitem__(i)
-            
-            
-            class tools(
-                schemas.ListSchema
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @staticmethod
-                    def items() -> typing.Type['ModelConfigToolRequest']:
-                        return ModelConfigToolRequest
-            
-                def __new__(
-                    cls,
-                    arg: typing.Union[typing.Tuple['ModelConfigToolRequest'], typing.List['ModelConfigToolRequest']],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                ) -> 'tools':
-                    return super().__new__(
-                        cls,
-                        arg,
-                        _configuration=_configuration,
-                    )
-            
-                def __getitem__(self, i: int) -> 'ModelConfigToolRequest':
-                    return super().__getitem__(i)
+        
+            @staticmethod
+            def tools() -> typing.Type['ModelConfigChatRequestTools']:
+                return ModelConfigChatRequestTools
             __annotations__ = {
                 "model": model,
                 "description": description,
@@ -338,7 +316,7 @@ class ModelConfigChatRequest(
     def __getitem__(self, name: typing_extensions.Literal["chat_template"]) -> MetaOapg.properties.chat_template: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tools"]) -> MetaOapg.properties.tools: ...
+    def __getitem__(self, name: typing_extensions.Literal["tools"]) -> 'ModelConfigChatRequestTools': ...
     
     def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], ]):
         # dict_instance[name] accessor
@@ -390,7 +368,7 @@ class ModelConfigChatRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["chat_template"]) -> typing.Union[MetaOapg.properties.chat_template, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union[MetaOapg.properties.tools, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union['ModelConfigChatRequestTools', schemas.Unset]: ...
     
     def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], ]):
         return super().get_item_oapg(name)
@@ -413,7 +391,7 @@ class ModelConfigChatRequest(
         response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         endpoint: typing.Union[MetaOapg.properties.endpoint, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         chat_template: typing.Union[MetaOapg.properties.chat_template, list, tuple, schemas.Unset] = schemas.unset,
-        tools: typing.Union[MetaOapg.properties.tools, list, tuple, schemas.Unset] = schemas.unset,
+        tools: typing.Union['ModelConfigChatRequestTools', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs,
     ) -> 'ModelConfigChatRequest':
@@ -440,7 +418,7 @@ class ModelConfigChatRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.model_config_tool_request import ModelConfigToolRequest
+from humanloop.model.model_config_chat_request_tools import ModelConfigChatRequestTools
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders
 from humanloop.model.response_format import ResponseFormat

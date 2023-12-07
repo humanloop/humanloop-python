@@ -5,7 +5,7 @@
 # Humanloop<a id="humanloop"></a>
 
 
-[![PyPI](https://img.shields.io/badge/PyPI-v0.6.0rc.11-blue)](https://pypi.org/project/humanloop/0.6.0-rc.11)
+[![PyPI](https://img.shields.io/badge/PyPI-v0.6.0rc.12-blue)](https://pypi.org/project/humanloop/0.6.0-rc.12)
 [![GitHub last commit](https://img.shields.io/github/last-commit/humanloop/humanloop-python.svg)](https://github.com/humanloop/humanloop-python/commits)
 [![README.md](https://img.shields.io/badge/README-Click%20Here-green)](https://github.com/humanloop/humanloop-python#readme)
 
@@ -129,7 +129,7 @@ Python >=3.7
 ## Installing<a id="installing"></a>
 
 ```sh
-pip install humanloop==0.6.0-rc.11
+pip install humanloop==0.6.0-rc.12
 ```
 
 ## Getting Started<a id="getting-started"></a>
@@ -3184,7 +3184,8 @@ register_response = humanloop.model_configs.register(
     endpoint="string_example",
     tools=[
         {
-            "name": "name_example",
+            "id": "id_example",
+            "source": "string_example",
         }
     ],
 )
@@ -3270,9 +3271,7 @@ Messages prepended to the list of messages sent to the provider. These messages 
 
 Which of the providers model endpoints to use. For example Complete or Edit.
 
-##### tools: List[`ModelConfigToolRequest`]<a id="tools-listmodelconfigtoolrequest"></a>
-
-Make tools available to OpenAIs chat model as functions.
+##### tools: [`ProjectModelConfigRequestTools`](./humanloop/type/project_model_config_request_tools.py)<a id="tools-projectmodelconfigrequesttoolshumanlooptypeproject_model_config_request_toolspy"></a>
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -3328,7 +3327,8 @@ serialize_response = humanloop.model_configs.serialize(
     ],
     tools=[
         {
-            "name": "name_example",
+            "id": "id_example",
+            "source": "string_example",
         }
     ],
     prompt_template="{{question}}",
@@ -3399,9 +3399,7 @@ The provider model endpoint used.
 
 Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
 
-##### tools: List[`ModelConfigToolRequest`]<a id="tools-listmodelconfigtoolrequest"></a>
-
-Make tools available to OpenAIs chat model as functions.
+##### tools: [`ModelConfigChatRequestTools`](./humanloop/type/model_config_chat_request_tools.py)<a id="tools-modelconfigchatrequesttoolshumanlooptypemodel_config_chat_request_toolspy"></a>
 
 ##### prompt_template: `str`<a id="prompt_template-str"></a>
 

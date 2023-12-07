@@ -34,17 +34,17 @@ from humanloop import schemas  # noqa: F401
 
 from humanloop.model.model_providers import ModelProviders as ModelProvidersSchema
 from humanloop.model.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestSchema
-from humanloop.model.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
 from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
 from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
+from humanloop.model.project_model_config_request_tools import ProjectModelConfigRequestTools as ProjectModelConfigRequestToolsSchema
 from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
-from humanloop.type.model_config_tool_request import ModelConfigToolRequest
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
 from humanloop.type.project_model_config_request import ProjectModelConfigRequest
+from humanloop.type.project_model_config_request_tools import ProjectModelConfigRequestTools
 from humanloop.type.model_providers import ModelProviders
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
@@ -54,7 +54,7 @@ from ...api_client import Dictionary
 from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
 from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
 from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestPydantic
+from humanloop.pydantic.project_model_config_request_tools import ProjectModelConfigRequestTools as ProjectModelConfigRequestToolsPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestPydantic
 from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
@@ -150,7 +150,7 @@ class BaseApi(api_client.Api):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -418,7 +418,7 @@ class RegisterRaw(BaseApi):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -473,7 +473,7 @@ class RegisterRaw(BaseApi):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -527,7 +527,7 @@ class Register(BaseApi):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         validate: bool = False,
         **kwargs,
     ):
@@ -580,7 +580,7 @@ class Register(BaseApi):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         validate: bool = False,
     ):
         raw_response = self.raw.register(
@@ -634,7 +634,7 @@ class ApiForpost(BaseApi):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -689,7 +689,7 @@ class ApiForpost(BaseApi):
         prompt_template: typing.Optional[str] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ProjectModelConfigRequestTools] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,

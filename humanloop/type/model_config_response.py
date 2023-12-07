@@ -19,6 +19,7 @@ from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
 from humanloop.type.response_format import ResponseFormat
 from humanloop.type.tool_config_response import ToolConfigResponse
+from humanloop.type.tool_response import ToolResponse
 
 class RequiredModelConfigResponse(TypedDict):
     # String ID of config. Starts with `config_`.
@@ -72,8 +73,11 @@ class OptionalModelConfigResponse(TypedDict, total=False):
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. NB: Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
     chat_template: typing.List[ChatMessage]
 
-    # Definition of tools shown to the model.
+    # NB: Deprecated with tools field. Definition of tools shown to the model.
     tool_configs: typing.List[ToolConfigResponse]
+
+    # Tools shown to the model.
+    tools: typing.List[ToolResponse]
 
     # The provider model endpoint used.
     endpoint: ModelEndpoints

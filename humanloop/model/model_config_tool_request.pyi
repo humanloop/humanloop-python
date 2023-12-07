@@ -45,7 +45,43 @@ Does not have things like the signature or setup schema.
             name = schemas.StrSchema
             description = schemas.StrSchema
             parameters = schemas.DictSchema
-            source = schemas.StrSchema
+            
+            
+            class source(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def all_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            ToolSource,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'source':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
+            source_code = schemas.StrSchema
             other = schemas.DictSchema
             preset_name = schemas.StrSchema
             __annotations__ = {
@@ -53,6 +89,7 @@ Does not have things like the signature or setup schema.
                 "description": description,
                 "parameters": parameters,
                 "source": source,
+                "source_code": source_code,
                 "other": other,
                 "preset_name": preset_name,
             }
@@ -72,6 +109,9 @@ Does not have things like the signature or setup schema.
     def __getitem__(self, name: typing_extensions.Literal["source"]) -> MetaOapg.properties.source: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["source_code"]) -> MetaOapg.properties.source_code: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["other"]) -> MetaOapg.properties.other: ...
     
     @typing.overload
@@ -80,7 +120,7 @@ Does not have things like the signature or setup schema.
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "description", "parameters", "source", "other", "preset_name", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "description", "parameters", "source", "source_code", "other", "preset_name", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -98,6 +138,9 @@ Does not have things like the signature or setup schema.
     def get_item_oapg(self, name: typing_extensions.Literal["source"]) -> typing.Union[MetaOapg.properties.source, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["source_code"]) -> typing.Union[MetaOapg.properties.source_code, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["other"]) -> typing.Union[MetaOapg.properties.other, schemas.Unset]: ...
     
     @typing.overload
@@ -106,7 +149,7 @@ Does not have things like the signature or setup schema.
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "description", "parameters", "source", "other", "preset_name", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "description", "parameters", "source", "source_code", "other", "preset_name", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -116,7 +159,8 @@ Does not have things like the signature or setup schema.
         name: typing.Union[MetaOapg.properties.name, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         parameters: typing.Union[MetaOapg.properties.parameters, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
-        source: typing.Union[MetaOapg.properties.source, str, schemas.Unset] = schemas.unset,
+        source: typing.Union[MetaOapg.properties.source, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        source_code: typing.Union[MetaOapg.properties.source_code, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         preset_name: typing.Union[MetaOapg.properties.preset_name, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
@@ -129,8 +173,11 @@ Does not have things like the signature or setup schema.
             description=description,
             parameters=parameters,
             source=source,
+            source_code=source_code,
             other=other,
             preset_name=preset_name,
             _configuration=_configuration,
             **kwargs,
         )
+
+from humanloop.model.tool_source import ToolSource

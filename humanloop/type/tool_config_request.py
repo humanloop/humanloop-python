@@ -14,6 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+from humanloop.type.tool_source import ToolSource
 
 class RequiredToolConfigRequest(TypedDict):
     # The name of the tool shown to the model.
@@ -28,8 +29,11 @@ class OptionalToolConfigRequest(TypedDict, total=False):
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
     parameters: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
+    source: ToolSource
+
     # Code source of the tool.
-    source: str
+    source_code: str
 
     # Other parameters that define the config.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]

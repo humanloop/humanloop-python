@@ -33,16 +33,16 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.model_providers import ModelProviders as ModelProvidersSchema
-from humanloop.model.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestSchema
+from humanloop.model.model_config_chat_request_tools import ModelConfigChatRequestTools as ModelConfigChatRequestToolsSchema
 from humanloop.model.model_configs_serialize_request import ModelConfigsSerializeRequest as ModelConfigsSerializeRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
 from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
 from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
-from humanloop.type.model_config_tool_request import ModelConfigToolRequest
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
+from humanloop.type.model_config_chat_request_tools import ModelConfigChatRequestTools
 from humanloop.type.model_providers import ModelProviders
 from humanloop.type.model_configs_serialize_request import ModelConfigsSerializeRequest
 from humanloop.type.http_validation_error import HTTPValidationError
@@ -52,7 +52,7 @@ from ...api_client import Dictionary
 from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
 from humanloop.pydantic.model_configs_serialize_request import ModelConfigsSerializeRequest as ModelConfigsSerializeRequestPydantic
 from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest as ModelConfigToolRequestPydantic
+from humanloop.pydantic.model_config_chat_request_tools import ModelConfigChatRequestTools as ModelConfigChatRequestToolsPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
 from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
@@ -135,7 +135,7 @@ class BaseApi(api_client.Api):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
@@ -395,7 +395,7 @@ class SerializeRaw(BaseApi):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
@@ -446,7 +446,7 @@ class SerializeRaw(BaseApi):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -496,7 +496,7 @@ class Serialize(BaseApi):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
@@ -545,7 +545,7 @@ class Serialize(BaseApi):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         validate: bool = False,
     ):
@@ -595,7 +595,7 @@ class ApiForpost(BaseApi):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
@@ -646,7 +646,7 @@ class ApiForpost(BaseApi):
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         chat_template: typing.Optional[typing.List[ChatMessage]] = None,
-        tools: typing.Optional[typing.List[ModelConfigToolRequest]] = None,
+        tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,

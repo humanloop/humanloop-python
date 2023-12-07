@@ -20,6 +20,7 @@ from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
 from humanloop.pydantic.response_format import ResponseFormat
 from humanloop.pydantic.tool_config_response import ToolConfigResponse
+from humanloop.pydantic.tool_response import ToolResponse
 
 class ModelConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
@@ -72,8 +73,11 @@ class ModelConfigResponse(BaseModel):
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. NB: Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
     chat_template: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='chat_template')
 
-    # Definition of tools shown to the model.
+    # NB: Deprecated with tools field. Definition of tools shown to the model.
     tool_configs: typing.Optional[typing.List[ToolConfigResponse]] = Field(None, alias='tool_configs')
+
+    # Tools shown to the model.
+    tools: typing.Optional[typing.List[ToolResponse]] = Field(None, alias='tools')
 
     # The provider model endpoint used.
     endpoint: typing.Optional[ModelEndpoints] = Field(None, alias='endpoint')

@@ -37,10 +37,10 @@ class LogResponse(BaseModel):
 
     updated_at: datetime = Field(alias='updated_at')
 
-    # Unique project name. If no project exists with this name, a new project will be created.
+    # The name of the project associated with this log
     project: typing.Optional[str] = Field(None, alias='project')
 
-    # Unique ID of a project to associate to the log. Either this or `project` must be provided.
+    # The unique ID of the project associated with this log.
     project_id: typing.Optional[str] = Field(None, alias='project_id')
 
     # ID of the session to associate the datapoint.

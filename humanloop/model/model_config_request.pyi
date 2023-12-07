@@ -245,32 +245,10 @@ class ModelConfigRequest(
             
                 def __getitem__(self, i: int) -> 'ChatMessage':
                     return super().__getitem__(i)
-            
-            
-            class tools(
-                schemas.ListSchema
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @staticmethod
-                    def items() -> typing.Type['ModelConfigToolRequest']:
-                        return ModelConfigToolRequest
-            
-                def __new__(
-                    cls,
-                    arg: typing.Union[typing.Tuple['ModelConfigToolRequest'], typing.List['ModelConfigToolRequest']],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                ) -> 'tools':
-                    return super().__new__(
-                        cls,
-                        arg,
-                        _configuration=_configuration,
-                    )
-            
-                def __getitem__(self, i: int) -> 'ModelConfigToolRequest':
-                    return super().__getitem__(i)
+        
+            @staticmethod
+            def tools() -> typing.Type['ModelConfigRequestTools']:
+                return ModelConfigRequestTools
             
             
             class type(
@@ -354,7 +332,7 @@ class ModelConfigRequest(
     def __getitem__(self, name: typing_extensions.Literal["chat_template"]) -> MetaOapg.properties.chat_template: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tools"]) -> MetaOapg.properties.tools: ...
+    def __getitem__(self, name: typing_extensions.Literal["tools"]) -> 'ModelConfigRequestTools': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
@@ -412,7 +390,7 @@ class ModelConfigRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["chat_template"]) -> typing.Union[MetaOapg.properties.chat_template, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union[MetaOapg.properties.tools, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union['ModelConfigRequestTools', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> typing.Union[MetaOapg.properties.type, schemas.Unset]: ...
@@ -439,7 +417,7 @@ class ModelConfigRequest(
         endpoint: typing.Union[MetaOapg.properties.endpoint, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         prompt_template: typing.Union[MetaOapg.properties.prompt_template, str, schemas.Unset] = schemas.unset,
         chat_template: typing.Union[MetaOapg.properties.chat_template, list, tuple, schemas.Unset] = schemas.unset,
-        tools: typing.Union[MetaOapg.properties.tools, list, tuple, schemas.Unset] = schemas.unset,
+        tools: typing.Union['ModelConfigRequestTools', schemas.Unset] = schemas.unset,
         type: typing.Union[MetaOapg.properties.type, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs,
@@ -469,7 +447,7 @@ class ModelConfigRequest(
         )
 
 from humanloop.model.chat_message import ChatMessage
-from humanloop.model.model_config_tool_request import ModelConfigToolRequest
+from humanloop.model.model_config_request_tools import ModelConfigRequestTools
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders
 from humanloop.model.response_format import ResponseFormat

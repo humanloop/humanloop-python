@@ -16,7 +16,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
+from humanloop.pydantic.model_config_request_tools import ModelConfigRequestTools
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
 from humanloop.pydantic.response_format import ResponseFormat
@@ -70,7 +70,6 @@ class ModelConfigRequest(BaseModel):
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
     chat_template: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='chat_template')
 
-    # Make tools available to OpenAIs chat model as functions.
-    tools: typing.Optional[typing.List[ModelConfigToolRequest]] = Field(None, alias='tools')
+    tools: typing.Optional[ModelConfigRequestTools] = Field(None, alias='tools')
 
     type: typing.Optional[str] = Field(None, alias='type')

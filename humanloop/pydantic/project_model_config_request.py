@@ -16,9 +16,9 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.chat_message import ChatMessage
-from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
+from humanloop.pydantic.project_model_config_request_tools import ProjectModelConfigRequestTools
 from humanloop.pydantic.response_format import ResponseFormat
 
 class ProjectModelConfigRequest(BaseModel):
@@ -79,5 +79,4 @@ class ProjectModelConfigRequest(BaseModel):
     # Which of the providers model endpoints to use. For example Complete or Edit.
     endpoint: typing.Optional[ModelEndpoints] = Field(None, alias='endpoint')
 
-    # Make tools available to OpenAIs chat model as functions.
-    tools: typing.Optional[typing.List[ModelConfigToolRequest]] = Field(None, alias='tools')
+    tools: typing.Optional[ProjectModelConfigRequestTools] = Field(None, alias='tools')

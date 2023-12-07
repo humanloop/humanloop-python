@@ -15,6 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
+from humanloop.pydantic.tool_source import ToolSource
 
 class ToolConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
@@ -22,7 +23,7 @@ class ToolConfigResponse(BaseModel):
 
     type: str = Field(alias='type')
 
-    # Name for the tool referenced by the model
+    # Name for the tool referenced by the model.
     name: str = Field(alias='name')
 
     # Description of the tool referenced by the model
@@ -34,8 +35,11 @@ class ToolConfigResponse(BaseModel):
     # Other parameters that define the config.
     other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
 
+    # Source of the tool. If defined at an organization level will be 'organiztion' else 'inline'.
+    source: typing.Optional[ToolSource] = Field(None, alias='source')
+
     # Code source of the tool.
-    source: typing.Optional[str] = Field(None, alias='source')
+    source_code: typing.Optional[str] = Field(None, alias='source_code')
 
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
     setup_schema: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='setup_schema')
