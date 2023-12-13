@@ -48,3 +48,6 @@ class GetModelConfigResponse(BaseModel):
 
     # ID of trial to reference in subsequent log calls.
     trial_id: typing.Optional[str] = Field(None, alias='trial_id')
+
+    # ID of environment to reference in subsequent log calls.
+    environment_id: typing.Optional[str] = Field(None, alias='environment_id')

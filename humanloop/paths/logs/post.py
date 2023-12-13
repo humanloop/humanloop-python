@@ -149,11 +149,14 @@ class BaseApi(api_client.Api):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -185,8 +188,12 @@ class BaseApi(api_client.Api):
             _body["messages"] = messages
         if output is not None:
             _body["output"] = output
+        if config_id is not None:
+            _body["config_id"] = config_id
         if config is not None:
             _body["config"] = config
+        if environment is not None:
+            _body["environment"] = environment
         if feedback is not None:
             _body["feedback"] = feedback
         if created_at is not None:
@@ -195,6 +202,8 @@ class BaseApi(api_client.Api):
             _body["error"] = error
         if duration is not None:
             _body["duration"] = duration
+        if output_message is not None:
+            _body["output_message"] = output_message
         args.body = body if body is not None else _body
         return args
 
@@ -415,11 +424,14 @@ class LogRaw(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -442,11 +454,14 @@ class LogRaw(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
         )
         return await self._alog_oapg(
             body=args.body,
@@ -470,11 +485,14 @@ class LogRaw(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -495,11 +513,14 @@ class LogRaw(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
         )
         return self._log_oapg(
             body=args.body,
@@ -524,11 +545,14 @@ class Log(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
         validate: bool = False,
         **kwargs,
     ) -> LogsLogResponsePydantic:
@@ -548,11 +572,14 @@ class Log(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
             **kwargs,
         )
         if validate:
@@ -577,11 +604,14 @@ class Log(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
         validate: bool = False,
     ) -> LogsLogResponsePydantic:
         raw_response = self.raw.log(
@@ -600,11 +630,14 @@ class Log(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
         )
         if validate:
             return RootModel[LogsLogResponsePydantic](raw_response.body).root
@@ -631,11 +664,14 @@ class ApiForpost(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -658,11 +694,14 @@ class ApiForpost(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
         )
         return await self._alog_oapg(
             body=args.body,
@@ -686,11 +725,14 @@ class ApiForpost(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -711,11 +753,14 @@ class ApiForpost(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
         )
         return self._log_oapg(
             body=args.body,

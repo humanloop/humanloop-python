@@ -2848,6 +2848,7 @@ log_response = humanloop.log(
         }
     ],
     output="string_example",
+    config_id="string_example",
     config={
         "type": "AgentConfigRequest",
         "agent_class": "agent_class_example",
@@ -2861,6 +2862,7 @@ log_response = humanloop.log(
             "type": "model",
         },
     },
+    environment="string_example",
     feedback={
         "type": "string_example",
         "value": 3.14,
@@ -2868,6 +2870,9 @@ log_response = humanloop.log(
     created_at="1970-01-01T00:00:00.00Z",
     error="string_example",
     duration=3.14,
+    output_message={
+        "role": "string_example",
+    },
 )
 ```
 
@@ -2929,10 +2934,18 @@ The messages passed to the to provider chat endpoint.
 
 Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
 
+##### config_id: `str`<a id="config_id-str"></a>
+
+Unique ID of a config to associate to the log.
+
 ##### config: Union[`ModelConfigRequest`, `ToolConfigRequest`, `GenericConfigRequest`, `AgentConfigRequest`]<a id="config-unionmodelconfigrequest-toolconfigrequest-genericconfigrequest-agentconfigrequest"></a>
 
 
-The model config used for this generation. Required unless `trial_id` is provided.
+The model config used for this generation. Required unless `config_id` or `trial_id` is provided.
+
+##### environment: `str`<a id="environment-str"></a>
+
+The environment name used to create the log.
 
 ##### feedback: Union[`Feedback`, List[`Feedback`]]<a id="feedback-unionfeedback-listfeedback"></a>
 
@@ -2950,6 +2963,11 @@ Error message if the log is an error.
 ##### duration: `Union[int, float]`<a id="duration-unionint-float"></a>
 
 Duration of the logged event in seconds.
+
+##### output_message: [`ChatMessage`](./humanloop/type/chat_message.py)<a id="output_message-chatmessagehumanlooptypechat_messagepy"></a>
+
+
+The message returned by the provider.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -3537,7 +3555,7 @@ String ID of project. Starts with `pr_`.
 
 ##### environment: `str`<a id="environment-str"></a>
 
-Name for the environment. E.g. 'producton'. If not provided, will delete the active config for the default environment.
+Name for the environment. E.g. 'production'. If not provided, will delete the active config for the default environment.
 
 #### 🔄 Return<a id="🔄-return"></a>
 

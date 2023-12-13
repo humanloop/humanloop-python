@@ -79,6 +79,12 @@ class OptionalLogResponse(TypedDict, total=False):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: str
 
+    # Unique ID of a config to associate to the log.
+    config_id: str
+
+    # The environment name used to create the log.
+    environment: str
+
     feedback: typing.List[FeedbackResponse]
 
     # User defined timestamp for when the log was created. 
@@ -89,6 +95,9 @@ class OptionalLogResponse(TypedDict, total=False):
 
     # Duration of the logged event in seconds.
     duration: typing.Union[int, float]
+
+    # The message returned by the provider.
+    output_message: ChatMessage
 
     # The config used for this datapoint.
     model_config: ProjectConfigResponse
@@ -114,9 +123,6 @@ class OptionalLogResponse(TypedDict, total=False):
 
     # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
     tool_choice: typing.Union[str, str, ToolChoice]
-
-    # The message returned by the provider.
-    output_message: ChatMessage
 
 class LogResponse(RequiredLogResponse, OptionalLogResponse):
     pass

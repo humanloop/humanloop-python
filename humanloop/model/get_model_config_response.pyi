@@ -111,6 +111,7 @@ the response will include a trial_id to associate a subsequent log() call.
                 def __getitem__(self, i: int) -> 'ModelConfigEvaluatorAggregateResponse':
                     return super().__getitem__(i)
             trial_id = schemas.StrSchema
+            environment_id = schemas.StrSchema
             __annotations__ = {
                 "project_id": project_id,
                 "project_name": project_name,
@@ -123,6 +124,7 @@ the response will include a trial_id to associate a subsequent log() call.
                 "experiment_id": experiment_id,
                 "evaluation_aggregates": evaluation_aggregates,
                 "trial_id": trial_id,
+                "environment_id": environment_id,
             }
     
     updated_at: MetaOapg.properties.updated_at
@@ -166,9 +168,12 @@ the response will include a trial_id to associate a subsequent log() call.
     def __getitem__(self, name: typing_extensions.Literal["trial_id"]) -> MetaOapg.properties.trial_id: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["environment_id"]) -> MetaOapg.properties.environment_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["project_id", "project_name", "created_at", "updated_at", "last_used", "config", "feedback_stats", "num_datapoints", "experiment_id", "evaluation_aggregates", "trial_id", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["project_id", "project_name", "created_at", "updated_at", "last_used", "config", "feedback_stats", "num_datapoints", "experiment_id", "evaluation_aggregates", "trial_id", "environment_id", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -207,9 +212,12 @@ the response will include a trial_id to associate a subsequent log() call.
     def get_item_oapg(self, name: typing_extensions.Literal["trial_id"]) -> typing.Union[MetaOapg.properties.trial_id, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["environment_id"]) -> typing.Union[MetaOapg.properties.environment_id, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["project_id", "project_name", "created_at", "updated_at", "last_used", "config", "feedback_stats", "num_datapoints", "experiment_id", "evaluation_aggregates", "trial_id", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["project_id", "project_name", "created_at", "updated_at", "last_used", "config", "feedback_stats", "num_datapoints", "experiment_id", "evaluation_aggregates", "trial_id", "environment_id", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -227,6 +235,7 @@ the response will include a trial_id to associate a subsequent log() call.
         experiment_id: typing.Union[MetaOapg.properties.experiment_id, str, schemas.Unset] = schemas.unset,
         evaluation_aggregates: typing.Union[MetaOapg.properties.evaluation_aggregates, list, tuple, schemas.Unset] = schemas.unset,
         trial_id: typing.Union[MetaOapg.properties.trial_id, str, schemas.Unset] = schemas.unset,
+        environment_id: typing.Union[MetaOapg.properties.environment_id, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'GetModelConfigResponse':
@@ -244,6 +253,7 @@ the response will include a trial_id to associate a subsequent log() call.
             experiment_id=experiment_id,
             evaluation_aggregates=evaluation_aggregates,
             trial_id=trial_id,
+            environment_id=environment_id,
             _configuration=_configuration,
             **kwargs,
         )

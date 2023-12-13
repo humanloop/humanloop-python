@@ -67,8 +67,14 @@ class OptionalLogRequest(TypedDict, total=False):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: str
 
-    # The model config used for this generation. Required unless `trial_id` is provided.
+    # Unique ID of a config to associate to the log.
+    config_id: str
+
+    # The model config used for this generation. Required unless `config_id` or `trial_id` is provided.
     config: typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]
+
+    # The environment name used to create the log.
+    environment: str
 
     # Optional parameter to provide feedback with your logged datapoint.
     feedback: typing.Union[Feedback, typing.List[Feedback]]
@@ -81,6 +87,9 @@ class OptionalLogRequest(TypedDict, total=False):
 
     # Duration of the logged event in seconds.
     duration: typing.Union[int, float]
+
+    # The message returned by the provider.
+    output_message: ChatMessage
 
 class LogRequest(RequiredLogRequest, OptionalLogRequest):
     pass

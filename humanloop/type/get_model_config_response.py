@@ -49,5 +49,8 @@ class OptionalGetModelConfigResponse(TypedDict, total=False):
     # ID of trial to reference in subsequent log calls.
     trial_id: str
 
+    # ID of environment to reference in subsequent log calls.
+    environment_id: str
+
 class GetModelConfigResponse(RequiredGetModelConfigResponse, OptionalGetModelConfigResponse):
     pass

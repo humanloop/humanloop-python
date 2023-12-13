@@ -65,8 +65,14 @@ class LogRequest(BaseModel):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: typing.Optional[str] = Field(None, alias='output')
 
-    # The model config used for this generation. Required unless `trial_id` is provided.
+    # Unique ID of a config to associate to the log.
+    config_id: typing.Optional[str] = Field(None, alias='config_id')
+
+    # The model config used for this generation. Required unless `config_id` or `trial_id` is provided.
     config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = Field(None, alias='config')
+
+    # The environment name used to create the log.
+    environment: typing.Optional[str] = Field(None, alias='environment')
 
     # Optional parameter to provide feedback with your logged datapoint.
     feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = Field(None, alias='feedback')
@@ -79,3 +85,6 @@ class LogRequest(BaseModel):
 
     # Duration of the logged event in seconds.
     duration: typing.Optional[typing.Union[int, float]] = Field(None, alias='duration')
+
+    # The message returned by the provider.
+    output_message: typing.Optional[ChatMessage] = Field(None, alias='output_message')

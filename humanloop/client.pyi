@@ -911,11 +911,14 @@ class Humanloop(ClientCustom):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
         **kwargs,
     ):
         return await self.logs.alog(
@@ -934,11 +937,14 @@ class Humanloop(ClientCustom):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
             **kwargs,
         )
 
@@ -960,11 +966,14 @@ class Humanloop(ClientCustom):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
+        config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
+        output_message: typing.Optional[ChatMessage] = None,
     ):
         return self.logs.log(
             body=body,
@@ -982,9 +991,12 @@ class Humanloop(ClientCustom):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            config_id=config_id,
             config=config,
+            environment=environment,
             feedback=feedback,
             created_at=created_at,
             error=error,
             duration=duration,
+            output_message=output_message,
         )
