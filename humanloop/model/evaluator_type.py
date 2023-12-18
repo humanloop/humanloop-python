@@ -38,6 +38,7 @@ class EvaluatorType(
         enum_value_to_name = {
             "python": "PYTHON",
             "llm": "LLM",
+            "human": "HUMAN",
             "external": "EXTERNAL",
         }
     
@@ -48,6 +49,10 @@ class EvaluatorType(
     @schemas.classproperty
     def LLM(cls):
         return cls("llm")
+    
+    @schemas.classproperty
+    def HUMAN(cls):
+        return cls("human")
     
     @schemas.classproperty
     def EXTERNAL(cls):

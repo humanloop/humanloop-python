@@ -14,5 +14,9 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+from humanloop.type.feedback_multi_select_aggregate import FeedbackMultiSelectAggregate
+from humanloop.type.feedback_number_aggregate import FeedbackNumberAggregate
+from humanloop.type.feedback_select_aggregate import FeedbackSelectAggregate
+from humanloop.type.feedback_text_aggregate import FeedbackTextAggregate
 
-EvaluatorType = Literal["python", "llm", "human", "external"]
+FeedbackAggregateResponse = typing.List[typing.Union[typing.List[FeedbackSelectAggregate], typing.List[FeedbackMultiSelectAggregate], typing.List[FeedbackTextAggregate], typing.List[FeedbackNumberAggregate]]]

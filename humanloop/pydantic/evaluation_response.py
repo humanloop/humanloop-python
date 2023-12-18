@@ -19,6 +19,7 @@ from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.dataset_response import DatasetResponse
 from humanloop.pydantic.evaluation_status import EvaluationStatus
 from humanloop.pydantic.evaluator_response import EvaluatorResponse
+from humanloop.pydantic.feedback_aggregate_response import FeedbackAggregateResponse
 from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 
 class EvaluationResponse(BaseModel):
@@ -40,3 +41,5 @@ class EvaluationResponse(BaseModel):
     dataset_snapshot: typing.Optional[DatasetResponse] = Field(None, alias='dataset_snapshot')
 
     evaluator_aggregates: typing.Optional[typing.List[ModelConfigEvaluatorAggregateResponse]] = Field(None, alias='evaluator_aggregates')
+
+    feedback_aggregates: typing.Optional[FeedbackAggregateResponse] = Field(None, alias='feedback_aggregates')

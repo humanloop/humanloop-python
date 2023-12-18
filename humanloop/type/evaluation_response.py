@@ -18,6 +18,7 @@ from humanloop.type.config_response import ConfigResponse
 from humanloop.type.dataset_response import DatasetResponse
 from humanloop.type.evaluation_status import EvaluationStatus
 from humanloop.type.evaluator_response import EvaluatorResponse
+from humanloop.type.feedback_aggregate_response import FeedbackAggregateResponse
 from humanloop.type.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
 
 class RequiredEvaluationResponse(TypedDict):
@@ -40,6 +41,8 @@ class OptionalEvaluationResponse(TypedDict, total=False):
     dataset_snapshot: DatasetResponse
 
     evaluator_aggregates: typing.List[ModelConfigEvaluatorAggregateResponse]
+
+    feedback_aggregates: FeedbackAggregateResponse
 
 class EvaluationResponse(RequiredEvaluationResponse, OptionalEvaluationResponse):
     pass

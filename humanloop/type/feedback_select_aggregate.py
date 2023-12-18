@@ -14,5 +14,19 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+from humanloop.type.feedback_select_aggregate_values import FeedbackSelectAggregateValues
+from humanloop.type.feedback_type_model import FeedbackTypeModel
 
-EvaluatorType = Literal["python", "llm", "human", "external"]
+class RequiredFeedbackSelectAggregate(TypedDict):
+    feedback_type: FeedbackTypeModel
+
+    values: FeedbackSelectAggregateValues
+
+    # The total number of feedbacks provided.
+    total: int
+
+class OptionalFeedbackSelectAggregate(TypedDict, total=False):
+    pass
+
+class FeedbackSelectAggregate(RequiredFeedbackSelectAggregate, OptionalFeedbackSelectAggregate):
+    pass

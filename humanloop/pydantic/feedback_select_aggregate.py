@@ -13,6 +13,15 @@ from datetime import datetime, date
 import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
+from pydantic import BaseModel, Field, RootModel
 
+from humanloop.pydantic.feedback_select_aggregate_values import FeedbackSelectAggregateValues
+from humanloop.pydantic.feedback_type_model import FeedbackTypeModel
 
-EvaluatorType = Literal["python", "llm", "human", "external"]
+class FeedbackSelectAggregate(BaseModel):
+    feedback_type: FeedbackTypeModel = Field(alias='feedback_type')
+
+    values: FeedbackSelectAggregateValues = Field(alias='values')
+
+    # The total number of feedbacks provided.
+    total: int = Field(alias='total')

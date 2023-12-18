@@ -13,6 +13,7 @@ from datetime import datetime, date
 import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
+from pydantic import BaseModel, Field, RootModel
 
 
-EvaluatorType = Literal["python", "llm", "human", "external"]
+FeedbackSelectAggregateValues = dict

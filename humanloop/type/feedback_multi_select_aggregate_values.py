@@ -15,4 +15,4 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
-EvaluatorType = Literal["python", "llm", "human", "external"]
+FeedbackMultiSelectAggregateValues = dict

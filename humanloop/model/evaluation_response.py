@@ -114,6 +114,10 @@ class EvaluationResponse(
             
                 def __getitem__(self, i: int) -> 'ModelConfigEvaluatorAggregateResponse':
                     return super().__getitem__(i)
+        
+            @staticmethod
+            def feedback_aggregates() -> typing.Type['FeedbackAggregateResponse']:
+                return FeedbackAggregateResponse
             __annotations__ = {
                 "id": id,
                 "status": status,
@@ -124,6 +128,7 @@ class EvaluationResponse(
                 "dataset": dataset,
                 "dataset_snapshot": dataset_snapshot,
                 "evaluator_aggregates": evaluator_aggregates,
+                "feedback_aggregates": feedback_aggregates,
             }
     
     updated_at: MetaOapg.properties.updated_at
@@ -162,9 +167,12 @@ class EvaluationResponse(
     def __getitem__(self, name: typing_extensions.Literal["evaluator_aggregates"]) -> MetaOapg.properties.evaluator_aggregates: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["feedback_aggregates"]) -> 'FeedbackAggregateResponse': ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_snapshot", "evaluator_aggregates", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_snapshot", "evaluator_aggregates", "feedback_aggregates", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -197,9 +205,12 @@ class EvaluationResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["evaluator_aggregates"]) -> typing.Union[MetaOapg.properties.evaluator_aggregates, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["feedback_aggregates"]) -> typing.Union['FeedbackAggregateResponse', schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_snapshot", "evaluator_aggregates", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_snapshot", "evaluator_aggregates", "feedback_aggregates", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -215,6 +226,7 @@ class EvaluationResponse(
         status: 'EvaluationStatus',
         dataset_snapshot: typing.Union['DatasetResponse', schemas.Unset] = schemas.unset,
         evaluator_aggregates: typing.Union[MetaOapg.properties.evaluator_aggregates, list, tuple, schemas.Unset] = schemas.unset,
+        feedback_aggregates: typing.Union['FeedbackAggregateResponse', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'EvaluationResponse':
@@ -230,6 +242,7 @@ class EvaluationResponse(
             status=status,
             dataset_snapshot=dataset_snapshot,
             evaluator_aggregates=evaluator_aggregates,
+            feedback_aggregates=feedback_aggregates,
             _configuration=_configuration,
             **kwargs,
         )
@@ -238,4 +251,5 @@ from humanloop.model.config_response import ConfigResponse
 from humanloop.model.dataset_response import DatasetResponse
 from humanloop.model.evaluation_status import EvaluationStatus
 from humanloop.model.evaluator_response import EvaluatorResponse
+from humanloop.model.feedback_aggregate_response import FeedbackAggregateResponse
 from humanloop.model.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
