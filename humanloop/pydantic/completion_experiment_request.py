@@ -57,17 +57,20 @@ class CompletionExperimentRequest(BaseModel):
     # The number of chat responses, where each chat response will use a model configuration sampled from the experiment.
     num_samples: typing.Optional[int] = Field(None, alias='num_samples')
 
-    # Include the log probabilities of the top n tokens in the provider_response
-    logprobs: typing.Optional[int] = Field(None, alias='logprobs')
-
     # If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
     stream: typing.Optional[bool] = Field(None, alias='stream')
 
-    # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
-    suffix: typing.Optional[str] = Field(None, alias='suffix')
+    # End-user ID passed through to provider call.
+    user: typing.Optional[str] = Field(None, alias='user')
 
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: typing.Optional[int] = Field(None, alias='seed')
 
-    # End-user ID passed through to provider call.
-    user: typing.Optional[str] = Field(None, alias='user')
+    # Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    return_inputs: typing.Optional[bool] = Field(None, alias='return_inputs')
+
+    # Include the log probabilities of the top n tokens in the provider_response
+    logprobs: typing.Optional[int] = Field(None, alias='logprobs')
+
+    # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+    suffix: typing.Optional[str] = Field(None, alias='suffix')

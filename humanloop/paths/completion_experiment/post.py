@@ -132,11 +132,12 @@ class BaseApi(api_client.Api):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -164,16 +165,18 @@ class BaseApi(api_client.Api):
             _body["provider_api_keys"] = provider_api_keys
         if num_samples is not None:
             _body["num_samples"] = num_samples
-        if logprobs is not None:
-            _body["logprobs"] = logprobs
         if stream is not None:
             _body["stream"] = stream
-        if suffix is not None:
-            _body["suffix"] = suffix
-        if seed is not None:
-            _body["seed"] = seed
         if user is not None:
             _body["user"] = user
+        if seed is not None:
+            _body["seed"] = seed
+        if return_inputs is not None:
+            _body["return_inputs"] = return_inputs
+        if logprobs is not None:
+            _body["logprobs"] = logprobs
+        if suffix is not None:
+            _body["suffix"] = suffix
         if experiment_id is not None:
             _body["experiment_id"] = experiment_id
         args.body = _body
@@ -394,11 +397,12 @@ class CreateExperimentRaw(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -419,11 +423,12 @@ class CreateExperimentRaw(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
         )
         return await self._acreate_experiment_oapg(
             body=args.body,
@@ -445,11 +450,12 @@ class CreateExperimentRaw(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -468,11 +474,12 @@ class CreateExperimentRaw(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
         )
         return self._create_experiment_oapg(
             body=args.body,
@@ -495,11 +502,12 @@ class CreateExperiment(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
     ) -> CompletionResponsePydantic:
@@ -517,11 +525,12 @@ class CreateExperiment(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             **kwargs,
         )
         if validate:
@@ -544,11 +553,12 @@ class CreateExperiment(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         validate: bool = False,
     ) -> CompletionResponsePydantic:
         raw_response = self.raw.create_experiment(
@@ -565,11 +575,12 @@ class CreateExperiment(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
         )
         if validate:
             return CompletionResponsePydantic(**raw_response.body)
@@ -594,11 +605,12 @@ class ApiForpost(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -619,11 +631,12 @@ class ApiForpost(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
         )
         return await self._acreate_experiment_oapg(
             body=args.body,
@@ -645,11 +658,12 @@ class ApiForpost(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -668,11 +682,12 @@ class ApiForpost(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
         )
         return self._create_experiment_oapg(
             body=args.body,

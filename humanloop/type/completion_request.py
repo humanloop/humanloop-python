@@ -58,20 +58,23 @@ class OptionalCompletionRequest(TypedDict, total=False):
     # The number of generations.
     num_samples: int
 
-    # Include the log probabilities of the top n tokens in the provider_response
-    logprobs: int
-
     # If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
     stream: bool
 
-    # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
-    suffix: str
+    # End-user ID passed through to provider call.
+    user: str
 
     # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     seed: int
 
-    # End-user ID passed through to provider call.
-    user: str
+    # Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    return_inputs: bool
+
+    # Include the log probabilities of the top n tokens in the provider_response
+    logprobs: int
+
+    # The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+    suffix: str
 
 class CompletionRequest(RequiredCompletionRequest, OptionalCompletionRequest):
     pass

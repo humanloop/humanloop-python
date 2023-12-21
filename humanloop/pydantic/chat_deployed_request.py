@@ -57,7 +57,7 @@ class ChatDeployedRequest(BaseModel):
     # API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
     provider_api_keys: typing.Optional[ProviderApiKeys] = Field(None, alias='provider_api_keys')
 
-    # The number of chat responses.
+    # The number of generations.
     num_samples: typing.Optional[int] = Field(None, alias='num_samples')
 
     # If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
@@ -66,14 +66,17 @@ class ChatDeployedRequest(BaseModel):
     # End-user ID passed through to provider call.
     user: typing.Optional[str] = Field(None, alias='user')
 
+    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    seed: typing.Optional[int] = Field(None, alias='seed')
+
+    # Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    return_inputs: typing.Optional[bool] = Field(None, alias='return_inputs')
+
     # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
     tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = Field(None, alias='tool_choice')
 
     # NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
     tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = Field(None, alias='tool_call')
-
-    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
-    seed: typing.Optional[int] = Field(None, alias='seed')
 
     # The format of the response. Only type json_object is currently supported for chat.
     response_format: typing.Optional[ResponseFormat] = Field(None, alias='response_format')

@@ -134,9 +134,10 @@ class BaseApi(api_client.Api):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
@@ -162,8 +163,6 @@ class BaseApi(api_client.Api):
             _body["metadata"] = metadata
         if source_datapoint_id is not None:
             _body["source_datapoint_id"] = source_datapoint_id
-        if messages is not None:
-            _body["messages"] = messages
         if provider_api_keys is not None:
             _body["provider_api_keys"] = provider_api_keys
         if num_samples is not None:
@@ -172,12 +171,16 @@ class BaseApi(api_client.Api):
             _body["stream"] = stream
         if user is not None:
             _body["user"] = user
+        if seed is not None:
+            _body["seed"] = seed
+        if return_inputs is not None:
+            _body["return_inputs"] = return_inputs
+        if messages is not None:
+            _body["messages"] = messages
         if tool_choice is not None:
             _body["tool_choice"] = tool_choice
         if tool_call is not None:
             _body["tool_call"] = tool_call
-        if seed is not None:
-            _body["seed"] = seed
         if response_format is not None:
             _body["response_format"] = response_format
         if environment is not None:
@@ -402,9 +405,10 @@ class CreateDeployedRaw(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
         **kwargs,
@@ -429,9 +433,10 @@ class CreateDeployedRaw(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             environment=environment,
         )
@@ -457,9 +462,10 @@ class CreateDeployedRaw(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
     ) -> typing.Union[
@@ -482,9 +488,10 @@ class CreateDeployedRaw(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             environment=environment,
         )
@@ -511,9 +518,10 @@ class CreateDeployed(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
         validate: bool = False,
@@ -535,9 +543,10 @@ class CreateDeployed(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             environment=environment,
             **kwargs,
@@ -564,9 +573,10 @@ class CreateDeployed(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
         validate: bool = False,
@@ -587,9 +597,10 @@ class CreateDeployed(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             environment=environment,
         )
@@ -618,9 +629,10 @@ class ApiForpost(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
         **kwargs,
@@ -645,9 +657,10 @@ class ApiForpost(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             environment=environment,
         )
@@ -673,9 +686,10 @@ class ApiForpost(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         environment: typing.Optional[str] = None,
     ) -> typing.Union[
@@ -698,9 +712,10 @@ class ApiForpost(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             environment=environment,
         )

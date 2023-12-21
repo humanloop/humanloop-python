@@ -350,9 +350,10 @@ try:
         num_samples=1,
         stream=False,
         user="string_example",
+        seed=1,
+        return_inputs=True,
         tool_choice="string_example",
         tool_call="string_example",
-        seed=1,
         response_format={
             "type": "json_object",
         },
@@ -467,9 +468,10 @@ create_response = humanloop.chat(
     num_samples=1,
     stream=False,
     user="string_example",
+    seed=1,
+    return_inputs=True,
     tool_choice="string_example",
     tool_call="string_example",
-    seed=1,
     response_format={
         "type": "json_object",
     },
@@ -534,7 +536,7 @@ API keys required by each provider to make API calls. The API keys provided here
 
 ##### num_samples: `int`<a id="num_samples-int"></a>
 
-The number of chat responses.
+The number of generations.
 
 ##### stream: `bool`<a id="stream-bool"></a>
 
@@ -543,6 +545,14 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 ##### user: `str`<a id="user-str"></a>
 
 End-user ID passed through to provider call.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
+
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
 ##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
@@ -553,10 +563,6 @@ Controls how the model uses tools. The following options are supported: 'none' f
 
 
 NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
-
-##### seed: `int`<a id="seed-int"></a>
-
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
 ##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
 
@@ -605,9 +611,10 @@ create_deployed_response = humanloop.chat_deployed(
     num_samples=1,
     stream=False,
     user="string_example",
+    seed=1,
+    return_inputs=True,
     tool_choice="string_example",
     tool_call="string_example",
-    seed=1,
     response_format={
         "type": "json_object",
     },
@@ -668,7 +675,7 @@ API keys required by each provider to make API calls. The API keys provided here
 
 ##### num_samples: `int`<a id="num_samples-int"></a>
 
-The number of chat responses.
+The number of generations.
 
 ##### stream: `bool`<a id="stream-bool"></a>
 
@@ -677,6 +684,14 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 ##### user: `str`<a id="user-str"></a>
 
 End-user ID passed through to provider call.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
+
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
 ##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
@@ -687,10 +702,6 @@ Controls how the model uses tools. The following options are supported: 'none' f
 
 
 NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
-
-##### seed: `int`<a id="seed-int"></a>
-
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
 ##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
 
@@ -744,9 +755,10 @@ create_experiment_response = humanloop.chat_experiment(
     num_samples=1,
     stream=False,
     user="string_example",
+    seed=1,
+    return_inputs=True,
     tool_choice="string_example",
     tool_call="string_example",
-    seed=1,
     response_format={
         "type": "json_object",
     },
@@ -820,6 +832,14 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 
 End-user ID passed through to provider call.
 
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
+
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
 ##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
 
@@ -829,10 +849,6 @@ Controls how the model uses tools. The following options are supported: 'none' f
 
 
 NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
-
-##### seed: `int`<a id="seed-int"></a>
-
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
 ##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
 
@@ -882,9 +898,10 @@ create_model_config_response = humanloop.chat_model_config(
     num_samples=1,
     stream=False,
     user="string_example",
+    seed=1,
+    return_inputs=True,
     tool_choice="string_example",
     tool_call="string_example",
-    seed=1,
     response_format={
         "type": "json_object",
     },
@@ -948,7 +965,7 @@ API keys required by each provider to make API calls. The API keys provided here
 
 ##### num_samples: `int`<a id="num_samples-int"></a>
 
-The number of chat responses.
+The number of generations.
 
 ##### stream: `bool`<a id="stream-bool"></a>
 
@@ -957,6 +974,14 @@ If true, tokens will be sent as data-only server-sent events. If num_samples > 1
 ##### user: `str`<a id="user-str"></a>
 
 End-user ID passed through to provider call.
+
+##### seed: `int`<a id="seed-int"></a>
+
+If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
+
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
 ##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
 
@@ -967,10 +992,6 @@ Controls how the model uses tools. The following options are supported: 'none' f
 
 
 NB: Deprecated with new tool_choice. Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'name': <TOOL_NAME>} forces the model to use the provided tool of the same name.
-
-##### seed: `int`<a id="seed-int"></a>
-
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
 ##### response_format: [`ResponseFormat`](./humanloop/type/response_format.py)<a id="response_format-responseformathumanlooptyperesponse_formatpy"></a>
 
@@ -1021,11 +1042,12 @@ create_response = humanloop.complete(
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
-    logprobs=1,
     stream=False,
-    suffix="string_example",
-    seed=1,
     user="string_example",
+    seed=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string_example",
 )
 ```
 
@@ -1085,25 +1107,29 @@ API keys required by each provider to make API calls. The API keys provided here
 
 The number of generations.
 
-##### logprobs: `int`<a id="logprobs-int"></a>
-
-Include the log probabilities of the top n tokens in the provider_response
-
 ##### stream: `bool`<a id="stream-bool"></a>
 
 If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
 
-##### suffix: `str`<a id="suffix-str"></a>
+##### user: `str`<a id="user-str"></a>
 
-The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
 If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-##### user: `str`<a id="user-str"></a>
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
-End-user ID passed through to provider call.
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
+##### logprobs: `int`<a id="logprobs-int"></a>
+
+Include the log probabilities of the top n tokens in the provider_response
+
+##### suffix: `str`<a id="suffix-str"></a>
+
+The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -1140,11 +1166,12 @@ create_deployed_response = humanloop.complete_deployed(
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
-    logprobs=1,
     stream=False,
-    suffix="string_example",
-    seed=1,
     user="string_example",
+    seed=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string_example",
     environment="string_example",
 )
 ```
@@ -1200,25 +1227,29 @@ API keys required by each provider to make API calls. The API keys provided here
 
 The number of generations.
 
-##### logprobs: `int`<a id="logprobs-int"></a>
-
-Include the log probabilities of the top n tokens in the provider_response
-
 ##### stream: `bool`<a id="stream-bool"></a>
 
 If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
 
-##### suffix: `str`<a id="suffix-str"></a>
+##### user: `str`<a id="user-str"></a>
 
-The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
 If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-##### user: `str`<a id="user-str"></a>
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
-End-user ID passed through to provider call.
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
+##### logprobs: `int`<a id="logprobs-int"></a>
+
+Include the log probabilities of the top n tokens in the provider_response
+
+##### suffix: `str`<a id="suffix-str"></a>
+
+The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
 ##### environment: `str`<a id="environment-str"></a>
 
@@ -1260,11 +1291,12 @@ create_experiment_response = humanloop.complete_experiment(
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
-    logprobs=1,
     stream=False,
-    suffix="string_example",
-    seed=1,
     user="string_example",
+    seed=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string_example",
 )
 ```
 
@@ -1323,25 +1355,29 @@ API keys required by each provider to make API calls. The API keys provided here
 
 The number of chat responses, where each chat response will use a model configuration sampled from the experiment.
 
-##### logprobs: `int`<a id="logprobs-int"></a>
-
-Include the log probabilities of the top n tokens in the provider_response
-
 ##### stream: `bool`<a id="stream-bool"></a>
 
 If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
 
-##### suffix: `str`<a id="suffix-str"></a>
+##### user: `str`<a id="user-str"></a>
 
-The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
 If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-##### user: `str`<a id="user-str"></a>
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
-End-user ID passed through to provider call.
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
+##### logprobs: `int`<a id="logprobs-int"></a>
+
+Include the log probabilities of the top n tokens in the provider_response
+
+##### suffix: `str`<a id="suffix-str"></a>
+
+The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -1379,11 +1415,12 @@ create_model_config_response = humanloop.complete_model_configuration(
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
-    logprobs=1,
     stream=False,
-    suffix="string_example",
-    seed=1,
     user="string_example",
+    seed=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string_example",
 )
 ```
 
@@ -1442,25 +1479,29 @@ API keys required by each provider to make API calls. The API keys provided here
 
 The number of generations.
 
-##### logprobs: `int`<a id="logprobs-int"></a>
-
-Include the log probabilities of the top n tokens in the provider_response
-
 ##### stream: `bool`<a id="stream-bool"></a>
 
 If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
 
-##### suffix: `str`<a id="suffix-str"></a>
+##### user: `str`<a id="user-str"></a>
 
-The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
 If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-##### user: `str`<a id="user-str"></a>
+##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
-End-user ID passed through to provider call.
+Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
+##### logprobs: `int`<a id="logprobs-int"></a>
+
+Include the log probabilities of the top n tokens in the provider_response
+
+##### suffix: `str`<a id="suffix-str"></a>
+
+The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 

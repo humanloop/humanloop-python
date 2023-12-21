@@ -87,11 +87,12 @@ class CompletionExperimentRequest(
                         **kwargs,
                     )
             num_samples = schemas.IntSchema
-            logprobs = schemas.IntSchema
             stream = schemas.BoolSchema
-            suffix = schemas.StrSchema
-            seed = schemas.IntSchema
             user = schemas.StrSchema
+            seed = schemas.IntSchema
+            return_inputs = schemas.BoolSchema
+            logprobs = schemas.IntSchema
+            suffix = schemas.StrSchema
             __annotations__ = {
                 "experiment_id": experiment_id,
                 "project": project,
@@ -106,11 +107,12 @@ class CompletionExperimentRequest(
                 "source_datapoint_id": source_datapoint_id,
                 "provider_api_keys": provider_api_keys,
                 "num_samples": num_samples,
-                "logprobs": logprobs,
                 "stream": stream,
-                "suffix": suffix,
-                "seed": seed,
                 "user": user,
+                "seed": seed,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
             }
         additional_properties = schemas.NotAnyTypeSchema
     
@@ -156,21 +158,24 @@ class CompletionExperimentRequest(
     def __getitem__(self, name: typing_extensions.Literal["num_samples"]) -> MetaOapg.properties.num_samples: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["logprobs"]) -> MetaOapg.properties.logprobs: ...
-    
-    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["stream"]) -> MetaOapg.properties.stream: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["suffix"]) -> MetaOapg.properties.suffix: ...
+    def __getitem__(self, name: typing_extensions.Literal["user"]) -> MetaOapg.properties.user: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["user"]) -> MetaOapg.properties.user: ...
+    def __getitem__(self, name: typing_extensions.Literal["return_inputs"]) -> MetaOapg.properties.return_inputs: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["experiment_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["stream"], typing_extensions.Literal["suffix"], typing_extensions.Literal["seed"], typing_extensions.Literal["user"], ]):
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["logprobs"]) -> MetaOapg.properties.logprobs: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["suffix"]) -> MetaOapg.properties.suffix: ...
+    
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["experiment_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["suffix"], ]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -214,21 +219,24 @@ class CompletionExperimentRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["num_samples"]) -> typing.Union[MetaOapg.properties.num_samples, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["logprobs"]) -> typing.Union[MetaOapg.properties.logprobs, schemas.Unset]: ...
-    
-    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["stream"]) -> typing.Union[MetaOapg.properties.stream, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["suffix"]) -> typing.Union[MetaOapg.properties.suffix, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["user"]) -> typing.Union[MetaOapg.properties.user, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["user"]) -> typing.Union[MetaOapg.properties.user, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["return_inputs"]) -> typing.Union[MetaOapg.properties.return_inputs, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["experiment_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["stream"], typing_extensions.Literal["suffix"], typing_extensions.Literal["seed"], typing_extensions.Literal["user"], ]):
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["logprobs"]) -> typing.Union[MetaOapg.properties.logprobs, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["suffix"]) -> typing.Union[MetaOapg.properties.suffix, schemas.Unset]: ...
+    
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["experiment_id"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["suffix"], ]):
         return super().get_item_oapg(name)
 
     def __new__(
@@ -247,11 +255,12 @@ class CompletionExperimentRequest(
         source_datapoint_id: typing.Union[MetaOapg.properties.source_datapoint_id, str, schemas.Unset] = schemas.unset,
         provider_api_keys: typing.Union[MetaOapg.properties.provider_api_keys, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         num_samples: typing.Union[MetaOapg.properties.num_samples, decimal.Decimal, int, schemas.Unset] = schemas.unset,
-        logprobs: typing.Union[MetaOapg.properties.logprobs, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         stream: typing.Union[MetaOapg.properties.stream, bool, schemas.Unset] = schemas.unset,
-        suffix: typing.Union[MetaOapg.properties.suffix, str, schemas.Unset] = schemas.unset,
-        seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
+        seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        return_inputs: typing.Union[MetaOapg.properties.return_inputs, bool, schemas.Unset] = schemas.unset,
+        logprobs: typing.Union[MetaOapg.properties.logprobs, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        suffix: typing.Union[MetaOapg.properties.suffix, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs,
     ) -> 'CompletionExperimentRequest':
@@ -271,11 +280,12 @@ class CompletionExperimentRequest(
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             _configuration=_configuration,
         )
 

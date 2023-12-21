@@ -116,6 +116,8 @@ class ChatModelConfigRequest(
             num_samples = schemas.IntSchema
             stream = schemas.BoolSchema
             user = schemas.StrSchema
+            seed = schemas.IntSchema
+            return_inputs = schemas.BoolSchema
             
             
             class tool_choice(
@@ -241,7 +243,6 @@ class ChatModelConfigRequest(
                         _configuration=_configuration,
                         **kwargs,
                     )
-            seed = schemas.IntSchema
             
             
             class response_format(
@@ -295,9 +296,10 @@ class ChatModelConfigRequest(
                 "num_samples": num_samples,
                 "stream": stream,
                 "user": user,
+                "seed": seed,
+                "return_inputs": return_inputs,
                 "tool_choice": tool_choice,
                 "tool_call": tool_call,
-                "seed": seed,
                 "response_format": response_format,
             }
         additional_properties = schemas.NotAnyTypeSchema
@@ -354,18 +356,21 @@ class ChatModelConfigRequest(
     def __getitem__(self, name: typing_extensions.Literal["user"]) -> MetaOapg.properties.user: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["return_inputs"]) -> MetaOapg.properties.return_inputs: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tool_choice"]) -> MetaOapg.properties.tool_choice: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
-    
-    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> MetaOapg.properties.response_format: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], ]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["response_format"], ]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -418,18 +423,21 @@ class ChatModelConfigRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["user"]) -> typing.Union[MetaOapg.properties.user, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["return_inputs"]) -> typing.Union[MetaOapg.properties.return_inputs, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tool_choice"]) -> typing.Union[MetaOapg.properties.tool_choice, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
-    
-    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union[MetaOapg.properties.response_format, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], ]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config_id"], typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["response_format"], ]):
         return super().get_item_oapg(name)
 
     def __new__(
@@ -451,9 +459,10 @@ class ChatModelConfigRequest(
         num_samples: typing.Union[MetaOapg.properties.num_samples, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         stream: typing.Union[MetaOapg.properties.stream, bool, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
+        seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        return_inputs: typing.Union[MetaOapg.properties.return_inputs, bool, schemas.Unset] = schemas.unset,
         tool_choice: typing.Union[MetaOapg.properties.tool_choice, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
-        seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs,
@@ -477,9 +486,10 @@ class ChatModelConfigRequest(
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             _configuration=_configuration,
         )

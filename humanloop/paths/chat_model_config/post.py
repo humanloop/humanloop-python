@@ -144,9 +144,10 @@ class BaseApi(api_client.Api):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
@@ -171,8 +172,6 @@ class BaseApi(api_client.Api):
             _body["metadata"] = metadata
         if source_datapoint_id is not None:
             _body["source_datapoint_id"] = source_datapoint_id
-        if messages is not None:
-            _body["messages"] = messages
         if provider_api_keys is not None:
             _body["provider_api_keys"] = provider_api_keys
         if num_samples is not None:
@@ -181,12 +180,16 @@ class BaseApi(api_client.Api):
             _body["stream"] = stream
         if user is not None:
             _body["user"] = user
+        if seed is not None:
+            _body["seed"] = seed
+        if return_inputs is not None:
+            _body["return_inputs"] = return_inputs
+        if messages is not None:
+            _body["messages"] = messages
         if tool_choice is not None:
             _body["tool_choice"] = tool_choice
         if tool_call is not None:
             _body["tool_call"] = tool_call
-        if seed is not None:
-            _body["seed"] = seed
         if response_format is not None:
             _body["response_format"] = response_format
         if model_config_id is not None:
@@ -412,9 +415,10 @@ class CreateModelConfigRaw(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
@@ -439,9 +443,10 @@ class CreateModelConfigRaw(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
         )
         return await self._acreate_model_config_oapg(
@@ -467,9 +472,10 @@ class CreateModelConfigRaw(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -492,9 +498,10 @@ class CreateModelConfigRaw(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
         )
         return self._create_model_config_oapg(
@@ -521,9 +528,10 @@ class CreateModelConfig(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
         **kwargs,
@@ -545,9 +553,10 @@ class CreateModelConfig(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
             **kwargs,
         )
@@ -574,9 +583,10 @@ class CreateModelConfig(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         validate: bool = False,
     ) -> ChatResponsePydantic:
@@ -597,9 +607,10 @@ class CreateModelConfig(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
         )
         if validate:
@@ -628,9 +639,10 @@ class ApiForpost(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         **kwargs,
     ) -> typing.Union[
@@ -655,9 +667,10 @@ class ApiForpost(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
         )
         return await self._acreate_model_config_oapg(
@@ -683,9 +696,10 @@ class ApiForpost(BaseApi):
         num_samples: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
         tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = None,
         tool_call: typing.Optional[typing.Union[str, typing.Dict[str, str]]] = None,
-        seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -708,9 +722,10 @@ class ApiForpost(BaseApi):
             num_samples=num_samples,
             stream=stream,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
             tool_choice=tool_choice,
             tool_call=tool_call,
-            seed=seed,
             response_format=response_format,
         )
         return self._create_model_config_oapg(

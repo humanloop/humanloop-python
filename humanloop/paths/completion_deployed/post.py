@@ -131,11 +131,12 @@ class BaseApi(api_client.Api):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
@@ -164,16 +165,18 @@ class BaseApi(api_client.Api):
             _body["provider_api_keys"] = provider_api_keys
         if num_samples is not None:
             _body["num_samples"] = num_samples
-        if logprobs is not None:
-            _body["logprobs"] = logprobs
         if stream is not None:
             _body["stream"] = stream
-        if suffix is not None:
-            _body["suffix"] = suffix
-        if seed is not None:
-            _body["seed"] = seed
         if user is not None:
             _body["user"] = user
+        if seed is not None:
+            _body["seed"] = seed
+        if return_inputs is not None:
+            _body["return_inputs"] = return_inputs
+        if logprobs is not None:
+            _body["logprobs"] = logprobs
+        if suffix is not None:
+            _body["suffix"] = suffix
         if environment is not None:
             _body["environment"] = environment
         args.body = _body
@@ -393,11 +396,12 @@ class CreateDeployedRaw(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
@@ -418,11 +422,12 @@ class CreateDeployedRaw(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             environment=environment,
         )
         return await self._acreate_deployed_oapg(
@@ -444,11 +449,12 @@ class CreateDeployedRaw(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -467,11 +473,12 @@ class CreateDeployedRaw(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             environment=environment,
         )
         return self._create_deployed_oapg(
@@ -494,11 +501,12 @@ class CreateDeployed(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
@@ -516,11 +524,12 @@ class CreateDeployed(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             environment=environment,
             **kwargs,
         )
@@ -543,11 +552,12 @@ class CreateDeployed(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         validate: bool = False,
     ) -> CompletionResponsePydantic:
@@ -564,11 +574,12 @@ class CreateDeployed(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             environment=environment,
         )
         if validate:
@@ -593,11 +604,12 @@ class ApiForpost(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
@@ -618,11 +630,12 @@ class ApiForpost(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             environment=environment,
         )
         return await self._acreate_deployed_oapg(
@@ -644,11 +657,12 @@ class ApiForpost(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
-        logprobs: typing.Optional[int] = None,
         stream: typing.Optional[bool] = None,
-        suffix: typing.Optional[str] = None,
-        seed: typing.Optional[int] = None,
         user: typing.Optional[str] = None,
+        seed: typing.Optional[int] = None,
+        return_inputs: typing.Optional[bool] = None,
+        logprobs: typing.Optional[int] = None,
+        suffix: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -667,11 +681,12 @@ class ApiForpost(BaseApi):
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
-            logprobs=logprobs,
             stream=stream,
-            suffix=suffix,
-            seed=seed,
             user=user,
+            seed=seed,
+            return_inputs=return_inputs,
+            logprobs=logprobs,
+            suffix=suffix,
             environment=environment,
         )
         return self._create_deployed_oapg(
