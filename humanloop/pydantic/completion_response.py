@@ -45,3 +45,6 @@ class CompletionResponse(BaseModel):
 
     # Any additional metadata to record.
     metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
+
+    # ID of the session if it belongs to one.
+    session_id: typing.Optional[str] = Field(None, alias='session_id')

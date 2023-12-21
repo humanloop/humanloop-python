@@ -367,6 +367,7 @@ try:
     pprint(create_response.body["user"])
     pprint(create_response.body["usage"])
     pprint(create_response.body["metadata"])
+    pprint(create_response.body["session_id"])
     pprint(create_response.body["tool_choice"])
     pprint(create_response.headers)
     pprint(create_response.status)

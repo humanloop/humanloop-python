@@ -51,10 +51,10 @@ class OptionalChatDataResponse(TypedDict, total=False):
     # The messages passed to the to provider chat endpoint.
     messages: typing.List[ChatMessage]
 
-    # JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
+    # Deprecated: Please use tool_calls field within the output_message.JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
     tool_call: FunctionTool
 
-    # JSON definition of the tools to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
+    # Deprecated: Please use tool_calls field within the output_message.JSON definition of the tools to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
     tool_calls: typing.List[ToolCall]
 
 class ChatDataResponse(RequiredChatDataResponse, OptionalChatDataResponse):
