@@ -21,4 +21,4 @@ class ModelConfigEvaluatorAggregateResponse(BaseModel):
 
     evaluator_id: str = Field(alias='evaluator_id')
 
-    aggregate_value: typing.Optional[typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='aggregate_value')
+    aggregate_value: typing.Union[bool, typing.Union[int, float]] = Field(alias='aggregate_value')

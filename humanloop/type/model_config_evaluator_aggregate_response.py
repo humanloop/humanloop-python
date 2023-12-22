@@ -20,8 +20,10 @@ class RequiredModelConfigEvaluatorAggregateResponse(TypedDict):
 
     evaluator_id: str
 
+    aggregate_value: typing.Union[bool, typing.Union[int, float]]
+
 class OptionalModelConfigEvaluatorAggregateResponse(TypedDict, total=False):
-    aggregate_value: typing.Union[bool, date, datetime, dict, float, int, list, str, None]
+    pass
 
 class ModelConfigEvaluatorAggregateResponse(RequiredModelConfigEvaluatorAggregateResponse, OptionalModelConfigEvaluatorAggregateResponse):
     pass

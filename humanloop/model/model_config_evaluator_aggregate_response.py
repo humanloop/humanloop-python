@@ -35,12 +35,51 @@ class ModelConfigEvaluatorAggregateResponse(
         required = {
             "model_config_id",
             "evaluator_id",
+            "aggregate_value",
         }
         
         class properties:
             model_config_id = schemas.StrSchema
             evaluator_id = schemas.StrSchema
-            aggregate_value = schemas.AnyTypeSchema
+            
+            
+            class aggregate_value(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    any_of_0 = schemas.BoolSchema
+                    any_of_1 = schemas.NumberSchema
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def any_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            cls.any_of_0,
+                            cls.any_of_1,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'aggregate_value':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
             __annotations__ = {
                 "model_config_id": model_config_id,
                 "evaluator_id": evaluator_id,
@@ -49,6 +88,7 @@ class ModelConfigEvaluatorAggregateResponse(
     
     model_config_id: MetaOapg.properties.model_config_id
     evaluator_id: MetaOapg.properties.evaluator_id
+    aggregate_value: MetaOapg.properties.aggregate_value
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["model_config_id"]) -> MetaOapg.properties.model_config_id: ...
@@ -74,7 +114,7 @@ class ModelConfigEvaluatorAggregateResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["evaluator_id"]) -> MetaOapg.properties.evaluator_id: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["aggregate_value"]) -> typing.Union[MetaOapg.properties.aggregate_value, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["aggregate_value"]) -> MetaOapg.properties.aggregate_value: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
@@ -88,7 +128,7 @@ class ModelConfigEvaluatorAggregateResponse(
         *args: typing.Union[dict, frozendict.frozendict, ],
         model_config_id: typing.Union[MetaOapg.properties.model_config_id, str, ],
         evaluator_id: typing.Union[MetaOapg.properties.evaluator_id, str, ],
-        aggregate_value: typing.Union[MetaOapg.properties.aggregate_value, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        aggregate_value: typing.Union[MetaOapg.properties.aggregate_value, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ModelConfigEvaluatorAggregateResponse':
