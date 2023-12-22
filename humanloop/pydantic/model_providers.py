@@ -16,4 +16,4 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
-ModelProviders = Literal["openai", "openai_azure", "ai21", "mock", "anthropic", "langchain", "cohere", "replicate"]
+ModelProviders = Literal["openai", "openai_azure", "ai21", "mock", "anthropic", "langchain", "cohere", "replicate", "google"]

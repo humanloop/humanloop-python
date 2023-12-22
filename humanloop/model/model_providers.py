@@ -44,6 +44,7 @@ class ModelProviders(
             "langchain": "LANGCHAIN",
             "cohere": "COHERE",
             "replicate": "REPLICATE",
+            "google": "GOOGLE",
         }
     
     @schemas.classproperty
@@ -77,3 +78,7 @@ class ModelProviders(
     @schemas.classproperty
     def REPLICATE(cls):
         return cls("replicate")
+    
+    @schemas.classproperty
+    def GOOGLE(cls):
+        return cls("google")

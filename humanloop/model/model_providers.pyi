@@ -64,3 +64,7 @@ class ModelProviders(
     @schemas.classproperty
     def REPLICATE(cls):
         return cls("replicate")
+    
+    @schemas.classproperty
+    def GOOGLE(cls):
+        return cls("google")
