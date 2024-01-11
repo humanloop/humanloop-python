@@ -32,31 +32,30 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.evaluation_response import EvaluationResponse as EvaluationResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
-from humanloop.model.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds as CreateEvaluationRequestEvaluatorIdsSchema
-from humanloop.model.create_evaluation_request import CreateEvaluationRequest as CreateEvaluationRequestSchema
+from humanloop.model.create_evaluation_log_request import CreateEvaluationLogRequest as CreateEvaluationLogRequestSchema
+from humanloop.model.log_request import LogRequest as LogRequestSchema
+from humanloop.model.create_log_response import CreateLogResponse as CreateLogResponseSchema
 
-from humanloop.type.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds
-from humanloop.type.create_evaluation_request import CreateEvaluationRequest
-from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.evaluation_response import EvaluationResponse
+from humanloop.type.create_log_response import CreateLogResponse
+from humanloop.type.log_request import LogRequest
+from humanloop.type.create_evaluation_log_request import CreateEvaluationLogRequest
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
-from humanloop.pydantic.evaluation_response import EvaluationResponse as EvaluationResponsePydantic
-from humanloop.pydantic.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds as CreateEvaluationRequestEvaluatorIdsPydantic
-from humanloop.pydantic.create_evaluation_request import CreateEvaluationRequest as CreateEvaluationRequestPydantic
+from humanloop.pydantic.log_request import LogRequest as LogRequestPydantic
+from humanloop.pydantic.create_evaluation_log_request import CreateEvaluationLogRequest as CreateEvaluationLogRequestPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
+from humanloop.pydantic.create_log_response import CreateLogResponse as CreateLogResponsePydantic
+
+from . import path
 
 # Path params
-ProjectIdSchema = schemas.StrSchema
+EvaluationIdSchema = schemas.StrSchema
 RequestRequiredPathParams = typing_extensions.TypedDict(
     'RequestRequiredPathParams',
     {
-        'project_id': typing.Union[ProjectIdSchema, str, ],
+        'evaluation_id': typing.Union[EvaluationIdSchema, str, ],
     }
 )
 RequestOptionalPathParams = typing_extensions.TypedDict(
@@ -71,34 +70,37 @@ class RequestPathParams(RequestRequiredPathParams, RequestOptionalPathParams):
     pass
 
 
-request_path_project_id = api_client.PathParameter(
-    name="project_id",
+request_path_evaluation_id = api_client.PathParameter(
+    name="evaluation_id",
     style=api_client.ParameterStyle.SIMPLE,
-    schema=ProjectIdSchema,
+    schema=EvaluationIdSchema,
     required=True,
 )
 # body param
-SchemaForRequestBodyApplicationJson = CreateEvaluationRequestSchema
+SchemaForRequestBodyApplicationJson = CreateEvaluationLogRequestSchema
 
 
-request_body_create_evaluation_request = api_client.RequestBody(
+request_body_create_evaluation_log_request = api_client.RequestBody(
     content={
         'application/json': api_client.MediaType(
             schema=SchemaForRequestBodyApplicationJson),
     },
     required=True,
 )
-SchemaFor201ResponseBodyApplicationJson = EvaluationResponseSchema
+_auth = [
+    'APIKeyHeader',
+]
+SchemaFor201ResponseBodyApplicationJson = CreateLogResponseSchema
 
 
 @dataclass
 class ApiResponseFor201(api_client.ApiResponse):
-    body: EvaluationResponse
+    body: CreateLogResponse
 
 
 @dataclass
 class ApiResponseFor201Async(api_client.AsyncApiResponse):
-    body: EvaluationResponse
+    body: CreateLogResponse
 
 
 _response_for_201 = api_client.OpenApiResponse(
@@ -130,6 +132,10 @@ _response_for_422 = api_client.OpenApiResponse(
             schema=SchemaFor422ResponseBodyApplicationJson),
     },
 )
+_status_code_to_response = {
+    '201': _response_for_201,
+    '422': _response_for_422,
+}
 _all_accept_content_types = (
     'application/json',
 )
@@ -137,38 +143,26 @@ _all_accept_content_types = (
 
 class BaseApi(api_client.Api):
 
-    def _create_mapped_args(
+    def _log_mapped_args(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _path_params = {}
         _body = {}
-        if config_id is not None:
-            _body["config_id"] = config_id
-        if evaluator_ids is not None:
-            _body["evaluator_ids"] = evaluator_ids
-        if dataset_id is not None:
-            _body["dataset_id"] = dataset_id
-        if provider_api_keys is not None:
-            _body["provider_api_keys"] = provider_api_keys
-        if max_concurrency is not None:
-            _body["max_concurrency"] = max_concurrency
-        if hl_generated is not None:
-            _body["hl_generated"] = hl_generated
+        if datapoint_id is not None:
+            _body["datapoint_id"] = datapoint_id
+        if log is not None:
+            _body["log"] = log
         args.body = _body
-        if project_id is not None:
-            _path_params["project_id"] = project_id
+        if evaluation_id is not None:
+            _path_params["evaluation_id"] = evaluation_id
         args.path = _path_params
         return args
 
-    async def _acreate_oapg(
+    async def _alog_oapg(
         self,
         body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
@@ -184,7 +178,7 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        Create
+        Log
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -194,7 +188,7 @@ class BaseApi(api_client.Api):
     
         _path_params = {}
         for parameter in (
-            request_path_project_id,
+            request_path_evaluation_id,
         ):
             parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -226,7 +220,7 @@ class BaseApi(api_client.Api):
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_create_evaluation_request.serialize(body, content_type)
+        serialized_data = request_body_create_evaluation_log_request.serialize(body, content_type)
         if 'fields' in serialized_data:
             _fields = serialized_data['fields']
         elif 'body' in serialized_data:
@@ -298,7 +292,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-    def _create_oapg(
+    def _log_oapg(
         self,
         body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
@@ -312,7 +306,7 @@ class BaseApi(api_client.Api):
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        Create
+        Log
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -322,7 +316,7 @@ class BaseApi(api_client.Api):
     
         _path_params = {}
         for parameter in (
-            request_path_project_id,
+            request_path_evaluation_id,
         ):
             parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -354,7 +348,7 @@ class BaseApi(api_client.Api):
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_create_evaluation_request.serialize(body, content_type)
+        serialized_data = request_body_create_evaluation_log_request.serialize(body, content_type)
         if 'fields' in serialized_data:
             _fields = serialized_data['fields']
         elif 'body' in serialized_data:
@@ -395,118 +389,86 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class CreateRaw(BaseApi):
+class LogRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
-    async def acreate(
+    async def alog(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._create_mapped_args(
-            config_id=config_id,
-            evaluator_ids=evaluator_ids,
-            dataset_id=dataset_id,
-            project_id=project_id,
-            provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
-            hl_generated=hl_generated,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return await self._acreate_oapg(
+        return await self._alog_oapg(
             body=args.body,
             path_params=args.path,
             **kwargs,
         )
     
-    def create(
+    def log(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._create_mapped_args(
-            config_id=config_id,
-            evaluator_ids=evaluator_ids,
-            dataset_id=dataset_id,
-            project_id=project_id,
-            provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
-            hl_generated=hl_generated,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return self._create_oapg(
+        return self._log_oapg(
             body=args.body,
             path_params=args.path,
         )
 
-class Create(BaseApi):
+class Log(BaseApi):
 
-    async def acreate(
+    async def alog(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         validate: bool = False,
         **kwargs,
-    ) -> EvaluationResponsePydantic:
-        raw_response = await self.raw.acreate(
-            config_id=config_id,
-            evaluator_ids=evaluator_ids,
-            dataset_id=dataset_id,
-            project_id=project_id,
-            provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
-            hl_generated=hl_generated,
+    ) -> CreateLogResponsePydantic:
+        raw_response = await self.raw.alog(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
             **kwargs,
         )
         if validate:
-            return EvaluationResponsePydantic(**raw_response.body)
-        return api_client.construct_model_instance(EvaluationResponsePydantic, raw_response.body)
+            return CreateLogResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CreateLogResponsePydantic, raw_response.body)
     
     
-    def create(
+    def log(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         validate: bool = False,
-    ) -> EvaluationResponsePydantic:
-        raw_response = self.raw.create(
-            config_id=config_id,
-            evaluator_ids=evaluator_ids,
-            dataset_id=dataset_id,
-            project_id=project_id,
-            provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
-            hl_generated=hl_generated,
+    ) -> CreateLogResponsePydantic:
+        raw_response = self.raw.log(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
         if validate:
-            return EvaluationResponsePydantic(**raw_response.body)
-        return api_client.construct_model_instance(EvaluationResponsePydantic, raw_response.body)
+            return CreateLogResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CreateLogResponsePydantic, raw_response.body)
 
 
 class ApiForpost(BaseApi):
@@ -514,29 +476,21 @@ class ApiForpost(BaseApi):
 
     async def apost(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._create_mapped_args(
-            config_id=config_id,
-            evaluator_ids=evaluator_ids,
-            dataset_id=dataset_id,
-            project_id=project_id,
-            provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
-            hl_generated=hl_generated,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return await self._acreate_oapg(
+        return await self._alog_oapg(
             body=args.body,
             path_params=args.path,
             **kwargs,
@@ -544,27 +498,19 @@ class ApiForpost(BaseApi):
     
     def post(
         self,
-        config_id: str,
-        evaluator_ids: CreateEvaluationRequestEvaluatorIds,
-        dataset_id: str,
-        project_id: str,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
-        hl_generated: typing.Optional[bool] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._create_mapped_args(
-            config_id=config_id,
-            evaluator_ids=evaluator_ids,
-            dataset_id=dataset_id,
-            project_id=project_id,
-            provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
-            hl_generated=hl_generated,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return self._create_oapg(
+        return self._log_oapg(
             body=args.body,
             path_params=args.path,
         )

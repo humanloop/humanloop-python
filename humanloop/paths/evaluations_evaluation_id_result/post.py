@@ -48,11 +48,11 @@ from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTP
 from . import path
 
 # Path params
-EvaluationRunExternalIdSchema = schemas.StrSchema
+EvaluationIdSchema = schemas.StrSchema
 RequestRequiredPathParams = typing_extensions.TypedDict(
     'RequestRequiredPathParams',
     {
-        'evaluation_run_external_id': typing.Union[EvaluationRunExternalIdSchema, str, ],
+        'evaluation_id': typing.Union[EvaluationIdSchema, str, ],
     }
 )
 RequestOptionalPathParams = typing_extensions.TypedDict(
@@ -67,10 +67,10 @@ class RequestPathParams(RequestRequiredPathParams, RequestOptionalPathParams):
     pass
 
 
-request_path_evaluation_run_external_id = api_client.PathParameter(
-    name="evaluation_run_external_id",
+request_path_evaluation_id = api_client.PathParameter(
+    name="evaluation_id",
     style=api_client.ParameterStyle.SIMPLE,
-    schema=EvaluationRunExternalIdSchema,
+    schema=EvaluationIdSchema,
     required=True,
 )
 # body param
@@ -140,11 +140,11 @@ _all_accept_content_types = (
 
 class BaseApi(api_client.Api):
 
-    def _log_result_mapped_args(
+    def _result_mapped_args(
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
@@ -160,12 +160,12 @@ class BaseApi(api_client.Api):
         if error is not None:
             _body["error"] = error
         args.body = _body
-        if evaluation_run_external_id is not None:
-            _path_params["evaluation_run_external_id"] = evaluation_run_external_id
+        if evaluation_id is not None:
+            _path_params["evaluation_id"] = evaluation_id
         args.path = _path_params
         return args
 
-    async def _alog_result_oapg(
+    async def _aresult_oapg(
         self,
         body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
@@ -181,7 +181,7 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        Log Result
+        Result
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -191,7 +191,7 @@ class BaseApi(api_client.Api):
     
         _path_params = {}
         for parameter in (
-            request_path_evaluation_run_external_id,
+            request_path_evaluation_id,
         ):
             parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -295,7 +295,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-    def _log_result_oapg(
+    def _result_oapg(
         self,
         body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
@@ -309,7 +309,7 @@ class BaseApi(api_client.Api):
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        Log Result
+        Result
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -319,7 +319,7 @@ class BaseApi(api_client.Api):
     
         _path_params = {}
         for parameter in (
-            request_path_evaluation_run_external_id,
+            request_path_evaluation_id,
         ):
             parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -392,14 +392,14 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class LogResultRaw(BaseApi):
+class ResultRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
-    async def alog_result(
+    async def aresult(
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
         **kwargs,
@@ -408,58 +408,58 @@ class LogResultRaw(BaseApi):
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._log_result_mapped_args(
+        args = self._result_mapped_args(
             log_id=log_id,
             evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
+            evaluation_id=evaluation_id,
             result=result,
             error=error,
         )
-        return await self._alog_result_oapg(
+        return await self._aresult_oapg(
             body=args.body,
             path_params=args.path,
             **kwargs,
         )
     
-    def log_result(
+    def result(
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._log_result_mapped_args(
+        args = self._result_mapped_args(
             log_id=log_id,
             evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
+            evaluation_id=evaluation_id,
             result=result,
             error=error,
         )
-        return self._log_result_oapg(
+        return self._result_oapg(
             body=args.body,
             path_params=args.path,
         )
 
-class LogResult(BaseApi):
+class Result(BaseApi):
 
-    async def alog_result(
+    async def aresult(
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
     ) -> EvaluationResultResponsePydantic:
-        raw_response = await self.raw.alog_result(
+        raw_response = await self.raw.aresult(
             log_id=log_id,
             evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
+            evaluation_id=evaluation_id,
             result=result,
             error=error,
             **kwargs,
@@ -469,19 +469,19 @@ class LogResult(BaseApi):
         return api_client.construct_model_instance(EvaluationResultResponsePydantic, raw_response.body)
     
     
-    def log_result(
+    def result(
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
         validate: bool = False,
     ) -> EvaluationResultResponsePydantic:
-        raw_response = self.raw.log_result(
+        raw_response = self.raw.result(
             log_id=log_id,
             evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
+            evaluation_id=evaluation_id,
             result=result,
             error=error,
         )
@@ -497,7 +497,7 @@ class ApiForpost(BaseApi):
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
         **kwargs,
@@ -506,14 +506,14 @@ class ApiForpost(BaseApi):
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._log_result_mapped_args(
+        args = self._result_mapped_args(
             log_id=log_id,
             evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
+            evaluation_id=evaluation_id,
             result=result,
             error=error,
         )
-        return await self._alog_result_oapg(
+        return await self._aresult_oapg(
             body=args.body,
             path_params=args.path,
             **kwargs,
@@ -523,21 +523,21 @@ class ApiForpost(BaseApi):
         self,
         log_id: str,
         evaluator_id: str,
-        evaluation_run_external_id: str,
+        evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._log_result_mapped_args(
+        args = self._result_mapped_args(
             log_id=log_id,
             evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
+            evaluation_id=evaluation_id,
             result=result,
             error=error,
         )
-        return self._log_result_oapg(
+        return self._result_oapg(
             body=args.body,
             path_params=args.path,
         )

@@ -33,24 +33,27 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.create_evaluation_result_log_request import CreateEvaluationResultLogRequest as CreateEvaluationResultLogRequestSchema
-from humanloop.model.evaluation_result_response import EvaluationResultResponse as EvaluationResultResponseSchema
+from humanloop.model.create_evaluation_log_request import CreateEvaluationLogRequest as CreateEvaluationLogRequestSchema
+from humanloop.model.log_request import LogRequest as LogRequestSchema
+from humanloop.model.create_log_response import CreateLogResponse as CreateLogResponseSchema
 
-from humanloop.type.create_evaluation_result_log_request import CreateEvaluationResultLogRequest
-from humanloop.type.evaluation_result_response import EvaluationResultResponse
+from humanloop.type.create_log_response import CreateLogResponse
+from humanloop.type.log_request import LogRequest
+from humanloop.type.create_evaluation_log_request import CreateEvaluationLogRequest
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
-from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse as EvaluationResultResponsePydantic
-from humanloop.pydantic.create_evaluation_result_log_request import CreateEvaluationResultLogRequest as CreateEvaluationResultLogRequestPydantic
+from humanloop.pydantic.log_request import LogRequest as LogRequestPydantic
+from humanloop.pydantic.create_evaluation_log_request import CreateEvaluationLogRequest as CreateEvaluationLogRequestPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.create_log_response import CreateLogResponse as CreateLogResponsePydantic
 
 # Path params
-EvaluationRunExternalIdSchema = schemas.StrSchema
+EvaluationIdSchema = schemas.StrSchema
 RequestRequiredPathParams = typing_extensions.TypedDict(
     'RequestRequiredPathParams',
     {
-        'evaluation_run_external_id': typing.Union[EvaluationRunExternalIdSchema, str, ],
+        'evaluation_id': typing.Union[EvaluationIdSchema, str, ],
     }
 )
 RequestOptionalPathParams = typing_extensions.TypedDict(
@@ -65,34 +68,34 @@ class RequestPathParams(RequestRequiredPathParams, RequestOptionalPathParams):
     pass
 
 
-request_path_evaluation_run_external_id = api_client.PathParameter(
-    name="evaluation_run_external_id",
+request_path_evaluation_id = api_client.PathParameter(
+    name="evaluation_id",
     style=api_client.ParameterStyle.SIMPLE,
-    schema=EvaluationRunExternalIdSchema,
+    schema=EvaluationIdSchema,
     required=True,
 )
 # body param
-SchemaForRequestBodyApplicationJson = CreateEvaluationResultLogRequestSchema
+SchemaForRequestBodyApplicationJson = CreateEvaluationLogRequestSchema
 
 
-request_body_create_evaluation_result_log_request = api_client.RequestBody(
+request_body_create_evaluation_log_request = api_client.RequestBody(
     content={
         'application/json': api_client.MediaType(
             schema=SchemaForRequestBodyApplicationJson),
     },
     required=True,
 )
-SchemaFor201ResponseBodyApplicationJson = EvaluationResultResponseSchema
+SchemaFor201ResponseBodyApplicationJson = CreateLogResponseSchema
 
 
 @dataclass
 class ApiResponseFor201(api_client.ApiResponse):
-    body: EvaluationResultResponse
+    body: CreateLogResponse
 
 
 @dataclass
 class ApiResponseFor201Async(api_client.AsyncApiResponse):
-    body: EvaluationResultResponse
+    body: CreateLogResponse
 
 
 _response_for_201 = api_client.OpenApiResponse(
@@ -131,32 +134,26 @@ _all_accept_content_types = (
 
 class BaseApi(api_client.Api):
 
-    def _log_result_mapped_args(
+    def _log_mapped_args(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _path_params = {}
         _body = {}
-        if log_id is not None:
-            _body["log_id"] = log_id
-        if evaluator_id is not None:
-            _body["evaluator_id"] = evaluator_id
-        if result is not None:
-            _body["result"] = result
-        if error is not None:
-            _body["error"] = error
+        if datapoint_id is not None:
+            _body["datapoint_id"] = datapoint_id
+        if log is not None:
+            _body["log"] = log
         args.body = _body
-        if evaluation_run_external_id is not None:
-            _path_params["evaluation_run_external_id"] = evaluation_run_external_id
+        if evaluation_id is not None:
+            _path_params["evaluation_id"] = evaluation_id
         args.path = _path_params
         return args
 
-    async def _alog_result_oapg(
+    async def _alog_oapg(
         self,
         body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
@@ -172,7 +169,7 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        Log Result
+        Log
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -182,7 +179,7 @@ class BaseApi(api_client.Api):
     
         _path_params = {}
         for parameter in (
-            request_path_evaluation_run_external_id,
+            request_path_evaluation_id,
         ):
             parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -214,7 +211,7 @@ class BaseApi(api_client.Api):
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_create_evaluation_result_log_request.serialize(body, content_type)
+        serialized_data = request_body_create_evaluation_log_request.serialize(body, content_type)
         if 'fields' in serialized_data:
             _fields = serialized_data['fields']
         elif 'body' in serialized_data:
@@ -286,7 +283,7 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-    def _log_result_oapg(
+    def _log_oapg(
         self,
         body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
@@ -300,7 +297,7 @@ class BaseApi(api_client.Api):
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        Log Result
+        Log
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
@@ -310,7 +307,7 @@ class BaseApi(api_client.Api):
     
         _path_params = {}
         for parameter in (
-            request_path_evaluation_run_external_id,
+            request_path_evaluation_id,
         ):
             parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -342,7 +339,7 @@ class BaseApi(api_client.Api):
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_create_evaluation_result_log_request.serialize(body, content_type)
+        serialized_data = request_body_create_evaluation_log_request.serialize(body, content_type)
         if 'fields' in serialized_data:
             _fields = serialized_data['fields']
         elif 'body' in serialized_data:
@@ -383,102 +380,86 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class LogResultRaw(BaseApi):
+class LogRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
-    async def alog_result(
+    async def alog(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._log_result_mapped_args(
-            log_id=log_id,
-            evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
-            result=result,
-            error=error,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return await self._alog_result_oapg(
+        return await self._alog_oapg(
             body=args.body,
             path_params=args.path,
             **kwargs,
         )
     
-    def log_result(
+    def log(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._log_result_mapped_args(
-            log_id=log_id,
-            evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
-            result=result,
-            error=error,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return self._log_result_oapg(
+        return self._log_oapg(
             body=args.body,
             path_params=args.path,
         )
 
-class LogResult(BaseApi):
+class Log(BaseApi):
 
-    async def alog_result(
+    async def alog(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         validate: bool = False,
         **kwargs,
-    ) -> EvaluationResultResponsePydantic:
-        raw_response = await self.raw.alog_result(
-            log_id=log_id,
-            evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
-            result=result,
-            error=error,
+    ) -> CreateLogResponsePydantic:
+        raw_response = await self.raw.alog(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
             **kwargs,
         )
         if validate:
-            return EvaluationResultResponsePydantic(**raw_response.body)
-        return api_client.construct_model_instance(EvaluationResultResponsePydantic, raw_response.body)
+            return CreateLogResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CreateLogResponsePydantic, raw_response.body)
     
     
-    def log_result(
+    def log(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         validate: bool = False,
-    ) -> EvaluationResultResponsePydantic:
-        raw_response = self.raw.log_result(
-            log_id=log_id,
-            evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
-            result=result,
-            error=error,
+    ) -> CreateLogResponsePydantic:
+        raw_response = self.raw.log(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
         if validate:
-            return EvaluationResultResponsePydantic(**raw_response.body)
-        return api_client.construct_model_instance(EvaluationResultResponsePydantic, raw_response.body)
+            return CreateLogResponsePydantic(**raw_response.body)
+        return api_client.construct_model_instance(CreateLogResponsePydantic, raw_response.body)
 
 
 class ApiForpost(BaseApi):
@@ -486,25 +467,21 @@ class ApiForpost(BaseApi):
 
     async def apost(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._log_result_mapped_args(
-            log_id=log_id,
-            evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
-            result=result,
-            error=error,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return await self._alog_result_oapg(
+        return await self._alog_oapg(
             body=args.body,
             path_params=args.path,
             **kwargs,
@@ -512,23 +489,19 @@ class ApiForpost(BaseApi):
     
     def post(
         self,
-        log_id: str,
-        evaluator_id: str,
-        evaluation_run_external_id: str,
-        result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
-        error: typing.Optional[str] = None,
+        datapoint_id: str,
+        log: LogRequest,
+        evaluation_id: str,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._log_result_mapped_args(
-            log_id=log_id,
-            evaluator_id=evaluator_id,
-            evaluation_run_external_id=evaluation_run_external_id,
-            result=result,
-            error=error,
+        args = self._log_mapped_args(
+            datapoint_id=datapoint_id,
+            log=log,
+            evaluation_id=evaluation_id,
         )
-        return self._log_result_oapg(
+        return self._log_oapg(
             body=args.body,
             path_params=args.path,
         )

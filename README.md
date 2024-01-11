@@ -73,7 +73,8 @@
   * [`humanloop.evaluations.get`](#humanloopevaluationsget)
   * [`humanloop.evaluations.list_all_for_project`](#humanloopevaluationslist_all_for_project)
   * [`humanloop.evaluations.list_datapoints`](#humanloopevaluationslist_datapoints)
-  * [`humanloop.evaluations.log_result`](#humanloopevaluationslog_result)
+  * [`humanloop.evaluations.log`](#humanloopevaluationslog)
+  * [`humanloop.evaluations.result`](#humanloopevaluationsresult)
   * [`humanloop.evaluations.update_status`](#humanloopevaluationsupdate_status)
   * [`humanloop.evaluators.create`](#humanloopevaluatorscreate)
   * [`humanloop.evaluators.delete`](#humanloopevaluatorsdelete)
@@ -1890,6 +1891,8 @@ create_response = humanloop.evaluations.create(
     dataset_id="string_example",
     project_id="project_id_example",
     provider_api_keys={},
+    max_concurrency=5,
+    hl_generated=True,
 )
 ```
 
@@ -1913,6 +1916,14 @@ String ID of project. Starts with `pr_`.
 
 
 API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization. Ensure you provide an API key for the provider for the model config you are evaluating, or have one saved to your organization.
+
+##### max_concurrency: `int`<a id="max_concurrency-int"></a>
+
+The maximum number of concurrent generations to run. A higher value will result in faster completion of the evaluation but may place higher load on your provider rate-limits. 
+
+##### hl_generated: `bool`<a id="hl_generated-bool"></a>
+
+Whether the log generations for this evaluation should be performed by Humanloop. If `False`, the log generations should be submitted by the user via the API.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -2039,17 +2050,61 @@ Number of evaluation results to retrieve.
 
 ---
 
-### `humanloop.evaluations.log_result`<a id="humanloopevaluationslog_result"></a>
+### `humanloop.evaluations.log`<a id="humanloopevaluationslog"></a>
 
-Log an evaluation result to an evaluation run.  The run must have status 'running' and the `evaluator_id` of the result must be one of the `evaluator_id`s associated with the run.
+Log an external generation to an evaluation run for a datapoint.  The run must have status 'running'.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
 ```python
-log_result_response = humanloop.evaluations.log_result(
+log_response = humanloop.evaluations.log(
+    datapoint_id="string_example",
+    log={},
+    evaluation_id="evaluation_id_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### datapoint_id: `str`<a id="datapoint_id-str"></a>
+
+The datapoint for which a log was generated. Must be one of the datapoints in the dataset being evaluated.
+
+##### log: [`LogRequest`](./humanloop/type/log_request.py)<a id="log-logrequesthumanlooptypelog_requestpy"></a>
+
+
+The log generated for the datapoint.
+
+##### evaluation_id: `str`<a id="evaluation_id-str"></a>
+
+ID of the evaluation run. Starts with `evrun_`.
+
+#### ⚙️ Request Body<a id="⚙️-request-body"></a>
+
+[`CreateEvaluationLogRequest`](./humanloop/type/create_evaluation_log_request.py)
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`CreateLogResponse`](./humanloop/pydantic/create_log_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/evaluations/{evaluation_id}/log` `post`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.evaluations.result`<a id="humanloopevaluationsresult"></a>
+
+Log an evaluation result to an evaluation run.  The run must have status 'running'. One of `result` or `error` must be provided.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+result_response = humanloop.evaluations.result(
     log_id="string_example",
     evaluator_id="string_example",
-    evaluation_run_external_id="evaluation_run_external_id_example",
+    evaluation_id="evaluation_id_example",
     result=True,
     error="string_example",
 )
@@ -2065,7 +2120,7 @@ The log that was evaluated. Must have as its `source_datapoint_id` one of the da
 
 ID of the evaluator that evaluated the log. Starts with `evfn_`. Must be one of the evaluator IDs associated with the evaluation run being logged to.
 
-##### evaluation_run_external_id: `str`<a id="evaluation_run_external_id-str"></a>
+##### evaluation_id: `str`<a id="evaluation_id-str"></a>
 
 ID of the evaluation run. Starts with `evrun_`.
 
@@ -2087,7 +2142,7 @@ An error that occurred during evaluation.
 
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
-`/evaluations/{evaluation_run_external_id}/result` `post`
+`/evaluations/{evaluation_id}/result` `post`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 

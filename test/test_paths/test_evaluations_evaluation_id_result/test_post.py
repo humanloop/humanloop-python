@@ -15,16 +15,16 @@ from unittest.mock import patch
 import urllib3
 
 import humanloop
-from humanloop.paths.evaluations_evaluation_run_external_id_result import post
+from humanloop.paths.evaluations_evaluation_id_result import post
 from humanloop import configuration, schemas, api_client
 
 from .. import ApiTestMixin
 
 
-class TestEvaluationsEvaluationRunExternalIdResult(ApiTestMixin, unittest.TestCase):
+class TestEvaluationsEvaluationIdResult(ApiTestMixin, unittest.TestCase):
     """
-    EvaluationsEvaluationRunExternalIdResult unit test stubs
-        Log Result
+    EvaluationsEvaluationIdResult unit test stubs
+        Result
     """
 
     def setUp(self):

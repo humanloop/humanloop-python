@@ -14,5 +14,17 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+from humanloop.type.log_request import LogRequest
 
-EvaluationStatus = Literal["pending", "running", "completed", "failed", "cancelled"]
+class RequiredCreateEvaluationLogRequest(TypedDict):
+    # The datapoint for which a log was generated. Must be one of the datapoints in the dataset being evaluated.
+    datapoint_id: str
+
+    # The log generated for the datapoint.
+    log: LogRequest
+
+class OptionalCreateEvaluationLogRequest(TypedDict, total=False):
+    pass
+
+class CreateEvaluationLogRequest(RequiredCreateEvaluationLogRequest, OptionalCreateEvaluationLogRequest):
+    pass

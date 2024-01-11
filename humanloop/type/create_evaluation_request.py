@@ -30,5 +30,11 @@ class OptionalCreateEvaluationRequest(TypedDict, total=False):
     # API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization. Ensure you provide an API key for the provider for the model config you are evaluating, or have one saved to your organization.
     provider_api_keys: ProviderApiKeys
 
+    # The maximum number of concurrent generations to run. A higher value will result in faster completion of the evaluation but may place higher load on your provider rate-limits. 
+    max_concurrency: int
+
+    # Whether the log generations for this evaluation should be performed by Humanloop. If `False`, the log generations should be submitted by the user via the API.
+    hl_generated: bool
+
 class CreateEvaluationRequest(RequiredCreateEvaluationRequest, OptionalCreateEvaluationRequest):
     pass

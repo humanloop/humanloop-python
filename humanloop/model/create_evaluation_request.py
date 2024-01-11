@@ -81,11 +81,15 @@ class CreateEvaluationRequest(
                         _configuration=_configuration,
                         **kwargs,
                     )
+            max_concurrency = schemas.IntSchema
+            hl_generated = schemas.BoolSchema
             __annotations__ = {
                 "config_id": config_id,
                 "evaluator_ids": evaluator_ids,
                 "dataset_id": dataset_id,
                 "provider_api_keys": provider_api_keys,
+                "max_concurrency": max_concurrency,
+                "hl_generated": hl_generated,
             }
     
     config_id: MetaOapg.properties.config_id
@@ -105,9 +109,15 @@ class CreateEvaluationRequest(
     def __getitem__(self, name: typing_extensions.Literal["provider_api_keys"]) -> MetaOapg.properties.provider_api_keys: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["max_concurrency"]) -> MetaOapg.properties.max_concurrency: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["hl_generated"]) -> MetaOapg.properties.hl_generated: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["config_id", "evaluator_ids", "dataset_id", "provider_api_keys", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["config_id", "evaluator_ids", "dataset_id", "provider_api_keys", "max_concurrency", "hl_generated", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -125,9 +135,15 @@ class CreateEvaluationRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["provider_api_keys"]) -> typing.Union[MetaOapg.properties.provider_api_keys, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["max_concurrency"]) -> typing.Union[MetaOapg.properties.max_concurrency, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["hl_generated"]) -> typing.Union[MetaOapg.properties.hl_generated, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["config_id", "evaluator_ids", "dataset_id", "provider_api_keys", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["config_id", "evaluator_ids", "dataset_id", "provider_api_keys", "max_concurrency", "hl_generated", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -138,6 +154,8 @@ class CreateEvaluationRequest(
         dataset_id: typing.Union[MetaOapg.properties.dataset_id, str, ],
         evaluator_ids: 'CreateEvaluationRequestEvaluatorIds',
         provider_api_keys: typing.Union[MetaOapg.properties.provider_api_keys, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        max_concurrency: typing.Union[MetaOapg.properties.max_concurrency, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        hl_generated: typing.Union[MetaOapg.properties.hl_generated, bool, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'CreateEvaluationRequest':
@@ -148,6 +166,8 @@ class CreateEvaluationRequest(
             dataset_id=dataset_id,
             evaluator_ids=evaluator_ids,
             provider_api_keys=provider_api_keys,
+            max_concurrency=max_concurrency,
+            hl_generated=hl_generated,
             _configuration=_configuration,
             **kwargs,
         )

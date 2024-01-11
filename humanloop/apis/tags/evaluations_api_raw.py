@@ -13,7 +13,8 @@ from humanloop.paths.projects_project_id_evaluations.post import CreateRaw
 from humanloop.paths.evaluations_id.get import GetRaw
 from humanloop.paths.projects_project_id_evaluations.get import ListAllForProjectRaw
 from humanloop.paths.evaluations_id_datapoints.get import ListDatapointsRaw
-from humanloop.paths.evaluations_evaluation_run_external_id_result.post import LogResultRaw
+from humanloop.paths.evaluations_evaluation_id_log.post import LogRaw
+from humanloop.paths.evaluations_evaluation_id_result.post import ResultRaw
 from humanloop.paths.evaluations_id_status.patch import UpdateStatusRaw
 
 
@@ -22,7 +23,8 @@ class EvaluationsApiRaw(
     GetRaw,
     ListAllForProjectRaw,
     ListDatapointsRaw,
-    LogResultRaw,
+    LogRaw,
+    ResultRaw,
     UpdateStatusRaw,
 ):
     """NOTE:

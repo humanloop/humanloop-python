@@ -13,7 +13,8 @@ from humanloop.paths.projects_project_id_evaluations.post import Create
 from humanloop.paths.evaluations_id.get import Get
 from humanloop.paths.projects_project_id_evaluations.get import ListAllForProject
 from humanloop.paths.evaluations_id_datapoints.get import ListDatapoints
-from humanloop.paths.evaluations_evaluation_run_external_id_result.post import LogResult
+from humanloop.paths.evaluations_evaluation_id_log.post import Log
+from humanloop.paths.evaluations_evaluation_id_result.post import Result
 from humanloop.paths.evaluations_id_status.patch import UpdateStatus
 from humanloop.apis.tags.evaluations_api_raw import EvaluationsApiRaw
 
@@ -23,7 +24,8 @@ class EvaluationsApi(
     Get,
     ListAllForProject,
     ListDatapoints,
-    LogResult,
+    Log,
+    Result,
     UpdateStatus,
 ):
     """NOTE:

@@ -237,7 +237,7 @@ async def test_complete_stream():
     response: AsyncGeneratorResponse = await humanloop.complete_stream(
         project="konfig-dev-001",
         inputs={"question": "How should I think about competition for my startup?"},
-        model_config={"model": "text-davinci-003", "prompt_template": "{{question}}"},
+        model_config={"model": "gpt-3.5-turbo-instruct", "prompt_template": "{{question}}"},
     )  # type: ignore
 
     lines = []
