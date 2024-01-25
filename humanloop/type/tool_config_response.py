@@ -35,7 +35,7 @@ class OptionalToolConfigResponse(TypedDict, total=False):
     # Other parameters that define the config.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
-    # Source of the tool. If defined at an organization level will be 'organiztion' else 'inline'.
+    # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
     source: ToolSource
 
     # Code source of the tool.

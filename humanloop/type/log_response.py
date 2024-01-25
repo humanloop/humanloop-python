@@ -20,7 +20,6 @@ from humanloop.type.evaluation_result_response import EvaluationResultResponse
 from humanloop.type.feedback_response import FeedbackResponse
 from humanloop.type.metric_value_response import MetricValueResponse
 from humanloop.type.observability_status import ObservabilityStatus
-from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.tool_result_response import ToolResultResponse
 
@@ -98,9 +97,6 @@ class OptionalLogResponse(TypedDict, total=False):
 
     # The message returned by the provider.
     output_message: ChatMessage
-
-    # The config used for this datapoint.
-    model_config: ProjectConfigResponse
 
     # User email address provided when creating the datapoint.
     user: str

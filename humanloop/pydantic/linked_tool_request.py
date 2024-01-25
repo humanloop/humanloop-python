@@ -15,14 +15,13 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.tool_source import ToolSource
 
 class LinkedToolRequest(BaseModel):
     # The ID of the linked tool. Starts with \"oc_\"
     id: str = Field(alias='id')
 
     # The source of the linked tool. For a linked tool it should be `organization`
-    source: ToolSource = Field(alias='source')
+    source: str = Field(alias='source')
 
     # The description of the linked tool.
     description: typing.Optional[str] = Field(None, alias='description')

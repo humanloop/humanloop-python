@@ -21,7 +21,6 @@ from humanloop.pydantic.evaluation_result_response import EvaluationResultRespon
 from humanloop.pydantic.feedback_response import FeedbackResponse
 from humanloop.pydantic.metric_value_response import MetricValueResponse
 from humanloop.pydantic.observability_status import ObservabilityStatus
-from humanloop.pydantic.project_config_response import ProjectConfigResponse
 from humanloop.pydantic.tool_choice import ToolChoice
 from humanloop.pydantic.tool_result_response import ToolResultResponse
 
@@ -98,9 +97,6 @@ class LogResponse(BaseModel):
 
     # The message returned by the provider.
     output_message: typing.Optional[ChatMessage] = Field(None, alias='output_message')
-
-    # The config used for this datapoint.
-    model_config_: typing.Optional[ProjectConfigResponse] = Field(None, alias='model_config')
 
     # User email address provided when creating the datapoint.
     user: typing.Optional[str] = Field(None, alias='user')

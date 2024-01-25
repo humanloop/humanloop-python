@@ -35,7 +35,7 @@ class ToolConfigResponse(BaseModel):
     # Other parameters that define the config.
     other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
 
-    # Source of the tool. If defined at an organization level will be 'organiztion' else 'inline'.
+    # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
     source: typing.Optional[ToolSource] = Field(None, alias='source')
 
     # Code source of the tool.

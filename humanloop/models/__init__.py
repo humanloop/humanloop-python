@@ -11,7 +11,6 @@
 # import sys
 # sys.setrecursionlimit(n)
 
-from humanloop.model.agent_config_request import AgentConfigRequest
 from humanloop.model.agent_config_response import AgentConfigResponse
 from humanloop.model.base_metric_response import BaseMetricResponse
 from humanloop.model.body_model_configs_deserialize import BodyModelConfigsDeserialize
@@ -103,7 +102,6 @@ from humanloop.model.finetune_response import FinetuneResponse
 from humanloop.model.finetunes_list_all_for_project_response import FinetunesListAllForProjectResponse
 from humanloop.model.function_tool import FunctionTool
 from humanloop.model.function_tool_choice import FunctionToolChoice
-from humanloop.model.generic_config_request import GenericConfigRequest
 from humanloop.model.generic_config_response import GenericConfigResponse
 from humanloop.model.get_model_config_response import GetModelConfigResponse
 from humanloop.model.http_validation_error import HTTPValidationError

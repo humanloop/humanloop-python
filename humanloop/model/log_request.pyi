@@ -98,8 +98,6 @@ class LogRequest(
                         return [
                             ModelConfigRequest,
                             ToolConfigRequest,
-                            GenericConfigRequest,
-                            AgentConfigRequest,
                         ]
             
             
@@ -447,9 +445,7 @@ class LogRequest(
             **kwargs,
         )
 
-from humanloop.model.agent_config_request import AgentConfigRequest
 from humanloop.model.chat_message import ChatMessage
 from humanloop.model.feedback import Feedback
-from humanloop.model.generic_config_request import GenericConfigRequest
 from humanloop.model.model_config_request import ModelConfigRequest
 from humanloop.model.tool_config_request import ToolConfigRequest

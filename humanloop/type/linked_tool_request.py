@@ -14,14 +14,13 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.tool_source import ToolSource
 
 class RequiredLinkedToolRequest(TypedDict):
     # The ID of the linked tool. Starts with \"oc_\"
     id: str
 
     # The source of the linked tool. For a linked tool it should be `organization`
-    source: ToolSource
+    source: str
 
 class OptionalLinkedToolRequest(TypedDict, total=False):
     # The description of the linked tool.

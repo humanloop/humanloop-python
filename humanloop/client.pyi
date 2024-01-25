@@ -81,8 +81,6 @@ from humanloop.type.feedback_submit_response import FeedbackSubmitResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.feedback import Feedback
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.agent_config_request import AgentConfigRequest
-from humanloop.type.generic_config_request import GenericConfigRequest
 from humanloop.type.tool_config_request import ToolConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.logs_log_response import LogsLogResponse
@@ -944,7 +942,7 @@ class Humanloop(ClientCustom):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -999,7 +997,7 @@ class Humanloop(ClientCustom):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,

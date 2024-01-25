@@ -32,20 +32,16 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.agent_config_request import AgentConfigRequest as AgentConfigRequestSchema
 from humanloop.model.tool_config_request import ToolConfigRequest as ToolConfigRequestSchema
 from humanloop.model.log_datapoint_request import LogDatapointRequest as LogDatapointRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.feedback import Feedback as FeedbackSchema
 from humanloop.model.model_config_request import ModelConfigRequest as ModelConfigRequestSchema
 from humanloop.model.logs_log_response import LogsLogResponse as LogsLogResponseSchema
-from humanloop.model.generic_config_request import GenericConfigRequest as GenericConfigRequestSchema
 from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
 from humanloop.type.feedback import Feedback
 from humanloop.type.chat_message import ChatMessage
-from humanloop.type.agent_config_request import AgentConfigRequest
-from humanloop.type.generic_config_request import GenericConfigRequest
 from humanloop.type.tool_config_request import ToolConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.logs_log_response import LogsLogResponse
@@ -56,11 +52,9 @@ from ...api_client import Dictionary
 from humanloop.pydantic.log_datapoint_request import LogDatapointRequest as LogDatapointRequestPydantic
 from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.feedback import Feedback as FeedbackPydantic
-from humanloop.pydantic.agent_config_request import AgentConfigRequest as AgentConfigRequestPydantic
 from humanloop.pydantic.tool_config_request import ToolConfigRequest as ToolConfigRequestPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.model_config_request import ModelConfigRequest as ModelConfigRequestPydantic
-from humanloop.pydantic.generic_config_request import GenericConfigRequest as GenericConfigRequestPydantic
 from humanloop.pydantic.logs_log_response import LogsLogResponse as LogsLogResponsePydantic
 
 from . import path
@@ -150,7 +144,7 @@ class BaseApi(api_client.Api):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -425,7 +419,7 @@ class LogRaw(BaseApi):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -486,7 +480,7 @@ class LogRaw(BaseApi):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -546,7 +540,7 @@ class Log(BaseApi):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -605,7 +599,7 @@ class Log(BaseApi):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -665,7 +659,7 @@ class ApiForpost(BaseApi):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
@@ -726,7 +720,7 @@ class ApiForpost(BaseApi):
         messages: typing.Optional[typing.List[ChatMessage]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
-        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = None,
+        config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,

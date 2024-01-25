@@ -15,10 +15,8 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.agent_config_request import AgentConfigRequest
 from humanloop.pydantic.chat_message import ChatMessage
 from humanloop.pydantic.feedback import Feedback
-from humanloop.pydantic.generic_config_request import GenericConfigRequest
 from humanloop.pydantic.model_config_request import ModelConfigRequest
 from humanloop.pydantic.tool_config_request import ToolConfigRequest
 
@@ -69,7 +67,7 @@ class LogRequest(BaseModel):
     config_id: typing.Optional[str] = Field(None, alias='config_id')
 
     # The model config used for this generation. Required unless `config_id` or `trial_id` is provided.
-    config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]] = Field(None, alias='config')
+    config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = Field(None, alias='config')
 
     # The environment name used to create the log.
     environment: typing.Optional[str] = Field(None, alias='environment')

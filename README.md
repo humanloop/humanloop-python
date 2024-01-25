@@ -2946,17 +2946,13 @@ log_response = humanloop.log(
     output="string_example",
     config_id="string_example",
     config={
-        "type": "AgentConfigRequest",
-        "agent_class": "agent_class_example",
-        "model_config": {
-            "model": "model_example",
-            "max_tokens": -1,
-            "temperature": 1,
-            "top_p": 1,
-            "presence_penalty": 0,
-            "frequency_penalty": 0,
-            "type": "model",
-        },
+        "model": "model_example",
+        "max_tokens": -1,
+        "temperature": 1,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "type": "ModelConfigRequest",
     },
     environment="string_example",
     feedback={
@@ -3034,7 +3030,7 @@ Generated output from your model for the provided inputs. Can be `None` if loggi
 
 Unique ID of a config to associate to the log.
 
-##### config: Union[`ModelConfigRequest`, `ToolConfigRequest`, `GenericConfigRequest`, `AgentConfigRequest`]<a id="config-unionmodelconfigrequest-toolconfigrequest-genericconfigrequest-agentconfigrequest"></a>
+##### config: Union[`ModelConfigRequest`, `ToolConfigRequest`]<a id="config-unionmodelconfigrequest-toolconfigrequest"></a>
 
 
 The model config used for this generation. Required unless `config_id` or `trial_id` is provided.
@@ -3299,7 +3295,7 @@ register_response = humanloop.model_configs.register(
     tools=[
         {
             "id": "id_example",
-            "source": "string_example",
+            "source": "organization",
         }
     ],
 )
@@ -3442,7 +3438,7 @@ serialize_response = humanloop.model_configs.serialize(
     tools=[
         {
             "id": "id_example",
-            "source": "string_example",
+            "source": "organization",
         }
     ],
     prompt_template="{{question}}",
@@ -3702,7 +3698,7 @@ Name for the environment. E.g. 'producton'. If not provided, will return the exp
 
 ### `humanloop.projects.delete`<a id="humanloopprojectsdelete"></a>
 
-Delete a specific project.
+Delete a specific file.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
@@ -3728,7 +3724,7 @@ String ID of project. Starts with `pr_`.
 
 ### `humanloop.projects.delete_deployed_config`<a id="humanloopprojectsdelete_deployed_config"></a>
 
-Remove the model config deployed to environment.  This has no effect if the project does not have an active model config set.
+Remove the verion deployed to environment.  This has no effect if the project does not have an active version set.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
@@ -3910,7 +3906,7 @@ Name for the environment. E.g. 'producton'. If not provided, will return the act
 
 ### `humanloop.projects.list`<a id="humanloopprojectslist"></a>
 
-Get a paginated list of projects.
+Get a paginated list of files.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
@@ -3965,7 +3961,7 @@ Direction to sort by.
 
 ### `humanloop.projects.list_configs`<a id="humanloopprojectslist_configs"></a>
 
-Get an array of configs associated to your project.
+Get an array of versions associated to your file.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 

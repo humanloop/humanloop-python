@@ -14,10 +14,8 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.agent_config_request import AgentConfigRequest
 from humanloop.type.chat_message import ChatMessage
 from humanloop.type.feedback import Feedback
-from humanloop.type.generic_config_request import GenericConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.tool_config_request import ToolConfigRequest
 
@@ -71,7 +69,7 @@ class OptionalLogRequest(TypedDict, total=False):
     config_id: str
 
     # The model config used for this generation. Required unless `config_id` or `trial_id` is provided.
-    config: typing.Union[ModelConfigRequest, ToolConfigRequest, GenericConfigRequest, AgentConfigRequest]
+    config: typing.Union[ModelConfigRequest, ToolConfigRequest]
 
     # The environment name used to create the log.
     environment: str
