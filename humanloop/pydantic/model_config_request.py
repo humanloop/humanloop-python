@@ -72,4 +72,4 @@ class ModelConfigRequest(BaseModel):
 
     tools: typing.Optional[ModelConfigRequestTools] = Field(None, alias='tools')
 
-    type: typing.Optional[str] = Field(None, alias='type')
+    type: typing.Optional[Literal["model"]] = Field(None, alias='type')

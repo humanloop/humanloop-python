@@ -21,7 +21,7 @@ class ToolConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
     id: str = Field(alias='id')
 
-    type: str = Field(alias='type')
+    type: Literal["tool"] = Field(alias='type')
 
     # Name for the tool referenced by the model.
     name: str = Field(alias='name')

@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field, RootModel
 from humanloop.pydantic.image_url import ImageUrl
 
 class ImageChatContent(BaseModel):
-    type: str = Field(alias='type')
+    type: Literal["image_url"] = Field(alias='type')
 
     # The message's image content.
     image_url: ImageUrl = Field(alias='image_url')

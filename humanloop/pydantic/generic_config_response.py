@@ -20,7 +20,7 @@ class GenericConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
     id: str = Field(alias='id')
 
-    type: str = Field(alias='type')
+    type: Literal["generic"] = Field(alias='type')
 
     # Name of config.
     name: str = Field(alias='name')

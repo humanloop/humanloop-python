@@ -21,4 +21,4 @@ class ImageUrl(BaseModel):
     url: str = Field(alias='url')
 
     # Specify the detail level of the image provided to the model. For more details see: https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding
-    detail: typing.Optional[str] = Field(None, alias='detail')
+    detail: typing.Optional[Literal["high", "low", "auto"]] = Field(None, alias='detail')

@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, RootModel
 
 
 class TextChatContent(BaseModel):
-    type: str = Field(alias='type')
+    type: Literal["text"] = Field(alias='type')
 
     # The message's text content.
     text: str = Field(alias='text')

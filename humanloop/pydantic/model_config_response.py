@@ -26,7 +26,7 @@ class ModelConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
     id: str = Field(alias='id')
 
-    type: str = Field(alias='type')
+    type: Literal["model"] = Field(alias='type')
 
     # The model instance used. E.g. text-davinci-002.
     model: str = Field(alias='model')

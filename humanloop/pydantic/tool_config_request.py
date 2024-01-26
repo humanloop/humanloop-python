@@ -21,7 +21,7 @@ class ToolConfigRequest(BaseModel):
     # The name of the tool shown to the model.
     name: str = Field(alias='name')
 
-    type: str = Field(alias='type')
+    type: Literal["tool"] = Field(alias='type')
 
     # The description of the tool shown to the model.
     description: typing.Optional[str] = Field(None, alias='description')

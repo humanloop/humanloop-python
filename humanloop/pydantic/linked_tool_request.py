@@ -21,7 +21,7 @@ class LinkedToolRequest(BaseModel):
     id: str = Field(alias='id')
 
     # The source of the linked tool. For a linked tool it should be `organization`
-    source: str = Field(alias='source')
+    source: Literal["organization"] = Field(alias='source')
 
     # The description of the linked tool.
     description: typing.Optional[str] = Field(None, alias='description')
