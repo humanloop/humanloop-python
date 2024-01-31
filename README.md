@@ -69,6 +69,7 @@
   * [`humanloop.datasets.list_all_for_project`](#humanloopdatasetslist_all_for_project)
   * [`humanloop.datasets.list_datapoints`](#humanloopdatasetslist_datapoints)
   * [`humanloop.datasets.update`](#humanloopdatasetsupdate)
+  * [`humanloop.evaluations.add_evaluators`](#humanloopevaluationsadd_evaluators)
   * [`humanloop.evaluations.create`](#humanloopevaluationscreate)
   * [`humanloop.evaluations.get`](#humanloopevaluationsget)
   * [`humanloop.evaluations.list_all_for_project`](#humanloopevaluationslist_all_for_project)
@@ -1873,6 +1874,42 @@ The name of the dataset.
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/datasets/{id}` `patch`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.evaluations.add_evaluators`<a id="humanloopevaluationsadd_evaluators"></a>
+
+Add evaluators to an existing evaluation run.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+add_evaluators_response = humanloop.evaluations.add_evaluators(
+    evaluator_ids=["string_example"],
+    id="id_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### evaluator_ids: [`AddEvaluatorsRequestEvaluatorIds`](./humanloop/type/add_evaluators_request_evaluator_ids.py)<a id="evaluator_ids-addevaluatorsrequestevaluatoridshumanlooptypeadd_evaluators_request_evaluator_idspy"></a>
+
+##### id: `str`<a id="id-str"></a>
+
+String ID of evaluation run. Starts with `ev_`.
+
+#### ⚙️ Request Body<a id="⚙️-request-body"></a>
+
+[`AddEvaluatorsRequest`](./humanloop/type/add_evaluators_request.py)
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`EvaluationResponse`](./humanloop/pydantic/evaluation_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/evaluations/{id}/evaluators` `patch`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 

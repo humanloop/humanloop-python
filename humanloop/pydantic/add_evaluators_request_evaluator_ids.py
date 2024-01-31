@@ -16,9 +16,4 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 
-class EnvironmentRequest(BaseModel):
-    # String ID of the environment. Starts with `env_`.
-    id: str = Field(alias='id')
-
-    # The environment name.
-    name: typing.Optional[str] = Field(None, alias='name')
+AddEvaluatorsRequestEvaluatorIds = typing.List[str]

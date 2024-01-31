@@ -16,7 +16,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
 class RequiredEnvironmentRequest(TypedDict):
-    # Str Id of the envrionment. Starts with `env_`.
+    # String ID of the environment. Starts with `env_`.
     id: str
 
 class OptionalEnvironmentRequest(TypedDict, total=False):

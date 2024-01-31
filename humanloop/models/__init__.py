@@ -11,6 +11,8 @@
 # import sys
 # sys.setrecursionlimit(n)
 
+from humanloop.model.add_evaluators_request import AddEvaluatorsRequest
+from humanloop.model.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
 from humanloop.model.agent_config_response import AgentConfigResponse
 from humanloop.model.base_metric_response import BaseMetricResponse
 from humanloop.model.body_model_configs_deserialize import BodyModelConfigsDeserialize

@@ -7,8 +7,8 @@ import enum
 
 class TagValues(str, enum.Enum):
     PROJECTS = "Projects"
-    DATASETS = "Datasets"
     EVALUATIONS = "Evaluations"
+    DATASETS = "Datasets"
     LOGS = "Logs"
     MODEL_CONFIGS = "Model Configs"
     EXPERIMENTS = "Experiments"

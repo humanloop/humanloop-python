@@ -2,8 +2,8 @@ import typing_extensions
 
 from humanloop.apis.tags import TagValues
 from humanloop.apis.tags.projects_api import ProjectsApi
-from humanloop.apis.tags.datasets_api import DatasetsApi
 from humanloop.apis.tags.evaluations_api import EvaluationsApi
+from humanloop.apis.tags.datasets_api import DatasetsApi
 from humanloop.apis.tags.logs_api import LogsApi
 from humanloop.apis.tags.model_configs_api import ModelConfigsApi
 from humanloop.apis.tags.experiments_api import ExperimentsApi
@@ -20,8 +20,8 @@ TagToApi = typing_extensions.TypedDict(
     'TagToApi',
     {
         TagValues.PROJECTS: ProjectsApi,
-        TagValues.DATASETS: DatasetsApi,
         TagValues.EVALUATIONS: EvaluationsApi,
+        TagValues.DATASETS: DatasetsApi,
         TagValues.LOGS: LogsApi,
         TagValues.MODEL_CONFIGS: ModelConfigsApi,
         TagValues.EXPERIMENTS: ExperimentsApi,
@@ -39,8 +39,8 @@ TagToApi = typing_extensions.TypedDict(
 tag_to_api = TagToApi(
     {
         TagValues.PROJECTS: ProjectsApi,
-        TagValues.DATASETS: DatasetsApi,
         TagValues.EVALUATIONS: EvaluationsApi,
+        TagValues.DATASETS: DatasetsApi,
         TagValues.LOGS: LogsApi,
         TagValues.MODEL_CONFIGS: ModelConfigsApi,
         TagValues.EXPERIMENTS: ExperimentsApi,

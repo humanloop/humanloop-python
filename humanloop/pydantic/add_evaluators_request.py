@@ -15,10 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
+from humanloop.pydantic.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
 
-class EnvironmentRequest(BaseModel):
-    # String ID of the environment. Starts with `env_`.
-    id: str = Field(alias='id')
-
-    # The environment name.
-    name: typing.Optional[str] = Field(None, alias='name')
+class AddEvaluatorsRequest(BaseModel):
+    evaluator_ids: AddEvaluatorsRequestEvaluatorIds = Field(alias='evaluator_ids')
