@@ -47,6 +47,9 @@ class ChatResponse(BaseModel):
     # Any additional metadata to record.
     metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='metadata')
 
+    # The raw request sent to the model provider.
+    provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='provider_request')
+
     # ID of the session if it belongs to one.
     session_id: typing.Optional[str] = Field(None, alias='session_id')
 

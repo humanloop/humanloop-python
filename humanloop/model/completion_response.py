@@ -110,6 +110,7 @@ class CompletionResponse(
                         **kwargs,
                     )
             metadata = schemas.DictSchema
+            provider_request = schemas.DictSchema
             session_id = schemas.StrSchema
             __annotations__ = {
                 "data": data,
@@ -121,6 +122,7 @@ class CompletionResponse(
                 "user": user,
                 "usage": usage,
                 "metadata": metadata,
+                "provider_request": provider_request,
                 "session_id": session_id,
             }
     
@@ -155,12 +157,15 @@ class CompletionResponse(
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["provider_request"]) -> MetaOapg.properties.provider_request: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["session_id"]) -> MetaOapg.properties.session_id: ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "session_id", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "provider_request", "session_id", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -193,12 +198,15 @@ class CompletionResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["provider_request"]) -> typing.Union[MetaOapg.properties.provider_request, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["session_id"]) -> typing.Union[MetaOapg.properties.session_id, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "session_id", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "provider_request", "session_id", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -214,6 +222,7 @@ class CompletionResponse(
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
         usage: typing.Union[MetaOapg.properties.usage, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        provider_request: typing.Union[MetaOapg.properties.provider_request, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         session_id: typing.Union[MetaOapg.properties.session_id, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
@@ -230,6 +239,7 @@ class CompletionResponse(
             user=user,
             usage=usage,
             metadata=metadata,
+            provider_request=provider_request,
             session_id=session_id,
             _configuration=_configuration,
             **kwargs,

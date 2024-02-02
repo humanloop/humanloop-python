@@ -24,7 +24,7 @@ from .. import ApiTestMixin
 class TestLogs(ApiTestMixin, unittest.TestCase):
     """
     Logs unit test stubs
-        Get Logs
+        List 
     """
 
     def setUp(self):

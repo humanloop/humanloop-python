@@ -10,6 +10,7 @@
 """
 
 from humanloop.paths.logs.delete import Delete
+from humanloop.paths.logs_id.get import Get
 from humanloop.paths.logs.get import List
 from humanloop.paths.logs.post import Log
 from humanloop.paths.logs_id.patch import Update
@@ -19,6 +20,7 @@ from humanloop.apis.tags.logs_api_raw import LogsApiRaw
 
 class LogsApi(
     Delete,
+    Get,
     List,
     Log,
     Update,

@@ -24,7 +24,7 @@ from .. import ApiTestMixin
 class TestLogs(ApiTestMixin, unittest.TestCase):
     """
     Logs unit test stubs
-        Delete Logs
+        Delete
     """
 
     def setUp(self):

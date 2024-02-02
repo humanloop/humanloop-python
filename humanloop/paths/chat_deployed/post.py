@@ -138,6 +138,7 @@ class BaseApi(api_client.Api):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -170,6 +171,8 @@ class BaseApi(api_client.Api):
             _body["source"] = source
         if metadata is not None:
             _body["metadata"] = metadata
+        if save is not None:
+            _body["save"] = save
         if source_datapoint_id is not None:
             _body["source_datapoint_id"] = source_datapoint_id
         if provider_api_keys is not None:
@@ -409,6 +412,7 @@ class CreateDeployedRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -437,6 +441,7 @@ class CreateDeployedRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
@@ -466,6 +471,7 @@ class CreateDeployedRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -492,6 +498,7 @@ class CreateDeployedRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
@@ -522,6 +529,7 @@ class CreateDeployed(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -547,6 +555,7 @@ class CreateDeployed(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
@@ -577,6 +586,7 @@ class CreateDeployed(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -601,6 +611,7 @@ class CreateDeployed(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
@@ -633,6 +644,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -661,6 +673,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,
@@ -690,6 +703,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
         num_samples: typing.Optional[int] = None,
@@ -716,6 +730,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             provider_api_keys=provider_api_keys,
             num_samples=num_samples,

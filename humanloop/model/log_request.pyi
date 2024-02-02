@@ -45,6 +45,7 @@ class LogRequest(
             inputs = schemas.DictSchema
             source = schemas.StrSchema
             metadata = schemas.DictSchema
+            save = schemas.BoolSchema
             source_datapoint_id = schemas.StrSchema
             reference_id = schemas.StrSchema
             trial_id = schemas.StrSchema
@@ -216,6 +217,10 @@ class LogRequest(
                         _configuration=_configuration,
                         **kwargs,
                     )
+            prompt_tokens = schemas.IntSchema
+            output_tokens = schemas.IntSchema
+            provider_request = schemas.DictSchema
+            provider_response = schemas.DictSchema
             __annotations__ = {
                 "project": project,
                 "project_id": project_id,
@@ -226,6 +231,7 @@ class LogRequest(
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
+                "save": save,
                 "source_datapoint_id": source_datapoint_id,
                 "reference_id": reference_id,
                 "trial_id": trial_id,
@@ -239,6 +245,10 @@ class LogRequest(
                 "error": error,
                 "duration": duration,
                 "output_message": output_message,
+                "prompt_tokens": prompt_tokens,
+                "output_tokens": output_tokens,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
             }
     
     @typing.overload
@@ -267,6 +277,9 @@ class LogRequest(
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["save"]) -> MetaOapg.properties.save: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["source_datapoint_id"]) -> MetaOapg.properties.source_datapoint_id: ...
@@ -308,9 +321,21 @@ class LogRequest(
     def __getitem__(self, name: typing_extensions.Literal["output_message"]) -> MetaOapg.properties.output_message: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["prompt_tokens"]) -> MetaOapg.properties.prompt_tokens: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["output_tokens"]) -> MetaOapg.properties.output_tokens: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["provider_request"]) -> MetaOapg.properties.provider_request: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["provider_response"]) -> MetaOapg.properties.provider_response: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "provider_request", "provider_response", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -341,6 +366,9 @@ class LogRequest(
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["save"]) -> typing.Union[MetaOapg.properties.save, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["source_datapoint_id"]) -> typing.Union[MetaOapg.properties.source_datapoint_id, schemas.Unset]: ...
@@ -382,9 +410,21 @@ class LogRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["output_message"]) -> typing.Union[MetaOapg.properties.output_message, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["prompt_tokens"]) -> typing.Union[MetaOapg.properties.prompt_tokens, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["output_tokens"]) -> typing.Union[MetaOapg.properties.output_tokens, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["provider_request"]) -> typing.Union[MetaOapg.properties.provider_request, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["provider_response"]) -> typing.Union[MetaOapg.properties.provider_response, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "provider_request", "provider_response", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -400,6 +440,7 @@ class LogRequest(
         inputs: typing.Union[MetaOapg.properties.inputs, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         source: typing.Union[MetaOapg.properties.source, str, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        save: typing.Union[MetaOapg.properties.save, bool, schemas.Unset] = schemas.unset,
         source_datapoint_id: typing.Union[MetaOapg.properties.source_datapoint_id, str, schemas.Unset] = schemas.unset,
         reference_id: typing.Union[MetaOapg.properties.reference_id, str, schemas.Unset] = schemas.unset,
         trial_id: typing.Union[MetaOapg.properties.trial_id, str, schemas.Unset] = schemas.unset,
@@ -413,6 +454,10 @@ class LogRequest(
         error: typing.Union[MetaOapg.properties.error, str, schemas.Unset] = schemas.unset,
         duration: typing.Union[MetaOapg.properties.duration, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         output_message: typing.Union[MetaOapg.properties.output_message, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        prompt_tokens: typing.Union[MetaOapg.properties.prompt_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        output_tokens: typing.Union[MetaOapg.properties.output_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        provider_request: typing.Union[MetaOapg.properties.provider_request, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        provider_response: typing.Union[MetaOapg.properties.provider_response, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'LogRequest':
@@ -428,6 +473,7 @@ class LogRequest(
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -441,6 +487,10 @@ class LogRequest(
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
             _configuration=_configuration,
             **kwargs,
         )

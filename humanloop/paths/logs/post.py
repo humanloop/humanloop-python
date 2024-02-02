@@ -138,6 +138,7 @@ class BaseApi(api_client.Api):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -151,6 +152,10 @@ class BaseApi(api_client.Api):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _body = {}
@@ -172,6 +177,8 @@ class BaseApi(api_client.Api):
             _body["source"] = source
         if metadata is not None:
             _body["metadata"] = metadata
+        if save is not None:
+            _body["save"] = save
         if source_datapoint_id is not None:
             _body["source_datapoint_id"] = source_datapoint_id
         if reference_id is not None:
@@ -198,6 +205,14 @@ class BaseApi(api_client.Api):
             _body["duration"] = duration
         if output_message is not None:
             _body["output_message"] = output_message
+        if prompt_tokens is not None:
+            _body["prompt_tokens"] = prompt_tokens
+        if output_tokens is not None:
+            _body["output_tokens"] = output_tokens
+        if provider_request is not None:
+            _body["provider_request"] = provider_request
+        if provider_response is not None:
+            _body["provider_response"] = provider_response
         args.body = body if body is not None else _body
         return args
 
@@ -413,6 +428,7 @@ class LogRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -426,6 +442,10 @@ class LogRaw(BaseApi):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -443,6 +463,7 @@ class LogRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -456,6 +477,10 @@ class LogRaw(BaseApi):
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
         )
         return await self._alog_oapg(
             body=args.body,
@@ -474,6 +499,7 @@ class LogRaw(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -487,6 +513,10 @@ class LogRaw(BaseApi):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -502,6 +532,7 @@ class LogRaw(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -515,6 +546,10 @@ class LogRaw(BaseApi):
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
         )
         return self._log_oapg(
             body=args.body,
@@ -534,6 +569,7 @@ class Log(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -547,6 +583,10 @@ class Log(BaseApi):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         validate: bool = False,
         **kwargs,
     ) -> LogsLogResponsePydantic:
@@ -561,6 +601,7 @@ class Log(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -574,6 +615,10 @@ class Log(BaseApi):
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
             **kwargs,
         )
         if validate:
@@ -593,6 +638,7 @@ class Log(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -606,6 +652,10 @@ class Log(BaseApi):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         validate: bool = False,
     ) -> LogsLogResponsePydantic:
         raw_response = self.raw.log(
@@ -619,6 +669,7 @@ class Log(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -632,6 +683,10 @@ class Log(BaseApi):
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
         )
         if validate:
             return RootModel[LogsLogResponsePydantic](raw_response.body).root
@@ -653,6 +708,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -666,6 +722,10 @@ class ApiForpost(BaseApi):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -683,6 +743,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -696,6 +757,10 @@ class ApiForpost(BaseApi):
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
         )
         return await self._alog_oapg(
             body=args.body,
@@ -714,6 +779,7 @@ class ApiForpost(BaseApi):
         inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         source: typing.Optional[str] = None,
         metadata: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        save: typing.Optional[bool] = None,
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
@@ -727,6 +793,10 @@ class ApiForpost(BaseApi):
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessage] = None,
+        prompt_tokens: typing.Optional[int] = None,
+        output_tokens: typing.Optional[int] = None,
+        provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
+        provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -742,6 +812,7 @@ class ApiForpost(BaseApi):
             inputs=inputs,
             source=source,
             metadata=metadata,
+            save=save,
             source_datapoint_id=source_datapoint_id,
             reference_id=reference_id,
             trial_id=trial_id,
@@ -755,6 +826,10 @@ class ApiForpost(BaseApi):
             error=error,
             duration=duration,
             output_message=output_message,
+            prompt_tokens=prompt_tokens,
+            output_tokens=output_tokens,
+            provider_request=provider_request,
+            provider_response=provider_response,
         )
         return self._log_oapg(
             body=args.body,

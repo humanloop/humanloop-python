@@ -32,57 +32,42 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.update_log_request import UpdateLogRequest as UpdateLogRequestSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.log_response import LogResponse as LogResponseSchema
 
-from humanloop.type.update_log_request import UpdateLogRequest
 from humanloop.type.log_response import LogResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.update_log_request import UpdateLogRequest as UpdateLogRequestPydantic
 from humanloop.pydantic.log_response import LogResponse as LogResponsePydantic
 
 from . import path
 
-# Query params
-ReferenceIdSchema = schemas.StrSchema
-RequestRequiredQueryParams = typing_extensions.TypedDict(
-    'RequestRequiredQueryParams',
+# Path params
+IdSchema = schemas.StrSchema
+RequestRequiredPathParams = typing_extensions.TypedDict(
+    'RequestRequiredPathParams',
     {
-        'reference_id': typing.Union[ReferenceIdSchema, str, ],
+        'id': typing.Union[IdSchema, str, ],
     }
 )
-RequestOptionalQueryParams = typing_extensions.TypedDict(
-    'RequestOptionalQueryParams',
+RequestOptionalPathParams = typing_extensions.TypedDict(
+    'RequestOptionalPathParams',
     {
     },
     total=False
 )
 
 
-class RequestQueryParams(RequestRequiredQueryParams, RequestOptionalQueryParams):
+class RequestPathParams(RequestRequiredPathParams, RequestOptionalPathParams):
     pass
 
 
-request_query_reference_id = api_client.QueryParameter(
-    name="reference_id",
-    style=api_client.ParameterStyle.FORM,
-    schema=ReferenceIdSchema,
-    required=True,
-    explode=True,
-)
-# body param
-SchemaForRequestBodyApplicationJson = UpdateLogRequestSchema
-
-
-request_body_update_log_request = api_client.RequestBody(
-    content={
-        'application/json': api_client.MediaType(
-            schema=SchemaForRequestBodyApplicationJson),
-    },
+request_path_id = api_client.PathParameter(
+    name="id",
+    style=api_client.ParameterStyle.SIMPLE,
+    schema=IdSchema,
     required=True,
 )
 _auth = [
@@ -141,36 +126,23 @@ _all_accept_content_types = (
 
 class BaseApi(api_client.Api):
 
-    def _update_by_ref_mapped_args(
+    def _get_mapped_args(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
-        _query_params = {}
-        _body = {}
-        if output is not None:
-            _body["output"] = output
-        if error is not None:
-            _body["error"] = error
-        if duration is not None:
-            _body["duration"] = duration
-        args.body = _body
-        if reference_id is not None:
-            _query_params["reference_id"] = reference_id
-        args.query = _query_params
+        _path_params = {}
+        if id is not None:
+            _path_params["id"] = id
+        args.path = _path_params
         return args
 
-    async def _aupdate_by_ref_oapg(
+    async def _aget_oapg(
         self,
-        body: typing.Any = None,
-            query_params: typing.Optional[dict] = {},
+            path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
-        content_type: str = 'application/json',
         stream: bool = False,
         **kwargs,
     ) -> typing.Union[
@@ -179,63 +151,46 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        Update By Reference
+        Get
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
-        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
+        self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
     
-        prefix_separator_iterator = None
+        _path_params = {}
         for parameter in (
-            request_query_reference_id,
+            request_path_id,
         ):
-            parameter_data = query_params.get(parameter.name, schemas.unset)
+            parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
                 continue
-            if prefix_separator_iterator is None:
-                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
-            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
-            for serialized_value in serialized_data.values():
-                used_path += serialized_value
+            serialized_data = parameter.serialize(parameter_data)
+            _path_params.update(serialized_data)
+    
+        for k, v in _path_params.items():
+            used_path = used_path.replace('{%s}' % k, v)
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
         if accept_content_types:
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
-        method = 'patch'.upper()
-        _headers.add('Content-Type', content_type)
-    
-        if body is schemas.unset:
-            raise exceptions.ApiValueError(
-                'The required body parameter has an invalid value of: unset. Set a valid value instead')
-        _fields = None
-        _body = None
+        method = 'get'.upper()
         request_before_hook(
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
-            body=body,
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_update_log_request.serialize(body, content_type)
-        if 'fields' in serialized_data:
-            _fields = serialized_data['fields']
-        elif 'body' in serialized_data:
-            _body = serialized_data['body']
     
         response = await self.api_client.async_call_api(
             resource_path=used_path,
             method=method,
             headers=_headers,
-            fields=_fields,
-            serialized_body=_body,
-            body=body,
             auth_settings=_auth,
-            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
             **kwargs
         )
@@ -294,77 +249,58 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-    def _update_by_ref_oapg(
+    def _get_oapg(
         self,
-        body: typing.Any = None,
-            query_params: typing.Optional[dict] = {},
+            path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
-        content_type: str = 'application/json',
         stream: bool = False,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        Update By Reference
+        Get
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
-        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
+        self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
     
-        prefix_separator_iterator = None
+        _path_params = {}
         for parameter in (
-            request_query_reference_id,
+            request_path_id,
         ):
-            parameter_data = query_params.get(parameter.name, schemas.unset)
+            parameter_data = path_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
                 continue
-            if prefix_separator_iterator is None:
-                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
-            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
-            for serialized_value in serialized_data.values():
-                used_path += serialized_value
+            serialized_data = parameter.serialize(parameter_data)
+            _path_params.update(serialized_data)
+    
+        for k, v in _path_params.items():
+            used_path = used_path.replace('{%s}' % k, v)
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
         if accept_content_types:
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
-        method = 'patch'.upper()
-        _headers.add('Content-Type', content_type)
-    
-        if body is schemas.unset:
-            raise exceptions.ApiValueError(
-                'The required body parameter has an invalid value of: unset. Set a valid value instead')
-        _fields = None
-        _body = None
+        method = 'get'.upper()
         request_before_hook(
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
-            body=body,
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_update_log_request.serialize(body, content_type)
-        if 'fields' in serialized_data:
-            _fields = serialized_data['fields']
-        elif 'body' in serialized_data:
-            _body = serialized_data['body']
     
         response = self.api_client.call_api(
             resource_path=used_path,
             method=method,
             headers=_headers,
-            fields=_fields,
-            serialized_body=_body,
-            body=body,
             auth_settings=_auth,
-            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -392,70 +328,50 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class UpdateByRefRaw(BaseApi):
+class GetRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
-    async def aupdate_by_ref(
+    async def aget(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._update_by_ref_mapped_args(
-            reference_id=reference_id,
-            output=output,
-            error=error,
-            duration=duration,
+        args = self._get_mapped_args(
+            id=id,
         )
-        return await self._aupdate_by_ref_oapg(
-            body=args.body,
-            query_params=args.query,
+        return await self._aget_oapg(
+            path_params=args.path,
             **kwargs,
         )
     
-    def update_by_ref(
+    def get(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._update_by_ref_mapped_args(
-            reference_id=reference_id,
-            output=output,
-            error=error,
-            duration=duration,
+        args = self._get_mapped_args(
+            id=id,
         )
-        return self._update_by_ref_oapg(
-            body=args.body,
-            query_params=args.query,
+        return self._get_oapg(
+            path_params=args.path,
         )
 
-class UpdateByRef(BaseApi):
+class Get(BaseApi):
 
-    async def aupdate_by_ref(
+    async def aget(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
         validate: bool = False,
         **kwargs,
     ) -> LogResponsePydantic:
-        raw_response = await self.raw.aupdate_by_ref(
-            reference_id=reference_id,
-            output=output,
-            error=error,
-            duration=duration,
+        raw_response = await self.raw.aget(
+            id=id,
             **kwargs,
         )
         if validate:
@@ -463,70 +379,50 @@ class UpdateByRef(BaseApi):
         return api_client.construct_model_instance(LogResponsePydantic, raw_response.body)
     
     
-    def update_by_ref(
+    def get(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
         validate: bool = False,
     ) -> LogResponsePydantic:
-        raw_response = self.raw.update_by_ref(
-            reference_id=reference_id,
-            output=output,
-            error=error,
-            duration=duration,
+        raw_response = self.raw.get(
+            id=id,
         )
         if validate:
             return LogResponsePydantic(**raw_response.body)
         return api_client.construct_model_instance(LogResponsePydantic, raw_response.body)
 
 
-class ApiForpatch(BaseApi):
+class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
-    async def apatch(
+    async def aget(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._update_by_ref_mapped_args(
-            reference_id=reference_id,
-            output=output,
-            error=error,
-            duration=duration,
+        args = self._get_mapped_args(
+            id=id,
         )
-        return await self._aupdate_by_ref_oapg(
-            body=args.body,
-            query_params=args.query,
+        return await self._aget_oapg(
+            path_params=args.path,
             **kwargs,
         )
     
-    def patch(
+    def get(
         self,
-        reference_id: str,
-        output: typing.Optional[str] = None,
-        error: typing.Optional[str] = None,
-        duration: typing.Optional[typing.Union[int, float]] = None,
+        id: str,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._update_by_ref_mapped_args(
-            reference_id=reference_id,
-            output=output,
-            error=error,
-            duration=duration,
+        args = self._get_mapped_args(
+            id=id,
         )
-        return self._update_by_ref_oapg(
-            body=args.body,
-            query_params=args.query,
+        return self._get_oapg(
+            path_params=args.path,
         )
 

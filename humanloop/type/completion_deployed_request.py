@@ -47,6 +47,9 @@ class OptionalCompletionDeployedRequest(TypedDict, total=False):
     # Any additional metadata to record.
     metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # Whether the request/response payloads will be stored on Humanloop.
+    save: bool
+
     # ID of the source datapoint if this is a log derived from a datapoint in a dataset.
     source_datapoint_id: str
 
@@ -62,7 +65,7 @@ class OptionalCompletionDeployedRequest(TypedDict, total=False):
     # End-user ID passed through to provider call.
     user: str
 
-    # If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    # Deprecated field: the seed is instead set as part of the request.config object.
     seed: int
 
     # Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.

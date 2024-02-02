@@ -93,6 +93,7 @@
   * [`humanloop.finetunes.summary`](#humanloopfinetunessummary)
   * [`humanloop.finetunes.update`](#humanloopfinetunesupdate)
   * [`humanloop.logs.delete`](#humanlooplogsdelete)
+  * [`humanloop.logs.get`](#humanlooplogsget)
   * [`humanloop.logs.list`](#humanlooplogslist)
   * [`humanloop.log`](#humanlooplog)
   * [`humanloop.logs.update`](#humanlooplogsupdate)
@@ -346,6 +347,7 @@ try:
         inputs={},
         source="string_example",
         metadata={},
+        save=True,
         source_datapoint_id="string_example",
         provider_api_keys={},
         num_samples=1,
@@ -369,6 +371,7 @@ try:
     pprint(create_response.body["user"])
     pprint(create_response.body["usage"])
     pprint(create_response.body["metadata"])
+    pprint(create_response.body["provider_request"])
     pprint(create_response.body["session_id"])
     pprint(create_response.body["tool_choice"])
     pprint(create_response.headers)
@@ -464,6 +467,7 @@ create_response = humanloop.chat(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -526,6 +530,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -549,7 +557,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -607,6 +615,7 @@ create_deployed_response = humanloop.chat_deployed(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -665,6 +674,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -688,7 +701,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -751,6 +764,7 @@ create_experiment_response = humanloop.chat_experiment(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -812,6 +826,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -835,7 +853,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -894,6 +912,7 @@ create_model_config_response = humanloop.chat_model_config(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -955,6 +974,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -978,7 +1001,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -1040,6 +1063,7 @@ create_response = humanloop.complete(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -1095,6 +1119,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -1118,7 +1146,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -1164,6 +1192,7 @@ create_deployed_response = humanloop.complete_deployed(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -1215,6 +1244,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -1238,7 +1271,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -1289,6 +1322,7 @@ create_experiment_response = humanloop.complete_experiment(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -1343,6 +1377,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -1366,7 +1404,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -1413,6 +1451,7 @@ create_model_config_response = humanloop.complete_model_configuration(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     provider_api_keys={},
     num_samples=1,
@@ -1467,6 +1506,10 @@ Identifies where the model was called from.
 
 Any additional metadata to record.
 
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
+
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
 ID of the source datapoint if this is a log derived from a datapoint in a dataset.
@@ -1490,7 +1533,7 @@ End-user ID passed through to provider call.
 
 ##### seed: `int`<a id="seed-int"></a>
 
-If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+Deprecated field: the seed is instead set as part of the request.config object.
 
 ##### return_inputs: `bool`<a id="return_inputs-bool"></a>
 
@@ -2096,7 +2139,9 @@ Log an external generation to an evaluation run for a datapoint.  The run must h
 ```python
 log_response = humanloop.evaluations.log(
     datapoint_id="string_example",
-    log={},
+    log={
+        "save": True,
+    },
     evaluation_id="evaluation_id_example",
 )
 ```
@@ -2886,7 +2931,7 @@ update_response = humanloop.finetunes.update(
 
 ### `humanloop.logs.delete`<a id="humanlooplogsdelete"></a>
 
-Delete Logs
+Delete
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
@@ -2903,6 +2948,36 @@ humanloop.logs.delete(
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/logs` `delete`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.logs.get`<a id="humanlooplogsget"></a>
+
+Retrieve a log by log id.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+get_response = humanloop.logs.get(
+    id="id_example",
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### id: `str`<a id="id-str"></a>
+
+String ID of log to return. Starts with `data_`.
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`LogResponse`](./humanloop/pydantic/log_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/logs/{id}` `get`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 
@@ -2962,7 +3037,11 @@ Log a datapoint or array of datapoints to your Humanloop project.
 
 ```python
 log_response = humanloop.log(
-    body=[{}],
+    body=[
+        {
+            "save": True,
+        }
+    ],
     project="string_example",
     project_id="string_example",
     session_id="string_example",
@@ -2972,6 +3051,7 @@ log_response = humanloop.log(
     inputs={},
     source="string_example",
     metadata={},
+    save=True,
     source_datapoint_id="string_example",
     reference_id="string_example",
     trial_id="string_example",
@@ -3002,6 +3082,10 @@ log_response = humanloop.log(
     output_message={
         "role": "string_example",
     },
+    prompt_tokens=1,
+    output_tokens=1,
+    provider_request={},
+    provider_response={},
 )
 ```
 
@@ -3042,6 +3126,10 @@ Identifies where the model was called from.
 ##### metadata: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="metadata-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
 
 Any additional metadata to record.
+
+##### save: `bool`<a id="save-bool"></a>
+
+Whether the request/response payloads will be stored on Humanloop.
 
 ##### source_datapoint_id: `str`<a id="source_datapoint_id-str"></a>
 
@@ -3097,6 +3185,22 @@ Duration of the logged event in seconds.
 
 
 The message returned by the provider.
+
+##### prompt_tokens: `int`<a id="prompt_tokens-int"></a>
+
+Number of tokens in the prompt used to generate the output.
+
+##### output_tokens: `int`<a id="output_tokens-int"></a>
+
+Number of tokens in the output generated by the model.
+
+##### provider_request: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="provider_request-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+
+Raw request sent to provider.
+
+##### provider_response: `Dict[str, Union[bool, date, datetime, dict, float, int, list, str, None]]`<a id="provider_response-dictstr-unionbool-date-datetime-dict-float-int-list-str-none"></a>
+
+Raw response received the provider.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 

@@ -112,6 +112,7 @@ class ChatResponse(
                         **kwargs,
                     )
             metadata = schemas.DictSchema
+            provider_request = schemas.DictSchema
             session_id = schemas.StrSchema
             
             
@@ -181,6 +182,7 @@ class ChatResponse(
                 "user": user,
                 "usage": usage,
                 "metadata": metadata,
+                "provider_request": provider_request,
                 "session_id": session_id,
                 "tool_choice": tool_choice,
             }
@@ -216,6 +218,9 @@ class ChatResponse(
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["provider_request"]) -> MetaOapg.properties.provider_request: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["session_id"]) -> MetaOapg.properties.session_id: ...
     
     @typing.overload
@@ -224,7 +229,7 @@ class ChatResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "session_id", "tool_choice", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "provider_request", "session_id", "tool_choice", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -257,6 +262,9 @@ class ChatResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["provider_request"]) -> typing.Union[MetaOapg.properties.provider_request, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["session_id"]) -> typing.Union[MetaOapg.properties.session_id, schemas.Unset]: ...
     
     @typing.overload
@@ -265,7 +273,7 @@ class ChatResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "session_id", "tool_choice", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["data", "provider_responses", "project_id", "num_samples", "logprobs", "suffix", "user", "usage", "metadata", "provider_request", "session_id", "tool_choice", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -281,6 +289,7 @@ class ChatResponse(
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
         usage: typing.Union[MetaOapg.properties.usage, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        provider_request: typing.Union[MetaOapg.properties.provider_request, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         session_id: typing.Union[MetaOapg.properties.session_id, str, schemas.Unset] = schemas.unset,
         tool_choice: typing.Union[MetaOapg.properties.tool_choice, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
@@ -298,6 +307,7 @@ class ChatResponse(
             user=user,
             usage=usage,
             metadata=metadata,
+            provider_request=provider_request,
             session_id=session_id,
             tool_choice=tool_choice,
             _configuration=_configuration,

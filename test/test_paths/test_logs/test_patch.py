@@ -24,7 +24,7 @@ from .. import ApiTestMixin
 class TestLogs(ApiTestMixin, unittest.TestCase):
     """
     Logs unit test stubs
-        Update By Reference Id
+        Update By Reference
     """
 
     def setUp(self):

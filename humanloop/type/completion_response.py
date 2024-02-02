@@ -46,6 +46,9 @@ class OptionalCompletionResponse(TypedDict, total=False):
     # Any additional metadata to record.
     metadata: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # The raw request sent to the model provider.
+    provider_request: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
+
     # ID of the session if it belongs to one.
     session_id: str
 
