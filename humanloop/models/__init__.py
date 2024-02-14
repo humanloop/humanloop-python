@@ -137,6 +137,7 @@ from humanloop.model.paginated_data_evaluation_response import PaginatedDataEval
 from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse
 from humanloop.model.paginated_data_project_response import PaginatedDataProjectResponse
 from humanloop.model.paginated_data_session_response import PaginatedDataSessionResponse
+from humanloop.model.platform_access_enum import PlatformAccessEnum
 from humanloop.model.positive_label import PositiveLabel
 from humanloop.model.project_config_response import ProjectConfigResponse
 from humanloop.model.project_input_response import ProjectInputResponse
@@ -178,5 +179,6 @@ from humanloop.model.update_finetune_request import UpdateFinetuneRequest
 from humanloop.model.update_log_request import UpdateLogRequest
 from humanloop.model.update_project_request import UpdateProjectRequest
 from humanloop.model.usage import Usage
+from humanloop.model.user_response import UserResponse
 from humanloop.model.validation_error import ValidationError
 from humanloop.model.validation_error_loc import ValidationErrorLoc

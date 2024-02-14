@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.model_config_request import ModelConfigRequest
 from humanloop.pydantic.tool_config_request import ToolConfigRequest
+from humanloop.pydantic.user_response import UserResponse
 
 class AgentConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
@@ -38,6 +39,9 @@ class AgentConfigResponse(BaseModel):
 
     # Other parameters that define the config.
     other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
+
+    # The user who created the config.
+    created_by: typing.Optional[UserResponse] = Field(None, alias='created_by')
 
     # Tools associated with the agent.
     tools: typing.Optional[typing.List[ToolConfigRequest]] = Field(None, alias='tools')

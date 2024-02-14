@@ -15,22 +15,5 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.user_response import UserResponse
 
-class GenericConfigResponse(BaseModel):
-    # String ID of config. Starts with `config_`.
-    id: str = Field(alias='id')
-
-    type: Literal["generic"] = Field(alias='type')
-
-    # Name of config.
-    name: str = Field(alias='name')
-
-    # Description of config.
-    description: typing.Optional[str] = Field(None, alias='description')
-
-    # Other parameters that define the config.
-    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
-
-    # The user who created the config.
-    created_by: typing.Optional[UserResponse] = Field(None, alias='created_by')
+PlatformAccessEnum = Literal["superadmin", "user"]

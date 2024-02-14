@@ -15,6 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.tool_source import ToolSource
+from humanloop.type.user_response import UserResponse
 
 class RequiredToolConfigResponse(TypedDict):
     # String ID of config. Starts with `config_`.
@@ -34,6 +35,9 @@ class OptionalToolConfigResponse(TypedDict, total=False):
 
     # Other parameters that define the config.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
+
+    # The user who created the config.
+    created_by: UserResponse
 
     # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
     source: ToolSource

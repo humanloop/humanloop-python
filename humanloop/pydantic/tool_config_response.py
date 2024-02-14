@@ -16,6 +16,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
 from humanloop.pydantic.tool_source import ToolSource
+from humanloop.pydantic.user_response import UserResponse
 
 class ToolConfigResponse(BaseModel):
     # String ID of config. Starts with `config_`.
@@ -34,6 +35,9 @@ class ToolConfigResponse(BaseModel):
 
     # Other parameters that define the config.
     other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
+
+    # The user who created the config.
+    created_by: typing.Optional[UserResponse] = Field(None, alias='created_by')
 
     # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
     source: typing.Optional[ToolSource] = Field(None, alias='source')

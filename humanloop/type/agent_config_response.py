@@ -16,6 +16,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.tool_config_request import ToolConfigRequest
+from humanloop.type.user_response import UserResponse
 
 class RequiredAgentConfigResponse(TypedDict):
     # String ID of config. Starts with `config_`.
@@ -38,6 +39,9 @@ class OptionalAgentConfigResponse(TypedDict, total=False):
 
     # Other parameters that define the config.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
+
+    # The user who created the config.
+    created_by: UserResponse
 
     # Tools associated with the agent.
     tools: typing.List[ToolConfigRequest]

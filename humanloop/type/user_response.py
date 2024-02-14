@@ -13,24 +13,21 @@ from datetime import datetime, date
 import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
-from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.user_response import UserResponse
 
-class GenericConfigResponse(BaseModel):
-    # String ID of config. Starts with `config_`.
-    id: str = Field(alias='id')
+class RequiredUserResponse(TypedDict):
+    # String ID of user. Starts with `usr_`.
+    id: str
 
-    type: Literal["generic"] = Field(alias='type')
+    # The user's email address.
+    email_address: str
 
-    # Name of config.
-    name: str = Field(alias='name')
+    # Whether the user has verified their email address.
+    verified: bool
 
-    # Description of config.
-    description: typing.Optional[str] = Field(None, alias='description')
+class OptionalUserResponse(TypedDict, total=False):
+    # The user's full name.
+    full_name: str
 
-    # Other parameters that define the config.
-    other: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='other')
-
-    # The user who created the config.
-    created_by: typing.Optional[UserResponse] = Field(None, alias='created_by')
+class UserResponse(RequiredUserResponse, OptionalUserResponse):
+    pass
