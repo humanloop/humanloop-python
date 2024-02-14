@@ -15,7 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse
 from humanloop.pydantic.feedback_response import FeedbackResponse
@@ -76,7 +76,7 @@ class LogResponse(BaseModel):
     trial_id: typing.Optional[str] = Field(None, alias='trial_id')
 
     # The messages passed to the to provider chat endpoint.
-    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = Field(None, alias='messages')
 
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: typing.Optional[str] = Field(None, alias='output')
@@ -99,7 +99,7 @@ class LogResponse(BaseModel):
     duration: typing.Optional[typing.Union[int, float]] = Field(None, alias='duration')
 
     # The message returned by the provider.
-    output_message: typing.Optional[ChatMessage] = Field(None, alias='output_message')
+    output_message: typing.Optional[ChatMessageWithToolCall] = Field(None, alias='output_message')
 
     # Number of tokens in the prompt used to generate the output.
     prompt_tokens: typing.Optional[int] = Field(None, alias='prompt_tokens')

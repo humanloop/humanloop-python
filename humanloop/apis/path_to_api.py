@@ -46,6 +46,7 @@ from humanloop.apis.paths.evaluations_evaluation_id_log import EvaluationsEvalua
 from humanloop.apis.paths.evaluations_evaluation_id_result import EvaluationsEvaluationIdResult
 from humanloop.apis.paths.evaluations_id_status import EvaluationsIdStatus
 from humanloop.apis.paths.evaluations_id_evaluators import EvaluationsIdEvaluators
+from humanloop.apis.paths.evaluations import Evaluations
 from humanloop.apis.paths.projects_project_id_finetunes import ProjectsProjectIdFinetunes
 from humanloop.apis.paths.projects_project_id_finetunes_summary import ProjectsProjectIdFinetunesSummary
 from humanloop.apis.paths.finetunes_id import FinetunesId
@@ -98,6 +99,7 @@ PathToApi = typing_extensions.TypedDict(
         PathValues.EVALUATIONS_EVALUATION_ID_RESULT: EvaluationsEvaluationIdResult,
         PathValues.EVALUATIONS_ID_STATUS: EvaluationsIdStatus,
         PathValues.EVALUATIONS_ID_EVALUATORS: EvaluationsIdEvaluators,
+        PathValues.EVALUATIONS: Evaluations,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES: ProjectsProjectIdFinetunes,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES_SUMMARY: ProjectsProjectIdFinetunesSummary,
         PathValues.FINETUNES_ID: FinetunesId,
@@ -151,6 +153,7 @@ path_to_api = PathToApi(
         PathValues.EVALUATIONS_EVALUATION_ID_RESULT: EvaluationsEvaluationIdResult,
         PathValues.EVALUATIONS_ID_STATUS: EvaluationsIdStatus,
         PathValues.EVALUATIONS_ID_EVALUATORS: EvaluationsIdEvaluators,
+        PathValues.EVALUATIONS: Evaluations,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES: ProjectsProjectIdFinetunes,
         PathValues.PROJECTS_PROJECT_ID_FINETUNES_SUMMARY: ProjectsProjectIdFinetunesSummary,
         PathValues.FINETUNES_ID: FinetunesId,

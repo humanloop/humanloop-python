@@ -198,12 +198,12 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
                 class MetaOapg:
                     
                     @staticmethod
-                    def items() -> typing.Type['ChatMessage']:
-                        return ChatMessage
+                    def items() -> typing.Type['ChatMessageWithToolCall']:
+                        return ChatMessageWithToolCall
             
                 def __new__(
                     cls,
-                    arg: typing.Union[typing.Tuple['ChatMessage'], typing.List['ChatMessage']],
+                    arg: typing.Union[typing.Tuple['ChatMessageWithToolCall'], typing.List['ChatMessageWithToolCall']],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                 ) -> 'chat_template':
                     return super().__new__(
@@ -212,7 +212,7 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
                         _configuration=_configuration,
                     )
             
-                def __getitem__(self, i: int) -> 'ChatMessage':
+                def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
             
             
@@ -276,7 +276,6 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
                 "endpoint": endpoint,
                 "tools": tools,
             }
-        additional_properties = schemas.NotAnyTypeSchema
     
     model: MetaOapg.properties.model
     
@@ -340,9 +339,13 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tools"]) -> 'ProjectModelConfigRequestTools': ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["experiment"], typing_extensions.Literal["prompt_template"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["tools"], ]):
+    @typing.overload
+    def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
+    
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model", "description", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "other", "seed", "response_format", "project", "project_id", "experiment", "prompt_template", "chat_template", "endpoint", "tools", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
+    
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["model"]) -> MetaOapg.properties.model: ...
@@ -404,8 +407,12 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union['ProjectModelConfigRequestTools', schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["experiment"], typing_extensions.Literal["prompt_template"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["tools"], ]):
+    @typing.overload
+    def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
+    
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model", "description", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "other", "seed", "response_format", "project", "project_id", "experiment", "prompt_template", "chat_template", "endpoint", "tools", ], str]):
         return super().get_item_oapg(name)
+    
 
     def __new__(
         cls,
@@ -431,7 +438,7 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
         endpoint: typing.Union[MetaOapg.properties.endpoint, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         tools: typing.Union['ProjectModelConfigRequestTools', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
-        **kwargs,
+        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ProjectModelConfigRequest':
         return super().__new__(
             cls,
@@ -457,9 +464,10 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
             endpoint=endpoint,
             tools=tools,
             _configuration=_configuration,
+            **kwargs,
         )
 
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders
 from humanloop.model.project_model_config_request_tools import ProjectModelConfigRequestTools

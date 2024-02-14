@@ -15,7 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs
 from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget
 
@@ -30,7 +30,7 @@ class DatapointResponse(BaseModel):
 
     inputs: typing.Optional[DatapointResponseInputs] = Field(None, alias='inputs')
 
-    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = Field(None, alias='messages')
 
     target: typing.Optional[DatapointResponseTarget] = Field(None, alias='target')
 

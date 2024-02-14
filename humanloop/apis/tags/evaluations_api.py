@@ -12,6 +12,7 @@
 from humanloop.paths.evaluations_id_evaluators.patch import AddEvaluators
 from humanloop.paths.projects_project_id_evaluations.post import Create
 from humanloop.paths.evaluations_id.get import Get
+from humanloop.paths.evaluations.get import List
 from humanloop.paths.projects_project_id_evaluations.get import ListAllForProject
 from humanloop.paths.evaluations_id_datapoints.get import ListDatapoints
 from humanloop.paths.evaluations_evaluation_id_log.post import Log
@@ -24,6 +25,7 @@ class EvaluationsApi(
     AddEvaluators,
     Create,
     Get,
+    List,
     ListAllForProject,
     ListDatapoints,
     Log,

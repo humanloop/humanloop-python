@@ -15,7 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.pydantic.model_config_request_tools import ModelConfigRequestTools
 from humanloop.pydantic.model_endpoints import ModelEndpoints
 from humanloop.pydantic.model_providers import ModelProviders
@@ -68,7 +68,7 @@ class ModelConfigRequest(BaseModel):
     prompt_template: typing.Optional[str] = Field(None, alias='prompt_template')
 
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
-    chat_template: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='chat_template')
+    chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = Field(None, alias='chat_template')
 
     tools: typing.Optional[ModelConfigRequestTools] = Field(None, alias='tools')
 

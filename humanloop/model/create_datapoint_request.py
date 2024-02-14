@@ -48,12 +48,12 @@ class CreateDatapointRequest(
                 class MetaOapg:
                     
                     @staticmethod
-                    def items() -> typing.Type['ChatMessage']:
-                        return ChatMessage
+                    def items() -> typing.Type['ChatMessageWithToolCall']:
+                        return ChatMessageWithToolCall
             
                 def __new__(
                     cls,
-                    arg: typing.Union[typing.Tuple['ChatMessage'], typing.List['ChatMessage']],
+                    arg: typing.Union[typing.Tuple['ChatMessageWithToolCall'], typing.List['ChatMessageWithToolCall']],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                 ) -> 'messages':
                     return super().__new__(
@@ -62,7 +62,7 @@ class CreateDatapointRequest(
                         _configuration=_configuration,
                     )
             
-                def __getitem__(self, i: int) -> 'ChatMessage':
+                def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
         
             @staticmethod
@@ -126,6 +126,6 @@ class CreateDatapointRequest(
             **kwargs,
         )
 
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.model.create_datapoint_request_inputs import CreateDatapointRequestInputs
 from humanloop.model.create_datapoint_request_target import CreateDatapointRequestTarget

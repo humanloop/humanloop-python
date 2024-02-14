@@ -14,7 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.datapoint_response_inputs import DatapointResponseInputs
 from humanloop.type.datapoint_response_target import DatapointResponseTarget
 
@@ -30,7 +30,7 @@ class RequiredDatapointResponse(TypedDict):
 class OptionalDatapointResponse(TypedDict, total=False):
     inputs: DatapointResponseInputs
 
-    messages: typing.List[ChatMessage]
+    messages: typing.List[ChatMessageWithToolCall]
 
     target: DatapointResponseTarget
 

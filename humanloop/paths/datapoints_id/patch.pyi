@@ -35,24 +35,24 @@ from humanloop import schemas  # noqa: F401
 from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsSchema
 from humanloop.model.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
 from humanloop.model.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestSchema
 from humanloop.model.datapoint_response import DatapointResponse as DatapointResponseSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
 from humanloop.type.update_datapoint_request import UpdateDatapointRequest
 from humanloop.type.update_datapoint_request_inputs import UpdateDatapointRequestInputs
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.datapoint_response import DatapointResponse
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.update_datapoint_request_target import UpdateDatapointRequestTarget
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetPydantic
 from humanloop.pydantic.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestPydantic
 from humanloop.pydantic.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsPydantic
 from humanloop.pydantic.datapoint_response import DatapointResponse as DatapointResponsePydantic
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 # Path params
 IdSchema = schemas.StrSchema
@@ -144,7 +144,7 @@ class BaseApi(api_client.Api):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
@@ -396,7 +396,7 @@ class UpdateRaw(BaseApi):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
         **kwargs,
     ) -> typing.Union[
@@ -420,7 +420,7 @@ class UpdateRaw(BaseApi):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -443,7 +443,7 @@ class Update(BaseApi):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
         validate: bool = False,
         **kwargs,
@@ -464,7 +464,7 @@ class Update(BaseApi):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
         validate: bool = False,
     ) -> DatapointResponsePydantic:
@@ -486,7 +486,7 @@ class ApiForpatch(BaseApi):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
         **kwargs,
     ) -> typing.Union[
@@ -510,7 +510,7 @@ class ApiForpatch(BaseApi):
         self,
         id: str,
         inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[UpdateDatapointRequestTarget] = None,
     ) -> typing.Union[
         ApiResponseFor200,

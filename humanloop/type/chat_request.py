@@ -14,7 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.model_config_chat_request import ModelConfigChatRequest
 from humanloop.type.provider_api_keys import ProviderApiKeys
 from humanloop.type.response_format import ResponseFormat
@@ -22,7 +22,7 @@ from humanloop.type.tool_choice import ToolChoice
 
 class RequiredChatRequest(TypedDict):
     # The messages passed to the to provider chat endpoint.
-    messages: typing.List[ChatMessage]
+    messages: typing.List[ChatMessageWithToolCall]
 
     # The model configuration used to create a chat response.
     model_config: ModelConfigChatRequest

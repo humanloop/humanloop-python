@@ -72,6 +72,7 @@
   * [`humanloop.evaluations.add_evaluators`](#humanloopevaluationsadd_evaluators)
   * [`humanloop.evaluations.create`](#humanloopevaluationscreate)
   * [`humanloop.evaluations.get`](#humanloopevaluationsget)
+  * [`humanloop.evaluations.list`](#humanloopevaluationslist)
   * [`humanloop.evaluations.list_all_for_project`](#humanloopevaluationslist_all_for_project)
   * [`humanloop.evaluations.list_datapoints`](#humanloopevaluationslist_datapoints)
   * [`humanloop.evaluations.log`](#humanloopevaluationslog)
@@ -485,7 +486,7 @@ create_response = humanloop.chat(
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
+##### messages: List[`ChatMessageWithToolCall`]<a id="messages-listchatmessagewithtoolcall"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -634,7 +635,7 @@ create_deployed_response = humanloop.chat_deployed(
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
+##### messages: List[`ChatMessageWithToolCall`]<a id="messages-listchatmessagewithtoolcall"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -782,7 +783,7 @@ create_experiment_response = humanloop.chat_experiment(
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
+##### messages: List[`ChatMessageWithToolCall`]<a id="messages-listchatmessagewithtoolcall"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -930,7 +931,7 @@ create_model_config_response = humanloop.chat_model_config(
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
+##### messages: List[`ChatMessageWithToolCall`]<a id="messages-listchatmessagewithtoolcall"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -1646,7 +1647,7 @@ String ID of datapoint. Starts with `evtc_`.
 
 ##### inputs: [`UpdateDatapointRequestInputs`](./humanloop/type/update_datapoint_request_inputs.py)<a id="inputs-updatedatapointrequestinputshumanlooptypeupdate_datapoint_request_inputspy"></a>
 
-##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
+##### messages: List[`ChatMessageWithToolCall`]<a id="messages-listchatmessagewithtoolcall"></a>
 
 The chat messages for this datapoint.
 
@@ -2055,9 +2056,60 @@ Whether to include evaluator aggregates in the response.
 
 ---
 
+### `humanloop.evaluations.list`<a id="humanloopevaluationslist"></a>
+
+Get the evaluations associated with a project.  Sorting and filtering are supported through query params for categorical columns and the `created_at` timestamp.  Sorting is supported for the `dataset`, `config`, `status` and `evaluator-{evaluator_id}` columns. Specify sorting with the `sort` query param, with values `{column}.{ordering}`. E.g. ?sort=dataset.asc&sort=status.desc will yield a multi-column sort. First by dataset then by status.  Filtering is supported for the `id`, `dataset`, `config` and `status` columns.  Specify filtering with the `id_filter`, `dataset_filter`, `config_filter` and `status_filter` query params.  E.g. ?dataset_filter=my_dataset&dataset_filter=my_other_dataset&status_filter=running will only show rows where the dataset is \"my_dataset\" or \"my_other_dataset\", and where the status is \"running\".  An additional date range filter is supported for the `created_at` column. Use the `start_date` and `end_date` query parameters to configure this.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+list_response = humanloop.evaluations.list(
+    project_id="project_id_example",
+    id=["string_example"],
+    start_date="1970-01-01",
+    end_date="1970-01-01",
+    size=50,
+    page=0,
+)
+```
+
+#### ⚙️ Parameters<a id="⚙️-parameters"></a>
+
+##### project_id: `str`<a id="project_id-str"></a>
+
+String ID of project. Starts with `pr_`.
+
+##### id: List[`str`]<a id="id-liststr"></a>
+
+A list of evaluation run ids to filter on. Starts with `ev_`.
+
+##### start_date: `date`<a id="start_date-date"></a>
+
+Only return evaluations created after this date.
+
+##### end_date: `date`<a id="end_date-date"></a>
+
+Only return evaluations created before this date.
+
+##### size: `int`<a id="size-int"></a>
+
+##### page: `int`<a id="page-int"></a>
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`PaginatedDataEvaluationResponse`](./humanloop/pydantic/paginated_data_evaluation_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/evaluations` `get`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
 ### `humanloop.evaluations.list_all_for_project`<a id="humanloopevaluationslist_all_for_project"></a>
 
-Get all the evaluations associated with your project.
+Get all the evaluations associated with your project.  Deprecated: This is a legacy unpaginated endpoint. Use `/evaluations` instead, with appropriate sorting, filtering and pagination options.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
@@ -2985,7 +3037,7 @@ String ID of log to return. Starts with `data_`.
 
 ### `humanloop.logs.list`<a id="humanlooplogslist"></a>
 
-Retrieve paginated logs from the server.  Sorting and filtering are supported through query params. See docstring of get_sorted_filtered_project_data_from_query_params for more details.
+Retrieve paginated logs from the server.  Sorting and filtering are supported through query params.  Sorting is supported for the `source`, `model`, `timestamp`, and `feedback-{output_name}` columns. Specify sorting with the `sort` query param, with values `{column}.{ordering}`. E.g. ?sort=source.asc&sort=model.desc will yield a multi-column sort. First by source then by model.  Filtering is supported for the `source`, `model`, `feedback-{output_name}`, `evaluator-{evaluator_external_id}` columns.  Specify filtering with the `source_filter`, `model_filter`, `feedback-{output.name}_filter` and `evaluator-{evaluator_external_id}_filter` query params.  E.g. ?source_filter=AI&source_filter=user_1234&feedback-explicit_filter=good will only show rows where the source is \"AI\" or \"user_1234\", and where the latest feedback for the \"explicit\" output group is \"good\".  An additional date range filter is supported for the `Timestamp` column (i.e. `Log.created_at`). These are supported through the `start_date` and `end_date` query parameters.  Searching is supported for the model inputs and output. Specify a search term with the `search` query param. E.g. ?search=hello%20there will cause a case-insensitive search across model inputs and output.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
@@ -3143,7 +3195,7 @@ A unique string to reference the datapoint. Allows you to log nested datapoints 
 
 Unique ID of an experiment trial to associate to the log.
 
-##### messages: List[`ChatMessage`]<a id="messages-listchatmessage"></a>
+##### messages: List[`ChatMessageWithToolCall`]<a id="messages-listchatmessagewithtoolcall"></a>
 
 The messages passed to the to provider chat endpoint.
 
@@ -3181,7 +3233,7 @@ Error message if the log is an error.
 
 Duration of the logged event in seconds.
 
-##### output_message: [`ChatMessage`](./humanloop/type/chat_message.py)<a id="output_message-chatmessagehumanlooptypechat_messagepy"></a>
+##### output_message: [`ChatMessageWithToolCall`](./humanloop/type/chat_message_with_tool_call.py)<a id="output_message-chatmessagewithtoolcallhumanlooptypechat_message_with_tool_callpy"></a>
 
 
 The message returned by the provider.
@@ -3514,7 +3566,7 @@ If specified, the model config will be added to this experiment. Experiments are
 
 Prompt template that will take your specified inputs to form your final request to the provider model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
 
-##### chat_template: List[`ChatMessage`]<a id="chat_template-listchatmessage"></a>
+##### chat_template: List[`ChatMessageWithToolCall`]<a id="chat_template-listchatmessagewithtoolcall"></a>
 
 Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. NB: Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
 
@@ -3646,7 +3698,7 @@ The format of the response. Only type json_object is currently supported for cha
 
 The provider model endpoint used.
 
-##### chat_template: List[`ChatMessage`]<a id="chat_template-listchatmessage"></a>
+##### chat_template: List[`ChatMessageWithToolCall`]<a id="chat_template-listchatmessagewithtoolcall"></a>
 
 Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
 

@@ -228,12 +228,12 @@ class ModelConfigChatRequest(
                 class MetaOapg:
                     
                     @staticmethod
-                    def items() -> typing.Type['ChatMessage']:
-                        return ChatMessage
+                    def items() -> typing.Type['ChatMessageWithToolCall']:
+                        return ChatMessageWithToolCall
             
                 def __new__(
                     cls,
-                    arg: typing.Union[typing.Tuple['ChatMessage'], typing.List['ChatMessage']],
+                    arg: typing.Union[typing.Tuple['ChatMessageWithToolCall'], typing.List['ChatMessageWithToolCall']],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                 ) -> 'chat_template':
                     return super().__new__(
@@ -242,7 +242,7 @@ class ModelConfigChatRequest(
                         _configuration=_configuration,
                     )
             
-                def __getitem__(self, i: int) -> 'ChatMessage':
+                def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
         
             @staticmethod
@@ -266,7 +266,6 @@ class ModelConfigChatRequest(
                 "chat_template": chat_template,
                 "tools": tools,
             }
-        additional_properties = schemas.NotAnyTypeSchema
     
     model: MetaOapg.properties.model
     
@@ -318,9 +317,13 @@ class ModelConfigChatRequest(
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tools"]) -> 'ModelConfigChatRequestTools': ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], ]):
+    @typing.overload
+    def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
+    
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model", "description", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "other", "seed", "response_format", "endpoint", "chat_template", "tools", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
+    
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["model"]) -> MetaOapg.properties.model: ...
@@ -370,8 +373,12 @@ class ModelConfigChatRequest(
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union['ModelConfigChatRequestTools', schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model"], typing_extensions.Literal["description"], typing_extensions.Literal["name"], typing_extensions.Literal["provider"], typing_extensions.Literal["max_tokens"], typing_extensions.Literal["temperature"], typing_extensions.Literal["top_p"], typing_extensions.Literal["stop"], typing_extensions.Literal["presence_penalty"], typing_extensions.Literal["frequency_penalty"], typing_extensions.Literal["other"], typing_extensions.Literal["seed"], typing_extensions.Literal["response_format"], typing_extensions.Literal["endpoint"], typing_extensions.Literal["chat_template"], typing_extensions.Literal["tools"], ]):
+    @typing.overload
+    def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
+    
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model", "description", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "other", "seed", "response_format", "endpoint", "chat_template", "tools", ], str]):
         return super().get_item_oapg(name)
+    
 
     def __new__(
         cls,
@@ -393,7 +400,7 @@ class ModelConfigChatRequest(
         chat_template: typing.Union[MetaOapg.properties.chat_template, list, tuple, schemas.Unset] = schemas.unset,
         tools: typing.Union['ModelConfigChatRequestTools', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
-        **kwargs,
+        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ModelConfigChatRequest':
         return super().__new__(
             cls,
@@ -415,9 +422,10 @@ class ModelConfigChatRequest(
             chat_template=chat_template,
             tools=tools,
             _configuration=_configuration,
+            **kwargs,
         )
 
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.model.model_config_chat_request_tools import ModelConfigChatRequestTools
 from humanloop.model.model_endpoints import ModelEndpoints
 from humanloop.model.model_providers import ModelProviders

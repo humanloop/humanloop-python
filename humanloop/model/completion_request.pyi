@@ -151,7 +151,6 @@ class CompletionRequest(
                 "logprobs": logprobs,
                 "suffix": suffix,
             }
-        additional_properties = schemas.NotAnyTypeSchema
     
     model_config: MetaOapg.properties.model_config
     
@@ -215,9 +214,13 @@ class CompletionRequest(
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["suffix"]) -> MetaOapg.properties.suffix: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["save"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["suffix"], ]):
+    @typing.overload
+    def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
+    
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "provider_api_keys", "num_samples", "stream", "user", "seed", "return_inputs", "logprobs", "suffix", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
+    
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["model_config"]) -> MetaOapg.properties.model_config: ...
@@ -279,8 +282,12 @@ class CompletionRequest(
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["suffix"]) -> typing.Union[MetaOapg.properties.suffix, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["save"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["logprobs"], typing_extensions.Literal["suffix"], ]):
+    @typing.overload
+    def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
+    
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "provider_api_keys", "num_samples", "stream", "user", "seed", "return_inputs", "logprobs", "suffix", ], str]):
         return super().get_item_oapg(name)
+    
 
     def __new__(
         cls,
@@ -306,7 +313,7 @@ class CompletionRequest(
         logprobs: typing.Union[MetaOapg.properties.logprobs, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         suffix: typing.Union[MetaOapg.properties.suffix, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
-        **kwargs,
+        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'CompletionRequest':
         return super().__new__(
             cls,
@@ -332,6 +339,7 @@ class CompletionRequest(
             logprobs=logprobs,
             suffix=suffix,
             _configuration=_configuration,
+            **kwargs,
         )
 
 from humanloop.model.model_config_completion_request import ModelConfigCompletionRequest

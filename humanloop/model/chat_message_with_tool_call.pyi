@@ -23,7 +23,7 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 
-class ChatMessage(
+class ChatMessageWithToolCall(
     schemas.DictSchema
 ):
     """
@@ -212,6 +212,33 @@ class ChatMessage(
                     )
             
             
+            class tool_calls(
+                schemas.ListBase,
+                schemas.NoneBase,
+                schemas.Schema,
+                schemas.NoneTupleMixin
+            ):
+            
+            
+                class MetaOapg:
+                    
+                    @staticmethod
+                    def items() -> typing.Type['ToolCall']:
+                        return ToolCall
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[list, tuple, None, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                ) -> 'tool_calls':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                    )
+            
+            
             class tool_call(
                 schemas.ComposedSchema,
             ):
@@ -246,40 +273,13 @@ class ChatMessage(
                         _configuration=_configuration,
                         **kwargs,
                     )
-            
-            
-            class tool_calls(
-                schemas.ListBase,
-                schemas.NoneBase,
-                schemas.Schema,
-                schemas.NoneTupleMixin
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @staticmethod
-                    def items() -> typing.Type['ToolCall']:
-                        return ToolCall
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[list, tuple, None, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                ) -> 'tool_calls':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                    )
             __annotations__ = {
                 "role": role,
                 "content": content,
                 "name": name,
                 "tool_call_id": tool_call_id,
-                "tool_call": tool_call,
                 "tool_calls": tool_calls,
+                "tool_call": tool_call,
             }
     
     role: MetaOapg.properties.role
@@ -297,15 +297,15 @@ class ChatMessage(
     def __getitem__(self, name: typing_extensions.Literal["tool_call_id"]) -> MetaOapg.properties.tool_call_id: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
+    def __getitem__(self, name: typing_extensions.Literal["tool_calls"]) -> MetaOapg.properties.tool_calls: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tool_calls"]) -> MetaOapg.properties.tool_calls: ...
+    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["role", "content", "name", "tool_call_id", "tool_call", "tool_calls", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["role", "content", "name", "tool_call_id", "tool_calls", "tool_call", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -323,15 +323,15 @@ class ChatMessage(
     def get_item_oapg(self, name: typing_extensions.Literal["tool_call_id"]) -> typing.Union[MetaOapg.properties.tool_call_id, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_calls"]) -> typing.Union[MetaOapg.properties.tool_calls, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tool_calls"]) -> typing.Union[MetaOapg.properties.tool_calls, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["role", "content", "name", "tool_call_id", "tool_call", "tool_calls", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["role", "content", "name", "tool_call_id", "tool_calls", "tool_call", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -342,11 +342,11 @@ class ChatMessage(
         content: typing.Union[MetaOapg.properties.content, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         name: typing.Union[MetaOapg.properties.name, None, str, schemas.Unset] = schemas.unset,
         tool_call_id: typing.Union[MetaOapg.properties.tool_call_id, None, str, schemas.Unset] = schemas.unset,
-        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         tool_calls: typing.Union[MetaOapg.properties.tool_calls, list, tuple, None, schemas.Unset] = schemas.unset,
+        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-    ) -> 'ChatMessage':
+    ) -> 'ChatMessageWithToolCall':
         return super().__new__(
             cls,
             *args,
@@ -354,8 +354,8 @@ class ChatMessage(
             content=content,
             name=name,
             tool_call_id=tool_call_id,
-            tool_call=tool_call,
             tool_calls=tool_calls,
+            tool_call=tool_call,
             _configuration=_configuration,
             **kwargs,
         )

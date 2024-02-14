@@ -12,6 +12,7 @@
 from humanloop.paths.evaluations_id_evaluators.patch import AddEvaluatorsRaw
 from humanloop.paths.projects_project_id_evaluations.post import CreateRaw
 from humanloop.paths.evaluations_id.get import GetRaw
+from humanloop.paths.evaluations.get import ListRaw
 from humanloop.paths.projects_project_id_evaluations.get import ListAllForProjectRaw
 from humanloop.paths.evaluations_id_datapoints.get import ListDatapointsRaw
 from humanloop.paths.evaluations_evaluation_id_log.post import LogRaw
@@ -23,6 +24,7 @@ class EvaluationsApiRaw(
     AddEvaluatorsRaw,
     CreateRaw,
     GetRaw,
+    ListRaw,
     ListAllForProjectRaw,
     ListDatapointsRaw,
     LogRaw,

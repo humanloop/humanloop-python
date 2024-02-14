@@ -36,26 +36,26 @@ from humanloop.model.datasets_create_datapoint_request import DatasetsCreateData
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.datasets_create_datapoint_response import DatasetsCreateDatapointResponse as DatasetsCreateDatapointResponseSchema
 from humanloop.model.create_datapoints_by_logs_request_log_ids import CreateDatapointsByLogsRequestLogIds as CreateDatapointsByLogsRequestLogIdsSchema
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
 from humanloop.model.create_datapoint_request_target import CreateDatapointRequestTarget as CreateDatapointRequestTargetSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 from humanloop.model.create_datapoint_request_inputs import CreateDatapointRequestInputs as CreateDatapointRequestInputsSchema
 
 from humanloop.type.create_datapoint_request_target import CreateDatapointRequestTarget
 from humanloop.type.datasets_create_datapoint_response import DatasetsCreateDatapointResponse
 from humanloop.type.create_datapoints_by_logs_request_log_ids import CreateDatapointsByLogsRequestLogIds
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.create_datapoint_request_inputs import CreateDatapointRequestInputs
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.datasets_create_datapoint_request import DatasetsCreateDatapointRequest
 
 from ...api_client import Dictionary
 from humanloop.pydantic.datasets_create_datapoint_response import DatasetsCreateDatapointResponse as DatasetsCreateDatapointResponsePydantic
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.create_datapoints_by_logs_request_log_ids import CreateDatapointsByLogsRequestLogIds as CreateDatapointsByLogsRequestLogIdsPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.datasets_create_datapoint_request import DatasetsCreateDatapointRequest as DatasetsCreateDatapointRequestPydantic
 from humanloop.pydantic.create_datapoint_request_target import CreateDatapointRequestTarget as CreateDatapointRequestTargetPydantic
 from humanloop.pydantic.create_datapoint_request_inputs import CreateDatapointRequestInputs as CreateDatapointRequestInputsPydantic
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 # Path params
 DatasetIdSchema = schemas.StrSchema
@@ -149,7 +149,7 @@ class BaseApi(api_client.Api):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
@@ -405,7 +405,7 @@ class CreateDatapointRaw(BaseApi):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
         **kwargs,
     ) -> typing.Union[
@@ -433,7 +433,7 @@ class CreateDatapointRaw(BaseApi):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
     ) -> typing.Union[
         ApiResponseFor201,
@@ -460,7 +460,7 @@ class CreateDatapoint(BaseApi):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
         validate: bool = False,
         **kwargs,
@@ -485,7 +485,7 @@ class CreateDatapoint(BaseApi):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
         validate: bool = False,
     ) -> DatasetsCreateDatapointResponsePydantic:
@@ -511,7 +511,7 @@ class ApiForpost(BaseApi):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
         **kwargs,
     ) -> typing.Union[
@@ -539,7 +539,7 @@ class ApiForpost(BaseApi):
         body: typing.Optional[DatasetsCreateDatapointRequest] = None,
         log_ids: typing.Optional[CreateDatapointsByLogsRequestLogIds] = None,
         inputs: typing.Optional[CreateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         target: typing.Optional[CreateDatapointRequestTarget] = None,
     ) -> typing.Union[
         ApiResponseFor201,

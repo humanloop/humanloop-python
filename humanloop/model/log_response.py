@@ -102,12 +102,12 @@ class LogResponse(
                 class MetaOapg:
                     
                     @staticmethod
-                    def items() -> typing.Type['ChatMessage']:
-                        return ChatMessage
+                    def items() -> typing.Type['ChatMessageWithToolCall']:
+                        return ChatMessageWithToolCall
             
                 def __new__(
                     cls,
-                    arg: typing.Union[typing.Tuple['ChatMessage'], typing.List['ChatMessage']],
+                    arg: typing.Union[typing.Tuple['ChatMessageWithToolCall'], typing.List['ChatMessageWithToolCall']],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                 ) -> 'messages':
                     return super().__new__(
@@ -116,7 +116,7 @@ class LogResponse(
                         _configuration=_configuration,
                     )
             
-                def __getitem__(self, i: int) -> 'ChatMessage':
+                def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
             output = schemas.StrSchema
             config_id = schemas.StrSchema
@@ -170,7 +170,7 @@ class LogResponse(
                         # classes don't exist yet because their module has not finished
                         # loading
                         return [
-                            ChatMessage,
+                            ChatMessageWithToolCall,
                         ]
             
             
@@ -705,7 +705,7 @@ class LogResponse(
             **kwargs,
         )
 
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.model.config_response import ConfigResponse
 from humanloop.model.evaluation_result_response import EvaluationResultResponse
 from humanloop.model.feedback_response import FeedbackResponse

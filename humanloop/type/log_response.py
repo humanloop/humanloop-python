@@ -14,7 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.config_response import ConfigResponse
 from humanloop.type.evaluation_result_response import EvaluationResultResponse
 from humanloop.type.feedback_response import FeedbackResponse
@@ -76,7 +76,7 @@ class OptionalLogResponse(TypedDict, total=False):
     trial_id: str
 
     # The messages passed to the to provider chat endpoint.
-    messages: typing.List[ChatMessage]
+    messages: typing.List[ChatMessageWithToolCall]
 
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: str
@@ -99,7 +99,7 @@ class OptionalLogResponse(TypedDict, total=False):
     duration: typing.Union[int, float]
 
     # The message returned by the provider.
-    output_message: ChatMessage
+    output_message: ChatMessageWithToolCall
 
     # Number of tokens in the prompt used to generate the output.
     prompt_tokens: int

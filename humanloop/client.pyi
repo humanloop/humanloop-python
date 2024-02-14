@@ -30,31 +30,31 @@ from humanloop.apis.tags.projects_api import ProjectsApi
 from humanloop.apis.tags.sessions_api import SessionsApi
 
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.chat_request import ChatRequest
 from humanloop.type.response_format import ResponseFormat
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.model_config_chat_request import ModelConfigChatRequest
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.chat_deployed_request import ChatDeployedRequest
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.chat_experiment_request import ChatExperimentRequest
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.chat_model_config_request import ChatModelConfigRequest
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
@@ -80,7 +80,7 @@ from humanloop.type.feedback_type import FeedbackType
 from humanloop.type.feedback_submit_response import FeedbackSubmitResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 from humanloop.type.feedback import Feedback
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_config_request import ToolConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.logs_log_response import LogsLogResponse
@@ -114,7 +114,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.acreate)
     async def achat(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config: ModelConfigChatRequest,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -167,7 +167,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.create)
     def chat(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config: ModelConfigChatRequest,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -218,7 +218,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.acreate_deployed)
     async def achat_deployed(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         session_id: typing.Optional[str] = None,
@@ -271,7 +271,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.create_deployed)
     def chat_deployed(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
         session_id: typing.Optional[str] = None,
@@ -322,7 +322,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.acreate_experiment)
     async def achat_experiment(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         experiment_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -375,7 +375,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.create_experiment)
     def chat_experiment(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         experiment_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -426,7 +426,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.acreate_model_config)
     async def achat_model_config(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -479,7 +479,7 @@ class Humanloop(ClientCustom):
     @copy_signature(ChatsApi.create_model_config)
     def chat_model_config(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -972,7 +972,7 @@ class Humanloop(ClientCustom):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -981,7 +981,7 @@ class Humanloop(ClientCustom):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -1037,7 +1037,7 @@ class Humanloop(ClientCustom):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -1046,7 +1046,7 @@ class Humanloop(ClientCustom):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,

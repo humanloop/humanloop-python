@@ -394,6 +394,7 @@ class BaseApi(api_client.Api):
 class ListAllForProjectRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
+    @api_client.DeprecationWarningOnce(prefix="evaluations")
     async def alist_all_for_project(
         self,
         project_id: str,
@@ -414,6 +415,7 @@ class ListAllForProjectRaw(BaseApi):
             **kwargs,
         )
     
+    @api_client.DeprecationWarningOnce(prefix="evaluations")
     def list_all_for_project(
         self,
         project_id: str,
@@ -433,6 +435,7 @@ class ListAllForProjectRaw(BaseApi):
 
 class ListAllForProject(BaseApi):
 
+    @api_client.DeprecationWarningOnce(prefix="evaluations")
     async def alist_all_for_project(
         self,
         project_id: str,
@@ -450,6 +453,7 @@ class ListAllForProject(BaseApi):
         return api_client.construct_model_instance(EvaluationsGetForProjectResponsePydantic, raw_response.body)
     
     
+    @api_client.DeprecationWarningOnce(prefix="evaluations")
     def list_all_for_project(
         self,
         project_id: str,
@@ -468,6 +472,7 @@ class ListAllForProject(BaseApi):
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
+    @api_client.DeprecationWarningOnce(prefix="evaluations")
     async def aget(
         self,
         project_id: str,
@@ -488,6 +493,7 @@ class ApiForget(BaseApi):
             **kwargs,
         )
     
+    @api_client.DeprecationWarningOnce(prefix="evaluations")
     def get(
         self,
         project_id: str,

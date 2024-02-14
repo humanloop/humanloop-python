@@ -14,7 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.model_config_request_tools import ModelConfigRequestTools
 from humanloop.type.model_endpoints import ModelEndpoints
 from humanloop.type.model_providers import ModelProviders
@@ -68,7 +68,7 @@ class OptionalModelConfigRequest(TypedDict, total=False):
     prompt_template: str
 
     # Messages prepended to the list of messages sent to the provider. These messages that will take your specified inputs to form your final request to the provider model. Input variables within the template should be specified with syntax: {{INPUT_NAME}}.
-    chat_template: typing.List[ChatMessage]
+    chat_template: typing.List[ChatMessageWithToolCall]
 
     tools: ModelConfigRequestTools
 

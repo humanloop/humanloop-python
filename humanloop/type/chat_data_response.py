@@ -14,7 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.function_tool import FunctionTool
 from humanloop.type.tool_call import ToolCall
 from humanloop.type.tool_result_response import ToolResultResponse
@@ -36,7 +36,7 @@ class RequiredChatDataResponse(TypedDict):
     model_config_id: str
 
     # The message returned by the provider.
-    output_message: ChatMessage
+    output_message: ChatMessageWithToolCall
 
 class OptionalChatDataResponse(TypedDict, total=False):
     # The inputs passed to the chat template.
@@ -49,7 +49,7 @@ class OptionalChatDataResponse(TypedDict, total=False):
     tool_results: typing.List[ToolResultResponse]
 
     # The messages passed to the to provider chat endpoint.
-    messages: typing.List[ChatMessage]
+    messages: typing.List[ChatMessageWithToolCall]
 
     # Deprecated: Please use tool_calls field within the output_message.JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
     tool_call: FunctionTool

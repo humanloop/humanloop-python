@@ -15,14 +15,14 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.pydantic.provider_api_keys import ProviderApiKeys
 from humanloop.pydantic.response_format import ResponseFormat
 from humanloop.pydantic.tool_choice import ToolChoice
 
 class ChatModelConfigRequest(BaseModel):
     # The messages passed to the to provider chat endpoint.
-    messages: typing.List[ChatMessage] = Field(alias='messages')
+    messages: typing.List[ChatMessageWithToolCall] = Field(alias='messages')
 
     # Identifies the model configuration used to create a chat response.
     model_config_id_: str = Field(alias='model_config_id')

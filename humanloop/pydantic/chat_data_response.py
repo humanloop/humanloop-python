@@ -15,7 +15,7 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.chat_message import ChatMessage
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.pydantic.function_tool import FunctionTool
 from humanloop.pydantic.tool_call import ToolCall
 from humanloop.pydantic.tool_result_response import ToolResultResponse
@@ -37,7 +37,7 @@ class ChatDataResponse(BaseModel):
     model_config_id_: str = Field(alias='model_config_id')
 
     # The message returned by the provider.
-    output_message: ChatMessage = Field(alias='output_message')
+    output_message: ChatMessageWithToolCall = Field(alias='output_message')
 
     # The inputs passed to the chat template.
     inputs: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='inputs')
@@ -49,7 +49,7 @@ class ChatDataResponse(BaseModel):
     tool_results: typing.Optional[typing.List[ToolResultResponse]] = Field(None, alias='tool_results')
 
     # The messages passed to the to provider chat endpoint.
-    messages: typing.Optional[typing.List[ChatMessage]] = Field(None, alias='messages')
+    messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = Field(None, alias='messages')
 
     # Deprecated: Please use tool_calls field within the output_message.JSON definition of the tool to call and the corresponding argument values. Will be populated when finish_reason='tool_call'.
     tool_call: typing.Optional[FunctionTool] = Field(None, alias='tool_call')

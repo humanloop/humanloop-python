@@ -12,12 +12,12 @@
 import unittest
 
 import humanloop
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop import configuration
 
 
-class TestChatMessage(unittest.TestCase):
-    """ChatMessage unit test stubs"""
+class TestChatMessageWithToolCall(unittest.TestCase):
+    """ChatMessageWithToolCall unit test stubs"""
     pass
 
 

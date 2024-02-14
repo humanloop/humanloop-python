@@ -36,14 +36,14 @@ from humanloop.model.tool_choice import ToolChoice as ToolChoiceSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
 from humanloop.model.provider_api_keys import ProviderApiKeys as ProviderApiKeysSchema
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
 from humanloop.model.chat_model_config_request import ChatModelConfigRequest as ChatModelConfigRequestSchema
 from humanloop.model.chat_response import ChatResponse as ChatResponseSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
 from humanloop.type.chat_model_config_request import ChatModelConfigRequest
 from humanloop.type.provider_api_keys import ProviderApiKeys
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_choice import ToolChoice
 from humanloop.type.chat_response import ChatResponse
 from humanloop.type.http_validation_error import HTTPValidationError
@@ -51,11 +51,11 @@ from humanloop.type.http_validation_error import HTTPValidationError
 from ...api_client import Dictionary
 from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
 from humanloop.pydantic.chat_model_config_request import ChatModelConfigRequest as ChatModelConfigRequestPydantic
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.chat_response import ChatResponse as ChatResponsePydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.provider_api_keys import ProviderApiKeys as ProviderApiKeysPydantic
 from humanloop.pydantic.tool_choice import ToolChoice as ToolChoicePydantic
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 # body param
 SchemaForRequestBodyApplicationJson = ChatModelConfigRequestSchema
@@ -119,7 +119,7 @@ class BaseApi(api_client.Api):
 
     def _create_model_config_mapped_args(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -393,7 +393,7 @@ class CreateModelConfigRaw(BaseApi):
 
     async def acreate_model_config(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -452,7 +452,7 @@ class CreateModelConfigRaw(BaseApi):
     
     def create_model_config(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -510,7 +510,7 @@ class CreateModelConfig(BaseApi):
 
     async def acreate_model_config(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -567,7 +567,7 @@ class CreateModelConfig(BaseApi):
     
     def create_model_config(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -625,7 +625,7 @@ class ApiForpost(BaseApi):
 
     async def apost(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,
@@ -684,7 +684,7 @@ class ApiForpost(BaseApi):
     
     def post(
         self,
-        messages: typing.List[ChatMessage],
+        messages: typing.List[ChatMessageWithToolCall],
         model_config_id: str,
         project: typing.Optional[str] = None,
         project_id: typing.Optional[str] = None,

@@ -37,11 +37,11 @@ from humanloop.model.log_datapoint_request import LogDatapointRequest as LogData
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.feedback import Feedback as FeedbackSchema
 from humanloop.model.model_config_request import ModelConfigRequest as ModelConfigRequestSchema
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
 from humanloop.model.logs_log_response import LogsLogResponse as LogsLogResponseSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
 from humanloop.type.feedback import Feedback
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.tool_config_request import ToolConfigRequest
 from humanloop.type.model_config_request import ModelConfigRequest
 from humanloop.type.logs_log_response import LogsLogResponse
@@ -50,12 +50,12 @@ from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.log_datapoint_request import LogDatapointRequest as LogDatapointRequestPydantic
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.feedback import Feedback as FeedbackPydantic
 from humanloop.pydantic.tool_config_request import ToolConfigRequest as ToolConfigRequestPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.model_config_request import ModelConfigRequest as ModelConfigRequestPydantic
 from humanloop.pydantic.logs_log_response import LogsLogResponse as LogsLogResponsePydantic
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 from . import path
 
@@ -142,7 +142,7 @@ class BaseApi(api_client.Api):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -151,7 +151,7 @@ class BaseApi(api_client.Api):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -432,7 +432,7 @@ class LogRaw(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -441,7 +441,7 @@ class LogRaw(BaseApi):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -503,7 +503,7 @@ class LogRaw(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -512,7 +512,7 @@ class LogRaw(BaseApi):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -573,7 +573,7 @@ class Log(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -582,7 +582,7 @@ class Log(BaseApi):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -642,7 +642,7 @@ class Log(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -651,7 +651,7 @@ class Log(BaseApi):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -712,7 +712,7 @@ class ApiForpost(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -721,7 +721,7 @@ class ApiForpost(BaseApi):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
@@ -783,7 +783,7 @@ class ApiForpost(BaseApi):
         source_datapoint_id: typing.Optional[str] = None,
         reference_id: typing.Optional[str] = None,
         trial_id: typing.Optional[str] = None,
-        messages: typing.Optional[typing.List[ChatMessage]] = None,
+        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
@@ -792,7 +792,7 @@ class ApiForpost(BaseApi):
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
-        output_message: typing.Optional[ChatMessage] = None,
+        output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,

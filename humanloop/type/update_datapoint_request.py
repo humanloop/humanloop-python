@@ -14,7 +14,7 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.chat_message import ChatMessage
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.update_datapoint_request_inputs import UpdateDatapointRequestInputs
 from humanloop.type.update_datapoint_request_target import UpdateDatapointRequestTarget
 
@@ -25,7 +25,7 @@ class OptionalUpdateDatapointRequest(TypedDict, total=False):
     inputs: UpdateDatapointRequestInputs
 
     # The chat messages for this datapoint.
-    messages: typing.List[ChatMessage]
+    messages: typing.List[ChatMessageWithToolCall]
 
     target: UpdateDatapointRequestTarget
 

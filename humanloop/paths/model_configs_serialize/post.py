@@ -38,11 +38,11 @@ from humanloop.model.model_configs_serialize_request import ModelConfigsSerializ
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
 from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
 
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
 from humanloop.type.model_config_chat_request_tools import ModelConfigChatRequestTools
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.model_providers import ModelProviders
 from humanloop.type.model_configs_serialize_request import ModelConfigsSerializeRequest
 from humanloop.type.http_validation_error import HTTPValidationError
@@ -51,11 +51,11 @@ from humanloop.type.model_endpoints import ModelEndpoints
 from ...api_client import Dictionary
 from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
 from humanloop.pydantic.model_configs_serialize_request import ModelConfigsSerializeRequest as ModelConfigsSerializeRequestPydantic
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.model_config_chat_request_tools import ModelConfigChatRequestTools as ModelConfigChatRequestToolsPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
 from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 from . import path
 
@@ -143,7 +143,7 @@ class BaseApi(api_client.Api):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
@@ -403,7 +403,7 @@ class SerializeRaw(BaseApi):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         **kwargs,
@@ -454,7 +454,7 @@ class SerializeRaw(BaseApi):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
     ) -> typing.Union[
@@ -504,7 +504,7 @@ class Serialize(BaseApi):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         validate: bool = False,
@@ -553,7 +553,7 @@ class Serialize(BaseApi):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         validate: bool = False,
@@ -603,7 +603,7 @@ class ApiForpost(BaseApi):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
         **kwargs,
@@ -654,7 +654,7 @@ class ApiForpost(BaseApi):
         seed: typing.Optional[int] = None,
         response_format: typing.Optional[ResponseFormat] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         tools: typing.Optional[ModelConfigChatRequestTools] = None,
         prompt_template: typing.Optional[str] = None,
     ) -> typing.Union[

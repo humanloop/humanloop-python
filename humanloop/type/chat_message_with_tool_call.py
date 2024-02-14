@@ -20,11 +20,11 @@ from humanloop.type.image_chat_content import ImageChatContent
 from humanloop.type.text_chat_content import TextChatContent
 from humanloop.type.tool_call import ToolCall
 
-class RequiredChatMessage(TypedDict):
+class RequiredChatMessageWithToolCall(TypedDict):
     # Role of the message author.
     role: ChatRole
 
-class OptionalChatMessage(TypedDict, total=False):
+class OptionalChatMessageWithToolCall(TypedDict, total=False):
     # The content of the message.
     content: typing.Union[str, typing.List[typing.Union[typing.List[TextChatContent], typing.List[ImageChatContent]]]]
 
@@ -34,11 +34,11 @@ class OptionalChatMessage(TypedDict, total=False):
     # Tool call that this message is responding to.
     tool_call_id: typing.Optional[str]
 
-    # NB: Deprecated in favour of tool_calls. A tool call requested by the assistant.
-    tool_call: FunctionTool
-
     # A list of tool calls requested by the assistant.
     tool_calls: typing.Optional[typing.List[ToolCall]]
 
-class ChatMessage(RequiredChatMessage, OptionalChatMessage):
+    # NB: Deprecated in favour of tool_calls. A tool call requested by the assistant.
+    tool_call: FunctionTool
+
+class ChatMessageWithToolCall(RequiredChatMessageWithToolCall, OptionalChatMessageWithToolCall):
     pass

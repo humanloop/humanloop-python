@@ -49,12 +49,12 @@ class ChatDeployedRequest(
                 class MetaOapg:
                     
                     @staticmethod
-                    def items() -> typing.Type['ChatMessage']:
-                        return ChatMessage
+                    def items() -> typing.Type['ChatMessageWithToolCall']:
+                        return ChatMessageWithToolCall
             
                 def __new__(
                     cls,
-                    arg: typing.Union[typing.Tuple['ChatMessage'], typing.List['ChatMessage']],
+                    arg: typing.Union[typing.Tuple['ChatMessageWithToolCall'], typing.List['ChatMessageWithToolCall']],
                     _configuration: typing.Optional[schemas.Configuration] = None,
                 ) -> 'messages':
                     return super().__new__(
@@ -63,7 +63,7 @@ class ChatDeployedRequest(
                         _configuration=_configuration,
                     )
             
-                def __getitem__(self, i: int) -> 'ChatMessage':
+                def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
             project = schemas.StrSchema
             project_id = schemas.StrSchema
@@ -303,7 +303,6 @@ class ChatDeployedRequest(
                 "response_format": response_format,
                 "environment": environment,
             }
-        additional_properties = schemas.NotAnyTypeSchema
     
     messages: MetaOapg.properties.messages
     
@@ -373,9 +372,13 @@ class ChatDeployedRequest(
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["environment"]) -> MetaOapg.properties.environment: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["save"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["response_format"], typing_extensions.Literal["environment"], ]):
+    @typing.overload
+    def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
+    
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["messages", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "provider_api_keys", "num_samples", "stream", "user", "seed", "return_inputs", "tool_choice", "tool_call", "response_format", "environment", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
+    
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["messages"]) -> MetaOapg.properties.messages: ...
@@ -443,8 +446,12 @@ class ChatDeployedRequest(
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["environment"]) -> typing.Union[MetaOapg.properties.environment, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["messages"], typing_extensions.Literal["project"], typing_extensions.Literal["project_id"], typing_extensions.Literal["session_id"], typing_extensions.Literal["session_reference_id"], typing_extensions.Literal["parent_id"], typing_extensions.Literal["parent_reference_id"], typing_extensions.Literal["inputs"], typing_extensions.Literal["source"], typing_extensions.Literal["metadata"], typing_extensions.Literal["save"], typing_extensions.Literal["source_datapoint_id"], typing_extensions.Literal["provider_api_keys"], typing_extensions.Literal["num_samples"], typing_extensions.Literal["stream"], typing_extensions.Literal["user"], typing_extensions.Literal["seed"], typing_extensions.Literal["return_inputs"], typing_extensions.Literal["tool_choice"], typing_extensions.Literal["tool_call"], typing_extensions.Literal["response_format"], typing_extensions.Literal["environment"], ]):
+    @typing.overload
+    def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
+    
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["messages", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "provider_api_keys", "num_samples", "stream", "user", "seed", "return_inputs", "tool_choice", "tool_call", "response_format", "environment", ], str]):
         return super().get_item_oapg(name)
+    
 
     def __new__(
         cls,
@@ -472,7 +479,7 @@ class ChatDeployedRequest(
         response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         environment: typing.Union[MetaOapg.properties.environment, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
-        **kwargs,
+        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ChatDeployedRequest':
         return super().__new__(
             cls,
@@ -500,9 +507,10 @@ class ChatDeployedRequest(
             response_format=response_format,
             environment=environment,
             _configuration=_configuration,
+            **kwargs,
         )
 
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.model.provider_api_keys import ProviderApiKeys
 from humanloop.model.response_format import ResponseFormat
 from humanloop.model.tool_choice import ToolChoice

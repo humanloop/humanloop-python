@@ -37,14 +37,14 @@ from humanloop.model.project_model_config_request import ProjectModelConfigReque
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.response_format import ResponseFormat as ResponseFormatSchema
 from humanloop.model.model_endpoints import ModelEndpoints as ModelEndpointsSchema
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
 from humanloop.model.project_config_response import ProjectConfigResponse as ProjectConfigResponseSchema
 from humanloop.model.project_model_config_request_tools import ProjectModelConfigRequestTools as ProjectModelConfigRequestToolsSchema
-from humanloop.model.chat_message import ChatMessage as ChatMessageSchema
 
-from humanloop.type.chat_message import ChatMessage
 from humanloop.type.response_format import ResponseFormat
 from humanloop.type.project_model_config_request import ProjectModelConfigRequest
 from humanloop.type.project_model_config_request_tools import ProjectModelConfigRequestTools
+from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.model_providers import ModelProviders
 from humanloop.type.project_config_response import ProjectConfigResponse
 from humanloop.type.http_validation_error import HTTPValidationError
@@ -53,12 +53,12 @@ from humanloop.type.model_endpoints import ModelEndpoints
 from ...api_client import Dictionary
 from humanloop.pydantic.response_format import ResponseFormat as ResponseFormatPydantic
 from humanloop.pydantic.project_config_response import ProjectConfigResponse as ProjectConfigResponsePydantic
-from humanloop.pydantic.chat_message import ChatMessage as ChatMessagePydantic
 from humanloop.pydantic.project_model_config_request_tools import ProjectModelConfigRequestTools as ProjectModelConfigRequestToolsPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.project_model_config_request import ProjectModelConfigRequest as ProjectModelConfigRequestPydantic
 from humanloop.pydantic.model_endpoints import ModelEndpoints as ModelEndpointsPydantic
 from humanloop.pydantic.model_providers import ModelProviders as ModelProvidersPydantic
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 # body param
 SchemaForRequestBodyApplicationJson = ProjectModelConfigRequestSchema
@@ -139,7 +139,7 @@ class BaseApi(api_client.Api):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
     ) -> api_client.MappedArgs:
@@ -407,7 +407,7 @@ class RegisterRaw(BaseApi):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         **kwargs,
@@ -462,7 +462,7 @@ class RegisterRaw(BaseApi):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
     ) -> typing.Union[
@@ -516,7 +516,7 @@ class Register(BaseApi):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         validate: bool = False,
@@ -569,7 +569,7 @@ class Register(BaseApi):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         validate: bool = False,
@@ -623,7 +623,7 @@ class ApiForpost(BaseApi):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
         **kwargs,
@@ -678,7 +678,7 @@ class ApiForpost(BaseApi):
         project_id: typing.Optional[str] = None,
         experiment: typing.Optional[str] = None,
         prompt_template: typing.Optional[str] = None,
-        chat_template: typing.Optional[typing.List[ChatMessage]] = None,
+        chat_template: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         endpoint: typing.Optional[ModelEndpoints] = None,
         tools: typing.Optional[ProjectModelConfigRequestTools] = None,
     ) -> typing.Union[

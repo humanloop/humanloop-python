@@ -20,7 +20,7 @@ from humanloop.model.categorical_feedback_label import CategoricalFeedbackLabel
 from humanloop.model.chat_data_response import ChatDataResponse
 from humanloop.model.chat_deployed_request import ChatDeployedRequest
 from humanloop.model.chat_experiment_request import ChatExperimentRequest
-from humanloop.model.chat_message import ChatMessage
+from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.model.chat_model_config_request import ChatModelConfigRequest
 from humanloop.model.chat_request import ChatRequest
 from humanloop.model.chat_response import ChatResponse
@@ -133,6 +133,7 @@ from humanloop.model.model_providers import ModelProviders
 from humanloop.model.observability_status import ObservabilityStatus
 from humanloop.model.paginated_data_datapoint_response import PaginatedDataDatapointResponse
 from humanloop.model.paginated_data_evaluation_datapoint_snapshot_response import PaginatedDataEvaluationDatapointSnapshotResponse
+from humanloop.model.paginated_data_evaluation_response import PaginatedDataEvaluationResponse
 from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse
 from humanloop.model.paginated_data_project_response import PaginatedDataProjectResponse
 from humanloop.model.paginated_data_session_response import PaginatedDataSessionResponse

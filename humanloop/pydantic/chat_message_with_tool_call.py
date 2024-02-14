@@ -21,7 +21,7 @@ from humanloop.pydantic.image_chat_content import ImageChatContent
 from humanloop.pydantic.text_chat_content import TextChatContent
 from humanloop.pydantic.tool_call import ToolCall
 
-class ChatMessage(BaseModel):
+class ChatMessageWithToolCall(BaseModel):
     # Role of the message author.
     role: ChatRole = Field(alias='role')
 
@@ -34,8 +34,8 @@ class ChatMessage(BaseModel):
     # Tool call that this message is responding to.
     tool_call_id: typing.Optional[typing.Optional[str]] = Field(None, alias='tool_call_id')
 
-    # NB: Deprecated in favour of tool_calls. A tool call requested by the assistant.
-    tool_call: typing.Optional[FunctionTool] = Field(None, alias='tool_call')
-
     # A list of tool calls requested by the assistant.
     tool_calls: typing.Optional[typing.Optional[typing.List[ToolCall]]] = Field(None, alias='tool_calls')
+
+    # NB: Deprecated in favour of tool_calls. A tool call requested by the assistant.
+    tool_call: typing.Optional[FunctionTool] = Field(None, alias='tool_call')
