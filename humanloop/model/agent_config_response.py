@@ -60,80 +60,16 @@ class AgentConfigResponse(
                     return cls("agent")
             name = schemas.StrSchema
             agent_class = schemas.StrSchema
-            
-            
-            class model_config(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ModelConfigRequest,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'model_config':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def model_config() -> typing.Type['ModelConfigRequest']:
+                return ModelConfigRequest
             description = schemas.StrSchema
             other = schemas.DictSchema
-            
-            
-            class created_by(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            UserResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'created_by':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def created_by() -> typing.Type['UserResponse']:
+                return UserResponse
             
             
             class tools(
@@ -172,7 +108,7 @@ class AgentConfigResponse(
                 "tools": tools,
             }
     
-    model_config: MetaOapg.properties.model_config
+    model_config: 'ModelConfigRequest'
     agent_class: MetaOapg.properties.agent_class
     name: MetaOapg.properties.name
     id: MetaOapg.properties.id
@@ -191,7 +127,7 @@ class AgentConfigResponse(
     def __getitem__(self, name: typing_extensions.Literal["agent_class"]) -> MetaOapg.properties.agent_class: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["model_config"]) -> MetaOapg.properties.model_config: ...
+    def __getitem__(self, name: typing_extensions.Literal["model_config"]) -> 'ModelConfigRequest': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["description"]) -> MetaOapg.properties.description: ...
@@ -200,7 +136,7 @@ class AgentConfigResponse(
     def __getitem__(self, name: typing_extensions.Literal["other"]) -> MetaOapg.properties.other: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["created_by"]) -> MetaOapg.properties.created_by: ...
+    def __getitem__(self, name: typing_extensions.Literal["created_by"]) -> 'UserResponse': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tools"]) -> MetaOapg.properties.tools: ...
@@ -226,7 +162,7 @@ class AgentConfigResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["agent_class"]) -> MetaOapg.properties.agent_class: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["model_config"]) -> MetaOapg.properties.model_config: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["model_config"]) -> 'ModelConfigRequest': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["description"]) -> typing.Union[MetaOapg.properties.description, schemas.Unset]: ...
@@ -235,7 +171,7 @@ class AgentConfigResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["other"]) -> typing.Union[MetaOapg.properties.other, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["created_by"]) -> typing.Union[MetaOapg.properties.created_by, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["created_by"]) -> typing.Union['UserResponse', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union[MetaOapg.properties.tools, schemas.Unset]: ...
@@ -250,14 +186,14 @@ class AgentConfigResponse(
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
-        model_config: typing.Union[MetaOapg.properties.model_config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        model_config: 'ModelConfigRequest',
         agent_class: typing.Union[MetaOapg.properties.agent_class, str, ],
         name: typing.Union[MetaOapg.properties.name, str, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
         type: typing.Union[MetaOapg.properties.type, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
-        created_by: typing.Union[MetaOapg.properties.created_by, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        created_by: typing.Union['UserResponse', schemas.Unset] = schemas.unset,
         tools: typing.Union[MetaOapg.properties.tools, list, tuple, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],

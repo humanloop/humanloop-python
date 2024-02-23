@@ -63,79 +63,11 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
             model = schemas.StrSchema
             description = schemas.StrSchema
             other = schemas.DictSchema
-            
-            
-            class created_by(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            UserResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'created_by':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
             name = schemas.StrSchema
-            
-            
-            class provider(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ModelProviders,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'provider':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def provider() -> typing.Type['ModelProviders']:
+                return ModelProviders
             max_tokens = schemas.IntSchema
             temperature = schemas.NumberSchema
             top_p = schemas.NumberSchema
@@ -203,42 +135,10 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
             presence_penalty = schemas.NumberSchema
             frequency_penalty = schemas.NumberSchema
             seed = schemas.IntSchema
-            
-            
-            class response_format(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ResponseFormat,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'response_format':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def response_format() -> typing.Type['ResponseFormat']:
+                return ResponseFormat
             prompt_template = schemas.StrSchema
             
             
@@ -318,49 +218,16 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
             
                 def __getitem__(self, i: int) -> 'ToolResponse':
                     return super().__getitem__(i)
-            
-            
-            class endpoint(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ModelEndpoints,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'endpoint':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def endpoint() -> typing.Type['ModelEndpoints']:
+                return ModelEndpoints
             __annotations__ = {
                 "id": id,
                 "type": type,
                 "model": model,
                 "description": description,
                 "other": other,
-                "created_by": created_by,
                 "name": name,
                 "provider": provider,
                 "max_tokens": max_tokens,
@@ -398,13 +265,10 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     def __getitem__(self, name: typing_extensions.Literal["other"]) -> MetaOapg.properties.other: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["created_by"]) -> MetaOapg.properties.created_by: ...
-    
-    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["provider"]) -> MetaOapg.properties.provider: ...
+    def __getitem__(self, name: typing_extensions.Literal["provider"]) -> 'ModelProviders': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["max_tokens"]) -> MetaOapg.properties.max_tokens: ...
@@ -428,7 +292,7 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     def __getitem__(self, name: typing_extensions.Literal["seed"]) -> MetaOapg.properties.seed: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> MetaOapg.properties.response_format: ...
+    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> 'ResponseFormat': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["prompt_template"]) -> MetaOapg.properties.prompt_template: ...
@@ -443,12 +307,12 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     def __getitem__(self, name: typing_extensions.Literal["tools"]) -> MetaOapg.properties.tools: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["endpoint"]) -> MetaOapg.properties.endpoint: ...
+    def __getitem__(self, name: typing_extensions.Literal["endpoint"]) -> 'ModelEndpoints': ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "model", "description", "other", "created_by", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "seed", "response_format", "prompt_template", "chat_template", "tool_configs", "tools", "endpoint", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "model", "description", "other", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "seed", "response_format", "prompt_template", "chat_template", "tool_configs", "tools", "endpoint", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -469,13 +333,10 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     def get_item_oapg(self, name: typing_extensions.Literal["other"]) -> typing.Union[MetaOapg.properties.other, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["created_by"]) -> typing.Union[MetaOapg.properties.created_by, schemas.Unset]: ...
-    
-    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> typing.Union[MetaOapg.properties.name, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["provider"]) -> typing.Union[MetaOapg.properties.provider, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["provider"]) -> typing.Union['ModelProviders', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["max_tokens"]) -> typing.Union[MetaOapg.properties.max_tokens, schemas.Unset]: ...
@@ -499,7 +360,7 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     def get_item_oapg(self, name: typing_extensions.Literal["seed"]) -> typing.Union[MetaOapg.properties.seed, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union[MetaOapg.properties.response_format, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union['ResponseFormat', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["prompt_template"]) -> typing.Union[MetaOapg.properties.prompt_template, schemas.Unset]: ...
@@ -514,12 +375,12 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
     def get_item_oapg(self, name: typing_extensions.Literal["tools"]) -> typing.Union[MetaOapg.properties.tools, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["endpoint"]) -> typing.Union[MetaOapg.properties.endpoint, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["endpoint"]) -> typing.Union['ModelEndpoints', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "model", "description", "other", "created_by", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "seed", "response_format", "prompt_template", "chat_template", "tool_configs", "tools", "endpoint", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "model", "description", "other", "name", "provider", "max_tokens", "temperature", "top_p", "stop", "presence_penalty", "frequency_penalty", "seed", "response_format", "prompt_template", "chat_template", "tool_configs", "tools", "endpoint", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -531,9 +392,8 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
         type: typing.Union[MetaOapg.properties.type, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
-        created_by: typing.Union[MetaOapg.properties.created_by, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         name: typing.Union[MetaOapg.properties.name, str, schemas.Unset] = schemas.unset,
-        provider: typing.Union[MetaOapg.properties.provider, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        provider: typing.Union['ModelProviders', schemas.Unset] = schemas.unset,
         max_tokens: typing.Union[MetaOapg.properties.max_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         temperature: typing.Union[MetaOapg.properties.temperature, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         top_p: typing.Union[MetaOapg.properties.top_p, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
@@ -541,12 +401,12 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
         presence_penalty: typing.Union[MetaOapg.properties.presence_penalty, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         frequency_penalty: typing.Union[MetaOapg.properties.frequency_penalty, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         seed: typing.Union[MetaOapg.properties.seed, decimal.Decimal, int, schemas.Unset] = schemas.unset,
-        response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        response_format: typing.Union['ResponseFormat', schemas.Unset] = schemas.unset,
         prompt_template: typing.Union[MetaOapg.properties.prompt_template, str, schemas.Unset] = schemas.unset,
         chat_template: typing.Union[MetaOapg.properties.chat_template, list, tuple, schemas.Unset] = schemas.unset,
         tool_configs: typing.Union[MetaOapg.properties.tool_configs, list, tuple, schemas.Unset] = schemas.unset,
         tools: typing.Union[MetaOapg.properties.tools, list, tuple, schemas.Unset] = schemas.unset,
-        endpoint: typing.Union[MetaOapg.properties.endpoint, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        endpoint: typing.Union['ModelEndpoints', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ModelConfigResponse':
@@ -558,7 +418,6 @@ Contains fields that are common to all (i.e. both chat and complete) endpoints.
             type=type,
             description=description,
             other=other,
-            created_by=created_by,
             name=name,
             provider=provider,
             max_tokens=max_tokens,
@@ -584,4 +443,3 @@ from humanloop.model.model_providers import ModelProviders
 from humanloop.model.response_format import ResponseFormat
 from humanloop.model.tool_config_response import ToolConfigResponse
 from humanloop.model.tool_response import ToolResponse
-from humanloop.model.user_response import UserResponse

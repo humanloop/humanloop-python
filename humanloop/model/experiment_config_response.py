@@ -47,42 +47,10 @@ class ExperimentConfigResponse(
             active = schemas.BoolSchema
             id = schemas.StrSchema
             display_name = schemas.StrSchema
-            
-            
-            class config(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ConfigResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'config':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def config() -> typing.Type['ConfigResponse']:
+                return ConfigResponse
             created_at = schemas.DateTimeSchema
             updated_at = schemas.DateTimeSchema
             mean = schemas.NumberSchema
@@ -104,7 +72,7 @@ class ExperimentConfigResponse(
     created_at: MetaOapg.properties.created_at
     id: MetaOapg.properties.id
     display_name: MetaOapg.properties.display_name
-    config: MetaOapg.properties.config
+    config: 'ConfigResponse'
     trials_count: MetaOapg.properties.trials_count
     
     @typing.overload
@@ -120,7 +88,7 @@ class ExperimentConfigResponse(
     def __getitem__(self, name: typing_extensions.Literal["display_name"]) -> MetaOapg.properties.display_name: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["config"]) -> MetaOapg.properties.config: ...
+    def __getitem__(self, name: typing_extensions.Literal["config"]) -> 'ConfigResponse': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
@@ -155,7 +123,7 @@ class ExperimentConfigResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["display_name"]) -> MetaOapg.properties.display_name: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["config"]) -> MetaOapg.properties.config: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["config"]) -> 'ConfigResponse': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
@@ -184,7 +152,7 @@ class ExperimentConfigResponse(
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
         display_name: typing.Union[MetaOapg.properties.display_name, str, ],
-        config: typing.Union[MetaOapg.properties.config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        config: 'ConfigResponse',
         trials_count: typing.Union[MetaOapg.properties.trials_count, decimal.Decimal, int, ],
         mean: typing.Union[MetaOapg.properties.mean, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         spread: typing.Union[MetaOapg.properties.spread, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,

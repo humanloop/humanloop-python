@@ -76,42 +76,10 @@ class ChatDeployedRequest(
             metadata = schemas.DictSchema
             save = schemas.BoolSchema
             source_datapoint_id = schemas.StrSchema
-            
-            
-            class provider_api_keys(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ProviderApiKeys,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'provider_api_keys':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def provider_api_keys() -> typing.Type['ProviderApiKeys']:
+                return ProviderApiKeys
             num_samples = schemas.IntSchema
             stream = schemas.BoolSchema
             user = schemas.StrSchema
@@ -254,42 +222,10 @@ class ChatDeployedRequest(
                         _configuration=_configuration,
                         **kwargs,
                     )
-            
-            
-            class response_format(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ResponseFormat,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'response_format':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def response_format() -> typing.Type['ResponseFormat']:
+                return ResponseFormat
             environment = schemas.StrSchema
             __annotations__ = {
                 "messages": messages,
@@ -355,7 +291,7 @@ class ChatDeployedRequest(
     def __getitem__(self, name: typing_extensions.Literal["source_datapoint_id"]) -> MetaOapg.properties.source_datapoint_id: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["provider_api_keys"]) -> MetaOapg.properties.provider_api_keys: ...
+    def __getitem__(self, name: typing_extensions.Literal["provider_api_keys"]) -> 'ProviderApiKeys': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["num_samples"]) -> MetaOapg.properties.num_samples: ...
@@ -379,7 +315,7 @@ class ChatDeployedRequest(
     def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> MetaOapg.properties.response_format: ...
+    def __getitem__(self, name: typing_extensions.Literal["response_format"]) -> 'ResponseFormat': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["environment"]) -> MetaOapg.properties.environment: ...
@@ -429,7 +365,7 @@ class ChatDeployedRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["source_datapoint_id"]) -> typing.Union[MetaOapg.properties.source_datapoint_id, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["provider_api_keys"]) -> typing.Union[MetaOapg.properties.provider_api_keys, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["provider_api_keys"]) -> typing.Union['ProviderApiKeys', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["num_samples"]) -> typing.Union[MetaOapg.properties.num_samples, schemas.Unset]: ...
@@ -453,7 +389,7 @@ class ChatDeployedRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union[MetaOapg.properties.response_format, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["response_format"]) -> typing.Union['ResponseFormat', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["environment"]) -> typing.Union[MetaOapg.properties.environment, schemas.Unset]: ...
@@ -480,7 +416,7 @@ class ChatDeployedRequest(
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         save: typing.Union[MetaOapg.properties.save, bool, schemas.Unset] = schemas.unset,
         source_datapoint_id: typing.Union[MetaOapg.properties.source_datapoint_id, str, schemas.Unset] = schemas.unset,
-        provider_api_keys: typing.Union[MetaOapg.properties.provider_api_keys, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        provider_api_keys: typing.Union['ProviderApiKeys', schemas.Unset] = schemas.unset,
         num_samples: typing.Union[MetaOapg.properties.num_samples, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         stream: typing.Union[MetaOapg.properties.stream, bool, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
@@ -488,7 +424,7 @@ class ChatDeployedRequest(
         return_inputs: typing.Union[MetaOapg.properties.return_inputs, bool, schemas.Unset] = schemas.unset,
         tool_choice: typing.Union[MetaOapg.properties.tool_choice, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
-        response_format: typing.Union[MetaOapg.properties.response_format, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        response_format: typing.Union['ResponseFormat', schemas.Unset] = schemas.unset,
         environment: typing.Union[MetaOapg.properties.environment, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],

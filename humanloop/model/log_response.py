@@ -150,42 +150,10 @@ class LogResponse(
             created_at = schemas.DateTimeSchema
             error = schemas.StrSchema
             duration = schemas.NumberSchema
-            
-            
-            class output_message(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ChatMessageWithToolCall,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'output_message':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def output_message() -> typing.Type['ChatMessageWithToolCall']:
+                return ChatMessageWithToolCall
             prompt_tokens = schemas.IntSchema
             output_tokens = schemas.IntSchema
             provider_request = schemas.DictSchema
@@ -444,7 +412,7 @@ class LogResponse(
     def __getitem__(self, name: typing_extensions.Literal["duration"]) -> MetaOapg.properties.duration: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["output_message"]) -> MetaOapg.properties.output_message: ...
+    def __getitem__(self, name: typing_extensions.Literal["output_message"]) -> 'ChatMessageWithToolCall': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["prompt_tokens"]) -> MetaOapg.properties.prompt_tokens: ...
@@ -569,7 +537,7 @@ class LogResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["duration"]) -> typing.Union[MetaOapg.properties.duration, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["output_message"]) -> typing.Union[MetaOapg.properties.output_message, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["output_message"]) -> typing.Union['ChatMessageWithToolCall', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["prompt_tokens"]) -> typing.Union[MetaOapg.properties.prompt_tokens, schemas.Unset]: ...
@@ -643,7 +611,7 @@ class LogResponse(
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, schemas.Unset] = schemas.unset,
         error: typing.Union[MetaOapg.properties.error, str, schemas.Unset] = schemas.unset,
         duration: typing.Union[MetaOapg.properties.duration, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
-        output_message: typing.Union[MetaOapg.properties.output_message, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        output_message: typing.Union['ChatMessageWithToolCall', schemas.Unset] = schemas.unset,
         prompt_tokens: typing.Union[MetaOapg.properties.prompt_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         output_tokens: typing.Union[MetaOapg.properties.output_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         provider_request: typing.Union[MetaOapg.properties.provider_request, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,

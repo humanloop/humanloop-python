@@ -328,16 +328,18 @@ try:
     create_response = humanloop.chats.raw.create(
         messages=[
             {
-                "role": "string_example",
+                "role": "user",
             }
         ],
         model_config={
+            "provider": "openai",
             "model": "model_example",
             "max_tokens": -1,
             "temperature": 1,
             "top_p": 1,
             "presence_penalty": 0,
             "frequency_penalty": 0,
+            "endpoint": "complete",
         },
         project="string_example",
         project_id="string_example",
@@ -448,16 +450,18 @@ Get a chat response by providing details of the model configuration in the reque
 create_response = humanloop.chat(
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     model_config={
+        "provider": "openai",
         "model": "model_example",
         "max_tokens": -1,
         "temperature": 1,
         "top_p": 1,
         "presence_penalty": 0,
         "frequency_penalty": 0,
+        "endpoint": "complete",
     },
     project="string_example",
     project_id="string_example",
@@ -604,7 +608,7 @@ Get a chat response using the project's active deployment.  The active deploymen
 create_deployed_response = humanloop.chat_deployed(
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     project="string_example",
@@ -752,7 +756,7 @@ Get a chat response for a specific experiment.
 create_experiment_response = humanloop.chat_experiment(
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     experiment_id="string_example",
@@ -900,7 +904,7 @@ Get chat response for a specific model configuration.
 create_model_config_response = humanloop.chat_model_config(
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     model_config_id="string_example",
@@ -1047,12 +1051,14 @@ Create a completion by providing details of the model configuration in the reque
 ```python
 create_response = humanloop.complete(
     model_config={
+        "provider": "openai",
         "model": "model_example",
         "max_tokens": -1,
         "temperature": 1,
         "top_p": 1,
         "presence_penalty": 0,
         "frequency_penalty": 0,
+        "endpoint": "complete",
         "prompt_template": "{{question}}",
     },
     project="string_example",
@@ -1630,7 +1636,7 @@ update_response = humanloop.datapoints.update(
     },
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     target={
@@ -1727,7 +1733,7 @@ create_datapoint_response = humanloop.datasets.create_datapoint(
     },
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     target={
@@ -2290,7 +2296,7 @@ Update the status of an evaluation run.  Can only be used to update the status o
 
 ```python
 update_status_response = humanloop.evaluations.update_status(
-    status="string_example",
+    status="pending",
     id="id_example",
 )
 ```
@@ -2330,17 +2336,19 @@ Create an evaluator within your organization.
 create_response = humanloop.evaluators.create(
     description="string_example",
     name="a",
-    arguments_type="string_example",
-    return_type="string_example",
-    type="string_example",
+    arguments_type="target_free",
+    return_type="boolean",
+    type="python",
     code="string_example",
     model_config={
+        "provider": "openai",
         "model": "model_example",
         "max_tokens": -1,
         "temperature": 1,
         "top_p": 1,
         "presence_penalty": 0,
         "frequency_penalty": 0,
+        "endpoint": "complete",
         "prompt_template": "{{question}}",
     },
 )
@@ -2477,16 +2485,18 @@ update_response = humanloop.evaluators.update(
     id="id_example",
     description="string_example",
     name="string_example",
-    arguments_type="string_example",
-    return_type="string_example",
+    arguments_type="target_free",
+    return_type="boolean",
     code="string_example",
     model_config={
+        "provider": "openai",
         "model": "model_example",
         "max_tokens": -1,
         "temperature": 1,
         "top_p": 1,
         "presence_penalty": 0,
         "frequency_penalty": 0,
+        "endpoint": "complete",
         "prompt_template": "{{question}}",
     },
 )
@@ -2807,6 +2817,7 @@ create_response = humanloop.finetunes.create(
     name="string_example",
     dataset_id="string_example",
     config={
+        "provider": "openai",
         "base_model": "base_model_example",
     },
     project_id="project_id_example",
@@ -2895,6 +2906,7 @@ summary_response = humanloop.finetunes.summary(
     name="string_example",
     dataset_id="string_example",
     config={
+        "provider": "openai",
         "base_model": "base_model_example",
     },
     project_id="project_id_example",
@@ -3109,18 +3121,20 @@ log_response = humanloop.log(
     trial_id="string_example",
     messages=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     output="string_example",
     config_id="string_example",
     config={
+        "provider": "openai",
         "model": "model_example",
         "max_tokens": -1,
         "temperature": 1,
         "top_p": 1,
         "presence_penalty": 0,
         "frequency_penalty": 0,
+        "endpoint": "complete",
         "type": "ModelConfigRequest",
     },
     environment="string_example",
@@ -3132,7 +3146,7 @@ log_response = humanloop.log(
     error="string_example",
     duration=3.14,
     output_message={
-        "role": "string_example",
+        "role": "user",
     },
     prompt_tokens=1,
     output_tokens=1,
@@ -3463,7 +3477,7 @@ register_response = humanloop.model_configs.register(
     model="string_example",
     description="string_example",
     name="string_example",
-    provider="string_example",
+    provider="openai",
     max_tokens=-1,
     temperature=1,
     top_p=1,
@@ -3481,10 +3495,10 @@ register_response = humanloop.model_configs.register(
     prompt_template="string_example",
     chat_template=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
-    endpoint="string_example",
+    endpoint="complete",
     tools=[
         {
             "id": "id_example",
@@ -3600,16 +3614,18 @@ Serialize a model config to a .prompt file format.
 ```python
 serialize_response = humanloop.model_configs.serialize(
     body={
+        "provider": "openai",
         "model": "model_example",
         "max_tokens": -1,
         "temperature": 1,
         "top_p": 1,
         "presence_penalty": 0,
         "frequency_penalty": 0,
+        "endpoint": "complete",
     },
     description="string_example",
     name="string_example",
-    provider="string_example",
+    provider="openai",
     model="string_example",
     max_tokens=-1,
     temperature=1,
@@ -3622,10 +3638,10 @@ serialize_response = humanloop.model_configs.serialize(
     response_format={
         "type": "json_object",
     },
-    endpoint="string_example",
+    endpoint="complete",
     chat_template=[
         {
-            "role": "string_example",
+            "role": "user",
         }
     ],
     tools=[
@@ -3731,6 +3747,7 @@ create_response = humanloop.projects.create(
     feedback_types=[
         {
             "type": "type_example",
+            "_class": "select",
         }
     ],
     directory_id="string_example",
@@ -3782,7 +3799,7 @@ create_feedback_type_response = humanloop.projects.create_feedback_type(
             "sentiment": "positive",
         }
     ],
-    _class="string_example",
+    _class="select",
 )
 ```
 
@@ -4109,8 +4126,8 @@ list_response = humanloop.projects.list(
     size=10,
     filter="string_example",
     user_filter="string_example",
-    sort_by="string_example",
-    order="string_example",
+    sort_by="created_at",
+    order="asc",
 )
 ```
 
@@ -4132,11 +4149,11 @@ Case-insensitive filter for project name.
 
 Case-insensitive filter for users in the project. This filter matches against both email address and name of users.
 
-##### sort_by: [`ProjectSortBy`](./humanloop/type/project_sort_by.py)<a id="sort_by-projectsortbyhumanlooptypeproject_sort_bypy"></a>
+##### sort_by: [`ProjectSortBy`](./humanloop/type/.py)<a id="sort_by-projectsortbyhumanlooptypepy"></a>
 
 Field to sort projects by
 
-##### order: [`SortOrder`](./humanloop/type/sort_order.py)<a id="order-sortorderhumanlooptypesort_orderpy"></a>
+##### order: [`SortOrder`](./humanloop/type/.py)<a id="order-sortorderhumanlooptypepy"></a>
 
 Direction to sort by.
 
@@ -4289,6 +4306,7 @@ update_feedback_types_response = humanloop.projects.update_feedback_types(
     body=[
         {
             "type": "type_example",
+            "_class": "select",
         }
     ],
     id="id_example",

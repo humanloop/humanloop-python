@@ -49,42 +49,10 @@ class ChatDataResponse(
             output = schemas.StrSchema
             raw_output = schemas.StrSchema
             model_config_id = schemas.StrSchema
-            
-            
-            class output_message(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ChatMessageWithToolCall,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'output_message':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def output_message() -> typing.Type['ChatMessageWithToolCall']:
+                return ChatMessageWithToolCall
             inputs = schemas.DictSchema
             finish_reason = schemas.StrSchema
             
@@ -139,42 +107,10 @@ class ChatDataResponse(
             
                 def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
-            
-            
-            class tool_call(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            FunctionTool,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'tool_call':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def tool_call() -> typing.Type['FunctionTool']:
+                return FunctionTool
             
             
             class tool_calls(
@@ -221,7 +157,7 @@ class ChatDataResponse(
     raw_output: MetaOapg.properties.raw_output
     index: MetaOapg.properties.index
     id: MetaOapg.properties.id
-    output_message: MetaOapg.properties.output_message
+    output_message: 'ChatMessageWithToolCall'
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
@@ -239,7 +175,7 @@ class ChatDataResponse(
     def __getitem__(self, name: typing_extensions.Literal["model_config_id"]) -> MetaOapg.properties.model_config_id: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["output_message"]) -> MetaOapg.properties.output_message: ...
+    def __getitem__(self, name: typing_extensions.Literal["output_message"]) -> 'ChatMessageWithToolCall': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["inputs"]) -> MetaOapg.properties.inputs: ...
@@ -254,7 +190,7 @@ class ChatDataResponse(
     def __getitem__(self, name: typing_extensions.Literal["messages"]) -> MetaOapg.properties.messages: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
+    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> 'FunctionTool': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["tool_calls"]) -> MetaOapg.properties.tool_calls: ...
@@ -283,7 +219,7 @@ class ChatDataResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["model_config_id"]) -> MetaOapg.properties.model_config_id: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["output_message"]) -> MetaOapg.properties.output_message: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["output_message"]) -> 'ChatMessageWithToolCall': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["inputs"]) -> typing.Union[MetaOapg.properties.inputs, schemas.Unset]: ...
@@ -298,7 +234,7 @@ class ChatDataResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["messages"]) -> typing.Union[MetaOapg.properties.messages, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union['FunctionTool', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["tool_calls"]) -> typing.Union[MetaOapg.properties.tool_calls, schemas.Unset]: ...
@@ -318,12 +254,12 @@ class ChatDataResponse(
         raw_output: typing.Union[MetaOapg.properties.raw_output, str, ],
         index: typing.Union[MetaOapg.properties.index, decimal.Decimal, int, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
-        output_message: typing.Union[MetaOapg.properties.output_message, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        output_message: 'ChatMessageWithToolCall',
         inputs: typing.Union[MetaOapg.properties.inputs, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         finish_reason: typing.Union[MetaOapg.properties.finish_reason, str, schemas.Unset] = schemas.unset,
         tool_results: typing.Union[MetaOapg.properties.tool_results, list, tuple, schemas.Unset] = schemas.unset,
         messages: typing.Union[MetaOapg.properties.messages, list, tuple, schemas.Unset] = schemas.unset,
-        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        tool_call: typing.Union['FunctionTool', schemas.Unset] = schemas.unset,
         tool_calls: typing.Union[MetaOapg.properties.tool_calls, list, tuple, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],

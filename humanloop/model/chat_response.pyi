@@ -75,42 +75,10 @@ class ChatResponse(
             logprobs = schemas.IntSchema
             suffix = schemas.StrSchema
             user = schemas.StrSchema
-            
-            
-            class usage(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            Usage,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'usage':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def usage() -> typing.Type['Usage']:
+                return Usage
             metadata = schemas.DictSchema
             provider_request = schemas.DictSchema
             session_id = schemas.StrSchema
@@ -212,7 +180,7 @@ class ChatResponse(
     def __getitem__(self, name: typing_extensions.Literal["user"]) -> MetaOapg.properties.user: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["usage"]) -> MetaOapg.properties.usage: ...
+    def __getitem__(self, name: typing_extensions.Literal["usage"]) -> 'Usage': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["metadata"]) -> MetaOapg.properties.metadata: ...
@@ -256,7 +224,7 @@ class ChatResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["user"]) -> typing.Union[MetaOapg.properties.user, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["usage"]) -> typing.Union[MetaOapg.properties.usage, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["usage"]) -> typing.Union['Usage', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["metadata"]) -> typing.Union[MetaOapg.properties.metadata, schemas.Unset]: ...
@@ -287,7 +255,7 @@ class ChatResponse(
         logprobs: typing.Union[MetaOapg.properties.logprobs, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         suffix: typing.Union[MetaOapg.properties.suffix, str, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
-        usage: typing.Union[MetaOapg.properties.usage, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        usage: typing.Union['Usage', schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         provider_request: typing.Union[MetaOapg.properties.provider_request, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         session_id: typing.Union[MetaOapg.properties.session_id, str, schemas.Unset] = schemas.unset,

@@ -60,78 +60,14 @@ class ToolConfigResponse(
             description = schemas.StrSchema
             parameters = schemas.DictSchema
             other = schemas.DictSchema
-            
-            
-            class created_by(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            UserResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'created_by':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
-            
-            
-            class source(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ToolSource,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'source':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def created_by() -> typing.Type['UserResponse']:
+                return UserResponse
+        
+            @staticmethod
+            def source() -> typing.Type['ToolSource']:
+                return ToolSource
             source_code = schemas.StrSchema
             setup_schema = schemas.DictSchema
             signature = schemas.StrSchema
@@ -176,10 +112,10 @@ class ToolConfigResponse(
     def __getitem__(self, name: typing_extensions.Literal["other"]) -> MetaOapg.properties.other: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["created_by"]) -> MetaOapg.properties.created_by: ...
+    def __getitem__(self, name: typing_extensions.Literal["created_by"]) -> 'UserResponse': ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["source"]) -> MetaOapg.properties.source: ...
+    def __getitem__(self, name: typing_extensions.Literal["source"]) -> 'ToolSource': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["source_code"]) -> MetaOapg.properties.source_code: ...
@@ -223,10 +159,10 @@ class ToolConfigResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["other"]) -> typing.Union[MetaOapg.properties.other, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["created_by"]) -> typing.Union[MetaOapg.properties.created_by, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["created_by"]) -> typing.Union['UserResponse', schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["source"]) -> typing.Union[MetaOapg.properties.source, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["source"]) -> typing.Union['ToolSource', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["source_code"]) -> typing.Union[MetaOapg.properties.source_code, schemas.Unset]: ...
@@ -259,8 +195,8 @@ class ToolConfigResponse(
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         parameters: typing.Union[MetaOapg.properties.parameters, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
-        created_by: typing.Union[MetaOapg.properties.created_by, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
-        source: typing.Union[MetaOapg.properties.source, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        created_by: typing.Union['UserResponse', schemas.Unset] = schemas.unset,
+        source: typing.Union['ToolSource', schemas.Unset] = schemas.unset,
         source_code: typing.Union[MetaOapg.properties.source_code, str, schemas.Unset] = schemas.unset,
         setup_schema: typing.Union[MetaOapg.properties.setup_schema, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         signature: typing.Union[MetaOapg.properties.signature, str, schemas.Unset] = schemas.unset,

@@ -55,78 +55,8 @@ PageSchema = schemas.IntSchema
 SizeSchema = schemas.IntSchema
 FilterSchema = schemas.StrSchema
 UserFilterSchema = schemas.StrSchema
-
-
-class SortBySchema(
-    schemas.ComposedSchema,
-):
-
-
-    class MetaOapg:
-        
-        @classmethod
-        @functools.lru_cache()
-        def all_of(cls):
-            # we need this here to make our import statements work
-            # we must store _composed_schemas in here so the code is only run
-            # when we invoke this method. If we kept this at the class
-            # level we would get an error because the class level
-            # code would be run when this module is imported, and these composed
-            # classes don't exist yet because their module has not finished
-            # loading
-            return [
-                ProjectSortBySchema,
-            ]
-
-
-    def __new__(
-        cls,
-        *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-        _configuration: typing.Optional[schemas.Configuration] = None,
-        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-    ) -> 'SortBySchema':
-        return super().__new__(
-            cls,
-            *args,
-            _configuration=_configuration,
-            **kwargs,
-        )
-
-
-class OrderSchema(
-    schemas.ComposedSchema,
-):
-
-
-    class MetaOapg:
-        
-        @classmethod
-        @functools.lru_cache()
-        def all_of(cls):
-            # we need this here to make our import statements work
-            # we must store _composed_schemas in here so the code is only run
-            # when we invoke this method. If we kept this at the class
-            # level we would get an error because the class level
-            # code would be run when this module is imported, and these composed
-            # classes don't exist yet because their module has not finished
-            # loading
-            return [
-                SortOrderSchema,
-            ]
-
-
-    def __new__(
-        cls,
-        *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-        _configuration: typing.Optional[schemas.Configuration] = None,
-        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-    ) -> 'OrderSchema':
-        return super().__new__(
-            cls,
-            *args,
-            _configuration=_configuration,
-            **kwargs,
-        )
+SortBySchema = ProjectSortBySchema
+OrderSchema = SortOrderSchema
 RequestRequiredQueryParams = typing_extensions.TypedDict(
     'RequestRequiredQueryParams',
     {
@@ -139,8 +69,8 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
         'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
         'filter': typing.Union[FilterSchema, str, ],
         'user_filter': typing.Union[UserFilterSchema, str, ],
-        'sort_by': typing.Union[SortBySchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-        'order': typing.Union[OrderSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        'sort_by': typing.Union[SortBySchema, ],
+        'order': typing.Union[OrderSchema, ],
     },
     total=False
 )
@@ -177,13 +107,13 @@ request_query_user_filter = api_client.QueryParameter(
 request_query_sort_by = api_client.QueryParameter(
     name="sort_by",
     style=api_client.ParameterStyle.FORM,
-    schema=SortBySchema,
+    schema=ProjectSortBy,
     explode=True,
 )
 request_query_order = api_client.QueryParameter(
     name="order",
     style=api_client.ParameterStyle.FORM,
-    schema=OrderSchema,
+    schema=SortOrder,
     explode=True,
 )
 _auth = [

@@ -45,42 +45,10 @@ Does not have things like the signature or setup schema.
             name = schemas.StrSchema
             description = schemas.StrSchema
             parameters = schemas.DictSchema
-            
-            
-            class source(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ToolSource,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'source':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def source() -> typing.Type['ToolSource']:
+                return ToolSource
             source_code = schemas.StrSchema
             other = schemas.DictSchema
             preset_name = schemas.StrSchema
@@ -106,7 +74,7 @@ Does not have things like the signature or setup schema.
     def __getitem__(self, name: typing_extensions.Literal["parameters"]) -> MetaOapg.properties.parameters: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["source"]) -> MetaOapg.properties.source: ...
+    def __getitem__(self, name: typing_extensions.Literal["source"]) -> 'ToolSource': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["source_code"]) -> MetaOapg.properties.source_code: ...
@@ -135,7 +103,7 @@ Does not have things like the signature or setup schema.
     def get_item_oapg(self, name: typing_extensions.Literal["parameters"]) -> typing.Union[MetaOapg.properties.parameters, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["source"]) -> typing.Union[MetaOapg.properties.source, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["source"]) -> typing.Union['ToolSource', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["source_code"]) -> typing.Union[MetaOapg.properties.source_code, schemas.Unset]: ...
@@ -159,7 +127,7 @@ Does not have things like the signature or setup schema.
         name: typing.Union[MetaOapg.properties.name, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         parameters: typing.Union[MetaOapg.properties.parameters, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
-        source: typing.Union[MetaOapg.properties.source, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        source: typing.Union['ToolSource', schemas.Unset] = schemas.unset,
         source_code: typing.Union[MetaOapg.properties.source_code, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         preset_name: typing.Union[MetaOapg.properties.preset_name, str, schemas.Unset] = schemas.unset,

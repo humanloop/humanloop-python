@@ -47,78 +47,14 @@ class ExperimentResponse(
             id = schemas.StrSchema
             project_id = schemas.StrSchema
             name = schemas.StrSchema
-            
-            
-            class status(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ExperimentStatus,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'status':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
-            
-            
-            class metric(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            BaseMetricResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'metric':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def status() -> typing.Type['ExperimentStatus']:
+                return ExperimentStatus
+        
+            @staticmethod
+            def metric() -> typing.Type['BaseMetricResponse']:
+                return BaseMetricResponse
             
             
             class positive_labels(
@@ -187,12 +123,12 @@ class ExperimentResponse(
     
     positive_labels: MetaOapg.properties.positive_labels
     updated_at: MetaOapg.properties.updated_at
-    metric: MetaOapg.properties.metric
+    metric: 'BaseMetricResponse'
     project_id: MetaOapg.properties.project_id
     name: MetaOapg.properties.name
     created_at: MetaOapg.properties.created_at
     id: MetaOapg.properties.id
-    status: MetaOapg.properties.status
+    status: 'ExperimentStatus'
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
@@ -204,10 +140,10 @@ class ExperimentResponse(
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
+    def __getitem__(self, name: typing_extensions.Literal["status"]) -> 'ExperimentStatus': ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["metric"]) -> MetaOapg.properties.metric: ...
+    def __getitem__(self, name: typing_extensions.Literal["metric"]) -> 'BaseMetricResponse': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["positive_labels"]) -> MetaOapg.properties.positive_labels: ...
@@ -239,10 +175,10 @@ class ExperimentResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["status"]) -> 'ExperimentStatus': ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["metric"]) -> MetaOapg.properties.metric: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["metric"]) -> 'BaseMetricResponse': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["positive_labels"]) -> MetaOapg.properties.positive_labels: ...
@@ -268,12 +204,12 @@ class ExperimentResponse(
         *args: typing.Union[dict, frozendict.frozendict, ],
         positive_labels: typing.Union[MetaOapg.properties.positive_labels, list, tuple, ],
         updated_at: typing.Union[MetaOapg.properties.updated_at, str, datetime, ],
-        metric: typing.Union[MetaOapg.properties.metric, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        metric: 'BaseMetricResponse',
         project_id: typing.Union[MetaOapg.properties.project_id, str, ],
         name: typing.Union[MetaOapg.properties.name, str, ],
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
-        status: typing.Union[MetaOapg.properties.status, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        status: 'ExperimentStatus',
         configs: typing.Union[MetaOapg.properties.configs, list, tuple, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],

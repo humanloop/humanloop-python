@@ -46,78 +46,14 @@ class FinetuneResponse(
             id = schemas.StrSchema
             name = schemas.StrSchema
             status = schemas.StrSchema
-            
-            
-            class config(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            FinetuneConfig,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'config':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
-            
-            
-            class dataset(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            DatasetResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'dataset':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def config() -> typing.Type['FinetuneConfig']:
+                return FinetuneConfig
+        
+            @staticmethod
+            def dataset() -> typing.Type['DatasetResponse']:
+                return DatasetResponse
             created_at = schemas.DateTimeSchema
             updated_at = schemas.DateTimeSchema
             model_name = schemas.StrSchema
@@ -144,8 +80,8 @@ class FinetuneResponse(
     name: MetaOapg.properties.name
     created_at: MetaOapg.properties.created_at
     id: MetaOapg.properties.id
-    config: MetaOapg.properties.config
-    dataset: MetaOapg.properties.dataset
+    config: 'FinetuneConfig'
+    dataset: 'DatasetResponse'
     status: MetaOapg.properties.status
     
     @typing.overload
@@ -158,10 +94,10 @@ class FinetuneResponse(
     def __getitem__(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["config"]) -> MetaOapg.properties.config: ...
+    def __getitem__(self, name: typing_extensions.Literal["config"]) -> 'FinetuneConfig': ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["dataset"]) -> MetaOapg.properties.dataset: ...
+    def __getitem__(self, name: typing_extensions.Literal["dataset"]) -> 'DatasetResponse': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
@@ -202,10 +138,10 @@ class FinetuneResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["config"]) -> MetaOapg.properties.config: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["config"]) -> 'FinetuneConfig': ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["dataset"]) -> MetaOapg.properties.dataset: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["dataset"]) -> 'DatasetResponse': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
@@ -242,8 +178,8 @@ class FinetuneResponse(
         name: typing.Union[MetaOapg.properties.name, str, ],
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
-        config: typing.Union[MetaOapg.properties.config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-        dataset: typing.Union[MetaOapg.properties.dataset, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        config: 'FinetuneConfig',
+        dataset: 'DatasetResponse',
         status: typing.Union[MetaOapg.properties.status, str, ],
         model_name: typing.Union[MetaOapg.properties.model_name, str, schemas.Unset] = schemas.unset,
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,

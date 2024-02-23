@@ -34,6 +34,7 @@ class RequiredProjectResponse(TypedDict):
     # The count of datapoints that have been logged to the project.
     data_count: int
 
+    # The feedback types that have been defined in the project.
     feedback_types: FeedbackTypes
 
     # Unique ID of the team the project belongs to. Starts with `tm_`.

@@ -80,78 +80,14 @@ class ProjectResponse(
             team_id = schemas.StrSchema
             created_at = schemas.DateTimeSchema
             updated_at = schemas.DateTimeSchema
-            
-            
-            class active_experiment(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ExperimentResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'active_experiment':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
-            
-            
-            class active_config(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ProjectConfigResponse,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'active_config':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def active_experiment() -> typing.Type['ExperimentResponse']:
+                return ExperimentResponse
+        
+            @staticmethod
+            def active_config() -> typing.Type['ProjectConfigResponse']:
+                return ProjectConfigResponse
         
             @staticmethod
             def config_type() -> typing.Type['ConfigType']:
@@ -233,10 +169,10 @@ class ProjectResponse(
     def __getitem__(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["active_experiment"]) -> MetaOapg.properties.active_experiment: ...
+    def __getitem__(self, name: typing_extensions.Literal["active_experiment"]) -> 'ExperimentResponse': ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["active_config"]) -> MetaOapg.properties.active_config: ...
+    def __getitem__(self, name: typing_extensions.Literal["active_config"]) -> 'ProjectConfigResponse': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["config_type"]) -> 'ConfigType': ...
@@ -280,10 +216,10 @@ class ProjectResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["active_experiment"]) -> typing.Union[MetaOapg.properties.active_experiment, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["active_experiment"]) -> typing.Union['ExperimentResponse', schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["active_config"]) -> typing.Union[MetaOapg.properties.active_config, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["active_config"]) -> typing.Union['ProjectConfigResponse', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["config_type"]) -> typing.Union['ConfigType', schemas.Unset]: ...
@@ -312,8 +248,8 @@ class ProjectResponse(
         team_id: typing.Union[MetaOapg.properties.team_id, str, ],
         data_count: typing.Union[MetaOapg.properties.data_count, decimal.Decimal, int, ],
         users: typing.Union[MetaOapg.properties.users, list, tuple, ],
-        active_experiment: typing.Union[MetaOapg.properties.active_experiment, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
-        active_config: typing.Union[MetaOapg.properties.active_config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        active_experiment: typing.Union['ExperimentResponse', schemas.Unset] = schemas.unset,
+        active_config: typing.Union['ProjectConfigResponse', schemas.Unset] = schemas.unset,
         config_type: typing.Union['ConfigType', schemas.Unset] = schemas.unset,
         active_evaluators: typing.Union[MetaOapg.properties.active_evaluators, list, tuple, schemas.Unset] = schemas.unset,
         directory_id: typing.Union[MetaOapg.properties.directory_id, str, schemas.Unset] = schemas.unset,

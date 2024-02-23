@@ -35,6 +35,7 @@ class ProjectResponse(BaseModel):
     # The count of datapoints that have been logged to the project.
     data_count: int = Field(alias='data_count')
 
+    # The feedback types that have been defined in the project.
     feedback_types: FeedbackTypes = Field(alias='feedback_types')
 
     # Unique ID of the team the project belongs to. Starts with `tm_`.

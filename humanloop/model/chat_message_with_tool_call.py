@@ -37,42 +37,10 @@ class ChatMessageWithToolCall(
         }
         
         class properties:
-            
-            
-            class role(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ChatRole,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'role':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def role() -> typing.Type['ChatRole']:
+                return ChatRole
             
             
             class content(
@@ -237,42 +205,10 @@ class ChatMessageWithToolCall(
                         *args,
                         _configuration=_configuration,
                     )
-            
-            
-            class tool_call(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            FunctionTool,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'tool_call':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def tool_call() -> typing.Type['FunctionTool']:
+                return FunctionTool
             __annotations__ = {
                 "role": role,
                 "content": content,
@@ -282,10 +218,10 @@ class ChatMessageWithToolCall(
                 "tool_call": tool_call,
             }
     
-    role: MetaOapg.properties.role
+    role: 'ChatRole'
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["role"]) -> MetaOapg.properties.role: ...
+    def __getitem__(self, name: typing_extensions.Literal["role"]) -> 'ChatRole': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["content"]) -> MetaOapg.properties.content: ...
@@ -300,7 +236,7 @@ class ChatMessageWithToolCall(
     def __getitem__(self, name: typing_extensions.Literal["tool_calls"]) -> MetaOapg.properties.tool_calls: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> MetaOapg.properties.tool_call: ...
+    def __getitem__(self, name: typing_extensions.Literal["tool_call"]) -> 'FunctionTool': ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
@@ -311,7 +247,7 @@ class ChatMessageWithToolCall(
     
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["role"]) -> MetaOapg.properties.role: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["role"]) -> 'ChatRole': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["content"]) -> typing.Union[MetaOapg.properties.content, schemas.Unset]: ...
@@ -326,7 +262,7 @@ class ChatMessageWithToolCall(
     def get_item_oapg(self, name: typing_extensions.Literal["tool_calls"]) -> typing.Union[MetaOapg.properties.tool_calls, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union[MetaOapg.properties.tool_call, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["tool_call"]) -> typing.Union['FunctionTool', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
@@ -338,12 +274,12 @@ class ChatMessageWithToolCall(
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
-        role: typing.Union[MetaOapg.properties.role, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        role: 'ChatRole',
         content: typing.Union[MetaOapg.properties.content, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         name: typing.Union[MetaOapg.properties.name, None, str, schemas.Unset] = schemas.unset,
         tool_call_id: typing.Union[MetaOapg.properties.tool_call_id, None, str, schemas.Unset] = schemas.unset,
         tool_calls: typing.Union[MetaOapg.properties.tool_calls, list, tuple, None, schemas.Unset] = schemas.unset,
-        tool_call: typing.Union[MetaOapg.properties.tool_call, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        tool_call: typing.Union['FunctionTool', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ChatMessageWithToolCall':

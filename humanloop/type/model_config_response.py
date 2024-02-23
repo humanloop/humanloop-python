@@ -20,7 +20,6 @@ from humanloop.type.model_providers import ModelProviders
 from humanloop.type.response_format import ResponseFormat
 from humanloop.type.tool_config_response import ToolConfigResponse
 from humanloop.type.tool_response import ToolResponse
-from humanloop.type.user_response import UserResponse
 
 class RequiredModelConfigResponse(TypedDict):
     # String ID of config. Starts with `config_`.
@@ -37,9 +36,6 @@ class OptionalModelConfigResponse(TypedDict, total=False):
 
     # Other parameter values to be passed to the provider call.
     other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
-
-    # The user who created the config.
-    created_by: UserResponse
 
     # A friendly display name for the model config. If not provided, a name will be generated.
     name: str

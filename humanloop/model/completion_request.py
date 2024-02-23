@@ -39,42 +39,10 @@ class CompletionRequest(
         }
         
         class properties:
-            
-            
-            class model_config(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ModelConfigCompletionRequest,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'model_config':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def model_config() -> typing.Type['ModelConfigCompletionRequest']:
+                return ModelConfigCompletionRequest
             project = schemas.StrSchema
             project_id = schemas.StrSchema
             session_id = schemas.StrSchema
@@ -86,42 +54,10 @@ class CompletionRequest(
             metadata = schemas.DictSchema
             save = schemas.BoolSchema
             source_datapoint_id = schemas.StrSchema
-            
-            
-            class provider_api_keys(
-                schemas.ComposedSchema,
-            ):
-            
-            
-                class MetaOapg:
-                    
-                    @classmethod
-                    @functools.lru_cache()
-                    def all_of(cls):
-                        # we need this here to make our import statements work
-                        # we must store _composed_schemas in here so the code is only run
-                        # when we invoke this method. If we kept this at the class
-                        # level we would get an error because the class level
-                        # code would be run when this module is imported, and these composed
-                        # classes don't exist yet because their module has not finished
-                        # loading
-                        return [
-                            ProviderApiKeys,
-                        ]
-            
-            
-                def __new__(
-                    cls,
-                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
-                    _configuration: typing.Optional[schemas.Configuration] = None,
-                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
-                ) -> 'provider_api_keys':
-                    return super().__new__(
-                        cls,
-                        *args,
-                        _configuration=_configuration,
-                        **kwargs,
-                    )
+        
+            @staticmethod
+            def provider_api_keys() -> typing.Type['ProviderApiKeys']:
+                return ProviderApiKeys
             num_samples = schemas.IntSchema
             stream = schemas.BoolSchema
             user = schemas.StrSchema
@@ -152,10 +88,10 @@ class CompletionRequest(
                 "suffix": suffix,
             }
     
-    model_config: MetaOapg.properties.model_config
+    model_config: 'ModelConfigCompletionRequest'
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["model_config"]) -> MetaOapg.properties.model_config: ...
+    def __getitem__(self, name: typing_extensions.Literal["model_config"]) -> 'ModelConfigCompletionRequest': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["project"]) -> MetaOapg.properties.project: ...
@@ -191,7 +127,7 @@ class CompletionRequest(
     def __getitem__(self, name: typing_extensions.Literal["source_datapoint_id"]) -> MetaOapg.properties.source_datapoint_id: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["provider_api_keys"]) -> MetaOapg.properties.provider_api_keys: ...
+    def __getitem__(self, name: typing_extensions.Literal["provider_api_keys"]) -> 'ProviderApiKeys': ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["num_samples"]) -> MetaOapg.properties.num_samples: ...
@@ -223,7 +159,7 @@ class CompletionRequest(
     
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["model_config"]) -> MetaOapg.properties.model_config: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["model_config"]) -> 'ModelConfigCompletionRequest': ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["project"]) -> typing.Union[MetaOapg.properties.project, schemas.Unset]: ...
@@ -259,7 +195,7 @@ class CompletionRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["source_datapoint_id"]) -> typing.Union[MetaOapg.properties.source_datapoint_id, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["provider_api_keys"]) -> typing.Union[MetaOapg.properties.provider_api_keys, schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["provider_api_keys"]) -> typing.Union['ProviderApiKeys', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["num_samples"]) -> typing.Union[MetaOapg.properties.num_samples, schemas.Unset]: ...
@@ -292,7 +228,7 @@ class CompletionRequest(
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
-        model_config: typing.Union[MetaOapg.properties.model_config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        model_config: 'ModelConfigCompletionRequest',
         project: typing.Union[MetaOapg.properties.project, str, schemas.Unset] = schemas.unset,
         project_id: typing.Union[MetaOapg.properties.project_id, str, schemas.Unset] = schemas.unset,
         session_id: typing.Union[MetaOapg.properties.session_id, str, schemas.Unset] = schemas.unset,
@@ -304,7 +240,7 @@ class CompletionRequest(
         metadata: typing.Union[MetaOapg.properties.metadata, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         save: typing.Union[MetaOapg.properties.save, bool, schemas.Unset] = schemas.unset,
         source_datapoint_id: typing.Union[MetaOapg.properties.source_datapoint_id, str, schemas.Unset] = schemas.unset,
-        provider_api_keys: typing.Union[MetaOapg.properties.provider_api_keys, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
+        provider_api_keys: typing.Union['ProviderApiKeys', schemas.Unset] = schemas.unset,
         num_samples: typing.Union[MetaOapg.properties.num_samples, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         stream: typing.Union[MetaOapg.properties.stream, bool, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
