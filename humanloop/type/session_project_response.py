@@ -14,12 +14,16 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+from humanloop.type.file_type import FileType
 
 class RequiredSessionProjectResponse(TypedDict):
     # String ID of project the datapoint belongs to. Starts with `pr_`.
     id: str
 
     name: str
+
+    # Type of project. e.g. `prompt` or `tool`.
+    type: FileType
 
 class OptionalSessionProjectResponse(TypedDict, total=False):
     pass

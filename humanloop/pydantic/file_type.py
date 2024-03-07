@@ -15,15 +15,5 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel
 
-from humanloop.pydantic.file_type import FileType
 
-class SessionProjectResponse(BaseModel):
-    # String ID of project the datapoint belongs to. Starts with `pr_`.
-    id: str = Field(alias='id')
-
-    name: str = Field(alias='name')
-
-    # Type of project. e.g. `prompt` or `tool`.
-    type: FileType = Field(alias='type')
-    class Config:
-        arbitrary_types_allowed = True
+FileType = Literal["prompt", "tool"]

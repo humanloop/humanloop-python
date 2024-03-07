@@ -35,18 +35,25 @@ class SessionProjectResponse(
         required = {
             "name",
             "id",
+            "type",
         }
         
         class properties:
             id = schemas.StrSchema
             name = schemas.StrSchema
+        
+            @staticmethod
+            def type() -> typing.Type['FileType']:
+                return FileType
             __annotations__ = {
                 "id": id,
                 "name": name,
+                "type": type,
             }
     
     name: MetaOapg.properties.name
     id: MetaOapg.properties.id
+    type: 'FileType'
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
@@ -55,9 +62,12 @@ class SessionProjectResponse(
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["type"]) -> 'FileType': ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "name", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "name", "type", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -69,9 +79,12 @@ class SessionProjectResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> 'FileType': ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "name", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "name", "type", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -80,6 +93,7 @@ class SessionProjectResponse(
         *args: typing.Union[dict, frozendict.frozendict, ],
         name: typing.Union[MetaOapg.properties.name, str, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
+        type: 'FileType',
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'SessionProjectResponse':
@@ -88,6 +102,9 @@ class SessionProjectResponse(
             *args,
             name=name,
             id=id,
+            type=type,
             _configuration=_configuration,
             **kwargs,
         )
+
+from humanloop.model.file_type import FileType

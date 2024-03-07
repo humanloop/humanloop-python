@@ -96,6 +96,7 @@ from humanloop.model.feedback_type import FeedbackType
 from humanloop.model.feedback_type_model import FeedbackTypeModel
 from humanloop.model.feedback_type_request import FeedbackTypeRequest
 from humanloop.model.feedback_types import FeedbackTypes
+from humanloop.model.file_type import FileType
 from humanloop.model.finetune_config import FinetuneConfig
 from humanloop.model.finetune_data_summary import FinetuneDataSummary
 from humanloop.model.finetune_data_summary_errors import FinetuneDataSummaryErrors
