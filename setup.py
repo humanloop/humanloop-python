@@ -12,7 +12,7 @@
 from setuptools import setup, find_packages  # noqa: H301
 
 NAME = "humanloop"
-VERSION = "0.7.11"
+VERSION = "0.7.12"
 # To install the library, run the following
 #
 # python setup.py install
@@ -30,7 +30,7 @@ REQUIRES = [
     "python-dateutil ~= 2.8.2",
     "typing_extensions ~= 4.3.0",
     "urllib3 ~= 1.26.18",
-    "cryptography ~= 41.0.6",
+    "cryptography ~= 42.0.5",
     "frozendict ~= 2.3.4",
     "aiohttp ~= 3.9.2",
     "pydantic ~= 2.4.2"

@@ -107,13 +107,13 @@ request_query_user_filter = api_client.QueryParameter(
 request_query_sort_by = api_client.QueryParameter(
     name="sort_by",
     style=api_client.ParameterStyle.FORM,
-    schema=ProjectSortBy,
+    schema=ProjectSortBySchema,
     explode=True,
 )
 request_query_order = api_client.QueryParameter(
     name="order",
     style=api_client.ParameterStyle.FORM,
-    schema=SortOrder,
+    schema=SortOrderSchema,
     explode=True,
 )
 _auth = [
