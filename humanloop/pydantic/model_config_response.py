@@ -28,9 +28,6 @@ class ModelConfigResponse(BaseModel):
 
     type: Literal["model"] = Field(alias='type')
 
-    # Whether the config is committed or not.
-    status: str = Field(alias='status')
-
     # The model instance used. E.g. text-davinci-002.
     model: str = Field(alias='model')
 
