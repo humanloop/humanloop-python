@@ -12,7 +12,7 @@
 from setuptools import setup, find_packages  # noqa: H301
 
 NAME = "humanloop"
-VERSION = "0.7.12"
+VERSION = "0.7.13"
 # To install the library, run the following
 #
 # python setup.py install
