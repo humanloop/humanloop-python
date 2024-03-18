@@ -14,29 +14,5 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
-from humanloop.type.user_response import UserResponse
 
-class RequiredGenericConfigResponse(TypedDict):
-    # String ID of config. Starts with `config_`.
-    id: str
-
-    type: str
-
-    # Whether the config is committed or not.
-    status: str
-
-    # Name of config.
-    name: str
-
-class OptionalGenericConfigResponse(TypedDict, total=False):
-    # Description of config.
-    description: str
-
-    # Other parameters that define the config.
-    other: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
-
-    # The user who created the config.
-    created_by: UserResponse
-
-class GenericConfigResponse(RequiredGenericConfigResponse, OptionalGenericConfigResponse):
-    pass
+VersionStatus = Literal["uncommitted", "committed", "deleted"]

@@ -23,6 +23,9 @@ class GenericConfigResponse(BaseModel):
 
     type: Literal["generic"] = Field(alias='type')
 
+    # Whether the config is committed or not.
+    status: str = Field(alias='status')
+
     # Name of config.
     name: str = Field(alias='name')
 

@@ -33,14 +33,17 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
+from humanloop.model.version_status import VersionStatus as VersionStatusSchema
 from humanloop.model.paginated_data_log_response import PaginatedDataLogResponse as PaginatedDataLogResponseSchema
 
 from humanloop.type.paginated_data_log_response import PaginatedDataLogResponse
+from humanloop.type.version_status import VersionStatus
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.paginated_data_log_response import PaginatedDataLogResponse as PaginatedDataLogResponsePydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
+from humanloop.pydantic.version_status import VersionStatus as VersionStatusPydantic
 
 from . import path
 
@@ -48,6 +51,7 @@ from . import path
 ProjectIdSchema = schemas.StrSchema
 SearchSchema = schemas.StrSchema
 MetadataSearchSchema = schemas.StrSchema
+VersionStatusSchema = VersionStatusSchema
 StartDateSchema = schemas.DateSchema
 EndDateSchema = schemas.DateSchema
 SizeSchema = schemas.IntSchema
@@ -63,6 +67,7 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
     {
         'search': typing.Union[SearchSchema, str, ],
         'metadata_search': typing.Union[MetadataSearchSchema, str, ],
+        'version_status': typing.Union[VersionStatusSchema, ],
         'start_date': typing.Union[StartDateSchema, str, date, ],
         'end_date': typing.Union[EndDateSchema, str, date, ],
         'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
@@ -93,6 +98,12 @@ request_query_metadata_search = api_client.QueryParameter(
     name="metadata_search",
     style=api_client.ParameterStyle.FORM,
     schema=MetadataSearchSchema,
+    explode=True,
+)
+request_query_version_status = api_client.QueryParameter(
+    name="version_status",
+    style=api_client.ParameterStyle.FORM,
+    schema=VersionStatusSchema,
     explode=True,
 )
 request_query_start_date = api_client.QueryParameter(
@@ -180,6 +191,7 @@ class BaseApi(api_client.Api):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -193,6 +205,8 @@ class BaseApi(api_client.Api):
             _query_params["search"] = search
         if metadata_search is not None:
             _query_params["metadata_search"] = metadata_search
+        if version_status is not None:
+            _query_params["version_status"] = version_status
         if start_date is not None:
             _query_params["start_date"] = start_date
         if end_date is not None:
@@ -231,6 +245,7 @@ class BaseApi(api_client.Api):
             request_query_project_id,
             request_query_search,
             request_query_metadata_search,
+            request_query_version_status,
             request_query_start_date,
             request_query_end_date,
             request_query_size,
@@ -349,6 +364,7 @@ class BaseApi(api_client.Api):
             request_query_project_id,
             request_query_search,
             request_query_metadata_search,
+            request_query_version_status,
             request_query_start_date,
             request_query_end_date,
             request_query_size,
@@ -419,6 +435,7 @@ class ListRaw(BaseApi):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -433,6 +450,7 @@ class ListRaw(BaseApi):
             project_id=project_id,
             search=search,
             metadata_search=metadata_search,
+            version_status=version_status,
             start_date=start_date,
             end_date=end_date,
             size=size,
@@ -448,6 +466,7 @@ class ListRaw(BaseApi):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -460,6 +479,7 @@ class ListRaw(BaseApi):
             project_id=project_id,
             search=search,
             metadata_search=metadata_search,
+            version_status=version_status,
             start_date=start_date,
             end_date=end_date,
             size=size,
@@ -476,6 +496,7 @@ class List(BaseApi):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -487,6 +508,7 @@ class List(BaseApi):
             project_id=project_id,
             search=search,
             metadata_search=metadata_search,
+            version_status=version_status,
             start_date=start_date,
             end_date=end_date,
             size=size,
@@ -503,6 +525,7 @@ class List(BaseApi):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -513,6 +536,7 @@ class List(BaseApi):
             project_id=project_id,
             search=search,
             metadata_search=metadata_search,
+            version_status=version_status,
             start_date=start_date,
             end_date=end_date,
             size=size,
@@ -531,6 +555,7 @@ class ApiForget(BaseApi):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -545,6 +570,7 @@ class ApiForget(BaseApi):
             project_id=project_id,
             search=search,
             metadata_search=metadata_search,
+            version_status=version_status,
             start_date=start_date,
             end_date=end_date,
             size=size,
@@ -560,6 +586,7 @@ class ApiForget(BaseApi):
         project_id: str,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
+        version_status: typing.Optional[VersionStatus] = None,
         start_date: typing.Optional[date] = None,
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
@@ -572,6 +599,7 @@ class ApiForget(BaseApi):
             project_id=project_id,
             search=search,
             metadata_search=metadata_search,
+            version_status=version_status,
             start_date=start_date,
             end_date=end_date,
             size=size,

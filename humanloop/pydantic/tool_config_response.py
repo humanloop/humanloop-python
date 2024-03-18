@@ -24,6 +24,9 @@ class ToolConfigResponse(BaseModel):
 
     type: Literal["tool"] = Field(alias='type')
 
+    # Whether the config is committed or not.
+    status: str = Field(alias='status')
+
     # Name for the tool referenced by the model.
     name: str = Field(alias='name')
 

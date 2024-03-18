@@ -36,6 +36,7 @@ class GenericConfigResponse(
             "name",
             "id",
             "type",
+            "status",
         }
         
         class properties:
@@ -56,6 +57,7 @@ class GenericConfigResponse(
                 @schemas.classproperty
                 def GENERIC(cls):
                     return cls("generic")
+            status = schemas.StrSchema
             name = schemas.StrSchema
             description = schemas.StrSchema
             other = schemas.DictSchema
@@ -66,6 +68,7 @@ class GenericConfigResponse(
             __annotations__ = {
                 "id": id,
                 "type": type,
+                "status": status,
                 "name": name,
                 "description": description,
                 "other": other,
@@ -75,12 +78,16 @@ class GenericConfigResponse(
     name: MetaOapg.properties.name
     id: MetaOapg.properties.id
     type: MetaOapg.properties.type
+    status: MetaOapg.properties.status
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
@@ -97,7 +104,7 @@ class GenericConfigResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "name", "description", "other", "created_by", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "status", "name", "description", "other", "created_by", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -107,6 +114,9 @@ class GenericConfigResponse(
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
@@ -123,7 +133,7 @@ class GenericConfigResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "name", "description", "other", "created_by", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "status", "name", "description", "other", "created_by", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -133,6 +143,7 @@ class GenericConfigResponse(
         name: typing.Union[MetaOapg.properties.name, str, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
         type: typing.Union[MetaOapg.properties.type, str, ],
+        status: typing.Union[MetaOapg.properties.status, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         created_by: typing.Union['UserResponse', schemas.Unset] = schemas.unset,
@@ -145,6 +156,7 @@ class GenericConfigResponse(
             name=name,
             id=id,
             type=type,
+            status=status,
             description=description,
             other=other,
             created_by=created_by,

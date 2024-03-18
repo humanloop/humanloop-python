@@ -1012,6 +1012,9 @@ operation_parameter_map = {
                 'name': 'metadata_search'
             },
             {
+                'name': 'version_status'
+            },
+            {
                 'name': 'start_date'
             },
             {

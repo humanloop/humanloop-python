@@ -23,6 +23,9 @@ class RequiredToolConfigResponse(TypedDict):
 
     type: str
 
+    # Whether the config is committed or not.
+    status: str
+
     # Name for the tool referenced by the model.
     name: str
 

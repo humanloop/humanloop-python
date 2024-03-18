@@ -24,6 +24,9 @@ class RequiredAgentConfigResponse(TypedDict):
 
     type: str
 
+    # Whether the config is committed or not.
+    status: str
+
     # Name of config.
     name: str
 

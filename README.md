@@ -3124,6 +3124,7 @@ list_response = humanloop.logs.list(
     project_id="project_id_example",
     search="string_example",
     metadata_search="string_example",
+    version_status="uncommitted",
     start_date="1970-01-01",
     end_date="1970-01-01",
     size=50,
@@ -3138,6 +3139,8 @@ list_response = humanloop.logs.list(
 ##### search: `str`<a id="search-str"></a>
 
 ##### metadata_search: `str`<a id="metadata_search-str"></a>
+
+##### version_status: [`VersionStatus`](./humanloop/type/.py)<a id="version_status-versionstatushumanlooptypepy"></a>
 
 ##### start_date: `date`<a id="start_date-date"></a>
 

@@ -38,6 +38,7 @@ class AgentConfigResponse(
             "name",
             "id",
             "type",
+            "status",
         }
         
         class properties:
@@ -52,6 +53,7 @@ class AgentConfigResponse(
                 @schemas.classproperty
                 def AGENT(cls):
                     return cls("agent")
+            status = schemas.StrSchema
             name = schemas.StrSchema
             agent_class = schemas.StrSchema
         
@@ -93,6 +95,7 @@ class AgentConfigResponse(
             __annotations__ = {
                 "id": id,
                 "type": type,
+                "status": status,
                 "name": name,
                 "agent_class": agent_class,
                 "model_config": model_config,
@@ -107,12 +110,16 @@ class AgentConfigResponse(
     name: MetaOapg.properties.name
     id: MetaOapg.properties.id
     type: MetaOapg.properties.type
+    status: MetaOapg.properties.status
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
@@ -138,7 +145,7 @@ class AgentConfigResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "name", "agent_class", "model_config", "description", "other", "created_by", "tools", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "status", "name", "agent_class", "model_config", "description", "other", "created_by", "tools", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -148,6 +155,9 @@ class AgentConfigResponse(
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
@@ -173,7 +183,7 @@ class AgentConfigResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "name", "agent_class", "model_config", "description", "other", "created_by", "tools", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "status", "name", "agent_class", "model_config", "description", "other", "created_by", "tools", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -185,6 +195,7 @@ class AgentConfigResponse(
         name: typing.Union[MetaOapg.properties.name, str, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
         type: typing.Union[MetaOapg.properties.type, str, ],
+        status: typing.Union[MetaOapg.properties.status, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         created_by: typing.Union['UserResponse', schemas.Unset] = schemas.unset,
@@ -200,6 +211,7 @@ class AgentConfigResponse(
             name=name,
             id=id,
             type=type,
+            status=status,
             description=description,
             other=other,
             created_by=created_by,

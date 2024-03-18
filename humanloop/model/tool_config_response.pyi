@@ -36,6 +36,7 @@ class ToolConfigResponse(
             "name",
             "id",
             "type",
+            "status",
         }
         
         class properties:
@@ -50,6 +51,7 @@ class ToolConfigResponse(
                 @schemas.classproperty
                 def TOOL(cls):
                     return cls("tool")
+            status = schemas.StrSchema
             name = schemas.StrSchema
             description = schemas.StrSchema
             parameters = schemas.DictSchema
@@ -70,6 +72,7 @@ class ToolConfigResponse(
             __annotations__ = {
                 "id": id,
                 "type": type,
+                "status": status,
                 "name": name,
                 "description": description,
                 "parameters": parameters,
@@ -86,12 +89,16 @@ class ToolConfigResponse(
     name: MetaOapg.properties.name
     id: MetaOapg.properties.id
     type: MetaOapg.properties.type
+    status: MetaOapg.properties.status
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
@@ -129,7 +136,7 @@ class ToolConfigResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "name", "description", "parameters", "other", "created_by", "source", "source_code", "setup_schema", "signature", "is_preset", "preset_name", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "type", "status", "name", "description", "parameters", "other", "created_by", "source", "source_code", "setup_schema", "signature", "is_preset", "preset_name", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -139,6 +146,9 @@ class ToolConfigResponse(
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["status"]) -> MetaOapg.properties.status: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
@@ -176,7 +186,7 @@ class ToolConfigResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "name", "description", "parameters", "other", "created_by", "source", "source_code", "setup_schema", "signature", "is_preset", "preset_name", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "type", "status", "name", "description", "parameters", "other", "created_by", "source", "source_code", "setup_schema", "signature", "is_preset", "preset_name", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -186,6 +196,7 @@ class ToolConfigResponse(
         name: typing.Union[MetaOapg.properties.name, str, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
         type: typing.Union[MetaOapg.properties.type, str, ],
+        status: typing.Union[MetaOapg.properties.status, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         parameters: typing.Union[MetaOapg.properties.parameters, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
@@ -205,6 +216,7 @@ class ToolConfigResponse(
             name=name,
             id=id,
             type=type,
+            status=status,
             description=description,
             parameters=parameters,
             other=other,

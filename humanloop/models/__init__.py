@@ -183,3 +183,4 @@ from humanloop.model.usage import Usage
 from humanloop.model.user_response import UserResponse
 from humanloop.model.validation_error import ValidationError
 from humanloop.model.validation_error_loc import ValidationErrorLoc
+from humanloop.model.version_status import VersionStatus
