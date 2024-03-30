@@ -32,15 +32,12 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.dataset_response import DatasetResponse as DatasetResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 
-from humanloop.type.dataset_response import DatasetResponse
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.dataset_response import DatasetResponse as DatasetResponsePydantic
 
 # Path params
 IdSchema = schemas.StrSchema
@@ -68,17 +65,17 @@ request_path_id = api_client.PathParameter(
     schema=IdSchema,
     required=True,
 )
-SchemaFor200ResponseBodyApplicationJson = DatasetResponseSchema
+SchemaFor200ResponseBodyApplicationJson = schemas.DictSchema
 
 
 @dataclass
 class ApiResponseFor200(api_client.ApiResponse):
-    body: DatasetResponse
+    body: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
 
 @dataclass
 class ApiResponseFor200Async(api_client.AsyncApiResponse):
-    body: DatasetResponse
+    body: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
 
 _response_for_200 = api_client.OpenApiResponse(
@@ -362,27 +359,27 @@ class Delete(BaseApi):
         id: str,
         validate: bool = False,
         **kwargs,
-    ) -> DatasetResponsePydantic:
+    ) -> Dictionary:
         raw_response = await self.raw.adelete(
             id=id,
             **kwargs,
         )
         if validate:
-            return DatasetResponsePydantic(**raw_response.body)
-        return api_client.construct_model_instance(DatasetResponsePydantic, raw_response.body)
+            return Dictionary(**raw_response.body)
+        return api_client.construct_model_instance(Dictionary, raw_response.body)
     
     
     def delete(
         self,
         id: str,
         validate: bool = False,
-    ) -> DatasetResponsePydantic:
+    ) -> Dictionary:
         raw_response = self.raw.delete(
             id=id,
         )
         if validate:
-            return DatasetResponsePydantic(**raw_response.body)
-        return api_client.construct_model_instance(DatasetResponsePydantic, raw_response.body)
+            return Dictionary(**raw_response.body)
+        return api_client.construct_model_instance(Dictionary, raw_response.body)
 
 
 class ApiFordelete(BaseApi):

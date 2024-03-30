@@ -32,27 +32,15 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
-from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsSchema
-from humanloop.model.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallSchema
-from humanloop.model.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestSchema
 from humanloop.model.datapoint_response import DatapointResponse as DatapointResponseSchema
 
-from humanloop.type.update_datapoint_request import UpdateDatapointRequest
-from humanloop.type.update_datapoint_request_inputs import UpdateDatapointRequestInputs
 from humanloop.type.datapoint_response import DatapointResponse
-from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
-from humanloop.type.update_datapoint_request_target import UpdateDatapointRequestTarget
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.update_datapoint_request_target import UpdateDatapointRequestTarget as UpdateDatapointRequestTargetPydantic
-from humanloop.pydantic.update_datapoint_request import UpdateDatapointRequest as UpdateDatapointRequestPydantic
-from humanloop.pydantic.update_datapoint_request_inputs import UpdateDatapointRequestInputs as UpdateDatapointRequestInputsPydantic
 from humanloop.pydantic.datapoint_response import DatapointResponse as DatapointResponsePydantic
-from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall as ChatMessageWithToolCallPydantic
 
 # Path params
 IdSchema = schemas.StrSchema
@@ -78,17 +66,6 @@ request_path_id = api_client.PathParameter(
     name="id",
     style=api_client.ParameterStyle.SIMPLE,
     schema=IdSchema,
-    required=True,
-)
-# body param
-SchemaForRequestBodyApplicationJson = UpdateDatapointRequestSchema
-
-
-request_body_update_datapoint_request = api_client.RequestBody(
-    content={
-        'application/json': api_client.MediaType(
-            schema=SchemaForRequestBodyApplicationJson),
-    },
     required=True,
 )
 SchemaFor200ResponseBodyApplicationJson = DatapointResponseSchema
@@ -143,20 +120,9 @@ class BaseApi(api_client.Api):
     def _update_mapped_args(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _path_params = {}
-        _body = {}
-        if inputs is not None:
-            _body["inputs"] = inputs
-        if messages is not None:
-            _body["messages"] = messages
-        if target is not None:
-            _body["target"] = target
-        args.body = _body
         if id is not None:
             _path_params["id"] = id
         args.path = _path_params
@@ -164,12 +130,10 @@ class BaseApi(api_client.Api):
 
     async def _aupdate_oapg(
         self,
-        body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
-        content_type: str = 'application/json',
         stream: bool = False,
         **kwargs,
     ) -> typing.Union[
@@ -205,35 +169,19 @@ class BaseApi(api_client.Api):
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
         method = 'patch'.upper()
-        _headers.add('Content-Type', content_type)
-    
-        if body is schemas.unset:
-            raise exceptions.ApiValueError(
-                'The required body parameter has an invalid value of: unset. Set a valid value instead')
-        _fields = None
-        _body = None
         request_before_hook(
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
             path_template='/datapoints/{id}',
-            body=body,
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_update_datapoint_request.serialize(body, content_type)
-        if 'fields' in serialized_data:
-            _fields = serialized_data['fields']
-        elif 'body' in serialized_data:
-            _body = serialized_data['body']
     
         response = await self.api_client.async_call_api(
             resource_path=used_path,
             method=method,
             headers=_headers,
-            fields=_fields,
-            serialized_body=_body,
-            body=body,
             auth_settings=_auth,
             timeout=timeout,
             **kwargs
@@ -295,12 +243,10 @@ class BaseApi(api_client.Api):
 
     def _update_oapg(
         self,
-        body: typing.Any = None,
             path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
-        content_type: str = 'application/json',
         stream: bool = False,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -334,35 +280,19 @@ class BaseApi(api_client.Api):
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
         method = 'patch'.upper()
-        _headers.add('Content-Type', content_type)
-    
-        if body is schemas.unset:
-            raise exceptions.ApiValueError(
-                'The required body parameter has an invalid value of: unset. Set a valid value instead')
-        _fields = None
-        _body = None
         request_before_hook(
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
             path_template='/datapoints/{id}',
-            body=body,
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_update_datapoint_request.serialize(body, content_type)
-        if 'fields' in serialized_data:
-            _fields = serialized_data['fields']
-        elif 'body' in serialized_data:
-            _body = serialized_data['body']
     
         response = self.api_client.call_api(
             resource_path=used_path,
             method=method,
             headers=_headers,
-            fields=_fields,
-            serialized_body=_body,
-            body=body,
             auth_settings=_auth,
             timeout=timeout,
         )
@@ -394,12 +324,10 @@ class BaseApi(api_client.Api):
 class UpdateRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     async def aupdate(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -408,53 +336,38 @@ class UpdateRaw(BaseApi):
     ]:
         args = self._update_mapped_args(
             id=id,
-            inputs=inputs,
-            messages=messages,
-            target=target,
         )
         return await self._aupdate_oapg(
-            body=args.body,
             path_params=args.path,
             **kwargs,
         )
     
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     def update(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._update_mapped_args(
             id=id,
-            inputs=inputs,
-            messages=messages,
-            target=target,
         )
         return self._update_oapg(
-            body=args.body,
             path_params=args.path,
         )
 
 class Update(BaseApi):
 
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     async def aupdate(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
         validate: bool = False,
         **kwargs,
     ) -> DatapointResponsePydantic:
         raw_response = await self.raw.aupdate(
             id=id,
-            inputs=inputs,
-            messages=messages,
-            target=target,
             **kwargs,
         )
         if validate:
@@ -462,19 +375,14 @@ class Update(BaseApi):
         return api_client.construct_model_instance(DatapointResponsePydantic, raw_response.body)
     
     
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     def update(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
         validate: bool = False,
     ) -> DatapointResponsePydantic:
         raw_response = self.raw.update(
             id=id,
-            inputs=inputs,
-            messages=messages,
-            target=target,
         )
         if validate:
             return DatapointResponsePydantic(**raw_response.body)
@@ -484,12 +392,10 @@ class Update(BaseApi):
 class ApiForpatch(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     async def apatch(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -498,34 +404,24 @@ class ApiForpatch(BaseApi):
     ]:
         args = self._update_mapped_args(
             id=id,
-            inputs=inputs,
-            messages=messages,
-            target=target,
         )
         return await self._aupdate_oapg(
-            body=args.body,
             path_params=args.path,
             **kwargs,
         )
     
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     def patch(
         self,
         id: str,
-        inputs: typing.Optional[UpdateDatapointRequestInputs] = None,
-        messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
-        target: typing.Optional[UpdateDatapointRequestTarget] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._update_mapped_args(
             id=id,
-            inputs=inputs,
-            messages=messages,
-            target=target,
         )
         return self._update_oapg(
-            body=args.body,
             path_params=args.path,
         )
 

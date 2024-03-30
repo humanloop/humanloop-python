@@ -33,28 +33,14 @@ import frozendict  # noqa: F401
 from humanloop import schemas  # noqa: F401
 
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.datapoints_delete_request import DatapointsDeleteRequest as DatapointsDeleteRequestSchema
 
-from humanloop.type.datapoints_delete_request import DatapointsDeleteRequest
 from humanloop.type.http_validation_error import HTTPValidationError
 
 from ...api_client import Dictionary
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.datapoints_delete_request import DatapointsDeleteRequest as DatapointsDeleteRequestPydantic
 
 from . import path
 
-# body param
-SchemaForRequestBodyApplicationJson = DatapointsDeleteRequestSchema
-
-
-request_body_datapoints_delete_request = api_client.RequestBody(
-    content={
-        'application/json': api_client.MediaType(
-            schema=SchemaForRequestBodyApplicationJson),
-    },
-    required=True,
-)
 _auth = [
     'APIKeyHeader',
 ]
@@ -108,20 +94,15 @@ class BaseApi(api_client.Api):
 
     def _delete_mapped_args(
         self,
-        body: DatapointsDeleteRequest,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
-        _body = {}
-        args.body = body if body is not None else _body
         return args
 
     async def _adelete_oapg(
         self,
-        body: typing.Any = None,
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
-        content_type: str = 'application/json',
         stream: bool = False,
         **kwargs,
     ) -> typing.Union[
@@ -143,35 +124,19 @@ class BaseApi(api_client.Api):
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
         method = 'delete'.upper()
-        _headers.add('Content-Type', content_type)
-    
-        if body is schemas.unset:
-            raise exceptions.ApiValueError(
-                'The required body parameter has an invalid value of: unset. Set a valid value instead')
-        _fields = None
-        _body = None
         request_before_hook(
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
             path_template='/datapoints',
-            body=body,
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_datapoints_delete_request.serialize(body, content_type)
-        if 'fields' in serialized_data:
-            _fields = serialized_data['fields']
-        elif 'body' in serialized_data:
-            _body = serialized_data['body']
     
         response = await self.api_client.async_call_api(
             resource_path=used_path,
             method=method,
             headers=_headers,
-            fields=_fields,
-            serialized_body=_body,
-            body=body,
             auth_settings=_auth,
             timeout=timeout,
             **kwargs
@@ -233,11 +198,9 @@ class BaseApi(api_client.Api):
 
     def _delete_oapg(
         self,
-        body: typing.Any = None,
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
-        content_type: str = 'application/json',
         stream: bool = False,
     ) -> typing.Union[
         ApiResponseFor204,
@@ -257,35 +220,19 @@ class BaseApi(api_client.Api):
             for accept_content_type in accept_content_types:
                 _headers.add('Accept', accept_content_type)
         method = 'delete'.upper()
-        _headers.add('Content-Type', content_type)
-    
-        if body is schemas.unset:
-            raise exceptions.ApiValueError(
-                'The required body parameter has an invalid value of: unset. Set a valid value instead')
-        _fields = None
-        _body = None
         request_before_hook(
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
             path_template='/datapoints',
-            body=body,
             auth_settings=_auth,
             headers=_headers,
         )
-        serialized_data = request_body_datapoints_delete_request.serialize(body, content_type)
-        if 'fields' in serialized_data:
-            _fields = serialized_data['fields']
-        elif 'body' in serialized_data:
-            _body = serialized_data['body']
     
         response = self.api_client.call_api(
             resource_path=used_path,
             method=method,
             headers=_headers,
-            fields=_fields,
-            serialized_body=_body,
-            body=body,
             auth_settings=_auth,
             timeout=timeout,
         )
@@ -317,9 +264,9 @@ class BaseApi(api_client.Api):
 class DeleteRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     async def adelete(
         self,
-        body: DatapointsDeleteRequest,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor204Async,
@@ -327,57 +274,51 @@ class DeleteRaw(BaseApi):
         AsyncGeneratorResponse,
     ]:
         args = self._delete_mapped_args(
-            body=body,
         )
         return await self._adelete_oapg(
-            body=args.body,
             **kwargs,
         )
     
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     def delete(
         self,
-        body: DatapointsDeleteRequest,
     ) -> typing.Union[
         ApiResponseFor204,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._delete_mapped_args(
-            body=body,
         )
         return self._delete_oapg(
-            body=args.body,
         )
 
 class Delete(BaseApi):
 
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     async def adelete(
         self,
-        body: DatapointsDeleteRequest,
         validate: bool = False,
         **kwargs,
     ) -> None:
         raw_response = await self.raw.adelete(
-            body=body,
             **kwargs,
         )
     
     
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     def delete(
         self,
-        body: DatapointsDeleteRequest,
         validate: bool = False,
     ) -> None:
         raw_response = self.raw.delete(
-            body=body,
         )
 
 
 class ApiFordelete(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     async def adelete(
         self,
-        body: DatapointsDeleteRequest,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor204Async,
@@ -385,24 +326,20 @@ class ApiFordelete(BaseApi):
         AsyncGeneratorResponse,
     ]:
         args = self._delete_mapped_args(
-            body=body,
         )
         return await self._adelete_oapg(
-            body=args.body,
             **kwargs,
         )
     
+    @api_client.DeprecationWarningOnce(prefix="datapoints")
     def delete(
         self,
-        body: DatapointsDeleteRequest,
     ) -> typing.Union[
         ApiResponseFor204,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._delete_mapped_args(
-            body=body,
         )
         return self._delete_oapg(
-            body=args.body,
         )
 

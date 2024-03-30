@@ -551,15 +551,6 @@ operation_parameter_map = {
             {
                 'name': 'id'
             },
-            {
-                'name': 'inputs'
-            },
-            {
-                'name': 'messages'
-            },
-            {
-                'name': 'target'
-            },
         ]
     },
     '/projects/{project_id}/datasets-POST': {

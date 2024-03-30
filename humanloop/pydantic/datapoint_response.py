@@ -22,19 +22,13 @@ from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget
 class DatapointResponse(BaseModel):
     id: str = Field(alias='id')
 
-    dataset_id: str = Field(alias='dataset_id')
-
-    created_at: datetime = Field(alias='created_at')
-
-    updated_at: datetime = Field(alias='updated_at')
+    dataset_id: typing.Optional[str] = Field(None, alias='dataset_id')
 
     inputs: typing.Optional[DatapointResponseInputs] = Field(None, alias='inputs')
 
     messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = Field(None, alias='messages')
 
     target: typing.Optional[DatapointResponseTarget] = Field(None, alias='target')
-
-    source_project_data_id: typing.Optional[str] = Field(None, alias='source_project_data_id')
 
     model_config = ConfigDict(
         protected_namespaces=(),

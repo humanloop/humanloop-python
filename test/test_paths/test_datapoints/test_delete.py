@@ -37,7 +37,5 @@ class TestDatapoints(ApiTestMixin, unittest.TestCase):
     response_body = ''
 
 
-
-
 if __name__ == '__main__':
     unittest.main()

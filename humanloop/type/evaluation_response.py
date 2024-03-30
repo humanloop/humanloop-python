@@ -37,6 +37,8 @@ class RequiredEvaluationResponse(TypedDict):
 
     dataset: DatasetResponse
 
+    dataset_version_id: str
+
 class OptionalEvaluationResponse(TypedDict, total=False):
     dataset_snapshot: DatasetResponse
 

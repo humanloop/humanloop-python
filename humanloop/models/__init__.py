@@ -56,7 +56,6 @@ from humanloop.model.data_response import DataResponse
 from humanloop.model.datapoint_response import DatapointResponse
 from humanloop.model.datapoint_response_inputs import DatapointResponseInputs
 from humanloop.model.datapoint_response_target import DatapointResponseTarget
-from humanloop.model.datapoints_delete_request import DatapointsDeleteRequest
 from humanloop.model.dataset_response import DatasetResponse
 from humanloop.model.datasets_create_datapoint_request import DatasetsCreateDatapointRequest
 from humanloop.model.datasets_create_datapoint_response import DatasetsCreateDatapointResponse
@@ -168,9 +167,6 @@ from humanloop.model.tool_response import ToolResponse
 from humanloop.model.tool_result_response import ToolResultResponse
 from humanloop.model.tool_source import ToolSource
 from humanloop.model.tool_type import ToolType
-from humanloop.model.update_datapoint_request import UpdateDatapointRequest
-from humanloop.model.update_datapoint_request_inputs import UpdateDatapointRequestInputs
-from humanloop.model.update_datapoint_request_target import UpdateDatapointRequestTarget
 from humanloop.model.update_dataset_request import UpdateDatasetRequest
 from humanloop.model.update_evaluation_status_request import UpdateEvaluationStatusRequest
 from humanloop.model.update_evaluator_request import UpdateEvaluatorRequest

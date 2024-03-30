@@ -18,6 +18,8 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 class RequiredDatasetResponse(TypedDict):
     id: str
 
+    # WARNING: This property is deprecated
+    # Datasets are now files and do not belong to projects. If this dataset was created before that change, the legacy project ID will be provided here, otherwise an empty string will be returned.
     project_id: str
 
     name: str

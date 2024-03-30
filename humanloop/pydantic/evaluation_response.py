@@ -38,6 +38,8 @@ class EvaluationResponse(BaseModel):
 
     dataset: DatasetResponse = Field(alias='dataset')
 
+    dataset_version_id: str = Field(alias='dataset_version_id')
+
     dataset_snapshot: typing.Optional[DatasetResponse] = Field(None, alias='dataset_snapshot')
 
     evaluator_aggregates: typing.Optional[typing.List[ModelConfigEvaluatorAggregateResponse]] = Field(None, alias='evaluator_aggregates')

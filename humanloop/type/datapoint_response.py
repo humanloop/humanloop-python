@@ -21,20 +21,14 @@ from humanloop.type.datapoint_response_target import DatapointResponseTarget
 class RequiredDatapointResponse(TypedDict):
     id: str
 
+class OptionalDatapointResponse(TypedDict, total=False):
     dataset_id: str
 
-    created_at: datetime
-
-    updated_at: datetime
-
-class OptionalDatapointResponse(TypedDict, total=False):
     inputs: DatapointResponseInputs
 
     messages: typing.List[ChatMessageWithToolCall]
 
     target: DatapointResponseTarget
-
-    source_project_data_id: str
 
 class DatapointResponse(RequiredDatapointResponse, OptionalDatapointResponse):
     pass

@@ -34,6 +34,7 @@ class EvaluationResponse(
     class MetaOapg:
         required = {
             "updated_at",
+            "dataset_version_id",
             "evaluators",
             "created_at",
             "id",
@@ -84,6 +85,7 @@ class EvaluationResponse(
             @staticmethod
             def dataset() -> typing.Type['DatasetResponse']:
                 return DatasetResponse
+            dataset_version_id = schemas.StrSchema
         
             @staticmethod
             def dataset_snapshot() -> typing.Type['DatasetResponse']:
@@ -126,12 +128,14 @@ class EvaluationResponse(
                 "updated_at": updated_at,
                 "evaluators": evaluators,
                 "dataset": dataset,
+                "dataset_version_id": dataset_version_id,
                 "dataset_snapshot": dataset_snapshot,
                 "evaluator_aggregates": evaluator_aggregates,
                 "feedback_aggregates": feedback_aggregates,
             }
     
     updated_at: MetaOapg.properties.updated_at
+    dataset_version_id: MetaOapg.properties.dataset_version_id
     evaluators: MetaOapg.properties.evaluators
     created_at: MetaOapg.properties.created_at
     id: MetaOapg.properties.id
@@ -161,6 +165,9 @@ class EvaluationResponse(
     def __getitem__(self, name: typing_extensions.Literal["dataset"]) -> 'DatasetResponse': ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["dataset_version_id"]) -> MetaOapg.properties.dataset_version_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["dataset_snapshot"]) -> 'DatasetResponse': ...
     
     @typing.overload
@@ -172,7 +179,7 @@ class EvaluationResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_snapshot", "evaluator_aggregates", "feedback_aggregates", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_version_id", "dataset_snapshot", "evaluator_aggregates", "feedback_aggregates", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -199,6 +206,9 @@ class EvaluationResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["dataset"]) -> 'DatasetResponse': ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["dataset_version_id"]) -> MetaOapg.properties.dataset_version_id: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["dataset_snapshot"]) -> typing.Union['DatasetResponse', schemas.Unset]: ...
     
     @typing.overload
@@ -210,7 +220,7 @@ class EvaluationResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_snapshot", "evaluator_aggregates", "feedback_aggregates", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "status", "config", "created_at", "updated_at", "evaluators", "dataset", "dataset_version_id", "dataset_snapshot", "evaluator_aggregates", "feedback_aggregates", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -218,6 +228,7 @@ class EvaluationResponse(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
         updated_at: typing.Union[MetaOapg.properties.updated_at, str, datetime, ],
+        dataset_version_id: typing.Union[MetaOapg.properties.dataset_version_id, str, ],
         evaluators: typing.Union[MetaOapg.properties.evaluators, list, tuple, ],
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
@@ -234,6 +245,7 @@ class EvaluationResponse(
             cls,
             *args,
             updated_at=updated_at,
+            dataset_version_id=dataset_version_id,
             evaluators=evaluators,
             created_at=created_at,
             id=id,

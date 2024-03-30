@@ -33,17 +33,12 @@ class DatapointResponse(
 
     class MetaOapg:
         required = {
-            "updated_at",
-            "dataset_id",
-            "created_at",
             "id",
         }
         
         class properties:
             id = schemas.StrSchema
             dataset_id = schemas.StrSchema
-            created_at = schemas.DateTimeSchema
-            updated_at = schemas.DateTimeSchema
         
             @staticmethod
             def inputs() -> typing.Type['DatapointResponseInputs']:
@@ -78,21 +73,14 @@ class DatapointResponse(
             @staticmethod
             def target() -> typing.Type['DatapointResponseTarget']:
                 return DatapointResponseTarget
-            source_project_data_id = schemas.StrSchema
             __annotations__ = {
                 "id": id,
                 "dataset_id": dataset_id,
-                "created_at": created_at,
-                "updated_at": updated_at,
                 "inputs": inputs,
                 "messages": messages,
                 "target": target,
-                "source_project_data_id": source_project_data_id,
             }
     
-    updated_at: MetaOapg.properties.updated_at
-    dataset_id: MetaOapg.properties.dataset_id
-    created_at: MetaOapg.properties.created_at
     id: MetaOapg.properties.id
     
     @typing.overload
@@ -100,12 +88,6 @@ class DatapointResponse(
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["dataset_id"]) -> MetaOapg.properties.dataset_id: ...
-    
-    @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
-    
-    @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["inputs"]) -> 'DatapointResponseInputs': ...
@@ -117,12 +99,9 @@ class DatapointResponse(
     def __getitem__(self, name: typing_extensions.Literal["target"]) -> 'DatapointResponseTarget': ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["source_project_data_id"]) -> MetaOapg.properties.source_project_data_id: ...
-    
-    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "dataset_id", "created_at", "updated_at", "inputs", "messages", "target", "source_project_data_id", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "dataset_id", "inputs", "messages", "target", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -131,13 +110,7 @@ class DatapointResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["id"]) -> MetaOapg.properties.id: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["dataset_id"]) -> MetaOapg.properties.dataset_id: ...
-    
-    @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
-    
-    @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["dataset_id"]) -> typing.Union[MetaOapg.properties.dataset_id, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["inputs"]) -> typing.Union['DatapointResponseInputs', schemas.Unset]: ...
@@ -149,40 +122,31 @@ class DatapointResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["target"]) -> typing.Union['DatapointResponseTarget', schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["source_project_data_id"]) -> typing.Union[MetaOapg.properties.source_project_data_id, schemas.Unset]: ...
-    
-    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "dataset_id", "created_at", "updated_at", "inputs", "messages", "target", "source_project_data_id", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "dataset_id", "inputs", "messages", "target", ], str]):
         return super().get_item_oapg(name)
     
 
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
-        updated_at: typing.Union[MetaOapg.properties.updated_at, str, datetime, ],
-        dataset_id: typing.Union[MetaOapg.properties.dataset_id, str, ],
-        created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
+        dataset_id: typing.Union[MetaOapg.properties.dataset_id, str, schemas.Unset] = schemas.unset,
         inputs: typing.Union['DatapointResponseInputs', schemas.Unset] = schemas.unset,
         messages: typing.Union[MetaOapg.properties.messages, list, tuple, schemas.Unset] = schemas.unset,
         target: typing.Union['DatapointResponseTarget', schemas.Unset] = schemas.unset,
-        source_project_data_id: typing.Union[MetaOapg.properties.source_project_data_id, str, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'DatapointResponse':
         return super().__new__(
             cls,
             *args,
-            updated_at=updated_at,
-            dataset_id=dataset_id,
-            created_at=created_at,
             id=id,
+            dataset_id=dataset_id,
             inputs=inputs,
             messages=messages,
             target=target,
-            source_project_data_id=source_project_data_id,
             _configuration=_configuration,
             **kwargs,
         )
