@@ -66,6 +66,7 @@
   * [`humanloop.datasets.create_datapoint`](#humanloopdatasetscreate_datapoint)
   * [`humanloop.datasets.delete`](#humanloopdatasetsdelete)
   * [`humanloop.datasets.get`](#humanloopdatasetsget)
+  * [`humanloop.datasets.list`](#humanloopdatasetslist)
   * [`humanloop.datasets.list_all_for_project`](#humanloopdatasetslist_all_for_project)
   * [`humanloop.datasets.list_datapoints`](#humanloopdatasetslist_datapoints)
   * [`humanloop.datasets.update`](#humanloopdatasetsupdate)
@@ -1800,6 +1801,28 @@ String ID of dataset. Starts with `evts_`.
 #### 🌐 Endpoint<a id="🌐-endpoint"></a>
 
 `/datasets/{id}` `get`
+
+[🔙 **Back to Table of Contents**](#table-of-contents)
+
+---
+
+### `humanloop.datasets.list`<a id="humanloopdatasetslist"></a>
+
+Get all Datasets for an organization.
+
+#### 🛠️ Usage<a id="🛠️-usage"></a>
+
+```python
+list_response = humanloop.datasets.list()
+```
+
+#### 🔄 Return<a id="🔄-return"></a>
+
+[`DatasetsListResponse`](./humanloop/pydantic/datasets_list_response.py)
+
+#### 🌐 Endpoint<a id="🌐-endpoint"></a>
+
+`/datasets` `get`
 
 [🔙 **Back to Table of Contents**](#table-of-contents)
 

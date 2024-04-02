@@ -13,6 +13,7 @@ from humanloop.paths.projects_project_id_datasets.post import Create
 from humanloop.paths.datasets_dataset_id_datapoints.post import CreateDatapoint
 from humanloop.paths.datasets_id.delete import Delete
 from humanloop.paths.datasets_id.get import Get
+from humanloop.paths.datasets.get import List
 from humanloop.paths.projects_project_id_datasets.get import ListAllForProject
 from humanloop.paths.datasets_dataset_id_datapoints.get import ListDatapoints
 from humanloop.paths.datasets_id.patch import Update
@@ -24,6 +25,7 @@ class DatasetsApi(
     CreateDatapoint,
     Delete,
     Get,
+    List,
     ListAllForProject,
     ListDatapoints,
     Update,

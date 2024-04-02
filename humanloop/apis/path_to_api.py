@@ -37,6 +37,7 @@ from humanloop.apis.paths.evaluators_id import EvaluatorsId
 from humanloop.apis.paths.datapoints_id import DatapointsId
 from humanloop.apis.paths.datapoints import Datapoints
 from humanloop.apis.paths.projects_project_id_datasets import ProjectsProjectIdDatasets
+from humanloop.apis.paths.datasets import Datasets
 from humanloop.apis.paths.datasets_id import DatasetsId
 from humanloop.apis.paths.datasets_dataset_id_datapoints import DatasetsDatasetIdDatapoints
 from humanloop.apis.paths.evaluations_id import EvaluationsId
@@ -90,6 +91,7 @@ PathToApi = typing_extensions.TypedDict(
         PathValues.DATAPOINTS_ID: DatapointsId,
         PathValues.DATAPOINTS: Datapoints,
         PathValues.PROJECTS_PROJECT_ID_DATASETS: ProjectsProjectIdDatasets,
+        PathValues.DATASETS: Datasets,
         PathValues.DATASETS_ID: DatasetsId,
         PathValues.DATASETS_DATASET_ID_DATAPOINTS: DatasetsDatasetIdDatapoints,
         PathValues.EVALUATIONS_ID: EvaluationsId,
@@ -144,6 +146,7 @@ path_to_api = PathToApi(
         PathValues.DATAPOINTS_ID: DatapointsId,
         PathValues.DATAPOINTS: Datapoints,
         PathValues.PROJECTS_PROJECT_ID_DATASETS: ProjectsProjectIdDatasets,
+        PathValues.DATASETS: Datasets,
         PathValues.DATASETS_ID: DatasetsId,
         PathValues.DATASETS_DATASET_ID_DATAPOINTS: DatasetsDatasetIdDatapoints,
         PathValues.EVALUATIONS_ID: EvaluationsId,

@@ -599,6 +599,10 @@ operation_parameter_map = {
             },
         ]
     },
+    '/datasets-GET': {
+        'parameters': [
+        ]
+    },
     '/projects/{project_id}/datasets-GET': {
         'parameters': [
             {

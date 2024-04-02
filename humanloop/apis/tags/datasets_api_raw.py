@@ -13,6 +13,7 @@ from humanloop.paths.projects_project_id_datasets.post import CreateRaw
 from humanloop.paths.datasets_dataset_id_datapoints.post import CreateDatapointRaw
 from humanloop.paths.datasets_id.delete import DeleteRaw
 from humanloop.paths.datasets_id.get import GetRaw
+from humanloop.paths.datasets.get import ListRaw
 from humanloop.paths.projects_project_id_datasets.get import ListAllForProjectRaw
 from humanloop.paths.datasets_dataset_id_datapoints.get import ListDatapointsRaw
 from humanloop.paths.datasets_id.patch import UpdateRaw
@@ -23,6 +24,7 @@ class DatasetsApiRaw(
     CreateDatapointRaw,
     DeleteRaw,
     GetRaw,
+    ListRaw,
     ListAllForProjectRaw,
     ListDatapointsRaw,
     UpdateRaw,

@@ -32,58 +32,27 @@ import frozendict  # noqa: F401
 
 from humanloop import schemas  # noqa: F401
 
+from humanloop.model.datasets_list_response import DatasetsListResponse as DatasetsListResponseSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
-from humanloop.model.datasets_list_all_for_project_response import DatasetsListAllForProjectResponse as DatasetsListAllForProjectResponseSchema
 
-from humanloop.type.datasets_list_all_for_project_response import DatasetsListAllForProjectResponse
 from humanloop.type.http_validation_error import HTTPValidationError
+from humanloop.type.datasets_list_response import DatasetsListResponse
 
 from ...api_client import Dictionary
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
-from humanloop.pydantic.datasets_list_all_for_project_response import DatasetsListAllForProjectResponse as DatasetsListAllForProjectResponsePydantic
+from humanloop.pydantic.datasets_list_response import DatasetsListResponse as DatasetsListResponsePydantic
 
-from . import path
-
-# Path params
-ProjectIdSchema = schemas.StrSchema
-RequestRequiredPathParams = typing_extensions.TypedDict(
-    'RequestRequiredPathParams',
-    {
-        'project_id': typing.Union[ProjectIdSchema, str, ],
-    }
-)
-RequestOptionalPathParams = typing_extensions.TypedDict(
-    'RequestOptionalPathParams',
-    {
-    },
-    total=False
-)
-
-
-class RequestPathParams(RequestRequiredPathParams, RequestOptionalPathParams):
-    pass
-
-
-request_path_project_id = api_client.PathParameter(
-    name="project_id",
-    style=api_client.ParameterStyle.SIMPLE,
-    schema=ProjectIdSchema,
-    required=True,
-)
-_auth = [
-    'APIKeyHeader',
-]
-SchemaFor200ResponseBodyApplicationJson = DatasetsListAllForProjectResponseSchema
+SchemaFor200ResponseBodyApplicationJson = DatasetsListResponseSchema
 
 
 @dataclass
 class ApiResponseFor200(api_client.ApiResponse):
-    body: DatasetsListAllForProjectResponse
+    body: DatasetsListResponse
 
 
 @dataclass
 class ApiResponseFor200Async(api_client.AsyncApiResponse):
-    body: DatasetsListAllForProjectResponse
+    body: DatasetsListResponse
 
 
 _response_for_200 = api_client.OpenApiResponse(
@@ -115,10 +84,6 @@ _response_for_422 = api_client.OpenApiResponse(
             schema=SchemaFor422ResponseBodyApplicationJson),
     },
 )
-_status_code_to_response = {
-    '200': _response_for_200,
-    '422': _response_for_422,
-}
 _all_accept_content_types = (
     'application/json',
 )
@@ -126,20 +91,14 @@ _all_accept_content_types = (
 
 class BaseApi(api_client.Api):
 
-    def _list_all_for_project_mapped_args(
+    def _list_mapped_args(
         self,
-        project_id: str,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
-        _path_params = {}
-        if project_id is not None:
-            _path_params["project_id"] = project_id
-        args.path = _path_params
         return args
 
-    async def _alist_all_for_project_oapg(
+    async def _alist_oapg(
         self,
-            path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
@@ -151,26 +110,12 @@ class BaseApi(api_client.Api):
         AsyncGeneratorResponse,
     ]:
         """
-        List For Project
+        List 
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
-        self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
-    
-        _path_params = {}
-        for parameter in (
-            request_path_project_id,
-        ):
-            parameter_data = path_params.get(parameter.name, schemas.unset)
-            if parameter_data is schemas.unset:
-                continue
-            serialized_data = parameter.serialize(parameter_data)
-            _path_params.update(serialized_data)
-    
-        for k, v in _path_params.items():
-            used_path = used_path.replace('{%s}' % k, v)
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -182,7 +127,7 @@ class BaseApi(api_client.Api):
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
-            path_template='/projects/{project_id}/datasets',
+            path_template='/datasets',
             auth_settings=_auth,
             headers=_headers,
         )
@@ -250,9 +195,8 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-    def _list_all_for_project_oapg(
+    def _list_oapg(
         self,
-            path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
         accept_content_types: typing.Tuple[str] = _all_accept_content_types,
@@ -262,26 +206,12 @@ class BaseApi(api_client.Api):
         api_client.ApiResponseWithoutDeserialization,
     ]:
         """
-        List For Project
+        List 
         :param skip_deserialization: If true then api_response.response will be set but
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
-        self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
-    
-        _path_params = {}
-        for parameter in (
-            request_path_project_id,
-        ):
-            parameter_data = path_params.get(parameter.name, schemas.unset)
-            if parameter_data is schemas.unset:
-                continue
-            serialized_data = parameter.serialize(parameter_data)
-            _path_params.update(serialized_data)
-    
-        for k, v in _path_params.items():
-            used_path = used_path.replace('{%s}' % k, v)
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -293,7 +223,7 @@ class BaseApi(api_client.Api):
             resource_path=used_path,
             method=method,
             configuration=self.api_client.configuration,
-            path_template='/projects/{project_id}/datasets',
+            path_template='/datasets',
             auth_settings=_auth,
             headers=_headers,
         )
@@ -330,107 +260,85 @@ class BaseApi(api_client.Api):
         return api_response
 
 
-class ListAllForProjectRaw(BaseApi):
+class ListRaw(BaseApi):
     # this class is used by api classes that refer to endpoints with operationId fn names
 
-    @api_client.DeprecationWarningOnce(prefix="datasets")
-    async def alist_all_for_project(
+    async def alist(
         self,
-        project_id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._list_all_for_project_mapped_args(
-            project_id=project_id,
+        args = self._list_mapped_args(
         )
-        return await self._alist_all_for_project_oapg(
-            path_params=args.path,
+        return await self._alist_oapg(
             **kwargs,
         )
     
-    @api_client.DeprecationWarningOnce(prefix="datasets")
-    def list_all_for_project(
+    def list(
         self,
-        project_id: str,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._list_all_for_project_mapped_args(
-            project_id=project_id,
+        args = self._list_mapped_args(
         )
-        return self._list_all_for_project_oapg(
-            path_params=args.path,
+        return self._list_oapg(
         )
 
-class ListAllForProject(BaseApi):
+class List(BaseApi):
 
-    @api_client.DeprecationWarningOnce(prefix="datasets")
-    async def alist_all_for_project(
+    async def alist(
         self,
-        project_id: str,
         validate: bool = False,
         **kwargs,
-    ) -> DatasetsListAllForProjectResponsePydantic:
-        raw_response = await self.raw.alist_all_for_project(
-            project_id=project_id,
+    ) -> DatasetsListResponsePydantic:
+        raw_response = await self.raw.alist(
             **kwargs,
         )
         if validate:
-            return RootModel[DatasetsListAllForProjectResponsePydantic](raw_response.body).root
-        return api_client.construct_model_instance(DatasetsListAllForProjectResponsePydantic, raw_response.body)
+            return RootModel[DatasetsListResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(DatasetsListResponsePydantic, raw_response.body)
     
     
-    @api_client.DeprecationWarningOnce(prefix="datasets")
-    def list_all_for_project(
+    def list(
         self,
-        project_id: str,
         validate: bool = False,
-    ) -> DatasetsListAllForProjectResponsePydantic:
-        raw_response = self.raw.list_all_for_project(
-            project_id=project_id,
+    ) -> DatasetsListResponsePydantic:
+        raw_response = self.raw.list(
         )
         if validate:
-            return RootModel[DatasetsListAllForProjectResponsePydantic](raw_response.body).root
-        return api_client.construct_model_instance(DatasetsListAllForProjectResponsePydantic, raw_response.body)
+            return RootModel[DatasetsListResponsePydantic](raw_response.body).root
+        return api_client.construct_model_instance(DatasetsListResponsePydantic, raw_response.body)
 
 
 class ApiForget(BaseApi):
     # this class is used by api classes that refer to endpoints by path and http method names
 
-    @api_client.DeprecationWarningOnce(prefix="datasets")
     async def aget(
         self,
-        project_id: str,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
         api_client.ApiResponseWithoutDeserializationAsync,
         AsyncGeneratorResponse,
     ]:
-        args = self._list_all_for_project_mapped_args(
-            project_id=project_id,
+        args = self._list_mapped_args(
         )
-        return await self._alist_all_for_project_oapg(
-            path_params=args.path,
+        return await self._alist_oapg(
             **kwargs,
         )
     
-    @api_client.DeprecationWarningOnce(prefix="datasets")
     def get(
         self,
-        project_id: str,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
-        args = self._list_all_for_project_mapped_args(
-            project_id=project_id,
+        args = self._list_mapped_args(
         )
-        return self._list_all_for_project_oapg(
-            path_params=args.path,
+        return self._list_oapg(
         )
 
