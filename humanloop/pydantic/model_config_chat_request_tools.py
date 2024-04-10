@@ -18,4 +18,4 @@ from pydantic import BaseModel, Field, RootModel, ConfigDict
 from humanloop.pydantic.linked_tool_request import LinkedToolRequest
 from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
 
-ModelConfigChatRequestTools = typing.List[typing.Union[typing.List[LinkedToolRequest], typing.List[ModelConfigToolRequest]]]
+ModelConfigChatRequestTools = typing.List[typing.Union[LinkedToolRequest, ModelConfigToolRequest]]

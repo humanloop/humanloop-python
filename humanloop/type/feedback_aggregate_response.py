@@ -19,4 +19,4 @@ from humanloop.type.feedback_number_aggregate import FeedbackNumberAggregate
 from humanloop.type.feedback_select_aggregate import FeedbackSelectAggregate
 from humanloop.type.feedback_text_aggregate import FeedbackTextAggregate
 
-FeedbackAggregateResponse = typing.List[typing.Union[typing.List[FeedbackSelectAggregate], typing.List[FeedbackMultiSelectAggregate], typing.List[FeedbackTextAggregate], typing.List[FeedbackNumberAggregate]]]
+FeedbackAggregateResponse = typing.List[typing.Union[FeedbackSelectAggregate, FeedbackMultiSelectAggregate, FeedbackTextAggregate, FeedbackNumberAggregate]]

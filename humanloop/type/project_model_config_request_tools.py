@@ -17,4 +17,4 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from humanloop.type.linked_tool_request import LinkedToolRequest
 from humanloop.type.model_config_tool_request import ModelConfigToolRequest
 
-ProjectModelConfigRequestTools = typing.List[typing.Union[typing.List[LinkedToolRequest], typing.List[ModelConfigToolRequest]]]
+ProjectModelConfigRequestTools = typing.List[typing.Union[LinkedToolRequest, ModelConfigToolRequest]]

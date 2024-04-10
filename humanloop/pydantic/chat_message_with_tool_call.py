@@ -26,7 +26,7 @@ class ChatMessageWithToolCall(BaseModel):
     role: ChatRole = Field(alias='role')
 
     # The content of the message.
-    content: typing.Optional[typing.Union[str, typing.List[typing.Union[typing.List[TextChatContent], typing.List[ImageChatContent]]]]] = Field(None, alias='content')
+    content: typing.Optional[typing.Union[str, typing.List[typing.Union[TextChatContent, ImageChatContent]]]] = Field(None, alias='content')
 
     # Optional name of the message author.
     name: typing.Optional[typing.Optional[str]] = Field(None, alias='name')

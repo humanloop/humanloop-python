@@ -23,7 +23,6 @@ from humanloop.apis.tags.evaluations_api import EvaluationsApi
 from humanloop.apis.tags.evaluators_api import EvaluatorsApi
 from humanloop.apis.tags.experiments_api import ExperimentsApi
 from humanloop.apis.tags.feedback_api import FeedbackApi
-from humanloop.apis.tags.finetunes_api import FinetunesApi
 from humanloop.apis.tags.logs_api import LogsApi
 from humanloop.apis.tags.model_configs_api import ModelConfigsApi
 from humanloop.apis.tags.projects_api import ProjectsApi
@@ -105,7 +104,6 @@ class Humanloop(ClientCustom):
         self.evaluators: EvaluatorsApi = EvaluatorsApi(api_client)
         self.experiments: ExperimentsApi = ExperimentsApi(api_client)
         self.feedback_api: FeedbackApi = FeedbackApi(api_client)
-        self.finetunes: FinetunesApi = FinetunesApi(api_client)
         self.logs: LogsApi = LogsApi(api_client)
         self.model_configs: ModelConfigsApi = ModelConfigsApi(api_client)
         self.projects: ProjectsApi = ProjectsApi(api_client)

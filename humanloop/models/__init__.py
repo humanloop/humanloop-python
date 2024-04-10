@@ -97,12 +97,6 @@ from humanloop.model.feedback_type_model import FeedbackTypeModel
 from humanloop.model.feedback_type_request import FeedbackTypeRequest
 from humanloop.model.feedback_types import FeedbackTypes
 from humanloop.model.file_type import FileType
-from humanloop.model.finetune_config import FinetuneConfig
-from humanloop.model.finetune_data_summary import FinetuneDataSummary
-from humanloop.model.finetune_data_summary_errors import FinetuneDataSummaryErrors
-from humanloop.model.finetune_request import FinetuneRequest
-from humanloop.model.finetune_response import FinetuneResponse
-from humanloop.model.finetunes_list_all_for_project_response import FinetunesListAllForProjectResponse
 from humanloop.model.function_tool import FunctionTool
 from humanloop.model.function_tool_choice import FunctionToolChoice
 from humanloop.model.function_tool_nullable import FunctionToolNullable
@@ -174,7 +168,6 @@ from humanloop.model.update_evaluator_request import UpdateEvaluatorRequest
 from humanloop.model.update_experiment_request import UpdateExperimentRequest
 from humanloop.model.update_experiment_request_config_ids_to_deregister import UpdateExperimentRequestConfigIdsToDeregister
 from humanloop.model.update_experiment_request_config_ids_to_register import UpdateExperimentRequestConfigIdsToRegister
-from humanloop.model.update_finetune_request import UpdateFinetuneRequest
 from humanloop.model.update_log_request import UpdateLogRequest
 from humanloop.model.update_project_request import UpdateProjectRequest
 from humanloop.model.usage import Usage

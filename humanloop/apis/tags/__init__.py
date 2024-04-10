@@ -15,7 +15,6 @@ class TagValues(str, enum.Enum):
     EVALUATORS = "Evaluators"
     COMPLETIONS = "Completions"
     CHATS = "Chats"
-    FINETUNES = "Finetunes"
     SESSIONS = "Sessions"
     DATAPOINTS = "Datapoints"
     FEEDBACK = "Feedback"

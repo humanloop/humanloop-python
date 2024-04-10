@@ -26,7 +26,7 @@ class RequiredChatMessageWithToolCall(TypedDict):
 
 class OptionalChatMessageWithToolCall(TypedDict, total=False):
     # The content of the message.
-    content: typing.Union[str, typing.List[typing.Union[typing.List[TextChatContent], typing.List[ImageChatContent]]]]
+    content: typing.Union[str, typing.List[typing.Union[TextChatContent, ImageChatContent]]]
 
     # Optional name of the message author.
     name: typing.Optional[str]

@@ -10,7 +10,6 @@ from humanloop.apis.tags.experiments_api import ExperimentsApi
 from humanloop.apis.tags.evaluators_api import EvaluatorsApi
 from humanloop.apis.tags.completions_api import CompletionsApi
 from humanloop.apis.tags.chats_api import ChatsApi
-from humanloop.apis.tags.finetunes_api import FinetunesApi
 from humanloop.apis.tags.sessions_api import SessionsApi
 from humanloop.apis.tags.datapoints_api import DatapointsApi
 from humanloop.apis.tags.feedback_api import FeedbackApi
@@ -28,7 +27,6 @@ TagToApi = typing_extensions.TypedDict(
         TagValues.EVALUATORS: EvaluatorsApi,
         TagValues.COMPLETIONS: CompletionsApi,
         TagValues.CHATS: ChatsApi,
-        TagValues.FINETUNES: FinetunesApi,
         TagValues.SESSIONS: SessionsApi,
         TagValues.DATAPOINTS: DatapointsApi,
         TagValues.FEEDBACK: FeedbackApi,
@@ -47,7 +45,6 @@ tag_to_api = TagToApi(
         TagValues.EVALUATORS: EvaluatorsApi,
         TagValues.COMPLETIONS: CompletionsApi,
         TagValues.CHATS: ChatsApi,
-        TagValues.FINETUNES: FinetunesApi,
         TagValues.SESSIONS: SessionsApi,
         TagValues.DATAPOINTS: DatapointsApi,
         TagValues.FEEDBACK: FeedbackApi,
