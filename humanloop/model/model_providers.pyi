@@ -68,3 +68,7 @@ class ModelProviders(
     @schemas.classproperty
     def GOOGLE(cls):
         return cls("google")
+    
+    @schemas.classproperty
+    def GROQ(cls):
+        return cls("groq")

@@ -154,6 +154,8 @@ class BaseApi(api_client.Api):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
     ) -> api_client.MappedArgs:
@@ -209,6 +211,10 @@ class BaseApi(api_client.Api):
             _body["prompt_tokens"] = prompt_tokens
         if output_tokens is not None:
             _body["output_tokens"] = output_tokens
+        if prompt_cost is not None:
+            _body["prompt_cost"] = prompt_cost
+        if output_cost is not None:
+            _body["output_cost"] = output_cost
         if provider_request is not None:
             _body["provider_request"] = provider_request
         if provider_response is not None:
@@ -446,6 +452,8 @@ class LogRaw(BaseApi):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         **kwargs,
@@ -481,6 +489,8 @@ class LogRaw(BaseApi):
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
         )
@@ -517,6 +527,8 @@ class LogRaw(BaseApi):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
     ) -> typing.Union[
@@ -550,6 +562,8 @@ class LogRaw(BaseApi):
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
         )
@@ -587,6 +601,8 @@ class Log(BaseApi):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         validate: bool = False,
@@ -619,6 +635,8 @@ class Log(BaseApi):
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
             **kwargs,
@@ -656,6 +674,8 @@ class Log(BaseApi):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         validate: bool = False,
@@ -687,6 +707,8 @@ class Log(BaseApi):
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
         )
@@ -726,6 +748,8 @@ class ApiForpost(BaseApi):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         **kwargs,
@@ -761,6 +785,8 @@ class ApiForpost(BaseApi):
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
         )
@@ -797,6 +823,8 @@ class ApiForpost(BaseApi):
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
         output_tokens: typing.Optional[int] = None,
+        prompt_cost: typing.Optional[typing.Union[int, float]] = None,
+        output_cost: typing.Optional[typing.Union[int, float]] = None,
         provider_request: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
         provider_response: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = None,
     ) -> typing.Union[
@@ -830,6 +858,8 @@ class ApiForpost(BaseApi):
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
         )

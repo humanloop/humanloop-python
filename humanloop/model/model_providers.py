@@ -45,6 +45,7 @@ class ModelProviders(
             "cohere": "COHERE",
             "replicate": "REPLICATE",
             "google": "GOOGLE",
+            "groq": "GROQ",
         }
     
     @schemas.classproperty
@@ -82,3 +83,7 @@ class ModelProviders(
     @schemas.classproperty
     def GOOGLE(cls):
         return cls("google")
+    
+    @schemas.classproperty
+    def GROQ(cls):
+        return cls("groq")

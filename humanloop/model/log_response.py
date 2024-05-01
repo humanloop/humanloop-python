@@ -156,6 +156,8 @@ class LogResponse(
                 return ChatMessageWithToolCall
             prompt_tokens = schemas.IntSchema
             output_tokens = schemas.IntSchema
+            prompt_cost = schemas.NumberSchema
+            output_cost = schemas.NumberSchema
             provider_request = schemas.DictSchema
             provider_response = schemas.DictSchema
             user = schemas.StrSchema
@@ -315,6 +317,8 @@ class LogResponse(
                 "output_message": output_message,
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "user": user,
@@ -421,6 +425,12 @@ class LogResponse(
     def __getitem__(self, name: typing_extensions.Literal["output_tokens"]) -> MetaOapg.properties.output_tokens: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["prompt_cost"]) -> MetaOapg.properties.prompt_cost: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["output_cost"]) -> MetaOapg.properties.output_cost: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["provider_request"]) -> MetaOapg.properties.provider_request: ...
     
     @typing.overload
@@ -453,7 +463,7 @@ class LogResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -546,6 +556,12 @@ class LogResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["output_tokens"]) -> typing.Union[MetaOapg.properties.output_tokens, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["prompt_cost"]) -> typing.Union[MetaOapg.properties.prompt_cost, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["output_cost"]) -> typing.Union[MetaOapg.properties.output_cost, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["provider_request"]) -> typing.Union[MetaOapg.properties.provider_request, schemas.Unset]: ...
     
     @typing.overload
@@ -578,7 +594,7 @@ class LogResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -614,6 +630,8 @@ class LogResponse(
         output_message: typing.Union['ChatMessageWithToolCall', schemas.Unset] = schemas.unset,
         prompt_tokens: typing.Union[MetaOapg.properties.prompt_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
         output_tokens: typing.Union[MetaOapg.properties.output_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
+        prompt_cost: typing.Union[MetaOapg.properties.prompt_cost, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
+        output_cost: typing.Union[MetaOapg.properties.output_cost, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         provider_request: typing.Union[MetaOapg.properties.provider_request, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         provider_response: typing.Union[MetaOapg.properties.provider_response, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         user: typing.Union[MetaOapg.properties.user, str, schemas.Unset] = schemas.unset,
@@ -659,6 +677,8 @@ class LogResponse(
             output_message=output_message,
             prompt_tokens=prompt_tokens,
             output_tokens=output_tokens,
+            prompt_cost=prompt_cost,
+            output_cost=output_cost,
             provider_request=provider_request,
             provider_response=provider_response,
             user=user,

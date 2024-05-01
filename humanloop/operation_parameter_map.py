@@ -1037,6 +1037,12 @@ operation_parameter_map = {
                 'name': 'output_tokens'
             },
             {
+                'name': 'prompt_cost'
+            },
+            {
+                'name': 'output_cost'
+            },
+            {
                 'name': 'provider_request'
             },
             {
