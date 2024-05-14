@@ -16,4 +16,4 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel, ConfigDict
 
 
-PlatformAccessEnum = Literal["superadmin", "user"]
+PlatformAccessEnum = Literal["superadmin", "supportadmin", "user"]

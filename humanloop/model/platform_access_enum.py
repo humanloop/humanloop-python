@@ -37,12 +37,17 @@ class PlatformAccessEnum(
     class MetaOapg:
         enum_value_to_name = {
             "superadmin": "SUPERADMIN",
+            "supportadmin": "SUPPORTADMIN",
             "user": "USER",
         }
     
     @schemas.classproperty
     def SUPERADMIN(cls):
         return cls("superadmin")
+    
+    @schemas.classproperty
+    def SUPPORTADMIN(cls):
+        return cls("supportadmin")
     
     @schemas.classproperty
     def USER(cls):

@@ -38,5 +38,9 @@ class PlatformAccessEnum(
         return cls("superadmin")
     
     @schemas.classproperty
+    def SUPPORTADMIN(cls):
+        return cls("supportadmin")
+    
+    @schemas.classproperty
     def USER(cls):
         return cls("user")
