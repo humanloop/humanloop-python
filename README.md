@@ -5,7 +5,7 @@
 # Humanloop<a id="humanloop"></a>
 
 
-[![PyPI](https://img.shields.io/badge/PyPI-v0.7.22-blue)](https://pypi.org/project/humanloop/0.7.22)
+[![PyPI](https://img.shields.io/badge/PyPI-v0.7.23-blue)](https://pypi.org/project/humanloop/0.7.23)
 [![README.md](https://img.shields.io/badge/README-Click%20Here-green)](https://github.com/humanloop/humanloop-python#readme)
 
 </div>
@@ -129,7 +129,7 @@ Python >=3.7
 ## Installation<a id="installation"></a>
 
 ```sh
-pip install humanloop==0.7.22
+pip install humanloop==0.7.23
 ```
 
 ## Getting Started<a id="getting-started"></a>
@@ -253,6 +253,7 @@ except ApiException as e:
     pprint(e.status)
     pprint(e.reason)
     pprint(e.round_trip_time)
+
 ```
 
 ## Async<a id="async"></a>
@@ -299,6 +300,7 @@ async def main():
 
 
 asyncio.run(main())
+
 ```
 
 ## Raw HTTP Response<a id="raw-http-response"></a>
@@ -310,32 +312,33 @@ from pprint import pprint
 from humanloop import Humanloop, ApiException
 
 humanloop = Humanloop(
-    openai_api_key="OPENAI_API_KEY",
-    openai_azure_api_key="OPENAI_AZURE_API_KEY",
-    openai_azure_endpoint_api_key="OPENAI_AZURE_ENDPOINT_API_KEY",
-    anthropic_api_key="ANTHROPIC_API_KEY",
-    cohere_api_key="COHERE_API_KEY",
-    api_key="YOUR_API_KEY",
+    openai_api_key = 'OPENAI_API_KEY',
+    openai_azure_api_key = 'OPENAI_AZURE_API_KEY',
+    openai_azure_endpoint_api_key = 'OPENAI_AZURE_ENDPOINT_API_KEY',
+    anthropic_api_key = 'ANTHROPIC_API_KEY',
+    cohere_api_key = 'COHERE_API_KEY',
+
+    api_key = 'YOUR_API_KEY',
 )
 
 try:
     # Chat
     create_response = humanloop.chats.raw.create(
         messages=[
-            {
-                "role": "user",
-            }
-        ],
+        {
+            "role": "user",
+        }
+    ],
         model_config={
-            "provider": "openai",
-            "model": "model_example",
-            "max_tokens": -1,
-            "temperature": 1,
-            "top_p": 1,
-            "presence_penalty": 0,
-            "frequency_penalty": 0,
-            "endpoint": "complete",
-        },
+        "provider": "openai",
+        "model": "model_example",
+        "max_tokens": -1,
+        "temperature": 1,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "endpoint": "complete",
+    },
         project="string_example",
         project_id="string_example",
         session_id="string_example",
@@ -347,7 +350,8 @@ try:
         metadata={},
         save=True,
         source_datapoint_id="string_example",
-        provider_api_keys={},
+        provider_api_keys={
+    },
         num_samples=1,
         stream=False,
         user="string_example",
@@ -356,8 +360,8 @@ try:
         tool_choice="string_example",
         tool_call="string_example",
         response_format={
-            "type": "json_object",
-        },
+        "type": "json_object",
+    },
     )
     pprint(create_response.body)
     pprint(create_response.body["data"])
@@ -401,7 +405,6 @@ humanloop = Humanloop(
     anthropic_api_key="YOUR_ANTHROPIC_API_KEY",
 )
 
-
 async def main():
     response = await humanloop.chat_stream(
         project="sdk-example",
@@ -428,7 +431,6 @@ async def main():
     )
     async for token in response.content:
         print(token)
-
 
 asyncio.run(main())
 ```
@@ -469,7 +471,8 @@ create_response = humanloop.chat(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -619,7 +622,8 @@ create_deployed_response = humanloop.chat_deployed(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -768,7 +772,8 @@ create_experiment_response = humanloop.chat_experiment(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -916,7 +921,8 @@ create_model_config_response = humanloop.chat_model_config(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -1069,7 +1075,8 @@ create_response = humanloop.complete(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -1200,7 +1207,8 @@ create_deployed_response = humanloop.complete_deployed(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -1330,7 +1338,8 @@ create_experiment_response = humanloop.complete_experiment(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -1459,7 +1468,8 @@ create_model_config_response = humanloop.complete_model_configuration(
     metadata={},
     save=True,
     source_datapoint_id="string_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     num_samples=1,
     stream=False,
     user="string_example",
@@ -1708,10 +1718,14 @@ Here in the v4 API, this has the following behaviour:
 ```python
 create_datapoint_response = humanloop.datasets.create_datapoint(
     body={
-        "log_ids": ["log_ids_example"],
+        "log_ids": [
+            "log_ids_example"
+        ],
     },
     dataset_id="dataset_id_example",
-    log_ids=["string_example"],
+    log_ids=[
+        "string_example"
+    ],
     inputs={
         "key": "string_example",
     },
@@ -1941,8 +1955,12 @@ Add evaluators to an existing evaluation run.
 ```python
 add_evaluators_response = humanloop.evaluations.add_evaluators(
     id="id_example",
-    evaluator_ids=["string_example"],
-    evaluator_version_ids=["string_example"],
+    evaluator_ids=[
+        "string_example"
+    ],
+    evaluator_version_ids=[
+        "string_example"
+    ],
 )
 ```
 
@@ -1980,10 +1998,13 @@ Create an evaluation.
 ```python
 create_response = humanloop.evaluations.create(
     config_id="string_example",
-    evaluator_ids=["string_example"],
+    evaluator_ids=[
+        "string_example"
+    ],
     dataset_id="string_example",
     project_id="project_id_example",
-    provider_api_keys={},
+    provider_api_keys={
+    },
     max_concurrency=5,
     hl_generated=True,
 )
@@ -2094,7 +2115,9 @@ query parameters to configure this.
 ```python
 list_response = humanloop.evaluations.list(
     project_id="project_id_example",
-    id=["string_example"],
+    id=[
+        "string_example"
+    ],
     start_date="1970-01-01",
     end_date="1970-01-01",
     size=50,
@@ -2601,7 +2624,9 @@ create_response = humanloop.experiments.create(
         }
     ],
     project_id="project_id_example",
-    config_ids=["string_example"],
+    config_ids=[
+        "string_example"
+    ],
     set_active=False,
 )
 ```
@@ -2744,8 +2769,12 @@ update_response = humanloop.experiments.update(
             "value": "value_example",
         }
     ],
-    config_ids_to_register=["string_example"],
-    config_ids_to_deregister=["string_example"],
+    config_ids_to_register=[
+        "string_example"
+    ],
+    config_ids_to_deregister=[
+        "string_example"
+    ],
 )
 ```
 
@@ -2854,7 +2883,9 @@ Delete
 
 ```python
 humanloop.logs.delete(
-    id=["string_example"],
+    id=[
+        "string_example"
+    ],
 )
 ```
 
