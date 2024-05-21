@@ -48,3 +48,7 @@ class ConfigType(
     @schemas.classproperty
     def AGENT(cls):
         return cls("agent")
+    
+    @schemas.classproperty
+    def EVALUATOR(cls):
+        return cls("evaluator")

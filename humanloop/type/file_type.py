@@ -15,4 +15,4 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
-FileType = Literal["prompt", "tool", "dataset"]
+FileType = Literal["prompt", "tool", "dataset", "evaluator"]

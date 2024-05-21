@@ -21,6 +21,8 @@ class ModelConfigEvaluatorAggregateResponse(BaseModel):
 
     evaluator_id: str = Field(alias='evaluator_id')
 
+    evaluator_version_id: str = Field(alias='evaluator_version_id')
+
     aggregate_value: typing.Optional[typing.Union[int, float]] = Field(None, alias='aggregate_value')
 
     model_config = ConfigDict(

@@ -28,6 +28,7 @@ class RequiredGenericConfigResponse(TypedDict):
     # Name of config.
     name: str
 
+
 class OptionalGenericConfigResponse(TypedDict, total=False):
     # Description of config.
     description: str

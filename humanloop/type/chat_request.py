@@ -27,6 +27,7 @@ class RequiredChatRequest(TypedDict):
     # The model configuration used to create a chat response.
     model_config: ModelConfigChatRequest
 
+
 class OptionalChatRequest(TypedDict, total=False):
     # Unique project name. If no project exists with this name, a new project will be created.
     project: str

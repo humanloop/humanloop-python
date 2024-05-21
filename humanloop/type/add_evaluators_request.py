@@ -15,12 +15,15 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
+from humanloop.type.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds
 
 class RequiredAddEvaluatorsRequest(TypedDict):
-    evaluator_ids: AddEvaluatorsRequestEvaluatorIds
+    pass
 
 class OptionalAddEvaluatorsRequest(TypedDict, total=False):
-    pass
+    evaluator_ids: AddEvaluatorsRequestEvaluatorIds
+
+    evaluator_version_ids: AddEvaluatorsRequestEvaluatorVersionIds
 
 class AddEvaluatorsRequest(RequiredAddEvaluatorsRequest, OptionalAddEvaluatorsRequest):
     pass

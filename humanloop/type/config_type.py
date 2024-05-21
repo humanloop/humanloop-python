@@ -15,4 +15,4 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
-ConfigType = Literal["generic", "model", "tool", "agent"]
+ConfigType = Literal["generic", "model", "tool", "agent", "evaluator"]

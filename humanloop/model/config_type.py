@@ -40,6 +40,7 @@ class ConfigType(
             "model": "MODEL",
             "tool": "TOOL",
             "agent": "AGENT",
+            "evaluator": "EVALUATOR",
         }
     
     @schemas.classproperty
@@ -57,3 +58,7 @@ class ConfigType(
     @schemas.classproperty
     def AGENT(cls):
         return cls("agent")
+    
+    @schemas.classproperty
+    def EVALUATOR(cls):
+        return cls("evaluator")

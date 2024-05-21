@@ -36,6 +36,7 @@ class RequiredExperimentConfigResponse(TypedDict):
 
     updated_at: datetime
 
+
 class OptionalExperimentConfigResponse(TypedDict, total=False):
     # The mean performance of the model config.
     mean: typing.Union[int, float]

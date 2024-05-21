@@ -20,6 +20,9 @@ class RequiredModelConfigEvaluatorAggregateResponse(TypedDict):
 
     evaluator_id: str
 
+    evaluator_version_id: str
+
+
 class OptionalModelConfigEvaluatorAggregateResponse(TypedDict, total=False):
     aggregate_value: typing.Union[int, float]
 

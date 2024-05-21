@@ -29,6 +29,7 @@ class RequiredToolConfigResponse(TypedDict):
     # Name for the tool referenced by the model.
     name: str
 
+
 class OptionalToolConfigResponse(TypedDict, total=False):
     # Description of the tool referenced by the model
     description: str

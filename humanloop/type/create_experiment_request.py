@@ -24,6 +24,7 @@ class RequiredCreateExperimentRequest(TypedDict):
     # Feedback labels to treat as positive user feedback. Used to monitor the performance of model configs in the experiment.
     positive_labels: typing.List[PositiveLabel]
 
+
 class OptionalCreateExperimentRequest(TypedDict, total=False):
     config_ids: CreateExperimentRequestConfigIds
 

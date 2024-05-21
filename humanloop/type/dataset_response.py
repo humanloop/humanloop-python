@@ -30,6 +30,7 @@ class RequiredDatasetResponse(TypedDict):
 
     updated_at: datetime
 
+
 class OptionalDatasetResponse(TypedDict, total=False):
     description: str
 

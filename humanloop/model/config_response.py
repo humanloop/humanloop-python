@@ -38,10 +38,12 @@ class ConfigResponse(
             return {
                 'type': {
                     'AgentConfigResponse': AgentConfigResponse,
+                    'EvaluatorConfigResponse': EvaluatorConfigResponse,
                     'GenericConfigResponse': GenericConfigResponse,
                     'ModelConfigResponse': ModelConfigResponse,
                     'ToolConfigResponse': ToolConfigResponse,
                     'agent': AgentConfigResponse,
+                    'evaluator': EvaluatorConfigResponse,
                     'generic': GenericConfigResponse,
                     'model': ModelConfigResponse,
                     'tool': ToolConfigResponse,
@@ -61,6 +63,7 @@ class ConfigResponse(
             return [
                 ModelConfigResponse,
                 ToolConfigResponse,
+                EvaluatorConfigResponse,
                 AgentConfigResponse,
                 GenericConfigResponse,
             ]
@@ -80,6 +83,7 @@ class ConfigResponse(
         )
 
 from humanloop.model.agent_config_response import AgentConfigResponse
+from humanloop.model.evaluator_config_response import EvaluatorConfigResponse
 from humanloop.model.generic_config_response import GenericConfigResponse
 from humanloop.model.model_config_response import ModelConfigResponse
 from humanloop.model.tool_config_response import ToolConfigResponse

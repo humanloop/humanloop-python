@@ -20,6 +20,7 @@ class RequiredFeedbackRequest(TypedDict):
     # The type of feedback. The default feedback types available are 'rating', 'action', 'issue', 'correction', and 'comment'.
     type: typing.Union[FeedbackType, str]
 
+
 class OptionalFeedbackRequest(TypedDict, total=False):
     # The feedback value to be set. This field should be left blank when unsetting 'rating', 'correction' or 'comment', but is required otherwise.
     value: str

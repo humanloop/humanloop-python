@@ -36,6 +36,7 @@ class RequiredAgentConfigResponse(TypedDict):
     # Model config associated with the agent.
     model_config: ModelConfigRequest
 
+
 class OptionalAgentConfigResponse(TypedDict, total=False):
     # Description of config.
     description: str

@@ -34,9 +34,11 @@ from humanloop import schemas  # noqa: F401
 
 from humanloop.model.add_evaluators_request import AddEvaluatorsRequest as AddEvaluatorsRequestSchema
 from humanloop.model.evaluation_response import EvaluationResponse as EvaluationResponseSchema
+from humanloop.model.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds as AddEvaluatorsRequestEvaluatorVersionIdsSchema
 from humanloop.model.http_validation_error import HTTPValidationError as HTTPValidationErrorSchema
 from humanloop.model.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds as AddEvaluatorsRequestEvaluatorIdsSchema
 
+from humanloop.type.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds
 from humanloop.type.add_evaluators_request import AddEvaluatorsRequest
 from humanloop.type.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
 from humanloop.type.evaluation_response import EvaluationResponse
@@ -46,6 +48,7 @@ from ...api_client import Dictionary
 from humanloop.pydantic.evaluation_response import EvaluationResponse as EvaluationResponsePydantic
 from humanloop.pydantic.add_evaluators_request import AddEvaluatorsRequest as AddEvaluatorsRequestPydantic
 from humanloop.pydantic.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds as AddEvaluatorsRequestEvaluatorIdsPydantic
+from humanloop.pydantic.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds as AddEvaluatorsRequestEvaluatorVersionIdsPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 
 # Path params
@@ -136,14 +139,17 @@ class BaseApi(api_client.Api):
 
     def _add_evaluators_mapped_args(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _path_params = {}
         _body = {}
         if evaluator_ids is not None:
             _body["evaluator_ids"] = evaluator_ids
+        if evaluator_version_ids is not None:
+            _body["evaluator_version_ids"] = evaluator_version_ids
         args.body = _body
         if id is not None:
             _path_params["id"] = id
@@ -384,8 +390,9 @@ class AddEvaluatorsRaw(BaseApi):
 
     async def aadd_evaluators(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -393,8 +400,9 @@ class AddEvaluatorsRaw(BaseApi):
         AsyncGeneratorResponse,
     ]:
         args = self._add_evaluators_mapped_args(
-            evaluator_ids=evaluator_ids,
             id=id,
+            evaluator_ids=evaluator_ids,
+            evaluator_version_ids=evaluator_version_ids,
         )
         return await self._aadd_evaluators_oapg(
             body=args.body,
@@ -404,15 +412,17 @@ class AddEvaluatorsRaw(BaseApi):
     
     def add_evaluators(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._add_evaluators_mapped_args(
-            evaluator_ids=evaluator_ids,
             id=id,
+            evaluator_ids=evaluator_ids,
+            evaluator_version_ids=evaluator_version_ids,
         )
         return self._add_evaluators_oapg(
             body=args.body,
@@ -423,14 +433,16 @@ class AddEvaluators(BaseApi):
 
     async def aadd_evaluators(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
         validate: bool = False,
         **kwargs,
     ) -> EvaluationResponsePydantic:
         raw_response = await self.raw.aadd_evaluators(
-            evaluator_ids=evaluator_ids,
             id=id,
+            evaluator_ids=evaluator_ids,
+            evaluator_version_ids=evaluator_version_ids,
             **kwargs,
         )
         if validate:
@@ -440,13 +452,15 @@ class AddEvaluators(BaseApi):
     
     def add_evaluators(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
         validate: bool = False,
     ) -> EvaluationResponsePydantic:
         raw_response = self.raw.add_evaluators(
-            evaluator_ids=evaluator_ids,
             id=id,
+            evaluator_ids=evaluator_ids,
+            evaluator_version_ids=evaluator_version_ids,
         )
         if validate:
             return EvaluationResponsePydantic(**raw_response.body)
@@ -458,8 +472,9 @@ class ApiForpatch(BaseApi):
 
     async def apatch(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -467,8 +482,9 @@ class ApiForpatch(BaseApi):
         AsyncGeneratorResponse,
     ]:
         args = self._add_evaluators_mapped_args(
-            evaluator_ids=evaluator_ids,
             id=id,
+            evaluator_ids=evaluator_ids,
+            evaluator_version_ids=evaluator_version_ids,
         )
         return await self._aadd_evaluators_oapg(
             body=args.body,
@@ -478,15 +494,17 @@ class ApiForpatch(BaseApi):
     
     def patch(
         self,
-        evaluator_ids: AddEvaluatorsRequestEvaluatorIds,
         id: str,
+        evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = None,
+        evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
     ]:
         args = self._add_evaluators_mapped_args(
-            evaluator_ids=evaluator_ids,
             id=id,
+            evaluator_ids=evaluator_ids,
+            evaluator_version_ids=evaluator_version_ids,
         )
         return self._add_evaluators_oapg(
             body=args.body,

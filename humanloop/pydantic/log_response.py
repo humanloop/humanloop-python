@@ -30,7 +30,7 @@ class LogResponse(BaseModel):
 
     config: ConfigResponse = Field(alias='config')
 
-    evaluation_results: typing.List[EvaluationResultResponse] = Field(alias='evaluation_results')
+    evaluation_results: 'typing.List[EvaluationResultResponse]' = Field(alias='evaluation_results')
 
     observability_status: ObservabilityStatus = Field(alias='observability_status')
 

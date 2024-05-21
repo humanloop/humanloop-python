@@ -22,6 +22,7 @@ class RequiredCreateLogResponse(TypedDict):
     # String ID of project the datapoint belongs to. Starts with `pr_`.
     project_id: str
 
+
 class OptionalCreateLogResponse(TypedDict, total=False):
     # String ID of session the datapoint belongs to. Populated only if the datapoint was logged with `session_id` or `session_reference_id`, and is `None` otherwise. Starts with `sesh_`.
     session_id: str

@@ -18,6 +18,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 class RequiredFunctionToolNullable(TypedDict):
     name: str
 
+
 class OptionalFunctionToolNullable(TypedDict, total=False):
     arguments: str
 

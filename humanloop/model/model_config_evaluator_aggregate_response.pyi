@@ -33,6 +33,7 @@ class ModelConfigEvaluatorAggregateResponse(
 
     class MetaOapg:
         required = {
+            "evaluator_version_id",
             "model_config_id",
             "evaluator_id",
         }
@@ -40,13 +41,16 @@ class ModelConfigEvaluatorAggregateResponse(
         class properties:
             model_config_id = schemas.StrSchema
             evaluator_id = schemas.StrSchema
+            evaluator_version_id = schemas.StrSchema
             aggregate_value = schemas.NumberSchema
             __annotations__ = {
                 "model_config_id": model_config_id,
                 "evaluator_id": evaluator_id,
+                "evaluator_version_id": evaluator_version_id,
                 "aggregate_value": aggregate_value,
             }
     
+    evaluator_version_id: MetaOapg.properties.evaluator_version_id
     model_config_id: MetaOapg.properties.model_config_id
     evaluator_id: MetaOapg.properties.evaluator_id
     
@@ -57,12 +61,15 @@ class ModelConfigEvaluatorAggregateResponse(
     def __getitem__(self, name: typing_extensions.Literal["evaluator_id"]) -> MetaOapg.properties.evaluator_id: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["evaluator_version_id"]) -> MetaOapg.properties.evaluator_version_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["aggregate_value"]) -> MetaOapg.properties.aggregate_value: ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config_id", "evaluator_id", "aggregate_value", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["model_config_id", "evaluator_id", "evaluator_version_id", "aggregate_value", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -74,18 +81,22 @@ class ModelConfigEvaluatorAggregateResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["evaluator_id"]) -> MetaOapg.properties.evaluator_id: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["evaluator_version_id"]) -> MetaOapg.properties.evaluator_version_id: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["aggregate_value"]) -> typing.Union[MetaOapg.properties.aggregate_value, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config_id", "evaluator_id", "aggregate_value", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["model_config_id", "evaluator_id", "evaluator_version_id", "aggregate_value", ], str]):
         return super().get_item_oapg(name)
     
 
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
+        evaluator_version_id: typing.Union[MetaOapg.properties.evaluator_version_id, str, ],
         model_config_id: typing.Union[MetaOapg.properties.model_config_id, str, ],
         evaluator_id: typing.Union[MetaOapg.properties.evaluator_id, str, ],
         aggregate_value: typing.Union[MetaOapg.properties.aggregate_value, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
@@ -95,6 +106,7 @@ class ModelConfigEvaluatorAggregateResponse(
         return super().__new__(
             cls,
             *args,
+            evaluator_version_id=evaluator_version_id,
             model_config_id=model_config_id,
             evaluator_id=evaluator_id,
             aggregate_value=aggregate_value,

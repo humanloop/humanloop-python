@@ -30,6 +30,7 @@ class RequiredModelConfigResponse(TypedDict):
     # The model instance used. E.g. text-davinci-002.
     model: str
 
+
 class OptionalModelConfigResponse(TypedDict, total=False):
     # A description of the model config.
     description: str

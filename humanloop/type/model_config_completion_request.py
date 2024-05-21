@@ -25,6 +25,7 @@ class RequiredModelConfigCompletionRequest(TypedDict):
     # Prompt template that will take your specified inputs to form your final request to the model. Input variables within the prompt template should be specified with syntax: {{INPUT_NAME}}.
     prompt_template: str
 
+
 class OptionalModelConfigCompletionRequest(TypedDict, total=False):
     # A description of the model config.
     description: str

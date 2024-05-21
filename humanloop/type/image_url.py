@@ -19,6 +19,7 @@ class RequiredImageUrl(TypedDict):
     # Either a URL of the image or the base64 encoded image data.
     url: str
 
+
 class OptionalImageUrl(TypedDict, total=False):
     # Specify the detail level of the image provided to the model. For more details see: https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding
     detail: str

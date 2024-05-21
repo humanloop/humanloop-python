@@ -20,6 +20,7 @@ class RequiredCreateProjectRequest(TypedDict):
     # Unique project name.
     name: str
 
+
 class OptionalCreateProjectRequest(TypedDict, total=False):
     # Feedback types to be created.
     feedback_types: typing.List[FeedbackTypeRequest]

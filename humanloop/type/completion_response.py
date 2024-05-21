@@ -24,6 +24,7 @@ class RequiredCompletionResponse(TypedDict):
 
     provider_responses: CompletionResponseProviderResponses
 
+
 class OptionalCompletionResponse(TypedDict, total=False):
     # Unique identifier of the parent project. Will not be provided if the request was made without providing a project name or id
     project_id: str

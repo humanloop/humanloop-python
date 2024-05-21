@@ -24,6 +24,7 @@ class RequiredChatMessageWithToolCall(TypedDict):
     # Role of the message author.
     role: ChatRole
 
+
 class OptionalChatMessageWithToolCall(TypedDict, total=False):
     # The content of the message.
     content: typing.Union[str, typing.List[typing.Union[TextChatContent, ImageChatContent]]]

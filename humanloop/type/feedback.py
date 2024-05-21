@@ -23,6 +23,7 @@ class RequiredFeedback(TypedDict):
     # The feedback value to set. This would be the appropriate text for 'correction' or 'comment', or a label to apply for 'rating', 'action', or 'issue'.
     value: typing.Union[typing.Union[int, float], str]
 
+
 class OptionalFeedback(TypedDict, total=False):
     # ID to associate the feedback to a previously logged datapoint.
     data_id: str

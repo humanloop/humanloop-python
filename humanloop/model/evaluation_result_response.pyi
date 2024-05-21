@@ -33,18 +33,28 @@ class EvaluationResultResponse(
 
     class MetaOapg:
         required = {
+            "evaluator_version_id",
             "log_id",
             "updated_at",
             "evaluator_id",
+            "created_at",
             "id",
         }
         
         class properties:
             id = schemas.StrSchema
             evaluator_id = schemas.StrSchema
+            evaluator_version_id = schemas.StrSchema
             log_id = schemas.StrSchema
             updated_at = schemas.DateTimeSchema
+            created_at = schemas.DateTimeSchema
+            version = schemas.AnyTypeSchema
             evaluation_id = schemas.StrSchema
+        
+            @staticmethod
+            def log() -> typing.Type['LogResponse']:
+                return LogResponse
+            version_id = schemas.StrSchema
             
             
             class value(
@@ -85,19 +95,31 @@ class EvaluationResultResponse(
                         **kwargs,
                     )
             error = schemas.StrSchema
+        
+            @staticmethod
+            def llm_evaluator_log() -> typing.Type['LogResponse']:
+                return LogResponse
             __annotations__ = {
                 "id": id,
                 "evaluator_id": evaluator_id,
+                "evaluator_version_id": evaluator_version_id,
                 "log_id": log_id,
                 "updated_at": updated_at,
+                "created_at": created_at,
+                "version": version,
                 "evaluation_id": evaluation_id,
+                "log": log,
+                "version_id": version_id,
                 "value": value,
                 "error": error,
+                "llm_evaluator_log": llm_evaluator_log,
             }
     
+    evaluator_version_id: MetaOapg.properties.evaluator_version_id
     log_id: MetaOapg.properties.log_id
     updated_at: MetaOapg.properties.updated_at
     evaluator_id: MetaOapg.properties.evaluator_id
+    created_at: MetaOapg.properties.created_at
     id: MetaOapg.properties.id
     
     @typing.overload
@@ -107,13 +129,28 @@ class EvaluationResultResponse(
     def __getitem__(self, name: typing_extensions.Literal["evaluator_id"]) -> MetaOapg.properties.evaluator_id: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["evaluator_version_id"]) -> MetaOapg.properties.evaluator_version_id: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["log_id"]) -> MetaOapg.properties.log_id: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["version"]) -> MetaOapg.properties.version: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["evaluation_id"]) -> MetaOapg.properties.evaluation_id: ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["log"]) -> 'LogResponse': ...
+    
+    @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["version_id"]) -> MetaOapg.properties.version_id: ...
     
     @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["value"]) -> MetaOapg.properties.value: ...
@@ -122,9 +159,12 @@ class EvaluationResultResponse(
     def __getitem__(self, name: typing_extensions.Literal["error"]) -> MetaOapg.properties.error: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["llm_evaluator_log"]) -> 'LogResponse': ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "log_id", "updated_at", "evaluation_id", "value", "error", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "evaluator_version_id", "log_id", "updated_at", "created_at", "version", "evaluation_id", "log", "version_id", "value", "error", "llm_evaluator_log", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -136,13 +176,28 @@ class EvaluationResultResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["evaluator_id"]) -> MetaOapg.properties.evaluator_id: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["evaluator_version_id"]) -> MetaOapg.properties.evaluator_version_id: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["log_id"]) -> MetaOapg.properties.log_id: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["updated_at"]) -> MetaOapg.properties.updated_at: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["created_at"]) -> MetaOapg.properties.created_at: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["version"]) -> typing.Union[MetaOapg.properties.version, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["evaluation_id"]) -> typing.Union[MetaOapg.properties.evaluation_id, schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["log"]) -> typing.Union['LogResponse', schemas.Unset]: ...
+    
+    @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["version_id"]) -> typing.Union[MetaOapg.properties.version_id, schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["value"]) -> typing.Union[MetaOapg.properties.value, schemas.Unset]: ...
@@ -151,35 +206,52 @@ class EvaluationResultResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["error"]) -> typing.Union[MetaOapg.properties.error, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["llm_evaluator_log"]) -> typing.Union['LogResponse', schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "log_id", "updated_at", "evaluation_id", "value", "error", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "evaluator_version_id", "log_id", "updated_at", "created_at", "version", "evaluation_id", "log", "version_id", "value", "error", "llm_evaluator_log", ], str]):
         return super().get_item_oapg(name)
     
 
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
+        evaluator_version_id: typing.Union[MetaOapg.properties.evaluator_version_id, str, ],
         log_id: typing.Union[MetaOapg.properties.log_id, str, ],
         updated_at: typing.Union[MetaOapg.properties.updated_at, str, datetime, ],
         evaluator_id: typing.Union[MetaOapg.properties.evaluator_id, str, ],
+        created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, ],
         id: typing.Union[MetaOapg.properties.id, str, ],
+        version: typing.Union[MetaOapg.properties.version, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         evaluation_id: typing.Union[MetaOapg.properties.evaluation_id, str, schemas.Unset] = schemas.unset,
+        log: typing.Union['LogResponse', schemas.Unset] = schemas.unset,
+        version_id: typing.Union[MetaOapg.properties.version_id, str, schemas.Unset] = schemas.unset,
         value: typing.Union[MetaOapg.properties.value, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         error: typing.Union[MetaOapg.properties.error, str, schemas.Unset] = schemas.unset,
+        llm_evaluator_log: typing.Union['LogResponse', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'EvaluationResultResponse':
         return super().__new__(
             cls,
             *args,
+            evaluator_version_id=evaluator_version_id,
             log_id=log_id,
             updated_at=updated_at,
             evaluator_id=evaluator_id,
+            created_at=created_at,
             id=id,
+            version=version,
             evaluation_id=evaluation_id,
+            log=log,
+            version_id=version_id,
             value=value,
             error=error,
+            llm_evaluator_log=llm_evaluator_log,
             _configuration=_configuration,
             **kwargs,
         )
+
+from humanloop.model.log_response import LogResponse

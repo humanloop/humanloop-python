@@ -13,6 +13,7 @@
 
 from humanloop.model.add_evaluators_request import AddEvaluatorsRequest
 from humanloop.model.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
+from humanloop.model.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds
 from humanloop.model.agent_config_response import AgentConfigResponse
 from humanloop.model.base_metric_response import BaseMetricResponse
 from humanloop.model.body_model_configs_deserialize import BodyModelConfigsDeserialize
@@ -70,6 +71,7 @@ from humanloop.model.evaluation_result_response import EvaluationResultResponse
 from humanloop.model.evaluation_status import EvaluationStatus
 from humanloop.model.evaluations_get_for_project_response import EvaluationsGetForProjectResponse
 from humanloop.model.evaluator_arguments_type import EvaluatorArgumentsType
+from humanloop.model.evaluator_config_response import EvaluatorConfigResponse
 from humanloop.model.evaluator_response import EvaluatorResponse
 from humanloop.model.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from humanloop.model.evaluator_type import EvaluatorType

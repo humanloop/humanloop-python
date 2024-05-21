@@ -44,6 +44,7 @@ class RequiredProjectResponse(TypedDict):
 
     updated_at: datetime
 
+
 class OptionalProjectResponse(TypedDict, total=False):
     # Experiment that has been set as the project's active deployment. At most one of active_experiment and active_model_config can be set.
     active_experiment: ExperimentResponse

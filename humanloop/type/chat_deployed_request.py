@@ -23,6 +23,7 @@ class RequiredChatDeployedRequest(TypedDict):
     # The messages passed to the to provider chat endpoint.
     messages: typing.List[ChatMessageWithToolCall]
 
+
 class OptionalChatDeployedRequest(TypedDict, total=False):
     # Unique project name. If no project exists with this name, a new project will be created.
     project: str

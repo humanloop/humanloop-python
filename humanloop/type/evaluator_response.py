@@ -44,6 +44,7 @@ class RequiredEvaluatorResponse(TypedDict):
 
     updated_at: datetime
 
+
 class OptionalEvaluatorResponse(TypedDict, total=False):
     # The code for the evaluator. This code will be executed in a sandboxed environment.
     code: str

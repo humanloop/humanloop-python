@@ -19,6 +19,7 @@ from humanloop.type.label_sentiment import LabelSentiment
 class RequiredFeedbackLabelRequest(TypedDict):
     value: str
 
+
 class OptionalFeedbackLabelRequest(TypedDict, total=False):
     sentiment: LabelSentiment
 

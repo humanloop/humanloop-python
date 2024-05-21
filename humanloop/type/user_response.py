@@ -25,6 +25,7 @@ class RequiredUserResponse(TypedDict):
     # Whether the user has verified their email address.
     verified: bool
 
+
 class OptionalUserResponse(TypedDict, total=False):
     # The user's full name.
     full_name: str

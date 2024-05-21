@@ -22,6 +22,7 @@ class RequiredLinkedToolRequest(TypedDict):
     # The source of the linked tool. For a linked tool it should be `organization`
     source: str
 
+
 class OptionalLinkedToolRequest(TypedDict, total=False):
     # The description of the linked tool.
     description: str

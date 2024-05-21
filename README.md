@@ -1569,6 +1569,7 @@ The suffix that comes after a completion of inserted text. Useful for completion
 ---
 
 ### `humanloop.datapoints.delete`<a id="humanloopdatapointsdelete"></a>
+![Deprecated](https://img.shields.io/badge/deprecated-yellow)
 
 Delete a list of datapoints by their IDs.
 
@@ -1619,6 +1620,7 @@ String ID of datapoint.
 ---
 
 ### `humanloop.datapoints.update`<a id="humanloopdatapointsupdate"></a>
+![Deprecated](https://img.shields.io/badge/deprecated-yellow)
 
 Edit the input, messages and criteria fields of a datapoint.
 
@@ -1823,6 +1825,7 @@ list_response = humanloop.datasets.list()
 ---
 
 ### `humanloop.datasets.list_all_for_project`<a id="humanloopdatasetslist_all_for_project"></a>
+![Deprecated](https://img.shields.io/badge/deprecated-yellow)
 
 Get all datasets for a project.
 
@@ -1937,18 +1940,21 @@ Add evaluators to an existing evaluation run.
 
 ```python
 add_evaluators_response = humanloop.evaluations.add_evaluators(
-    evaluator_ids=["string_example"],
     id="id_example",
+    evaluator_ids=["string_example"],
+    evaluator_version_ids=["string_example"],
 )
 ```
 
 #### ⚙️ Parameters<a id="⚙️-parameters"></a>
 
-##### evaluator_ids: [`AddEvaluatorsRequestEvaluatorIds`](./humanloop/type/add_evaluators_request_evaluator_ids.py)<a id="evaluator_ids-addevaluatorsrequestevaluatoridshumanlooptypeadd_evaluators_request_evaluator_idspy"></a>
-
 ##### id: `str`<a id="id-str"></a>
 
 String ID of evaluation run. Starts with `ev_`.
+
+##### evaluator_ids: [`AddEvaluatorsRequestEvaluatorIds`](./humanloop/type/add_evaluators_request_evaluator_ids.py)<a id="evaluator_ids-addevaluatorsrequestevaluatoridshumanlooptypeadd_evaluators_request_evaluator_idspy"></a>
+
+##### evaluator_version_ids: [`AddEvaluatorsRequestEvaluatorVersionIds`](./humanloop/type/add_evaluators_request_evaluator_version_ids.py)<a id="evaluator_version_ids-addevaluatorsrequestevaluatorversionidshumanlooptypeadd_evaluators_request_evaluator_version_idspy"></a>
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -2131,6 +2137,7 @@ Only return evaluations created before this date.
 ---
 
 ### `humanloop.evaluations.list_all_for_project`<a id="humanloopevaluationslist_all_for_project"></a>
+![Deprecated](https://img.shields.io/badge/deprecated-yellow)
 
 Get all the evaluations associated with your project.
 

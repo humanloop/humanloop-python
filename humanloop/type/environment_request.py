@@ -19,6 +19,7 @@ class RequiredEnvironmentRequest(TypedDict):
     # String ID of the environment. Starts with `env_`.
     id: str
 
+
 class OptionalEnvironmentRequest(TypedDict, total=False):
     # The environment name.
     name: str

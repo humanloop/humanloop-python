@@ -22,6 +22,7 @@ class RequiredProjectUserResponse(TypedDict):
     # The user's email address.
     email_address: str
 
+
 class OptionalProjectUserResponse(TypedDict, total=False):
     # The user's full name.
     full_name: str

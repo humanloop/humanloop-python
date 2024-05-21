@@ -14,22 +14,37 @@ import typing
 from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from humanloop.type.log_response import LogResponse
 
 class RequiredEvaluationResultResponse(TypedDict):
     id: str
 
     evaluator_id: str
 
+    evaluator_version_id: str
+
     log_id: str
 
     updated_at: datetime
 
+    created_at: datetime
+
+
 class OptionalEvaluationResultResponse(TypedDict, total=False):
+    version: typing.Union[bool, date, datetime, dict, float, int, list, str, None]
+
     evaluation_id: str
+
+    log: 'LogResponse'
+
+    version_id: str
 
     value: typing.Union[bool, typing.Union[int, float]]
 
     error: str
+
+    llm_evaluator_log: 'LogResponse'
 
 class EvaluationResultResponse(RequiredEvaluationResultResponse, OptionalEvaluationResultResponse):
     pass

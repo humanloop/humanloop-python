@@ -25,6 +25,7 @@ class RequiredChatResponse(TypedDict):
 
     provider_responses: ChatResponseProviderResponses
 
+
 class OptionalChatResponse(TypedDict, total=False):
     # Unique identifier of the parent project. Will not be provided if the request was made without providing a project name or id
     project_id: str

@@ -21,6 +21,7 @@ class RequiredFeedbackTypeModel(TypedDict):
     # The type of feedback. The default feedback types available are 'rating', 'action', 'issue', 'correction', and 'comment'.
     type: typing.Union[FeedbackType, str]
 
+
 class OptionalFeedbackTypeModel(TypedDict, total=False):
     # The allowed values for categorical feedback types. Not populated for `correction` and `comment`.
     values: typing.List[CategoricalFeedbackLabel]

@@ -22,6 +22,7 @@ class RequiredCreateEvaluationResultLogRequest(TypedDict):
     # ID of the evaluator that evaluated the log. Starts with `evfn_`. Must be one of the evaluator IDs associated with the evaluation run being logged to.
     evaluator_id: str
 
+
 class OptionalCreateEvaluationResultLogRequest(TypedDict, total=False):
     # The result value of the evaluation.
     result: typing.Union[bool, int, typing.Union[int, float]]

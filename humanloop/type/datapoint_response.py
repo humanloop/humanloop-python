@@ -21,6 +21,7 @@ from humanloop.type.datapoint_response_target import DatapointResponseTarget
 class RequiredDatapointResponse(TypedDict):
     id: str
 
+
 class OptionalDatapointResponse(TypedDict, total=False):
     dataset_id: str
 

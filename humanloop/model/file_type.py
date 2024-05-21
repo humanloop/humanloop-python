@@ -39,6 +39,7 @@ class FileType(
             "prompt": "PROMPT",
             "tool": "TOOL",
             "dataset": "DATASET",
+            "evaluator": "EVALUATOR",
         }
     
     @schemas.classproperty
@@ -52,3 +53,7 @@ class FileType(
     @schemas.classproperty
     def DATASET(cls):
         return cls("dataset")
+    
+    @schemas.classproperty
+    def EVALUATOR(cls):
+        return cls("evaluator")

@@ -21,6 +21,7 @@ class RequiredCompletionRequest(TypedDict):
     # The model configuration used to generate.
     model_config: ModelConfigCompletionRequest
 
+
 class OptionalCompletionRequest(TypedDict, total=False):
     # Unique project name. If no project exists with this name, a new project will be created.
     project: str

@@ -20,6 +20,7 @@ class RequiredCompletionExperimentRequest(TypedDict):
     # If an experiment ID is provided a model configuration will be sampled from the experiments active model configurations.
     experiment_id: str
 
+
 class OptionalCompletionExperimentRequest(TypedDict, total=False):
     # Unique project name. If no project exists with this name, a new project will be created.
     project: str

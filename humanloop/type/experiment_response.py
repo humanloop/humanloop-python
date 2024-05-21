@@ -42,6 +42,7 @@ class RequiredExperimentResponse(TypedDict):
 
     updated_at: datetime
 
+
 class OptionalExperimentResponse(TypedDict, total=False):
     # List of configs associated to the experiment.
     configs: typing.List[ExperimentConfigResponse]

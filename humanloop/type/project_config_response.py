@@ -33,6 +33,7 @@ class RequiredProjectConfigResponse(TypedDict):
 
     config: ConfigResponse
 
+
 class OptionalProjectConfigResponse(TypedDict, total=False):
     # Feedback statistics for the project model config.
     feedback_stats: typing.List[ProjectModelConfigFeedbackStatsResponse]

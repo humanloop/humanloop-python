@@ -20,6 +20,7 @@ class RequiredModelConfigToolRequest(TypedDict):
     # The name of the tool shown to the model.
     name: str
 
+
 class OptionalModelConfigToolRequest(TypedDict, total=False):
     # The description of the tool shown to the model.
     description: str

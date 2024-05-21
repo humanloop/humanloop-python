@@ -26,6 +26,7 @@ class RequiredFeedbackResponse(TypedDict):
     # String ID of user feedback. Starts with `ann_`, short for annotation.
     id: str
 
+
 class OptionalFeedbackResponse(TypedDict, total=False):
     # ID to associate the feedback to a previously logged datapoint.
     data_id: str

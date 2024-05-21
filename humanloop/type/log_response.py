@@ -29,11 +29,12 @@ class RequiredLogResponse(TypedDict):
 
     config: ConfigResponse
 
-    evaluation_results: typing.List[EvaluationResultResponse]
+    evaluation_results: 'typing.List[EvaluationResultResponse]'
 
     observability_status: ObservabilityStatus
 
     updated_at: datetime
+
 
 class OptionalLogResponse(TypedDict, total=False):
     # The name of the project associated with this log

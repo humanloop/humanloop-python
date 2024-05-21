@@ -22,6 +22,7 @@ class RequiredToolResponse(TypedDict):
     # Name for the tool referenced by the model.
     name: str
 
+
 class OptionalToolResponse(TypedDict, total=False):
     # Description of the tool referenced by the model
     description: str

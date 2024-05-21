@@ -16,8 +16,9 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel, ConfigDict
 
 from humanloop.pydantic.agent_config_response import AgentConfigResponse
+from humanloop.pydantic.evaluator_config_response import EvaluatorConfigResponse
 from humanloop.pydantic.generic_config_response import GenericConfigResponse
 from humanloop.pydantic.model_config_response import ModelConfigResponse
 from humanloop.pydantic.tool_config_response import ToolConfigResponse
 
-ConfigResponse = typing.Union[ModelConfigResponse,ToolConfigResponse,AgentConfigResponse,GenericConfigResponse]
+ConfigResponse = typing.Union[ModelConfigResponse,ToolConfigResponse,EvaluatorConfigResponse,AgentConfigResponse,GenericConfigResponse]

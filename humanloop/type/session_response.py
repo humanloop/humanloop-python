@@ -30,6 +30,7 @@ class RequiredSessionResponse(TypedDict):
 
     updated_at: datetime
 
+
 class OptionalSessionResponse(TypedDict, total=False):
     # Unique user-provided string identifying the session.
     reference_id: str

@@ -35,6 +35,7 @@ class RequiredCreateEvaluatorRequest(TypedDict):
     # The type of the evaluator.
     type: EvaluatorType
 
+
 class OptionalCreateEvaluatorRequest(TypedDict, total=False):
     # The code for the evaluator. This code will be executed in a sandboxed environment.
     code: str

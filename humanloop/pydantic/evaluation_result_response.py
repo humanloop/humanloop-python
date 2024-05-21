@@ -15,21 +15,35 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel, ConfigDict
 
+if TYPE_CHECKING:
+    from humanloop.pydantic.log_response import LogResponse
 
 class EvaluationResultResponse(BaseModel):
     id: str = Field(alias='id')
 
     evaluator_id: str = Field(alias='evaluator_id')
 
+    evaluator_version_id: str = Field(alias='evaluator_version_id')
+
     log_id: str = Field(alias='log_id')
 
     updated_at: datetime = Field(alias='updated_at')
 
+    created_at: datetime = Field(alias='created_at')
+
+    version: typing.Optional[typing.Union[bool, date, datetime, dict, float, int, list, str, None]] = Field(None, alias='version')
+
     evaluation_id: typing.Optional[str] = Field(None, alias='evaluation_id')
+
+    log: typing.Optional['LogResponse'] = Field(None, alias='log')
+
+    version_id: typing.Optional[str] = Field(None, alias='version_id')
 
     value: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = Field(None, alias='value')
 
     error: typing.Optional[str] = Field(None, alias='error')
+
+    llm_evaluator_log: typing.Optional['LogResponse'] = Field(None, alias='llm_evaluator_log')
 
     model_config = ConfigDict(
         protected_namespaces=(),

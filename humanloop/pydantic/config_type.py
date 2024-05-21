@@ -16,4 +16,4 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel, ConfigDict
 
 
-ConfigType = Literal["generic", "model", "tool", "agent"]
+ConfigType = Literal["generic", "model", "tool", "agent", "evaluator"]

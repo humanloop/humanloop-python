@@ -16,9 +16,12 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel, ConfigDict
 
 from humanloop.pydantic.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
+from humanloop.pydantic.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds
 
 class AddEvaluatorsRequest(BaseModel):
-    evaluator_ids: AddEvaluatorsRequestEvaluatorIds = Field(alias='evaluator_ids')
+    evaluator_ids: typing.Optional[AddEvaluatorsRequestEvaluatorIds] = Field(None, alias='evaluator_ids')
+
+    evaluator_version_ids: typing.Optional[AddEvaluatorsRequestEvaluatorVersionIds] = Field(None, alias='evaluator_version_ids')
 
     model_config = ConfigDict(
         protected_namespaces=(),

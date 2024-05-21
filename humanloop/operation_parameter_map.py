@@ -639,10 +639,13 @@ operation_parameter_map = {
     '/evaluations/{id}/evaluators-PATCH': {
         'parameters': [
             {
+                'name': 'id'
+            },
+            {
                 'name': 'evaluator_ids'
             },
             {
-                'name': 'id'
+                'name': 'evaluator_version_ids'
             },
         ]
     },

@@ -18,6 +18,7 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 class RequiredFunctionTool(TypedDict):
     name: str
 
+
 class OptionalFunctionTool(TypedDict, total=False):
     arguments: str
 

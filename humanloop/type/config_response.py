@@ -15,8 +15,9 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 from humanloop.type.agent_config_response import AgentConfigResponse
+from humanloop.type.evaluator_config_response import EvaluatorConfigResponse
 from humanloop.type.generic_config_response import GenericConfigResponse
 from humanloop.type.model_config_response import ModelConfigResponse
 from humanloop.type.tool_config_response import ToolConfigResponse
 
-ConfigResponse = typing.Union[ModelConfigResponse,ToolConfigResponse,AgentConfigResponse,GenericConfigResponse]
+ConfigResponse = typing.Union[ModelConfigResponse,ToolConfigResponse,EvaluatorConfigResponse,AgentConfigResponse,GenericConfigResponse]

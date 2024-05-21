@@ -24,6 +24,7 @@ class RequiredProjectModelConfigRequest(TypedDict):
     # The model instance used. E.g. text-davinci-002.
     model: str
 
+
 class OptionalProjectModelConfigRequest(TypedDict, total=False):
     # A description of the model config.
     description: str

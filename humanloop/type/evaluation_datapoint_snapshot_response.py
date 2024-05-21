@@ -23,6 +23,7 @@ class RequiredEvaluationDatapointSnapshotResponse(TypedDict):
 
     evaluation_results: typing.List[EvaluationResultResponse]
 
+
 class OptionalEvaluationDatapointSnapshotResponse(TypedDict, total=False):
     log: LogResponse
 

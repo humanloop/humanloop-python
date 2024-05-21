@@ -20,6 +20,7 @@ from humanloop.type.feedback_label_request import FeedbackLabelRequest
 RequiredFeedbackTypeRequest = TypedDict("RequiredFeedbackTypeRequest", {
     # The type of feedback to update.
     "type": str,
+
     })
 
 OptionalFeedbackTypeRequest = TypedDict("OptionalFeedbackTypeRequest", {

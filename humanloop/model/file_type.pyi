@@ -44,3 +44,7 @@ class FileType(
     @schemas.classproperty
     def DATASET(cls):
         return cls("dataset")
+    
+    @schemas.classproperty
+    def EVALUATOR(cls):
+        return cls("evaluator")
