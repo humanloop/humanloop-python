@@ -52,8 +52,84 @@ ProjectIdSchema = schemas.StrSchema
 SearchSchema = schemas.StrSchema
 MetadataSearchSchema = schemas.StrSchema
 VersionStatusSchema = VersionStatusSchema
-StartDateSchema = schemas.DateSchema
-EndDateSchema = schemas.DateSchema
+
+
+class StartDateSchema(
+    schemas.ComposedSchema,
+):
+
+
+    class MetaOapg:
+        any_of_0 = schemas.DateSchema
+        any_of_1 = schemas.DateTimeSchema
+        
+        @classmethod
+        @functools.lru_cache()
+        def any_of(cls):
+            # we need this here to make our import statements work
+            # we must store _composed_schemas in here so the code is only run
+            # when we invoke this method. If we kept this at the class
+            # level we would get an error because the class level
+            # code would be run when this module is imported, and these composed
+            # classes don't exist yet because their module has not finished
+            # loading
+            return [
+                cls.any_of_0,
+                cls.any_of_1,
+            ]
+
+
+    def __new__(
+        cls,
+        *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        _configuration: typing.Optional[schemas.Configuration] = None,
+        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+    ) -> 'StartDateSchema':
+        return super().__new__(
+            cls,
+            *args,
+            _configuration=_configuration,
+            **kwargs,
+        )
+
+
+class EndDateSchema(
+    schemas.ComposedSchema,
+):
+
+
+    class MetaOapg:
+        any_of_0 = schemas.DateSchema
+        any_of_1 = schemas.DateTimeSchema
+        
+        @classmethod
+        @functools.lru_cache()
+        def any_of(cls):
+            # we need this here to make our import statements work
+            # we must store _composed_schemas in here so the code is only run
+            # when we invoke this method. If we kept this at the class
+            # level we would get an error because the class level
+            # code would be run when this module is imported, and these composed
+            # classes don't exist yet because their module has not finished
+            # loading
+            return [
+                cls.any_of_0,
+                cls.any_of_1,
+            ]
+
+
+    def __new__(
+        cls,
+        *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        _configuration: typing.Optional[schemas.Configuration] = None,
+        **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+    ) -> 'EndDateSchema':
+        return super().__new__(
+            cls,
+            *args,
+            _configuration=_configuration,
+            **kwargs,
+        )
 SizeSchema = schemas.IntSchema
 PageSchema = schemas.IntSchema
 RequestRequiredQueryParams = typing_extensions.TypedDict(
@@ -68,8 +144,8 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
         'search': typing.Union[SearchSchema, str, ],
         'metadata_search': typing.Union[MetadataSearchSchema, str, ],
         'version_status': typing.Union[VersionStatusSchema, ],
-        'start_date': typing.Union[StartDateSchema, str, date, ],
-        'end_date': typing.Union[EndDateSchema, str, date, ],
+        'start_date': typing.Union[StartDateSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        'end_date': typing.Union[EndDateSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
         'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
         'page': typing.Union[PageSchema, decimal.Decimal, int, ],
     },
@@ -192,8 +268,8 @@ class BaseApi(api_client.Api):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
     ) -> api_client.MappedArgs:
@@ -436,8 +512,8 @@ class ListRaw(BaseApi):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
         **kwargs,
@@ -467,8 +543,8 @@ class ListRaw(BaseApi):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
     ) -> typing.Union[
@@ -497,8 +573,8 @@ class List(BaseApi):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
         validate: bool = False,
@@ -526,8 +602,8 @@ class List(BaseApi):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
         validate: bool = False,
@@ -556,8 +632,8 @@ class ApiForget(BaseApi):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
         **kwargs,
@@ -587,8 +663,8 @@ class ApiForget(BaseApi):
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
-        start_date: typing.Optional[date] = None,
-        end_date: typing.Optional[date] = None,
+        start_date: typing.Optional[typing.Union[date, datetime]] = None,
+        end_date: typing.Optional[typing.Union[date, datetime]] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
     ) -> typing.Union[
