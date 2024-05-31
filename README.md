@@ -2916,18 +2916,18 @@ Filtering is supported for the `source`, `model`, `feedback-{output_name}`,
 Specify filtering with the `source_filter`, `model_filter`, `feedback-{output.name}_filter` and
 `evaluator-{evaluator_external_id}_filter` query params.
 
-E.g. ?source_filter=AI&source_filter=user_1234&feedback-explicit_filter=good
+E.g. `?source_filter=AI&source_filter=user_1234&feedback-explicit_filter=good`
 will only show rows where the source is "AI" or "user_1234", and where the latest feedback for the "explicit" output
 group is "good".
 
 An additional date range filter is supported for the `Timestamp` column (i.e. `Log.created_at`).
 These are supported through the `start_date` and `end_date` query parameters.
-The date format could be either date: YYYY-MM-DD, e.g. 2024-01-01
+The date format could be either date: `YYYY-MM-DD`, e.g. 2024-01-01
 or datetime: YYYY-MM-DD[T]HH:MM[:SS[.ffffff]][Z or [±]HH[:]MM], e.g. 2024-01-01T00:00:00Z.
 
 Searching is supported for the model inputs and output.
 Specify a search term with the `search` query param.
-E.g. ?search=hello%20there will cause a case-insensitive search across model inputs and output.
+E.g. `?search=hello%20there` will cause a case-insensitive search across model inputs and output.
 
 #### 🛠️ Usage<a id="🛠️-usage"></a>
 
