@@ -112,6 +112,7 @@ from humanloop.model.linked_tool_request import LinkedToolRequest
 from humanloop.model.log_datapoint_request import LogDatapointRequest
 from humanloop.model.log_request import LogRequest
 from humanloop.model.log_response import LogResponse
+from humanloop.model.log_response_batch_ids import LogResponseBatchIds
 from humanloop.model.logs_log_response import LogsLogResponse
 from humanloop.model.metric_value_response import MetricValueResponse
 from humanloop.model.model_config_chat_request import ModelConfigChatRequest

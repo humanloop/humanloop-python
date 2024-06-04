@@ -45,6 +45,7 @@ from humanloop.pydantic.evaluations_get_for_project_response import EvaluationsG
 from . import path
 
 # Query params
+EvaluateeIdSchema = schemas.StrSchema
 EvaluatorAggregatesSchema = schemas.BoolSchema
 RequestRequiredQueryParams = typing_extensions.TypedDict(
     'RequestRequiredQueryParams',
@@ -54,6 +55,7 @@ RequestRequiredQueryParams = typing_extensions.TypedDict(
 RequestOptionalQueryParams = typing_extensions.TypedDict(
     'RequestOptionalQueryParams',
     {
+        'evaluatee_id': typing.Union[EvaluateeIdSchema, str, ],
         'evaluator_aggregates': typing.Union[EvaluatorAggregatesSchema, bool, ],
     },
     total=False
@@ -64,6 +66,12 @@ class RequestQueryParams(RequestRequiredQueryParams, RequestOptionalQueryParams)
     pass
 
 
+request_query_evaluatee_id = api_client.QueryParameter(
+    name="evaluatee_id",
+    style=api_client.ParameterStyle.FORM,
+    schema=EvaluateeIdSchema,
+    explode=True,
+)
 request_query_evaluator_aggregates = api_client.QueryParameter(
     name="evaluator_aggregates",
     style=api_client.ParameterStyle.FORM,
@@ -155,11 +163,14 @@ class BaseApi(api_client.Api):
     def _list_all_for_project_mapped_args(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _query_params = {}
         _path_params = {}
+        if evaluatee_id is not None:
+            _query_params["evaluatee_id"] = evaluatee_id
         if evaluator_aggregates is not None:
             _query_params["evaluator_aggregates"] = evaluator_aggregates
         if project_id is not None:
@@ -207,6 +218,7 @@ class BaseApi(api_client.Api):
     
         prefix_separator_iterator = None
         for parameter in (
+            request_query_evaluatee_id,
             request_query_evaluator_aggregates,
         ):
             parameter_data = query_params.get(parameter.name, schemas.unset)
@@ -334,6 +346,7 @@ class BaseApi(api_client.Api):
     
         prefix_separator_iterator = None
         for parameter in (
+            request_query_evaluatee_id,
             request_query_evaluator_aggregates,
         ):
             parameter_data = query_params.get(parameter.name, schemas.unset)
@@ -400,6 +413,7 @@ class ListAllForProjectRaw(BaseApi):
     async def alist_all_for_project(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         **kwargs,
     ) -> typing.Union[
@@ -409,6 +423,7 @@ class ListAllForProjectRaw(BaseApi):
     ]:
         args = self._list_all_for_project_mapped_args(
             project_id=project_id,
+            evaluatee_id=evaluatee_id,
             evaluator_aggregates=evaluator_aggregates,
         )
         return await self._alist_all_for_project_oapg(
@@ -421,6 +436,7 @@ class ListAllForProjectRaw(BaseApi):
     def list_all_for_project(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -428,6 +444,7 @@ class ListAllForProjectRaw(BaseApi):
     ]:
         args = self._list_all_for_project_mapped_args(
             project_id=project_id,
+            evaluatee_id=evaluatee_id,
             evaluator_aggregates=evaluator_aggregates,
         )
         return self._list_all_for_project_oapg(
@@ -441,12 +458,14 @@ class ListAllForProject(BaseApi):
     async def alist_all_for_project(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         validate: bool = False,
         **kwargs,
     ) -> EvaluationsGetForProjectResponsePydantic:
         raw_response = await self.raw.alist_all_for_project(
             project_id=project_id,
+            evaluatee_id=evaluatee_id,
             evaluator_aggregates=evaluator_aggregates,
             **kwargs,
         )
@@ -459,11 +478,13 @@ class ListAllForProject(BaseApi):
     def list_all_for_project(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         validate: bool = False,
     ) -> EvaluationsGetForProjectResponsePydantic:
         raw_response = self.raw.list_all_for_project(
             project_id=project_id,
+            evaluatee_id=evaluatee_id,
             evaluator_aggregates=evaluator_aggregates,
         )
         if validate:
@@ -478,6 +499,7 @@ class ApiForget(BaseApi):
     async def aget(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         **kwargs,
     ) -> typing.Union[
@@ -487,6 +509,7 @@ class ApiForget(BaseApi):
     ]:
         args = self._list_all_for_project_mapped_args(
             project_id=project_id,
+            evaluatee_id=evaluatee_id,
             evaluator_aggregates=evaluator_aggregates,
         )
         return await self._alist_all_for_project_oapg(
@@ -499,6 +522,7 @@ class ApiForget(BaseApi):
     def get(
         self,
         project_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
     ) -> typing.Union[
         ApiResponseFor200,
@@ -506,6 +530,7 @@ class ApiForget(BaseApi):
     ]:
         args = self._list_all_for_project_mapped_args(
             project_id=project_id,
+            evaluatee_id=evaluatee_id,
             evaluator_aggregates=evaluator_aggregates,
         )
         return self._list_all_for_project_oapg(

@@ -46,6 +46,7 @@ from . import path
 
 # Query params
 EvaluatorAggregatesSchema = schemas.BoolSchema
+EvaluateeIdSchema = schemas.StrSchema
 RequestRequiredQueryParams = typing_extensions.TypedDict(
     'RequestRequiredQueryParams',
     {
@@ -55,6 +56,7 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
     'RequestOptionalQueryParams',
     {
         'evaluator_aggregates': typing.Union[EvaluatorAggregatesSchema, bool, ],
+        'evaluatee_id': typing.Union[EvaluateeIdSchema, str, ],
     },
     total=False
 )
@@ -68,6 +70,12 @@ request_query_evaluator_aggregates = api_client.QueryParameter(
     name="evaluator_aggregates",
     style=api_client.ParameterStyle.FORM,
     schema=EvaluatorAggregatesSchema,
+    explode=True,
+)
+request_query_evaluatee_id = api_client.QueryParameter(
+    name="evaluatee_id",
+    style=api_client.ParameterStyle.FORM,
+    schema=EvaluateeIdSchema,
     explode=True,
 )
 # Path params
@@ -156,12 +164,15 @@ class BaseApi(api_client.Api):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _query_params = {}
         _path_params = {}
         if evaluator_aggregates is not None:
             _query_params["evaluator_aggregates"] = evaluator_aggregates
+        if evaluatee_id is not None:
+            _query_params["evaluatee_id"] = evaluatee_id
         if id is not None:
             _path_params["id"] = id
         args.query = _query_params
@@ -208,6 +219,7 @@ class BaseApi(api_client.Api):
         prefix_separator_iterator = None
         for parameter in (
             request_query_evaluator_aggregates,
+            request_query_evaluatee_id,
         ):
             parameter_data = query_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -335,6 +347,7 @@ class BaseApi(api_client.Api):
         prefix_separator_iterator = None
         for parameter in (
             request_query_evaluator_aggregates,
+            request_query_evaluatee_id,
         ):
             parameter_data = query_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -400,6 +413,7 @@ class GetRaw(BaseApi):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -409,6 +423,7 @@ class GetRaw(BaseApi):
         args = self._get_mapped_args(
             id=id,
             evaluator_aggregates=evaluator_aggregates,
+            evaluatee_id=evaluatee_id,
         )
         return await self._aget_oapg(
             query_params=args.query,
@@ -420,6 +435,7 @@ class GetRaw(BaseApi):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -427,6 +443,7 @@ class GetRaw(BaseApi):
         args = self._get_mapped_args(
             id=id,
             evaluator_aggregates=evaluator_aggregates,
+            evaluatee_id=evaluatee_id,
         )
         return self._get_oapg(
             query_params=args.query,
@@ -439,12 +456,14 @@ class Get(BaseApi):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
     ) -> EvaluationResponsePydantic:
         raw_response = await self.raw.aget(
             id=id,
             evaluator_aggregates=evaluator_aggregates,
+            evaluatee_id=evaluatee_id,
             **kwargs,
         )
         if validate:
@@ -456,11 +475,13 @@ class Get(BaseApi):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
     ) -> EvaluationResponsePydantic:
         raw_response = self.raw.get(
             id=id,
             evaluator_aggregates=evaluator_aggregates,
+            evaluatee_id=evaluatee_id,
         )
         if validate:
             return EvaluationResponsePydantic(**raw_response.body)
@@ -474,6 +495,7 @@ class ApiForget(BaseApi):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -483,6 +505,7 @@ class ApiForget(BaseApi):
         args = self._get_mapped_args(
             id=id,
             evaluator_aggregates=evaluator_aggregates,
+            evaluatee_id=evaluatee_id,
         )
         return await self._aget_oapg(
             query_params=args.query,
@@ -494,6 +517,7 @@ class ApiForget(BaseApi):
         self,
         id: str,
         evaluator_aggregates: typing.Optional[bool] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -501,6 +525,7 @@ class ApiForget(BaseApi):
         args = self._get_mapped_args(
             id=id,
             evaluator_aggregates=evaluator_aggregates,
+            evaluatee_id=evaluatee_id,
         )
         return self._get_oapg(
             query_params=args.query,

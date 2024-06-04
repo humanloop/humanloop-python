@@ -2043,6 +2043,7 @@ Get evaluation by ID.
 get_response = humanloop.evaluations.get(
     id="id_example",
     evaluator_aggregates=True,
+    evaluatee_id="string_example",
 )
 ```
 
@@ -2055,6 +2056,10 @@ String ID of evaluation run. Starts with `ev_`.
 ##### evaluator_aggregates: `bool`<a id="evaluator_aggregates-bool"></a>
 
 Whether to include evaluator aggregates in the response.
+
+##### evaluatee_id: `str`<a id="evaluatee_id-str"></a>
+
+String ID of evaluatee version to return. If not defined, the first evaluatee will be returned. Starts with `evv_`.
 
 #### 🔄 Return<a id="🔄-return"></a>
 
@@ -2099,6 +2104,7 @@ list_response = humanloop.evaluations.list(
     end_date="1970-01-01",
     size=50,
     page=0,
+    evaluatee_id="string_example",
 )
 ```
 
@@ -2123,6 +2129,10 @@ Only return evaluations created before this date.
 ##### size: `int`<a id="size-int"></a>
 
 ##### page: `int`<a id="page-int"></a>
+
+##### evaluatee_id: `str`<a id="evaluatee_id-str"></a>
+
+String ID of evaluatee version to return. If not defined, the first evaluatee will be returned. Starts with `evv_`.
 
 #### 🔄 Return<a id="🔄-return"></a>
 
@@ -2149,6 +2159,7 @@ sorting, filtering and pagination options.
 ```python
 list_all_for_project_response = humanloop.evaluations.list_all_for_project(
     project_id="project_id_example",
+    evaluatee_id="string_example",
     evaluator_aggregates=True,
 )
 ```
@@ -2158,6 +2169,10 @@ list_all_for_project_response = humanloop.evaluations.list_all_for_project(
 ##### project_id: `str`<a id="project_id-str"></a>
 
 String ID of project. Starts with `pr_`.
+
+##### evaluatee_id: `str`<a id="evaluatee_id-str"></a>
+
+String ID of evaluatee version to return. If not defined, the first evaluatee will be returned. Starts with `evv_`.
 
 ##### evaluator_aggregates: `bool`<a id="evaluator_aggregates-bool"></a>
 
@@ -2186,6 +2201,7 @@ list_datapoints_response = humanloop.evaluations.list_datapoints(
     id="id_example",
     page=1,
     size=10,
+    evaluatee_id="string_example",
 )
 ```
 
@@ -2202,6 +2218,10 @@ Page to fetch. Starts from 1.
 ##### size: `int`<a id="size-int"></a>
 
 Number of evaluation results to retrieve.
+
+##### evaluatee_id: `str`<a id="evaluatee_id-str"></a>
+
+String ID of evaluatee version to return. If not defined, the first evaluatee will be returned. Starts with `evv_`.
 
 #### 🔄 Return<a id="🔄-return"></a>
 
@@ -2230,6 +2250,7 @@ log_response = humanloop.evaluations.log(
         "save": True,
     },
     evaluation_id="evaluation_id_example",
+    evaluatee_id="string_example",
 )
 ```
 
@@ -2247,6 +2268,10 @@ The log generated for the datapoint.
 ##### evaluation_id: `str`<a id="evaluation_id-str"></a>
 
 ID of the evaluation run. Starts with `evrun_`.
+
+##### evaluatee_id: `str`<a id="evaluatee_id-str"></a>
+
+String ID of evaluatee version to return. If not defined, the first evaluatee will be returned. Starts with `evv_`.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -2278,6 +2303,7 @@ result_response = humanloop.evaluations.result(
     evaluation_id="evaluation_id_example",
     result=True,
     error="string_example",
+    evaluatee_id="string_example",
 )
 ```
 
@@ -2303,6 +2329,10 @@ The result value of the evaluation.
 ##### error: `str`<a id="error-str"></a>
 
 An error that occurred during evaluation.
+
+##### evaluatee_id: `str`<a id="evaluatee_id-str"></a>
+
+String ID of evaluatee version to return. If not defined, the first evaluatee will be returned. Starts with `evv_`.
 
 #### ⚙️ Request Body<a id="⚙️-request-body"></a>
 
@@ -3008,6 +3038,7 @@ log_response = humanloop.log(
         }
     ],
     output="string_example",
+    judgment=True,
     config_id="string_example",
     config={
         "provider": "openai",
@@ -3101,6 +3132,9 @@ The messages passed to the to provider chat endpoint.
 ##### output: `str`<a id="output-str"></a>
 
 Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
+
+##### judgment: Union[`bool`, `Union[int, float]`]<a id="judgment-unionbool-unionint-float"></a>
+
 
 ##### config_id: `str`<a id="config_id-str"></a>
 

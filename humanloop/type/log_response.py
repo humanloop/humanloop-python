@@ -18,6 +18,7 @@ from humanloop.type.chat_message_with_tool_call import ChatMessageWithToolCall
 from humanloop.type.config_response import ConfigResponse
 from humanloop.type.evaluation_result_response import EvaluationResultResponse
 from humanloop.type.feedback_response import FeedbackResponse
+from humanloop.type.log_response_batch_ids import LogResponseBatchIds
 from humanloop.type.metric_value_response import MetricValueResponse
 from humanloop.type.observability_status import ObservabilityStatus
 from humanloop.type.tool_choice import ToolChoice
@@ -82,6 +83,8 @@ class OptionalLogResponse(TypedDict, total=False):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: str
 
+    judgment: typing.Union[bool, typing.Union[int, float]]
+
     # Unique ID of a config to associate to the log.
     config_id: str
 
@@ -141,6 +144,8 @@ class OptionalLogResponse(TypedDict, total=False):
 
     # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
     tool_choice: typing.Union[str, str, ToolChoice]
+
+    batch_ids: LogResponseBatchIds
 
 class LogResponse(RequiredLogResponse, OptionalLogResponse):
     pass

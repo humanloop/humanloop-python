@@ -68,6 +68,8 @@ class OptionalLogRequest(TypedDict, total=False):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: str
 
+    judgment: typing.Union[bool, typing.Union[int, float]]
+
     # Unique ID of a config to associate to the log.
     config_id: str
 

@@ -19,6 +19,7 @@ from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCa
 from humanloop.pydantic.config_response import ConfigResponse
 from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse
 from humanloop.pydantic.feedback_response import FeedbackResponse
+from humanloop.pydantic.log_response_batch_ids import LogResponseBatchIds
 from humanloop.pydantic.metric_value_response import MetricValueResponse
 from humanloop.pydantic.observability_status import ObservabilityStatus
 from humanloop.pydantic.tool_choice import ToolChoice
@@ -81,6 +82,8 @@ class LogResponse(BaseModel):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: typing.Optional[str] = Field(None, alias='output')
 
+    judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = Field(None, alias='judgment')
+
     # Unique ID of a config to associate to the log.
     config_id: typing.Optional[str] = Field(None, alias='config_id')
 
@@ -140,6 +143,8 @@ class LogResponse(BaseModel):
 
     # Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
     tool_choice: typing.Optional[typing.Union[str, str, ToolChoice]] = Field(None, alias='tool_choice')
+
+    batch_ids: typing.Optional[LogResponseBatchIds] = Field(None, alias='batch_ids')
 
     model_config = ConfigDict(
         protected_namespaces=(),

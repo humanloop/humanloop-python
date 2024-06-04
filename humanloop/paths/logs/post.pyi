@@ -135,6 +135,7 @@ class BaseApi(api_client.Api):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -182,6 +183,8 @@ class BaseApi(api_client.Api):
             _body["messages"] = messages
         if output is not None:
             _body["output"] = output
+        if judgment is not None:
+            _body["judgment"] = judgment
         if config_id is not None:
             _body["config_id"] = config_id
         if config is not None:
@@ -433,6 +436,7 @@ class LogRaw(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -470,6 +474,7 @@ class LogRaw(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,
@@ -508,6 +513,7 @@ class LogRaw(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -543,6 +549,7 @@ class LogRaw(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,
@@ -582,6 +589,7 @@ class Log(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -616,6 +624,7 @@ class Log(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,
@@ -655,6 +664,7 @@ class Log(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -688,6 +698,7 @@ class Log(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,
@@ -729,6 +740,7 @@ class ApiForpost(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -766,6 +778,7 @@ class ApiForpost(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,
@@ -804,6 +817,7 @@ class ApiForpost(BaseApi):
         trial_id: typing.Optional[str] = None,
         messages: typing.Optional[typing.List[ChatMessageWithToolCall]] = None,
         output: typing.Optional[str] = None,
+        judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = None,
         config_id: typing.Optional[str] = None,
         config: typing.Optional[typing.Union[ModelConfigRequest, ToolConfigRequest]] = None,
         environment: typing.Optional[str] = None,
@@ -839,6 +853,7 @@ class ApiForpost(BaseApi):
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,

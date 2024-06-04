@@ -73,6 +73,7 @@ StartDateSchema = schemas.DateSchema
 EndDateSchema = schemas.DateSchema
 SizeSchema = schemas.IntSchema
 PageSchema = schemas.IntSchema
+EvaluateeIdSchema = schemas.StrSchema
 RequestRequiredQueryParams = typing_extensions.TypedDict(
     'RequestRequiredQueryParams',
     {
@@ -87,6 +88,7 @@ RequestOptionalQueryParams = typing_extensions.TypedDict(
         'end_date': typing.Union[EndDateSchema, str, date, ],
         'size': typing.Union[SizeSchema, decimal.Decimal, int, ],
         'page': typing.Union[PageSchema, decimal.Decimal, int, ],
+        'evaluatee_id': typing.Union[EvaluateeIdSchema, str, ],
     },
     total=False
 )
@@ -131,6 +133,12 @@ request_query_page = api_client.QueryParameter(
     name="page",
     style=api_client.ParameterStyle.FORM,
     schema=PageSchema,
+    explode=True,
+)
+request_query_evaluatee_id = api_client.QueryParameter(
+    name="evaluatee_id",
+    style=api_client.ParameterStyle.FORM,
+    schema=EvaluateeIdSchema,
     explode=True,
 )
 _auth = [
@@ -197,6 +205,7 @@ class BaseApi(api_client.Api):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
         _query_params = {}
@@ -212,6 +221,8 @@ class BaseApi(api_client.Api):
             _query_params["size"] = size
         if page is not None:
             _query_params["page"] = page
+        if evaluatee_id is not None:
+            _query_params["evaluatee_id"] = evaluatee_id
         args.query = _query_params
         return args
 
@@ -245,6 +256,7 @@ class BaseApi(api_client.Api):
             request_query_end_date,
             request_query_size,
             request_query_page,
+            request_query_evaluatee_id,
         ):
             parameter_data = query_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -362,6 +374,7 @@ class BaseApi(api_client.Api):
             request_query_end_date,
             request_query_size,
             request_query_page,
+            request_query_evaluatee_id,
         ):
             parameter_data = query_params.get(parameter.name, schemas.unset)
             if parameter_data is schemas.unset:
@@ -431,6 +444,7 @@ class ListRaw(BaseApi):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -444,6 +458,7 @@ class ListRaw(BaseApi):
             end_date=end_date,
             size=size,
             page=page,
+            evaluatee_id=evaluatee_id,
         )
         return await self._alist_oapg(
             query_params=args.query,
@@ -458,6 +473,7 @@ class ListRaw(BaseApi):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -469,6 +485,7 @@ class ListRaw(BaseApi):
             end_date=end_date,
             size=size,
             page=page,
+            evaluatee_id=evaluatee_id,
         )
         return self._list_oapg(
             query_params=args.query,
@@ -484,6 +501,7 @@ class List(BaseApi):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
     ) -> PaginatedDataEvaluationResponsePydantic:
@@ -494,6 +512,7 @@ class List(BaseApi):
             end_date=end_date,
             size=size,
             page=page,
+            evaluatee_id=evaluatee_id,
             **kwargs,
         )
         if validate:
@@ -509,6 +528,7 @@ class List(BaseApi):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
     ) -> PaginatedDataEvaluationResponsePydantic:
         raw_response = self.raw.list(
@@ -518,6 +538,7 @@ class List(BaseApi):
             end_date=end_date,
             size=size,
             page=page,
+            evaluatee_id=evaluatee_id,
         )
         if validate:
             return PaginatedDataEvaluationResponsePydantic(**raw_response.body)
@@ -535,6 +556,7 @@ class ApiForget(BaseApi):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor200Async,
@@ -548,6 +570,7 @@ class ApiForget(BaseApi):
             end_date=end_date,
             size=size,
             page=page,
+            evaluatee_id=evaluatee_id,
         )
         return await self._alist_oapg(
             query_params=args.query,
@@ -562,6 +585,7 @@ class ApiForget(BaseApi):
         end_date: typing.Optional[date] = None,
         size: typing.Optional[int] = None,
         page: typing.Optional[int] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor200,
         api_client.ApiResponseWithoutDeserialization,
@@ -573,6 +597,7 @@ class ApiForget(BaseApi):
             end_date=end_date,
             size=size,
             page=page,
+            evaluatee_id=evaluatee_id,
         )
         return self._list_oapg(
             query_params=args.query,

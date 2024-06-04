@@ -682,6 +682,9 @@ operation_parameter_map = {
             {
                 'name': 'evaluator_aggregates'
             },
+            {
+                'name': 'evaluatee_id'
+            },
         ]
     },
     '/evaluations-GET': {
@@ -704,12 +707,18 @@ operation_parameter_map = {
             {
                 'name': 'page'
             },
+            {
+                'name': 'evaluatee_id'
+            },
         ]
     },
     '/projects/{project_id}/evaluations-GET': {
         'parameters': [
             {
                 'name': 'project_id'
+            },
+            {
+                'name': 'evaluatee_id'
             },
             {
                 'name': 'evaluator_aggregates'
@@ -727,6 +736,9 @@ operation_parameter_map = {
             {
                 'name': 'size'
             },
+            {
+                'name': 'evaluatee_id'
+            },
         ]
     },
     '/evaluations/{evaluation_id}/log-POST': {
@@ -739,6 +751,9 @@ operation_parameter_map = {
             },
             {
                 'name': 'evaluation_id'
+            },
+            {
+                'name': 'evaluatee_id'
             },
         ]
     },
@@ -758,6 +773,9 @@ operation_parameter_map = {
             },
             {
                 'name': 'error'
+            },
+            {
+                'name': 'evaluatee_id'
             },
         ]
     },
@@ -1008,6 +1026,9 @@ operation_parameter_map = {
             },
             {
                 'name': 'output'
+            },
+            {
+                'name': 'judgment'
             },
             {
                 'name': 'config_id'

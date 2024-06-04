@@ -45,6 +45,32 @@ from humanloop.pydantic.evaluation_result_response import EvaluationResultRespon
 from humanloop.pydantic.create_evaluation_result_log_request import CreateEvaluationResultLogRequest as CreateEvaluationResultLogRequestPydantic
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 
+# Query params
+EvaluateeIdSchema = schemas.StrSchema
+RequestRequiredQueryParams = typing_extensions.TypedDict(
+    'RequestRequiredQueryParams',
+    {
+    }
+)
+RequestOptionalQueryParams = typing_extensions.TypedDict(
+    'RequestOptionalQueryParams',
+    {
+        'evaluatee_id': typing.Union[EvaluateeIdSchema, str, ],
+    },
+    total=False
+)
+
+
+class RequestQueryParams(RequestRequiredQueryParams, RequestOptionalQueryParams):
+    pass
+
+
+request_query_evaluatee_id = api_client.QueryParameter(
+    name="evaluatee_id",
+    style=api_client.ParameterStyle.FORM,
+    schema=EvaluateeIdSchema,
+    explode=True,
+)
 # Path params
 EvaluationIdSchema = schemas.StrSchema
 RequestRequiredPathParams = typing_extensions.TypedDict(
@@ -138,8 +164,10 @@ class BaseApi(api_client.Api):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
+        _query_params = {}
         _path_params = {}
         _body = {}
         if log_id is not None:
@@ -151,14 +179,18 @@ class BaseApi(api_client.Api):
         if error is not None:
             _body["error"] = error
         args.body = _body
+        if evaluatee_id is not None:
+            _query_params["evaluatee_id"] = evaluatee_id
         if evaluation_id is not None:
             _path_params["evaluation_id"] = evaluation_id
+        args.query = _query_params
         args.path = _path_params
         return args
 
     async def _aresult_oapg(
         self,
         body: typing.Any = None,
+            query_params: typing.Optional[dict] = {},
             path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
@@ -177,6 +209,7 @@ class BaseApi(api_client.Api):
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
     
@@ -192,6 +225,19 @@ class BaseApi(api_client.Api):
     
         for k, v in _path_params.items():
             used_path = used_path.replace('{%s}' % k, v)
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_evaluatee_id,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -229,6 +275,7 @@ class BaseApi(api_client.Api):
             serialized_body=_body,
             body=body,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
             **kwargs
         )
@@ -290,6 +337,7 @@ class BaseApi(api_client.Api):
     def _result_oapg(
         self,
         body: typing.Any = None,
+            query_params: typing.Optional[dict] = {},
             path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
@@ -306,6 +354,7 @@ class BaseApi(api_client.Api):
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
     
@@ -321,6 +370,19 @@ class BaseApi(api_client.Api):
     
         for k, v in _path_params.items():
             used_path = used_path.replace('{%s}' % k, v)
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_evaluatee_id,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -358,6 +420,7 @@ class BaseApi(api_client.Api):
             serialized_body=_body,
             body=body,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -395,6 +458,7 @@ class ResultRaw(BaseApi):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
@@ -407,9 +471,11 @@ class ResultRaw(BaseApi):
             evaluation_id=evaluation_id,
             result=result,
             error=error,
+            evaluatee_id=evaluatee_id,
         )
         return await self._aresult_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
             **kwargs,
         )
@@ -421,6 +487,7 @@ class ResultRaw(BaseApi):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -431,9 +498,11 @@ class ResultRaw(BaseApi):
             evaluation_id=evaluation_id,
             result=result,
             error=error,
+            evaluatee_id=evaluatee_id,
         )
         return self._result_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
         )
 
@@ -446,6 +515,7 @@ class Result(BaseApi):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
     ) -> EvaluationResultResponsePydantic:
@@ -455,6 +525,7 @@ class Result(BaseApi):
             evaluation_id=evaluation_id,
             result=result,
             error=error,
+            evaluatee_id=evaluatee_id,
             **kwargs,
         )
         if validate:
@@ -469,6 +540,7 @@ class Result(BaseApi):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
     ) -> EvaluationResultResponsePydantic:
         raw_response = self.raw.result(
@@ -477,6 +549,7 @@ class Result(BaseApi):
             evaluation_id=evaluation_id,
             result=result,
             error=error,
+            evaluatee_id=evaluatee_id,
         )
         if validate:
             return EvaluationResultResponsePydantic(**raw_response.body)
@@ -493,6 +566,7 @@ class ApiForpost(BaseApi):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
@@ -505,9 +579,11 @@ class ApiForpost(BaseApi):
             evaluation_id=evaluation_id,
             result=result,
             error=error,
+            evaluatee_id=evaluatee_id,
         )
         return await self._aresult_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
             **kwargs,
         )
@@ -519,6 +595,7 @@ class ApiForpost(BaseApi):
         evaluation_id: str,
         result: typing.Optional[typing.Union[bool, int, typing.Union[int, float]]] = None,
         error: typing.Optional[str] = None,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -529,9 +606,11 @@ class ApiForpost(BaseApi):
             evaluation_id=evaluation_id,
             result=result,
             error=error,
+            evaluatee_id=evaluatee_id,
         )
         return self._result_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
         )
 

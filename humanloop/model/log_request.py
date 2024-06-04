@@ -76,6 +76,45 @@ class LogRequest(
                 def __getitem__(self, i: int) -> 'ChatMessageWithToolCall':
                     return super().__getitem__(i)
             output = schemas.StrSchema
+            
+            
+            class judgment(
+                schemas.ComposedSchema,
+            ):
+            
+            
+                class MetaOapg:
+                    any_of_0 = schemas.BoolSchema
+                    any_of_1 = schemas.NumberSchema
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def any_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            cls.any_of_0,
+                            cls.any_of_1,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'judgment':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
             config_id = schemas.StrSchema
             
             
@@ -207,6 +246,7 @@ class LogRequest(
                 "trial_id": trial_id,
                 "messages": messages,
                 "output": output,
+                "judgment": judgment,
                 "config_id": config_id,
                 "config": config,
                 "environment": environment,
@@ -269,6 +309,9 @@ class LogRequest(
     def __getitem__(self, name: typing_extensions.Literal["output"]) -> MetaOapg.properties.output: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["judgment"]) -> MetaOapg.properties.judgment: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["config_id"]) -> MetaOapg.properties.config_id: ...
     
     @typing.overload
@@ -313,7 +356,7 @@ class LogRequest(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "judgment", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -364,6 +407,9 @@ class LogRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["output"]) -> typing.Union[MetaOapg.properties.output, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["judgment"]) -> typing.Union[MetaOapg.properties.judgment, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["config_id"]) -> typing.Union[MetaOapg.properties.config_id, schemas.Unset]: ...
     
     @typing.overload
@@ -408,7 +454,7 @@ class LogRequest(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "judgment", "config_id", "config", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -430,6 +476,7 @@ class LogRequest(
         trial_id: typing.Union[MetaOapg.properties.trial_id, str, schemas.Unset] = schemas.unset,
         messages: typing.Union[MetaOapg.properties.messages, list, tuple, schemas.Unset] = schemas.unset,
         output: typing.Union[MetaOapg.properties.output, str, schemas.Unset] = schemas.unset,
+        judgment: typing.Union[MetaOapg.properties.judgment, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         config_id: typing.Union[MetaOapg.properties.config_id, str, schemas.Unset] = schemas.unset,
         config: typing.Union[MetaOapg.properties.config, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         environment: typing.Union[MetaOapg.properties.environment, str, schemas.Unset] = schemas.unset,
@@ -465,6 +512,7 @@ class LogRequest(
             trial_id=trial_id,
             messages=messages,
             output=output,
+            judgment=judgment,
             config_id=config_id,
             config=config,
             environment=environment,

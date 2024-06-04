@@ -48,6 +48,32 @@ from humanloop.pydantic.create_evaluation_log_request import CreateEvaluationLog
 from humanloop.pydantic.http_validation_error import HTTPValidationError as HTTPValidationErrorPydantic
 from humanloop.pydantic.create_log_response import CreateLogResponse as CreateLogResponsePydantic
 
+# Query params
+EvaluateeIdSchema = schemas.StrSchema
+RequestRequiredQueryParams = typing_extensions.TypedDict(
+    'RequestRequiredQueryParams',
+    {
+    }
+)
+RequestOptionalQueryParams = typing_extensions.TypedDict(
+    'RequestOptionalQueryParams',
+    {
+        'evaluatee_id': typing.Union[EvaluateeIdSchema, str, ],
+    },
+    total=False
+)
+
+
+class RequestQueryParams(RequestRequiredQueryParams, RequestOptionalQueryParams):
+    pass
+
+
+request_query_evaluatee_id = api_client.QueryParameter(
+    name="evaluatee_id",
+    style=api_client.ParameterStyle.FORM,
+    schema=EvaluateeIdSchema,
+    explode=True,
+)
 # Path params
 EvaluationIdSchema = schemas.StrSchema
 RequestRequiredPathParams = typing_extensions.TypedDict(
@@ -139,8 +165,10 @@ class BaseApi(api_client.Api):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
+        _query_params = {}
         _path_params = {}
         _body = {}
         if datapoint_id is not None:
@@ -148,14 +176,18 @@ class BaseApi(api_client.Api):
         if log is not None:
             _body["log"] = log
         args.body = _body
+        if evaluatee_id is not None:
+            _query_params["evaluatee_id"] = evaluatee_id
         if evaluation_id is not None:
             _path_params["evaluation_id"] = evaluation_id
+        args.query = _query_params
         args.path = _path_params
         return args
 
     async def _alog_oapg(
         self,
         body: typing.Any = None,
+            query_params: typing.Optional[dict] = {},
             path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
@@ -174,6 +206,7 @@ class BaseApi(api_client.Api):
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
     
@@ -189,6 +222,19 @@ class BaseApi(api_client.Api):
     
         for k, v in _path_params.items():
             used_path = used_path.replace('{%s}' % k, v)
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_evaluatee_id,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -226,6 +272,7 @@ class BaseApi(api_client.Api):
             serialized_body=_body,
             body=body,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
             **kwargs
         )
@@ -287,6 +334,7 @@ class BaseApi(api_client.Api):
     def _log_oapg(
         self,
         body: typing.Any = None,
+            query_params: typing.Optional[dict] = {},
             path_params: typing.Optional[dict] = {},
         skip_deserialization: bool = True,
         timeout: typing.Optional[typing.Union[float, typing.Tuple]] = None,
@@ -303,6 +351,7 @@ class BaseApi(api_client.Api):
             api_response.body and api_response.headers will not be deserialized into schema
             class instances
         """
+        self._verify_typed_dict_inputs_oapg(RequestQueryParams, query_params)
         self._verify_typed_dict_inputs_oapg(RequestPathParams, path_params)
         used_path = path.value
     
@@ -318,6 +367,19 @@ class BaseApi(api_client.Api):
     
         for k, v in _path_params.items():
             used_path = used_path.replace('{%s}' % k, v)
+    
+        prefix_separator_iterator = None
+        for parameter in (
+            request_query_evaluatee_id,
+        ):
+            parameter_data = query_params.get(parameter.name, schemas.unset)
+            if parameter_data is schemas.unset:
+                continue
+            if prefix_separator_iterator is None:
+                prefix_separator_iterator = parameter.get_prefix_separator_iterator()
+            serialized_data = parameter.serialize(parameter_data, prefix_separator_iterator)
+            for serialized_value in serialized_data.values():
+                used_path += serialized_value
     
         _headers = HTTPHeaderDict()
         # TODO add cookie handling
@@ -355,6 +417,7 @@ class BaseApi(api_client.Api):
             serialized_body=_body,
             body=body,
             auth_settings=_auth,
+            prefix_separator_iterator=prefix_separator_iterator,
             timeout=timeout,
         )
     
@@ -390,6 +453,7 @@ class LogRaw(BaseApi):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
@@ -400,9 +464,11 @@ class LogRaw(BaseApi):
             datapoint_id=datapoint_id,
             log=log,
             evaluation_id=evaluation_id,
+            evaluatee_id=evaluatee_id,
         )
         return await self._alog_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
             **kwargs,
         )
@@ -412,6 +478,7 @@ class LogRaw(BaseApi):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -420,9 +487,11 @@ class LogRaw(BaseApi):
             datapoint_id=datapoint_id,
             log=log,
             evaluation_id=evaluation_id,
+            evaluatee_id=evaluatee_id,
         )
         return self._log_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
         )
 
@@ -433,6 +502,7 @@ class Log(BaseApi):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
         **kwargs,
     ) -> CreateLogResponsePydantic:
@@ -440,6 +510,7 @@ class Log(BaseApi):
             datapoint_id=datapoint_id,
             log=log,
             evaluation_id=evaluation_id,
+            evaluatee_id=evaluatee_id,
             **kwargs,
         )
         if validate:
@@ -452,12 +523,14 @@ class Log(BaseApi):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         validate: bool = False,
     ) -> CreateLogResponsePydantic:
         raw_response = self.raw.log(
             datapoint_id=datapoint_id,
             log=log,
             evaluation_id=evaluation_id,
+            evaluatee_id=evaluatee_id,
         )
         if validate:
             return CreateLogResponsePydantic(**raw_response.body)
@@ -472,6 +545,7 @@ class ApiForpost(BaseApi):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
         **kwargs,
     ) -> typing.Union[
         ApiResponseFor201Async,
@@ -482,9 +556,11 @@ class ApiForpost(BaseApi):
             datapoint_id=datapoint_id,
             log=log,
             evaluation_id=evaluation_id,
+            evaluatee_id=evaluatee_id,
         )
         return await self._alog_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
             **kwargs,
         )
@@ -494,6 +570,7 @@ class ApiForpost(BaseApi):
         datapoint_id: str,
         log: LogRequest,
         evaluation_id: str,
+        evaluatee_id: typing.Optional[str] = None,
     ) -> typing.Union[
         ApiResponseFor201,
         api_client.ApiResponseWithoutDeserialization,
@@ -502,9 +579,11 @@ class ApiForpost(BaseApi):
             datapoint_id=datapoint_id,
             log=log,
             evaluation_id=evaluation_id,
+            evaluatee_id=evaluatee_id,
         )
         return self._log_oapg(
             body=args.body,
+            query_params=args.query,
             path_params=args.path,
         )
 

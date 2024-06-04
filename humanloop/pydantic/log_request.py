@@ -66,6 +66,8 @@ class LogRequest(BaseModel):
     # Generated output from your model for the provided inputs. Can be `None` if logging an error, or if logging a parent datapoint with the intention to populate it later
     output: typing.Optional[str] = Field(None, alias='output')
 
+    judgment: typing.Optional[typing.Union[bool, typing.Union[int, float]]] = Field(None, alias='judgment')
+
     # Unique ID of a config to associate to the log.
     config_id: typing.Optional[str] = Field(None, alias='config_id')
 
