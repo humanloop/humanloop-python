@@ -1984,7 +1984,6 @@ create_response = humanloop.evaluations.create(
     dataset_id="string_example",
     project_id="project_id_example",
     provider_api_keys={},
-    max_concurrency=5,
     hl_generated=True,
 )
 ```
@@ -2009,10 +2008,6 @@ String ID of project. Starts with `pr_`.
 
 
 API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization. Ensure you provide an API key for the provider for the model config you are evaluating, or have one saved to your organization.
-
-##### max_concurrency: `int`<a id="max_concurrency-int"></a>
-
-The maximum number of concurrent generations to run. A higher value will result in faster completion of the evaluation but may place higher load on your provider rate-limits. 
 
 ##### hl_generated: `bool`<a id="hl_generated-bool"></a>
 

@@ -667,9 +667,6 @@ operation_parameter_map = {
                 'name': 'provider_api_keys'
             },
             {
-                'name': 'max_concurrency'
-            },
-            {
                 'name': 'hl_generated'
             },
         ]

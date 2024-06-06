@@ -153,7 +153,6 @@ class BaseApi(api_client.Api):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
     ) -> api_client.MappedArgs:
         args: api_client.MappedArgs = api_client.MappedArgs()
@@ -167,8 +166,6 @@ class BaseApi(api_client.Api):
             _body["dataset_id"] = dataset_id
         if provider_api_keys is not None:
             _body["provider_api_keys"] = provider_api_keys
-        if max_concurrency is not None:
-            _body["max_concurrency"] = max_concurrency
         if hl_generated is not None:
             _body["hl_generated"] = hl_generated
         args.body = _body
@@ -416,7 +413,6 @@ class CreateRaw(BaseApi):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
         **kwargs,
     ) -> typing.Union[
@@ -430,7 +426,6 @@ class CreateRaw(BaseApi):
             dataset_id=dataset_id,
             project_id=project_id,
             provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
             hl_generated=hl_generated,
         )
         return await self._acreate_oapg(
@@ -446,7 +441,6 @@ class CreateRaw(BaseApi):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
     ) -> typing.Union[
         ApiResponseFor201,
@@ -458,7 +452,6 @@ class CreateRaw(BaseApi):
             dataset_id=dataset_id,
             project_id=project_id,
             provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
             hl_generated=hl_generated,
         )
         return self._create_oapg(
@@ -475,7 +468,6 @@ class Create(BaseApi):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
         validate: bool = False,
         **kwargs,
@@ -486,7 +478,6 @@ class Create(BaseApi):
             dataset_id=dataset_id,
             project_id=project_id,
             provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
             hl_generated=hl_generated,
             **kwargs,
         )
@@ -502,7 +493,6 @@ class Create(BaseApi):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
         validate: bool = False,
     ) -> EvaluationResponsePydantic:
@@ -512,7 +502,6 @@ class Create(BaseApi):
             dataset_id=dataset_id,
             project_id=project_id,
             provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
             hl_generated=hl_generated,
         )
         if validate:
@@ -530,7 +519,6 @@ class ApiForpost(BaseApi):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
         **kwargs,
     ) -> typing.Union[
@@ -544,7 +532,6 @@ class ApiForpost(BaseApi):
             dataset_id=dataset_id,
             project_id=project_id,
             provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
             hl_generated=hl_generated,
         )
         return await self._acreate_oapg(
@@ -560,7 +547,6 @@ class ApiForpost(BaseApi):
         dataset_id: str,
         project_id: str,
         provider_api_keys: typing.Optional[ProviderApiKeys] = None,
-        max_concurrency: typing.Optional[int] = None,
         hl_generated: typing.Optional[bool] = None,
     ) -> typing.Union[
         ApiResponseFor201,
@@ -572,7 +558,6 @@ class ApiForpost(BaseApi):
             dataset_id=dataset_id,
             project_id=project_id,
             provider_api_keys=provider_api_keys,
-            max_concurrency=max_concurrency,
             hl_generated=hl_generated,
         )
         return self._create_oapg(

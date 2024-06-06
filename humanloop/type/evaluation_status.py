@@ -15,4 +15,4 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
-EvaluationStatus = Literal["pending", "running", "completed", "failed", "cancelled"]
+EvaluationStatus = Literal["pending", "running", "completed", "cancelled"]
