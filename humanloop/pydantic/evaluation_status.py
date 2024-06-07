@@ -16,4 +16,4 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 from pydantic import BaseModel, Field, RootModel, ConfigDict
 
 
-EvaluationStatus = Literal["pending", "running", "completed", "cancelled"]
+EvaluationStatus = Literal["pending", "running", "completed", "cancelled", "failed"]
