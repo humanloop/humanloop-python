@@ -24,7 +24,8 @@ import typing
 import typing_extensions
 import aiohttp
 import urllib3
-from pydantic import BaseModel, RootModel, ValidationError, ConfigDict
+import pydantic
+from pydantic import BaseModel, RootModel, ConfigDict
 from urllib3._collections import HTTPHeaderDict
 from urllib.parse import urlparse, quote
 from urllib3.fields import RequestField as RequestFieldBase
@@ -51,6 +52,176 @@ from humanloop.schemas import (
     Unset,
     unset,
 )
+
+# import all pydantic classes so that any type hints which are quoted due to circular imports
+# are still available in the global namespace
+from humanloop.pydantic.add_evaluators_request import AddEvaluatorsRequest
+from humanloop.pydantic.add_evaluators_request_evaluator_ids import AddEvaluatorsRequestEvaluatorIds
+from humanloop.pydantic.add_evaluators_request_evaluator_version_ids import AddEvaluatorsRequestEvaluatorVersionIds
+from humanloop.pydantic.agent_config_response import AgentConfigResponse
+from humanloop.pydantic.base_metric_response import BaseMetricResponse
+from humanloop.pydantic.body_model_configs_deserialize import BodyModelConfigsDeserialize
+from humanloop.pydantic.categorical_feedback_label import CategoricalFeedbackLabel
+from humanloop.pydantic.chat_data_response import ChatDataResponse
+from humanloop.pydantic.chat_deployed_request import ChatDeployedRequest
+from humanloop.pydantic.chat_experiment_request import ChatExperimentRequest
+from humanloop.pydantic.chat_message_with_tool_call import ChatMessageWithToolCall
+from humanloop.pydantic.chat_model_config_request import ChatModelConfigRequest
+from humanloop.pydantic.chat_request import ChatRequest
+from humanloop.pydantic.chat_response import ChatResponse
+from humanloop.pydantic.chat_response_provider_responses import ChatResponseProviderResponses
+from humanloop.pydantic.chat_role import ChatRole
+from humanloop.pydantic.completion_deployed_request import CompletionDeployedRequest
+from humanloop.pydantic.completion_experiment_request import CompletionExperimentRequest
+from humanloop.pydantic.completion_model_config_request import CompletionModelConfigRequest
+from humanloop.pydantic.completion_request import CompletionRequest
+from humanloop.pydantic.completion_response import CompletionResponse
+from humanloop.pydantic.completion_response_provider_responses import CompletionResponseProviderResponses
+from humanloop.pydantic.config_response import ConfigResponse
+from humanloop.pydantic.config_type import ConfigType
+from humanloop.pydantic.create_datapoint_request import CreateDatapointRequest
+from humanloop.pydantic.create_datapoint_request_inputs import CreateDatapointRequestInputs
+from humanloop.pydantic.create_datapoint_request_target import CreateDatapointRequestTarget
+from humanloop.pydantic.create_datapoints_by_logs_request import CreateDatapointsByLogsRequest
+from humanloop.pydantic.create_datapoints_by_logs_request_log_ids import CreateDatapointsByLogsRequestLogIds
+from humanloop.pydantic.create_dataset_request import CreateDatasetRequest
+from humanloop.pydantic.create_evaluation_log_request import CreateEvaluationLogRequest
+from humanloop.pydantic.create_evaluation_request import CreateEvaluationRequest
+from humanloop.pydantic.create_evaluation_request_evaluator_ids import CreateEvaluationRequestEvaluatorIds
+from humanloop.pydantic.create_evaluation_result_log_request import CreateEvaluationResultLogRequest
+from humanloop.pydantic.create_evaluator_request import CreateEvaluatorRequest
+from humanloop.pydantic.create_experiment_request import CreateExperimentRequest
+from humanloop.pydantic.create_experiment_request_config_ids import CreateExperimentRequestConfigIds
+from humanloop.pydantic.create_log_response import CreateLogResponse
+from humanloop.pydantic.create_project_request import CreateProjectRequest
+from humanloop.pydantic.create_session_response import CreateSessionResponse
+from humanloop.pydantic.dashboard_configuration import DashboardConfiguration
+from humanloop.pydantic.dashboard_configuration_model_config_ids import DashboardConfigurationModelConfigIds
+from humanloop.pydantic.data_response import DataResponse
+from humanloop.pydantic.datapoint_response import DatapointResponse
+from humanloop.pydantic.datapoint_response_inputs import DatapointResponseInputs
+from humanloop.pydantic.datapoint_response_target import DatapointResponseTarget
+from humanloop.pydantic.dataset_response import DatasetResponse
+from humanloop.pydantic.datasets_create_datapoint_request import DatasetsCreateDatapointRequest
+from humanloop.pydantic.datasets_create_datapoint_response import DatasetsCreateDatapointResponse
+from humanloop.pydantic.datasets_list_all_for_project_response import DatasetsListAllForProjectResponse
+from humanloop.pydantic.datasets_list_response import DatasetsListResponse
+from humanloop.pydantic.environment_project_config_request import EnvironmentProjectConfigRequest
+from humanloop.pydantic.environment_project_config_response import EnvironmentProjectConfigResponse
+from humanloop.pydantic.environment_request import EnvironmentRequest
+from humanloop.pydantic.evaluation_datapoint_snapshot_response import EvaluationDatapointSnapshotResponse
+from humanloop.pydantic.evaluation_response import EvaluationResponse
+from humanloop.pydantic.evaluation_result_response import EvaluationResultResponse
+from humanloop.pydantic.evaluation_status import EvaluationStatus
+from humanloop.pydantic.evaluations_get_for_project_response import EvaluationsGetForProjectResponse
+from humanloop.pydantic.evaluator_arguments_type import EvaluatorArgumentsType
+from humanloop.pydantic.evaluator_config_response import EvaluatorConfigResponse
+from humanloop.pydantic.evaluator_response import EvaluatorResponse
+from humanloop.pydantic.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from humanloop.pydantic.evaluator_type import EvaluatorType
+from humanloop.pydantic.evaluators_list_response import EvaluatorsListResponse
+from humanloop.pydantic.experiment_config_response import ExperimentConfigResponse
+from humanloop.pydantic.experiment_response import ExperimentResponse
+from humanloop.pydantic.experiment_status import ExperimentStatus
+from humanloop.pydantic.experiments_list_response import ExperimentsListResponse
+from humanloop.pydantic.feedback import Feedback
+from humanloop.pydantic.feedback_aggregate_response import FeedbackAggregateResponse
+from humanloop.pydantic.feedback_class import FeedbackClass
+from humanloop.pydantic.feedback_label_request import FeedbackLabelRequest
+from humanloop.pydantic.feedback_multi_select_aggregate import FeedbackMultiSelectAggregate
+from humanloop.pydantic.feedback_multi_select_aggregate_values import FeedbackMultiSelectAggregateValues
+from humanloop.pydantic.feedback_number_aggregate import FeedbackNumberAggregate
+from humanloop.pydantic.feedback_request import FeedbackRequest
+from humanloop.pydantic.feedback_response import FeedbackResponse
+from humanloop.pydantic.feedback_select_aggregate import FeedbackSelectAggregate
+from humanloop.pydantic.feedback_select_aggregate_values import FeedbackSelectAggregateValues
+from humanloop.pydantic.feedback_submit_request import FeedbackSubmitRequest
+from humanloop.pydantic.feedback_submit_response import FeedbackSubmitResponse
+from humanloop.pydantic.feedback_text_aggregate import FeedbackTextAggregate
+from humanloop.pydantic.feedback_type import FeedbackType
+from humanloop.pydantic.feedback_type_model import FeedbackTypeModel
+from humanloop.pydantic.feedback_type_request import FeedbackTypeRequest
+from humanloop.pydantic.feedback_types import FeedbackTypes
+from humanloop.pydantic.file_type import FileType
+from humanloop.pydantic.function_tool import FunctionTool
+from humanloop.pydantic.function_tool_choice import FunctionToolChoice
+from humanloop.pydantic.function_tool_nullable import FunctionToolNullable
+from humanloop.pydantic.generic_config_response import GenericConfigResponse
+from humanloop.pydantic.get_model_config_response import GetModelConfigResponse
+from humanloop.pydantic.http_validation_error import HTTPValidationError
+from humanloop.pydantic.image_chat_content import ImageChatContent
+from humanloop.pydantic.image_url import ImageUrl
+from humanloop.pydantic.label_sentiment import LabelSentiment
+from humanloop.pydantic.linked_tool_request import LinkedToolRequest
+from humanloop.pydantic.log_datapoint_request import LogDatapointRequest
+from humanloop.pydantic.log_request import LogRequest
+from humanloop.pydantic.log_response import LogResponse
+from humanloop.pydantic.log_response_batch_ids import LogResponseBatchIds
+from humanloop.pydantic.logs_log_response import LogsLogResponse
+from humanloop.pydantic.metric_value_response import MetricValueResponse
+from humanloop.pydantic.model_config_chat_request import ModelConfigChatRequest
+from humanloop.pydantic.model_config_chat_request_tools import ModelConfigChatRequestTools
+from humanloop.pydantic.model_config_completion_request import ModelConfigCompletionRequest
+from humanloop.pydantic.model_config_evaluator_aggregate_response import ModelConfigEvaluatorAggregateResponse
+from humanloop.pydantic.model_config_request import ModelConfigRequest
+from humanloop.pydantic.model_config_request_tools import ModelConfigRequestTools
+from humanloop.pydantic.model_config_response import ModelConfigResponse
+from humanloop.pydantic.model_config_tool_request import ModelConfigToolRequest
+from humanloop.pydantic.model_configs_export200_response import ModelConfigsExport200Response
+from humanloop.pydantic.model_configs_export_response import ModelConfigsExportResponse
+from humanloop.pydantic.model_configs_serialize_request import ModelConfigsSerializeRequest
+from humanloop.pydantic.model_configs_serialize_response import ModelConfigsSerializeResponse
+from humanloop.pydantic.model_endpoints import ModelEndpoints
+from humanloop.pydantic.model_providers import ModelProviders
+from humanloop.pydantic.observability_status import ObservabilityStatus
+from humanloop.pydantic.paginated_data_datapoint_response import PaginatedDataDatapointResponse
+from humanloop.pydantic.paginated_data_evaluation_datapoint_snapshot_response import PaginatedDataEvaluationDatapointSnapshotResponse
+from humanloop.pydantic.paginated_data_evaluation_response import PaginatedDataEvaluationResponse
+from humanloop.pydantic.paginated_data_log_response import PaginatedDataLogResponse
+from humanloop.pydantic.paginated_data_project_response import PaginatedDataProjectResponse
+from humanloop.pydantic.paginated_data_session_response import PaginatedDataSessionResponse
+from humanloop.pydantic.platform_access_enum import PlatformAccessEnum
+from humanloop.pydantic.positive_label import PositiveLabel
+from humanloop.pydantic.project_config_response import ProjectConfigResponse
+from humanloop.pydantic.project_input_response import ProjectInputResponse
+from humanloop.pydantic.project_model_config_feedback_stats_response import ProjectModelConfigFeedbackStatsResponse
+from humanloop.pydantic.project_model_config_request import ProjectModelConfigRequest
+from humanloop.pydantic.project_model_config_request_tools import ProjectModelConfigRequestTools
+from humanloop.pydantic.project_response import ProjectResponse
+from humanloop.pydantic.project_sort_by import ProjectSortBy
+from humanloop.pydantic.project_user_response import ProjectUserResponse
+from humanloop.pydantic.projects_deploy_config_to_environments_response import ProjectsDeployConfigToEnvironmentsResponse
+from humanloop.pydantic.projects_get_configs_response import ProjectsGetConfigsResponse
+from humanloop.pydantic.projects_get_deployed_configs_response import ProjectsGetDeployedConfigsResponse
+from humanloop.pydantic.projects_update_feedback_types_request import ProjectsUpdateFeedbackTypesRequest
+from humanloop.pydantic.provider_api_keys import ProviderApiKeys
+from humanloop.pydantic.response_format import ResponseFormat
+from humanloop.pydantic.session_project_response import SessionProjectResponse
+from humanloop.pydantic.session_response import SessionResponse
+from humanloop.pydantic.sort_order import SortOrder
+from humanloop.pydantic.text_chat_content import TextChatContent
+from humanloop.pydantic.time_unit import TimeUnit
+from humanloop.pydantic.tool_call import ToolCall
+from humanloop.pydantic.tool_choice import ToolChoice
+from humanloop.pydantic.tool_config_request import ToolConfigRequest
+from humanloop.pydantic.tool_config_response import ToolConfigResponse
+from humanloop.pydantic.tool_response import ToolResponse
+from humanloop.pydantic.tool_result_response import ToolResultResponse
+from humanloop.pydantic.tool_source import ToolSource
+from humanloop.pydantic.tool_type import ToolType
+from humanloop.pydantic.update_dataset_request import UpdateDatasetRequest
+from humanloop.pydantic.update_evaluation_status_request import UpdateEvaluationStatusRequest
+from humanloop.pydantic.update_evaluator_request import UpdateEvaluatorRequest
+from humanloop.pydantic.update_experiment_request import UpdateExperimentRequest
+from humanloop.pydantic.update_experiment_request_config_ids_to_deregister import UpdateExperimentRequestConfigIdsToDeregister
+from humanloop.pydantic.update_experiment_request_config_ids_to_register import UpdateExperimentRequestConfigIdsToRegister
+from humanloop.pydantic.update_log_request import UpdateLogRequest
+from humanloop.pydantic.update_project_request import UpdateProjectRequest
+from humanloop.pydantic.usage import Usage
+from humanloop.pydantic.user_response import UserResponse
+from humanloop.pydantic.validation_error import ValidationError
+from humanloop.pydantic.validation_error_loc import ValidationErrorLoc
+from humanloop.pydantic.version_status import VersionStatus
 
 @dataclass
 class MappedArgs:
@@ -91,7 +262,7 @@ def closest_type_match(value: typing.Any, types: typing.List[typing.Type]) -> ty
                     try:
                         t(**value)
                         best_match = t
-                    except ValidationError:
+                    except pydantic.ValidationError:
                         continue
             else:  # This is a non-generic type
                 if isinstance(value, t):
@@ -136,7 +307,7 @@ def construct_model_instance(model: typing.Type[T], data: typing.Any) -> T:
     # if model is BaseModel, iterate over fields and recursively call
     elif issubclass(model, BaseModel):
         new_data = {}
-        for field_name, field_type in model.__annotations__.items():
+        for field_name, field_type in typing.get_type_hints(model, globals()).items():
             # get alias
             alias = model.model_fields[field_name].alias
             if alias in data:
@@ -1240,7 +1411,7 @@ class ApiClient:
             self.default_headers[header_name] = header_value
         self.cookie = cookie
         # Set default User-Agent.
-        self.user_agent = 'Konfig/0.7.27/python'
+        self.user_agent = 'Konfig/0.7.28/python'
 
     def __enter__(self):
         return self
