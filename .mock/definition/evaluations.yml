@@ -1,0 +1,589 @@
+imports:
+  root: __package__.yml
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    list:
+      path: /evaluations
+      method: GET
+      auth: true
+      docs: >-
+        List Evaluations for the given File.
+
+
+        Retrieve a list of Evaluations that evaluate versions of the specified
+        File.
+      pagination:
+        offset: $request.page
+        results: $response.records
+      display-name: List Evaluations for File
+      request:
+        name: EvaluationsListRequest
+        query-parameters:
+          file_id:
+            type: string
+            docs: >-
+              Filter by File ID. If provided, only Evaluation for the specified
+              File will be returned.
+          page:
+            type: optional<integer>
+            docs: Page number for pagination.
+          size:
+            type: optional<integer>
+            docs: Page size for pagination. Number of Evaluations to fetch.
+      response:
+        docs: Successful Response
+        type: root.PaginatedEvaluationResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - query-parameters:
+            file_id: file_id
+          response:
+            body:
+              records:
+                - id: id
+                  dataset:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    datapoints_count: 1
+                  evaluatees:
+                    - version:
+                        id: id
+                        name: name
+                        version_id: version_id
+                        created_at: '2024-01-15T09:30:00Z'
+                        updated_at: '2024-01-15T09:30:00Z'
+                        status: uncommitted
+                        last_used_at: '2024-01-15T09:30:00Z'
+                        path: path
+                        model: model
+                        version_logs_count: 1
+                        total_logs_count: 1
+                        inputs:
+                          - name: name
+                      orchestrated: true
+                  evaluators:
+                    - version:
+                        id: id
+                        name: name
+                        version_id: version_id
+                        created_at: '2024-01-15T09:30:00Z'
+                        updated_at: '2024-01-15T09:30:00Z'
+                        status: uncommitted
+                        last_used_at: '2024-01-15T09:30:00Z'
+                        path: path
+                        spec:
+                          arguments_type: target_free
+                          return_type: boolean
+                        version_logs_count: 1
+                        total_logs_count: 1
+                        inputs:
+                          - name: name
+                      orchestrated: true
+                  status: pending
+                  created_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  updated_at: '2024-01-15T09:30:00Z'
+              page: 1
+              size: 1
+              total: 1
+    create:
+      path: /evaluations
+      method: POST
+      auth: true
+      docs: >-
+        Create an Evaluation.
+
+
+        Create a new Evaluation by specifying the Dataset, Evaluatees, and
+        Evaluators.
+
+        Humanloop will automatically start generating Logs and running
+        Evaluators.
+
+
+        To keep updated on the progress of the Evaluation, you can poll the
+        Evaluation
+
+        and check its status.
+      display-name: Create Evaluation
+      request:
+        body: root.CreateEvaluationRequest
+      response:
+        docs: Successful Response
+        type: root.EvaluationResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request:
+            dataset:
+              version_id: version_id
+            evaluatees:
+              - version_id: version_id
+            evaluators:
+              - version_id: version_id
+          response:
+            body:
+              id: id
+              dataset:
+                id: id
+                name: name
+                version_id: version_id
+                directory_id: directory_id
+                environments:
+                  - id: id
+                    created_at: '2024-01-15T09:30:00Z'
+                    name: name
+                    tag: default
+                created_at: '2024-01-15T09:30:00Z'
+                updated_at: '2024-01-15T09:30:00Z'
+                created_by:
+                  id: id
+                  email_address: email_address
+                  full_name: full_name
+                status: uncommitted
+                last_used_at: '2024-01-15T09:30:00Z'
+                path: path
+                commit_message: commit_message
+                datapoints_count: 1
+                datapoints:
+                  - id: id
+              evaluatees:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    model: model
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  batch_id: batch_id
+                  orchestrated: true
+              evaluators:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    spec:
+                      arguments_type: target_free
+                      return_type: boolean
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  orchestrated: true
+              status: pending
+              created_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              updated_at: '2024-01-15T09:30:00Z'
+    get:
+      path: /evaluations/{id}
+      method: GET
+      auth: true
+      docs: |-
+        Get an Evaluation.
+
+        Retrieve the Evaluation with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluation.
+      display-name: Get Evaluation
+      response:
+        docs: Successful Response
+        type: root.EvaluationResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              id: id
+              dataset:
+                id: id
+                name: name
+                version_id: version_id
+                directory_id: directory_id
+                environments:
+                  - id: id
+                    created_at: '2024-01-15T09:30:00Z'
+                    name: name
+                    tag: default
+                created_at: '2024-01-15T09:30:00Z'
+                updated_at: '2024-01-15T09:30:00Z'
+                created_by:
+                  id: id
+                  email_address: email_address
+                  full_name: full_name
+                status: uncommitted
+                last_used_at: '2024-01-15T09:30:00Z'
+                path: path
+                commit_message: commit_message
+                datapoints_count: 1
+                datapoints:
+                  - id: id
+              evaluatees:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    model: model
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  batch_id: batch_id
+                  orchestrated: true
+              evaluators:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    spec:
+                      arguments_type: target_free
+                      return_type: boolean
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  orchestrated: true
+              status: pending
+              created_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              updated_at: '2024-01-15T09:30:00Z'
+    delete:
+      path: /evaluations/{id}
+      method: DELETE
+      auth: true
+      docs: >-
+        Delete an Evaluation.
+
+
+        Remove an Evaluation from Humanloop. The Logs and Versions used in the
+        Evaluation
+
+        will not be deleted.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluation.
+      display-name: Delete Evaluation
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+    update:
+      path: /evaluations/{id}
+      method: PATCH
+      auth: true
+      docs: >-
+        Update an Evaluation.
+
+
+        Update the setup of an Evaluation by specifying the Dataset, Evaluatees,
+        and Evaluators.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluation.
+      display-name: Update Evaluation
+      request:
+        body: root.CreateEvaluationRequest
+      response:
+        docs: Successful Response
+        type: root.EvaluationResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request:
+            dataset:
+              version_id: version_id
+            evaluatees:
+              - version_id: version_id
+            evaluators:
+              - version_id: version_id
+          response:
+            body:
+              id: id
+              dataset:
+                id: id
+                name: name
+                version_id: version_id
+                directory_id: directory_id
+                environments:
+                  - id: id
+                    created_at: '2024-01-15T09:30:00Z'
+                    name: name
+                    tag: default
+                created_at: '2024-01-15T09:30:00Z'
+                updated_at: '2024-01-15T09:30:00Z'
+                created_by:
+                  id: id
+                  email_address: email_address
+                  full_name: full_name
+                status: uncommitted
+                last_used_at: '2024-01-15T09:30:00Z'
+                path: path
+                commit_message: commit_message
+                datapoints_count: 1
+                datapoints:
+                  - id: id
+              evaluatees:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    model: model
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  batch_id: batch_id
+                  orchestrated: true
+              evaluators:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    spec:
+                      arguments_type: target_free
+                      return_type: boolean
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  orchestrated: true
+              status: pending
+              created_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              updated_at: '2024-01-15T09:30:00Z'
+    update_status:
+      path: /evaluations/{id}/status
+      method: PATCH
+      auth: true
+      docs: >-
+        Update the status of an Evaluation.
+
+
+        Can be used to cancel a running Evaluation, or mark an Evaluation that
+        uses external or human evaluators
+
+        as completed.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluation.
+      display-name: Update Status
+      request:
+        name: UpdateEvaluationStatusRequest
+        body:
+          properties:
+            status: root.EvaluationStatus
+      response:
+        docs: Successful Response
+        type: root.EvaluationResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request:
+            status: pending
+          response:
+            body:
+              id: id
+              dataset:
+                id: id
+                name: name
+                version_id: version_id
+                directory_id: directory_id
+                environments:
+                  - id: id
+                    created_at: '2024-01-15T09:30:00Z'
+                    name: name
+                    tag: default
+                created_at: '2024-01-15T09:30:00Z'
+                updated_at: '2024-01-15T09:30:00Z'
+                created_by:
+                  id: id
+                  email_address: email_address
+                  full_name: full_name
+                status: uncommitted
+                last_used_at: '2024-01-15T09:30:00Z'
+                path: path
+                commit_message: commit_message
+                datapoints_count: 1
+                datapoints:
+                  - id: id
+              evaluatees:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    model: model
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  batch_id: batch_id
+                  orchestrated: true
+              evaluators:
+                - version:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    spec:
+                      arguments_type: target_free
+                      return_type: boolean
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  orchestrated: true
+              status: pending
+              created_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              updated_at: '2024-01-15T09:30:00Z'
+    get_stats:
+      path: /evaluations/{id}/stats
+      method: GET
+      auth: true
+      docs: >-
+        Get Evaluation Stats.
+
+
+        Retrieve aggregate stats for the specified Evaluation.
+
+        This includes the number of generated Logs for every evaluatee and
+        Evaluator metrics
+
+        (such as the mean and percentiles for numeric Evaluators for every
+        evaluatee).
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluation.
+      display-name: Get Evaluation Stats
+      response:
+        docs: Successful Response
+        type: root.EvaluationStats
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              overall_stats:
+                num_datapoints: 1
+                total_logs: 1
+                total_evaluator_logs: 1
+              version_stats:
+                - version_id: version_id
+                  num_logs: 1
+                  evaluator_version_stats:
+                    - evaluator_version_id: evaluator_version_id
+                      total_logs: 1
+                      num_judgments: 1
+                      num_nulls: 1
+                      num_errors: 1
+                      mean: 0
+                      std: 1
+                      percentiles:
+                        '0': -2.5
+                        '25': -0.6745
+                        '50': 0
+                        '75': 0.6745
+                        '100': 2.5
+  display-name: Evaluations
+docs: >+
+  Evaluations help you measure the performance of your Prompts, Tools and LLM
+  Evaluators.
+
+
+  An Evaluation consists of a Dataset, Evaluatees (i.e. Versions to evaluate),
+  and Evaluators.
+
+  When an Evaluation is created, Humanloop will start generating Logs, iterating
+  through Datapoints in the Dataset,
+
+  for each Evaluatee. The Evaluators will then be run on these Logs.
+
+
+  Aggregate stats can be viewed in the Humanloop app or retrieved with the **Get
+  Evaluation Stats** endpoint.
+
+
+  Note that when an Evaluation is created, Humanloop will attempt to reuse any
+  existing Logs for each Datapoint-Evaluatee
+
+  pair. This means that you can create multiple Evaluations without generating
+  new Logs unnecessarily.
+

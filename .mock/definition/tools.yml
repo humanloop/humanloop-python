@@ -1,0 +1,747 @@
+imports:
+  root: __package__.yml
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    list:
+      path: /tools
+      method: GET
+      auth: true
+      docs: Get a list of Tools.
+      pagination:
+        offset: $request.page
+        results: $response.records
+      display-name: 'List '
+      request:
+        name: ToolsListRequest
+        query-parameters:
+          page:
+            type: optional<integer>
+            docs: Page offset for pagination.
+          size:
+            type: optional<integer>
+            docs: Page size for pagination. Number of Tools to fetch.
+          name:
+            type: optional<string>
+            docs: Case-insensitive filter for Tool name.
+          user_filter:
+            type: optional<string>
+            docs: >-
+              Case-insensitive filter for users in the Tool. This filter matches
+              against both email address and name of users.
+          sort_by:
+            type: optional<root.ProjectSortBy>
+            docs: Field to sort Tools by
+          order:
+            type: optional<root.SortOrder>
+            docs: Direction to sort by.
+      response:
+        docs: Successful Response
+        type: root.ListTools
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - response:
+            body:
+              records:
+                - id: id
+                  name: name
+                  version_id: version_id
+                  directory_id: directory_id
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  path: path
+                  function:
+                    name: name
+                    description: description
+                  source_code: source_code
+                  tool_type: pinecone_search
+                  commit_message: commit_message
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+                  signature: signature
+    create:
+      path: /tools
+      method: POST
+      auth: true
+      docs: >-
+        Create a Tool or update it with a new version if it already exists.
+
+
+        Tools are identified by the `ID` or their `path`. The name, description
+        and parameters determine the versions of the Tool.
+
+
+        If you provide a commit message, then the new version will be committed;
+
+        otherwise it will be uncommitted. If you try to commit an already
+        committed version,
+
+        an exception will be raised.
+      display-name: Upsert Tool
+      request:
+        name: ToolRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Tool including the Tool name, which is used as a
+                unique identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Tool to update.
+            function:
+              type: optional<root.ToolFunction>
+              docs: >-
+                Callable function specification of the Tool shown to the model
+                for tool calling.
+            source_code:
+              type: optional<string>
+              docs: Code source of the Tool.
+            setup_values:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Values needed to setup the Tool, defined in JSON Schema format:
+                https://json-schema.org/
+            name:
+              type: optional<string>
+              docs: Name of the Tool, which is used as a unique identifier.
+            tool_type:
+              type: optional<root.FilesToolType>
+              docs: Type of Tool.
+            commit_message:
+              type: optional<string>
+              docs: Message describing the changes made.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request: {}
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              function:
+                name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+              source_code: source_code
+              setup_values:
+                setup_values:
+                  key: value
+              tool_type: pinecone_search
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              signature: signature
+    get:
+      path: /tools/{id}
+      method: GET
+      auth: true
+      docs: >-
+        Retrieve the Tool with the given ID.
+
+
+        By default the deployed version of the Tool is returned. Use the query
+        parameters
+
+        `version_id` or `environment` to target a specific version of the Tool.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+      display-name: Get Tool
+      request:
+        name: ToolsGetRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific Version Id  of the Tool to retrieve.
+          environment:
+            type: optional<string>
+            docs: An environment tag to retrieve a deployed Version from.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              function:
+                name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+              source_code: source_code
+              setup_values:
+                setup_values:
+                  key: value
+              tool_type: pinecone_search
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              signature: signature
+    delete:
+      path: /tools/{id}
+      method: DELETE
+      auth: true
+      docs: Delete the Tool with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+      display-name: Delete Tool
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+    update:
+      path: /tools/{id}
+      method: PATCH
+      auth: true
+      docs: Move the Tool to a different path or change the name.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+      display-name: Move Tool
+      request:
+        name: UpdateToolRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Tool including the Tool name, which is used as a
+                unique identifier.
+            name:
+              type: optional<string>
+              docs: Name of the Tool, which is used as a unique identifier.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              function:
+                name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+              source_code: source_code
+              setup_values:
+                setup_values:
+                  key: value
+              tool_type: pinecone_search
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              signature: signature
+    list_versions:
+      path: /tools/{id}/versions
+      method: GET
+      auth: true
+      docs: Get a list of all the versions of a Tool.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for the Tool.
+      display-name: List Versions
+      request:
+        name: ToolsListVersionsRequest
+        query-parameters:
+          status:
+            type: optional<root.VersionStatus>
+            docs: >-
+              Filter versions by status: 'uncommitted', 'committed'. If no
+              status is provided, all versions are returned.
+          environment:
+            type: optional<string>
+            docs: >-
+              Filter versions by environment tag. If no environment is provided,
+              all versions are returned.
+          evaluation_aggregates: optional<boolean>
+      response:
+        docs: Successful Response
+        type: root.ListTools
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              records:
+                - id: id
+                  name: name
+                  version_id: version_id
+                  directory_id: directory_id
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  path: path
+                  function:
+                    name: name
+                    description: description
+                  source_code: source_code
+                  tool_type: pinecone_search
+                  commit_message: commit_message
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+                  signature: signature
+    deploy:
+      path: /tools/{id}/versions/{version_id}/deploy
+      method: POST
+      auth: true
+      docs: >-
+        Deploy Tool to Environment.
+
+
+        Set the deployed Version for the specified Environment. This Tool
+        Version
+
+        will be used for calls made to the Tool in this Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+        version_id:
+          type: string
+          docs: Unique identifier for the specific version of the Tool.
+      display-name: Deploy
+      request:
+        name: ToolsDeployRequest
+        query-parameters:
+          environment_id:
+            type: string
+            docs: Unique identifier for the Environment to deploy the Version to.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            version_id: version_id
+          query-parameters:
+            environment_id: environment_id
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              function:
+                name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+              source_code: source_code
+              setup_values:
+                setup_values:
+                  key: value
+              tool_type: pinecone_search
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              signature: signature
+    commit:
+      path: /tools/{id}/versions/{version_id}/commit
+      method: POST
+      auth: true
+      docs: Commit the Tool Version with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+        version_id:
+          type: string
+          docs: Unique identifier for the specific version of the Tool.
+      display-name: Commit
+      request:
+        body: root.CommitRequest
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            version_id: version_id
+          request:
+            commit_message: commit_message
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              function:
+                name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+              source_code: source_code
+              setup_values:
+                setup_values:
+                  key: value
+              tool_type: pinecone_search
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              signature: signature
+    log:
+      path: /tools/log
+      method: POST
+      auth: true
+      docs: >-
+        Log to a Tool.
+
+
+        You can use query parameters version_id, or environment, to target
+
+        an existing version of the Tool. Otherwise the default deployed version
+        will be chosen.
+
+
+        Instead of targeting an existing version explicitly, you can instead
+        pass in
+
+        Tool details in the request body. In this case, we will check if the
+        details correspond
+
+        to an existing version of the Tool, if not we will create a new version.
+        This is helpful
+
+        in the case where you are storing or deriving your Tool details in code.
+      display-name: Log
+      request:
+        name: ToolLogRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific version Id of the Tool to log to.
+          environment:
+            type: optional<string>
+            docs: An environment tag of the deployed version to log to.
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Tool, including the name, which is used as a unique
+                identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Tool to update.
+            output:
+              type: optional<string>
+              docs: >-
+                Generated output from your model for the provided inputs. Can be
+                `None` if logging an error, or if creating a parent Log with the
+                intention to populate it later.
+            raw_output:
+              type: optional<string>
+              docs: Raw output from the provider.
+            created_at:
+              type: optional<datetime>
+              docs: 'User defined timestamp for when the log was created. '
+            error:
+              type: optional<string>
+              docs: Error message if the log is an error.
+            provider_latency:
+              type: optional<double>
+              docs: Duration of the logged event in seconds.
+            provider_request:
+              type: optional<map<string, unknown>>
+              docs: Raw request sent to provider.
+            provider_response:
+              type: optional<map<string, unknown>>
+              docs: Raw response received the provider.
+            session_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Session to associate the Log to.
+                Allows you to record multiple Logs to a Session (using an ID
+                kept by your internal systems) by passing the same `session_id`
+                in subsequent log requests. 
+            parent_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the parent Log in a Session. Should only
+                be provided if `session_id` is provided. If provided, the Log
+                will be nested under the parent Log within the Session.
+            inputs:
+              type: optional<map<string, unknown>>
+              docs: The inputs passed to the prompt template.
+            source:
+              type: optional<string>
+              docs: Identifies where the model was called from.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: Any additional metadata to record.
+            save:
+              type: optional<boolean>
+              docs: >-
+                Whether the request/response payloads will be stored on
+                Humanloop.
+            source_datapoint_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Datapoint that this Log is derived
+                from. This can be used by Humanloop to associate Logs to
+                Evaluations. If provided, Humanloop will automatically associate
+                this Log to Evaluations that require a Log for this
+                Datapoint-Version pair.
+            batches:
+              type: optional<list<string>>
+              docs: >-
+                Array of Batch Ids that this log is part of. Batches are used to
+                group Logs together for offline Evaluations
+            user:
+              type: optional<string>
+              docs: End-user ID related to the Log.
+            environment:
+              type: optional<string>
+              docs: The name of the Environment the Log is associated to.
+              name: toolLogRequestEnvironment
+            tool:
+              type: optional<root.ToolKernelRequest>
+              docs: >-
+                Details of your Tool. A new Tool version will be created if the
+                provided details are new.
+      response:
+        docs: Successful Response
+        type: root.CreateToolLogResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request: {}
+          response:
+            body:
+              id: id
+              tool_id: tool_id
+              version_id: version_id
+              session_id: session_id
+    update_evaluators:
+      path: /tools/{id}/evaluators
+      method: POST
+      auth: true
+      docs: |-
+        Activate and deactivate Evaluators for the Tool.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Tool for monitoring purposes.
+      path-parameters:
+        id: string
+      display-name: Update Evaluators
+      request:
+        body: root.EvaluatorActivationDeactivationRequest
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              function:
+                name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+              source_code: source_code
+              setup_values:
+                setup_values:
+                  key: value
+              tool_type: pinecone_search
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              signature: signature
+    list_templates:
+      path: /tools/templates
+      method: GET
+      auth: true
+      display-name: List Templates
+      request:
+        name: ToolsListTemplatesRequest
+        query-parameters:
+          tool_type:
+            type: optional<root.FilesToolType>
+            docs: Type of tool to return the template
+      response:
+        docs: Successful Response
+        type: list<root.ToolTemplateResponse>
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - response:
+            body:
+              - name: name
+                description: description
+                parameters:
+                  parameters:
+                    key: value
+                signature: signature
+                setup_schema:
+                  setup_schema:
+                    key: value

@@ -1,0 +1,165 @@
+imports:
+  root: __package__.yml
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    get:
+      path: /sessions/{id}
+      method: GET
+      auth: true
+      docs: Retrieve the Session with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Session.
+      display-name: Get
+      response:
+        docs: Successful Response
+        type: root.SessionResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              id: id
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              logs:
+                - id: id
+                  output_message:
+                    role: user
+                  prompt_tokens: 1
+                  output_tokens: 1
+                  prompt_cost: 1.1
+                  output_cost: 1.1
+                  finish_reason: finish_reason
+                  prompt:
+                    id: id
+                    name: name
+                    version_id: version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
+                    status: uncommitted
+                    last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
+                    model: model
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: name
+                  messages:
+                    - role: user
+                  tool_choice: none
+                  output: output
+                  raw_output: raw_output
+                  created_at: '2024-01-15T09:30:00Z'
+                  error: error
+                  provider_latency: 1.1
+                  session_id: session_id
+                  parent_id: parent_id
+                  source: source
+                  save: true
+                  source_datapoint_id: source_datapoint_id
+                  batches:
+                    - batches
+                  user: user
+                  environment: environment
+    delete:
+      path: /sessions/{id}
+      method: DELETE
+      auth: true
+      docs: Delete the Session with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Session.
+      display-name: Delete
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+    list:
+      path: /sessions
+      method: GET
+      auth: true
+      docs: Get a list of Sessions.
+      pagination:
+        offset: $request.page
+        results: $response.records
+      display-name: 'List '
+      request:
+        name: SessionsListRequest
+        query-parameters:
+          file_id:
+            type: optional<string>
+            docs: >-
+              Unique identifier for File to return Sessions for. Sessions that
+              contain any Logs associated to this File will be returned.
+          version_id:
+            type: optional<string>
+            docs: >-
+              Unique identifier for Version to return Sessions for. Sessions
+              that contain any Logs associated to this Version will be returned.
+          page:
+            type: optional<integer>
+            docs: Page number for pagination.
+          size:
+            type: optional<integer>
+            docs: Page size for pagination. Number of Sessions to fetch.
+      response:
+        docs: Successful Response
+        type: root.PaginatedSessionResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - response:
+            body:
+              records:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  logs:
+                    - id: id
+                      prompt:
+                        id: id
+                        name: name
+                        version_id: version_id
+                        created_at: '2024-01-15T09:30:00Z'
+                        updated_at: '2024-01-15T09:30:00Z'
+                        status: uncommitted
+                        last_used_at: '2024-01-15T09:30:00Z'
+                        path: path
+                        model: model
+                        version_logs_count: 1
+                        total_logs_count: 1
+                        inputs:
+                          - name: name
+              page: 1
+              size: 1
+              total: 1
+  display-name: Sessions
+docs: >+
+  Sessions are groups of Logs that track sequences of LLM actions.
+
+
+  Sessions enable you to trace through related Logs across different Files. For
+
+  example, a Session can contain a Prompt Log recording an LLM generation, a
+  Tool
+
+  Log recording a retrieval step, and Evaluator Logs measuring the quality of
+  the
+
+  generated text.
+
+
+  Logs within a Session may be nested within each other. When Evaluators are run
+
+  for monitoring, the Evaluator Logs are added to the Session that the evaluated
+
+  Log is in, nested within the evaluated Log.
+

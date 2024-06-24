@@ -1,0 +1,1289 @@
+imports:
+  root: __package__.yml
+service:
+  auth: false
+  base-path: ''
+  endpoints:
+    list:
+      path: /prompts
+      method: GET
+      auth: true
+      docs: Get a list of Prompts.
+      pagination:
+        offset: $request.page
+        results: $response.records
+      display-name: List Prompts
+      request:
+        name: PromptsListRequest
+        query-parameters:
+          page:
+            type: optional<integer>
+            docs: Page number for pagination.
+          size:
+            type: optional<integer>
+            docs: Page size for pagination. Number of Prompts to fetch.
+          name:
+            type: optional<string>
+            docs: Case-insensitive filter for Prompt name.
+          user_filter:
+            type: optional<string>
+            docs: >-
+              Case-insensitive filter for users in the Prompt. This filter
+              matches against both email address and name of users.
+          sort_by:
+            type: optional<root.ProjectSortBy>
+            docs: Field to sort Prompts by
+          order:
+            type: optional<root.SortOrder>
+            docs: Direction to sort by.
+      response:
+        docs: Successful Response
+        type: root.ListPrompts
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - response:
+            body:
+              records:
+                - id: id
+                  name: name
+                  version_id: version_id
+                  directory_id: directory_id
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  path: path
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - name: name
+                      description: description
+                      id: id
+                      version_id: version_id
+                  commit_message: commit_message
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+    create:
+      path: /prompts
+      method: POST
+      auth: true
+      docs: >-
+        Create a Prompt or update it with a new version if it already exists.
+
+
+        Prompts are identified by the `ID` or their `path`. The parameters (i.e.
+        the prompt template, temperature, model etc.) determine the versions of
+        the Prompt.
+
+
+        If you provide a commit message, then the new version will be committed;
+
+        otherwise it will be uncommitted. If you try to commit an already
+        committed version,
+
+        an exception will be raised.
+      display-name: Upsert Prompt
+      request:
+        name: PromptRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Prompt, including the name, which is used as a
+                unique identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Prompt to update.
+            model:
+              type: string
+              docs: >-
+                The model instance used, e.g. `gpt-4`. See [supported
+                models](https://humanloop.com/docs/supported-models)
+            endpoint:
+              type: optional<root.ModelEndpoints>
+              docs: The provider model endpoint used.
+            template:
+              type: optional<PromptRequestTemplate>
+              docs: >-
+                For chat endpoint, provide a Chat template. For completion
+                endpoint, provide a Prompt template. Input variables within the
+                template should be specified with double curly bracket syntax:
+                {{INPUT_NAME}}.
+            provider:
+              type: optional<root.ModelProviders>
+              docs: The company providing the underlying model service.
+            max_tokens:
+              type: optional<integer>
+              docs: >-
+                The maximum number of tokens to generate. Provide max_tokens=-1
+                to dynamically calculate the maximum number of tokens to
+                generate given the length of the prompt
+              default: -1
+            temperature:
+              type: optional<double>
+              docs: >-
+                What sampling temperature to use when making a generation.
+                Higher values means the model will be more creative.
+              default: 1
+            top_p:
+              type: optional<double>
+              docs: >-
+                An alternative to sampling with temperature, called nucleus
+                sampling, where the model considers the results of the tokens
+                with top_p probability mass.
+              default: 1
+            stop:
+              type: optional<PromptRequestStop>
+              docs: >-
+                The string (or list of strings) after which the model will stop
+                generating. The returned text will not contain the stop
+                sequence.
+            presence_penalty:
+              type: optional<double>
+              docs: >-
+                Number between -2.0 and 2.0. Positive values penalize new tokens
+                based on whether they appear in the generation so far.
+              default: 0
+            frequency_penalty:
+              type: optional<double>
+              docs: >-
+                Number between -2.0 and 2.0. Positive values penalize new tokens
+                based on how frequently they appear in the generation so far.
+              default: 0
+            other:
+              type: optional<map<string, unknown>>
+              docs: Other parameter values to be passed to the provider call.
+            seed:
+              type: optional<integer>
+              docs: >-
+                If specified, model will make a best effort to sample
+                deterministically, but it is not guaranteed.
+            response_format:
+              type: optional<root.ResponseFormat>
+              docs: >-
+                The format of the response. Only `{"type": "json_object"}` is
+                currently supported for chat.
+            tools:
+              type: optional<list<root.ToolFunction>>
+              docs: >-
+                The tool specification that the model can choose to call if Tool
+                calling is supported.
+            linked_tools:
+              type: optional<list<string>>
+              docs: >-
+                The IDs of the Tools in your organization that the model can
+                choose to call if Tool calling is supported. The default
+                deployed version of that tool is called.
+            commit_message:
+              type: optional<string>
+              docs: Message describing the changes made.
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request:
+            model: model
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+    get:
+      path: /prompts/{id}
+      method: GET
+      auth: true
+      docs: >-
+        Retrieve the Prompt with the given ID.
+
+
+        By default the deployed version of the Prompt is returned. Use the query
+        parameters
+
+        `version_id` or `environment` to target a specific version of the
+        Prompt.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+      display-name: Get Prompt
+      request:
+        name: PromptsGetRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific Version Id  of the Prompt to retrieve.
+          environment:
+            type: optional<string>
+            docs: An environment tag to retrieve a deployed Version from.
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+    delete:
+      path: /prompts/{id}
+      method: DELETE
+      auth: true
+      docs: Delete the Prompt with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+      display-name: Delete Prompt
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+    update:
+      path: /prompts/{id}
+      method: PATCH
+      auth: true
+      docs: Move the Prompt to a different path or change the name.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+      display-name: Move Prompt
+      request:
+        name: UpdatePromptRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Prompt including the Prompt name, which is used as a
+                unique identifier.
+            name:
+              type: optional<string>
+              docs: Name of the Prompt.
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+    list_versions:
+      path: /prompts/{id}/versions
+      method: GET
+      auth: true
+      docs: Get a list of all the versions of a Prompt.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+      display-name: List Versions
+      request:
+        name: PromptsListVersionsRequest
+        query-parameters:
+          status:
+            type: optional<root.VersionStatus>
+            docs: >-
+              Filter versions by status: 'uncommitted', 'committed'. If no
+              status is provided, all versions are returned.
+          environment:
+            type: optional<string>
+            docs: >-
+              Filter versions by environment tag. If no environment is provided,
+              all versions are returned.
+          evaluation_aggregates: optional<boolean>
+      response:
+        docs: Successful Response
+        type: root.ListPrompts
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              records:
+                - id: id
+                  name: name
+                  version_id: version_id
+                  directory_id: directory_id
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  path: path
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - name: name
+                      description: description
+                      id: id
+                      version_id: version_id
+                  commit_message: commit_message
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+    deploy:
+      path: /prompts/{id}/versions/{version_id}/deploy
+      method: POST
+      auth: true
+      docs: >-
+        Deploy Prompt to Environment.
+
+
+        Set the deployed Version for the specified Environment. This Prompt
+        Version
+
+        will be used for calls made to the Prompt in this Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+        version_id:
+          type: string
+          docs: Unique identifier for the specific version of the Prompt.
+      display-name: Deploy
+      request:
+        name: PromptsDeployRequest
+        query-parameters:
+          environment_id:
+            type: string
+            docs: Unique identifier for the Environment to deploy the Version to.
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            version_id: version_id
+          query-parameters:
+            environment_id: environment_id
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+    commit:
+      path: /prompts/{id}/versions/{version_id}/commit
+      method: POST
+      auth: true
+      docs: Commit the Prompt Version with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+        version_id:
+          type: string
+          docs: Unique identifier for the specific version of the Prompt.
+      display-name: Commit
+      request:
+        body: root.CommitRequest
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            version_id: version_id
+          request:
+            commit_message: commit_message
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+    log:
+      path: /prompts/log
+      method: POST
+      auth: true
+      docs: >-
+        Log to a Prompt.
+
+
+        You can use query parameters version_id, or environment, to target
+
+        an existing version of the Prompt. Otherwise the default deployed
+        version will be chosen.
+
+
+        Instead of targeting an existing version explicitly, you can instead
+        pass in
+
+        Prompt details in the request body. In this case, we will check if the
+        details correspond
+
+        to an existing version of the Prompt, if not we will create a new
+        version. This is helpful
+
+        in the case where you are storing or deriving your Prompt details in
+        code.
+      display-name: Log
+      request:
+        name: PromptLogRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific version Id of the Prompt to log to.
+          environment:
+            type: optional<string>
+            docs: An environment tag of the deployed version to log to.
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Prompt, including the name, which is used as a
+                unique identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Prompt to update.
+            output_message:
+              type: optional<root.ChatMessage>
+              docs: The message returned by the provider.
+            prompt_tokens:
+              type: optional<integer>
+              docs: Number of tokens in the prompt used to generate the output.
+            output_tokens:
+              type: optional<integer>
+              docs: Number of tokens in the output generated by the model.
+            prompt_cost:
+              type: optional<double>
+              docs: Cost in dollars associated to the tokens in the prompt.
+            output_cost:
+              type: optional<double>
+              docs: Cost in dollars associated to the tokens in the output.
+            finish_reason:
+              type: optional<string>
+              docs: Reason the generation finished.
+            prompt:
+              type: optional<root.PromptKernelRequest>
+              docs: >-
+                Details of your Prompt. A new Prompt version will be created if
+                the provided details are new.
+            messages:
+              type: optional<list<root.ChatMessage>>
+              docs: The messages passed to the to provider chat endpoint.
+            tool_choice:
+              type: optional<PromptLogRequestToolChoice>
+              docs: >-
+                Controls how the model uses tools. The following options are
+                supported: 
+
+                - `'none'` means the model will not call any tool and instead
+                generates a message; this is the default when no tools are
+                provided as part of the Prompt. 
+
+                - `'auto'` means the model can decide to call one or more of the
+                provided tools; this is the default when tools are provided as
+                part of the Prompt. 
+
+                - `'required'` means the model can decide to call one or more of
+                the provided tools. 
+
+                - `{'type': 'function', 'function': {name': <TOOL_NAME>}}`
+                forces the model to use the named function.
+            output:
+              type: optional<string>
+              docs: >-
+                Generated output from your model for the provided inputs. Can be
+                `None` if logging an error, or if creating a parent Log with the
+                intention to populate it later.
+            raw_output:
+              type: optional<string>
+              docs: Raw output from the provider.
+            created_at:
+              type: optional<datetime>
+              docs: 'User defined timestamp for when the log was created. '
+            error:
+              type: optional<string>
+              docs: Error message if the log is an error.
+            provider_latency:
+              type: optional<double>
+              docs: Duration of the logged event in seconds.
+            provider_request:
+              type: optional<map<string, unknown>>
+              docs: Raw request sent to provider.
+            provider_response:
+              type: optional<map<string, unknown>>
+              docs: Raw response received the provider.
+            session_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Session to associate the Log to.
+                Allows you to record multiple Logs to a Session (using an ID
+                kept by your internal systems) by passing the same `session_id`
+                in subsequent log requests. 
+            parent_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the parent Log in a Session. Should only
+                be provided if `session_id` is provided. If provided, the Log
+                will be nested under the parent Log within the Session.
+            inputs:
+              type: optional<map<string, unknown>>
+              docs: The inputs passed to the prompt template.
+            source:
+              type: optional<string>
+              docs: Identifies where the model was called from.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: Any additional metadata to record.
+            save:
+              type: optional<boolean>
+              docs: >-
+                Whether the request/response payloads will be stored on
+                Humanloop.
+            source_datapoint_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Datapoint that this Log is derived
+                from. This can be used by Humanloop to associate Logs to
+                Evaluations. If provided, Humanloop will automatically associate
+                this Log to Evaluations that require a Log for this
+                Datapoint-Version pair.
+            batches:
+              type: optional<list<string>>
+              docs: >-
+                Array of Batch Ids that this log is part of. Batches are used to
+                group Logs together for offline Evaluations
+            user:
+              type: optional<string>
+              docs: End-user ID related to the Log.
+            environment:
+              type: optional<string>
+              docs: The name of the Environment the Log is associated to.
+              name: promptLogRequestEnvironment
+      response:
+        docs: Successful Response
+        type: root.CreatePromptLogResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request: {}
+          response:
+            body:
+              id: id
+              prompt_id: prompt_id
+              version_id: version_id
+              session_id: session_id
+    call:
+      path: /prompts/call
+      method: POST
+      auth: true
+      docs: >-
+        Call a Prompt.
+
+
+        Calling a Prompt subsequently calls the model provider before logging
+
+        the data to Humanloop.
+
+
+        You can use query parameters version_id, or environment, to target
+
+        an existing version of the Prompt. Otherwise the default deployed
+        version will be chosen.
+
+
+        Instead of targeting an existing version explicitly, you can instead
+        pass in
+
+        Prompt details in the request body. In this case, we will check if the
+        details correspond
+
+        to an existing version of the Prompt, if not we will create a new
+        version. This is helpful
+
+        in the case where you are storing or deriving your Prompt details in
+        code.
+      display-name: Call
+      request:
+        name: PromptCallRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific version Id of the Prompt to log to.
+          environment:
+            type: optional<string>
+            docs: An environment tag of the deployed version to log to.
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Prompt, including the name, which is used as a
+                unique identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Prompt to update.
+            prompt:
+              type: optional<root.PromptKernelRequest>
+              docs: >-
+                Details of your Prompt. A new Prompt version will be created if
+                the provided details are new.
+            messages:
+              type: optional<list<root.ChatMessage>>
+              docs: The messages passed to the to provider chat endpoint.
+            tool_choice:
+              type: optional<PromptCallRequestToolChoice>
+              docs: >-
+                Controls how the model uses tools. The following options are
+                supported: 
+
+                - `'none'` means the model will not call any tool and instead
+                generates a message; this is the default when no tools are
+                provided as part of the Prompt. 
+
+                - `'auto'` means the model can decide to call one or more of the
+                provided tools; this is the default when tools are provided as
+                part of the Prompt. 
+
+                - `'required'` means the model can decide to call one or more of
+                the provided tools. 
+
+                - `{'type': 'function', 'function': {name': <TOOL_NAME>}}`
+                forces the model to use the named function.
+            session_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Session to associate the Log to.
+                Allows you to record multiple Logs to a Session (using an ID
+                kept by your internal systems) by passing the same `session_id`
+                in subsequent log requests. 
+            parent_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the parent Log in a Session. Should only
+                be provided if `session_id` is provided. If provided, the Log
+                will be nested under the parent Log within the Session.
+            inputs:
+              type: optional<map<string, unknown>>
+              docs: The inputs passed to the prompt template.
+            source:
+              type: optional<string>
+              docs: Identifies where the model was called from.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: Any additional metadata to record.
+            save:
+              type: optional<boolean>
+              docs: >-
+                Whether the request/response payloads will be stored on
+                Humanloop.
+            source_datapoint_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Datapoint that this Log is derived
+                from. This can be used by Humanloop to associate Logs to
+                Evaluations. If provided, Humanloop will automatically associate
+                this Log to Evaluations that require a Log for this
+                Datapoint-Version pair.
+            batches:
+              type: optional<list<string>>
+              docs: >-
+                Array of Batch Ids that this log is part of. Batches are used to
+                group Logs together for offline Evaluations
+            user:
+              type: optional<string>
+              docs: End-user ID related to the Log.
+            environment:
+              type: optional<string>
+              docs: The name of the Environment the Log is associated to.
+              name: promptCallRequestEnvironment
+            provider_api_keys:
+              type: optional<root.ProviderApiKeys>
+              docs: >-
+                API keys required by each provider to make API calls. The API
+                keys provided here are not stored by Humanloop. If not specified
+                here, Humanloop will fall back to the key saved to your
+                organization.
+            num_samples:
+              type: optional<integer>
+              docs: The number of generations.
+              default: 1
+            stream:
+              type: optional<boolean>
+              docs: >-
+                If true, tokens will be sent as data-only server-sent events. If
+                num_samples > 1, samples are streamed back independently.
+            return_inputs:
+              type: optional<boolean>
+              docs: >-
+                Whether to return the inputs in the response. If false, the
+                response will contain an empty dictionary under inputs. This is
+                useful for reducing the size of the response. Defaults to true.
+            logprobs:
+              type: optional<integer>
+              docs: >-
+                Include the log probabilities of the top n tokens in the
+                provider_response
+            suffix:
+              type: optional<string>
+              docs: >-
+                The suffix that comes after a completion of inserted text.
+                Useful for completions that act like inserts.
+      response:
+        docs: Successful Response
+        type: PromptsCallResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request: {}
+          response:
+            body:
+              prompt:
+                id: id
+                name: name
+                version_id: version_id
+                directory_id: directory_id
+                environments:
+                  - id: id
+                    created_at: '2024-01-15T09:30:00Z'
+                    name: name
+                    tag: default
+                created_at: '2024-01-15T09:30:00Z'
+                updated_at: '2024-01-15T09:30:00Z'
+                created_by:
+                  id: id
+                  email_address: email_address
+                  full_name: full_name
+                status: uncommitted
+                last_used_at: '2024-01-15T09:30:00Z'
+                path: path
+                model: model
+                endpoint: complete
+                template: template
+                provider: openai
+                max_tokens: 1
+                temperature: 1.1
+                top_p: 1.1
+                stop: stop
+                presence_penalty: 1.1
+                frequency_penalty: 1.1
+                other:
+                  other:
+                    key: value
+                seed: 1
+                response_format:
+                  type: json_object
+                tools:
+                  - name: name
+                    description: description
+                linked_tools:
+                  - name: name
+                    description: description
+                    id: id
+                    version_id: version_id
+                commit_message: commit_message
+                version_logs_count: 1
+                total_logs_count: 1
+                inputs:
+                  - name: name
+              messages:
+                - content: content
+                  name: name
+                  tool_call_id: tool_call_id
+                  role: user
+                  tool_calls:
+                    - id: id
+                      type: function
+                      function:
+                        name: name
+              tool_choice: none
+              session_id: session_id
+              parent_id: parent_id
+              inputs:
+                inputs:
+                  key: value
+              source: source
+              metadata:
+                metadata:
+                  key: value
+              save: true
+              source_datapoint_id: source_datapoint_id
+              batches:
+                - batches
+              user: user
+              environment: environment
+              id: id
+              logs:
+                - output: output
+                  raw_output: raw_output
+                  created_at: '2024-01-15T09:30:00Z'
+                  error: error
+                  provider_latency: 1.1
+                  output_message:
+                    role: user
+                  prompt_tokens: 1
+                  output_tokens: 1
+                  prompt_cost: 1.1
+                  output_cost: 1.1
+                  finish_reason: finish_reason
+                  index: 1
+    update_evaluators:
+      path: /prompts/{id}/evaluators
+      method: POST
+      auth: true
+      docs: |-
+        Activate and deactivate Evaluators for the Prompt.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Prompt for monitoring purposes.
+      path-parameters:
+        id: string
+      display-name: Update Evaluators
+      request:
+        body: root.EvaluatorActivationDeactivationRequest
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              id: id
+              name: name
+              version_id: version_id
+              directory_id: directory_id
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              path: path
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+  display-name: Prompts
+docs: >+
+  Prompts define how a large language model behaves.
+
+
+  #### What is a Prompt?
+
+
+  A Prompt on Humanloop encapsulates the base instructions and other
+  configuration for how a large language model should
+
+  perform a specific task.
+
+
+  Prompts have immutable versions that you can **Commit** and **Deploy**.
+
+  To use a Prompt, you can **Call** it to create a generation and you can
+  **Log** generations manually.
+
+
+  #### Referencing Prompts
+
+
+  Prompts are referenced by their unique ID or path.
+
+
+  You can perform actions on a specific Prompt version by specifying either the
+  `version_id`
+
+  or `environment` query parameter in the request. If you provide a
+  `version_id`, Humanloop will
+
+  use the specified version of the Prompt. If you provide an `environment`,
+  Humanloop will use the
+
+  version of the Prompt that is currently deployed to that Environment.
+
+  If you do not provide either a `version_id` or `environment`, Humanloop will
+  use the Prompt version
+
+  that is deployed to the default Environment.
+
+types:
+  PromptRequestTemplate:
+    discriminated: false
+    docs: >-
+      For chat endpoint, provide a Chat template. For completion endpoint,
+      provide a Prompt template. Input variables within the template should be
+      specified with double curly bracket syntax: {{INPUT_NAME}}.
+    union:
+      - string
+      - list<root.ChatMessage>
+  PromptRequestStop:
+    discriminated: false
+    docs: >-
+      The string (or list of strings) after which the model will stop
+      generating. The returned text will not contain the stop sequence.
+    union:
+      - string
+      - list<string>
+  PromptLogRequestToolChoice:
+    discriminated: false
+    docs: >-
+      Controls how the model uses tools. The following options are supported: 
+
+      - `'none'` means the model will not call any tool and instead generates a
+      message; this is the default when no tools are provided as part of the
+      Prompt. 
+
+      - `'auto'` means the model can decide to call one or more of the provided
+      tools; this is the default when tools are provided as part of the Prompt. 
+
+      - `'required'` means the model can decide to call one or more of the
+      provided tools. 
+
+      - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the
+      model to use the named function.
+    union:
+      - literal<"none">
+      - literal<"auto">
+      - literal<"required">
+      - root.ToolChoice
+  PromptCallRequestToolChoice:
+    discriminated: false
+    docs: >-
+      Controls how the model uses tools. The following options are supported: 
+
+      - `'none'` means the model will not call any tool and instead generates a
+      message; this is the default when no tools are provided as part of the
+      Prompt. 
+
+      - `'auto'` means the model can decide to call one or more of the provided
+      tools; this is the default when tools are provided as part of the Prompt. 
+
+      - `'required'` means the model can decide to call one or more of the
+      provided tools. 
+
+      - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the
+      model to use the named function.
+    union:
+      - literal<"none">
+      - literal<"auto">
+      - literal<"required">
+      - root.ToolChoice
+  PromptsCallResponse:
+    discriminated: false
+    union:
+      - root.PromptCallResponse
+      - root.PromptCallStreamResponse
