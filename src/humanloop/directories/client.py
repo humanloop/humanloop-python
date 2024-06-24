@@ -47,13 +47,13 @@ class DirectoriesClient:
         _response = self._client_wrapper.httpx_client.request(
             "directories", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(typing.List[DirectoryResponse], construct_type(type_=typing.List[DirectoryResponse], object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[DirectoryResponse], construct_type(type_=typing.List[DirectoryResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -100,13 +100,13 @@ class DirectoriesClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -145,13 +145,13 @@ class DirectoriesClient:
         _response = self._client_wrapper.httpx_client.request(
             f"directories/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DirectoryWithParentsAndChildrenResponse, construct_type(type_=DirectoryWithParentsAndChildrenResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DirectoryWithParentsAndChildrenResponse, construct_type(type_=DirectoryWithParentsAndChildrenResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -189,13 +189,13 @@ class DirectoriesClient:
         _response = self._client_wrapper.httpx_client.request(
             f"directories/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -249,13 +249,13 @@ class DirectoriesClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -292,13 +292,13 @@ class AsyncDirectoriesClient:
         _response = await self._client_wrapper.httpx_client.request(
             "directories", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(typing.List[DirectoryResponse], construct_type(type_=typing.List[DirectoryResponse], object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[DirectoryResponse], construct_type(type_=typing.List[DirectoryResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -345,13 +345,13 @@ class AsyncDirectoriesClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -390,13 +390,13 @@ class AsyncDirectoriesClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"directories/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DirectoryWithParentsAndChildrenResponse, construct_type(type_=DirectoryWithParentsAndChildrenResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DirectoryWithParentsAndChildrenResponse, construct_type(type_=DirectoryWithParentsAndChildrenResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -434,13 +434,13 @@ class AsyncDirectoriesClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"directories/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -494,13 +494,13 @@ class AsyncDirectoriesClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DirectoryResponse, construct_type(type_=DirectoryResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)

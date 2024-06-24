@@ -104,28 +104,28 @@ class LogsClient:
             },
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                file_id=file_id,
-                page=page + 1,
-                size=size,
-                version_id=version_id,
-                version_status=version_status,
-                search=search,
-                metadata_search=metadata_search,
-                start_date=start_date,
-                end_date=end_date,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    file_id=file_id,
+                    page=page + 1,
+                    size=size,
+                    version_id=version_id,
+                    version_status=version_status,
+                    search=search,
+                    metadata_search=metadata_search,
+                    start_date=start_date,
+                    end_date=end_date,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -166,13 +166,13 @@ class LogsClient:
         _response = self._client_wrapper.httpx_client.request(
             "logs", method="DELETE", params={"id": id}, request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -209,13 +209,13 @@ class LogsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"logs/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(PromptLogResponse, construct_type(type_=PromptLogResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(PromptLogResponse, construct_type(type_=PromptLogResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -308,28 +308,28 @@ class AsyncLogsClient:
             },
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                file_id=file_id,
-                page=page + 1,
-                size=size,
-                version_id=version_id,
-                version_status=version_status,
-                search=search,
-                metadata_search=metadata_search,
-                start_date=start_date,
-                end_date=end_date,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    file_id=file_id,
+                    page=page + 1,
+                    size=size,
+                    version_id=version_id,
+                    version_status=version_status,
+                    search=search,
+                    metadata_search=metadata_search,
+                    start_date=start_date,
+                    end_date=end_date,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -370,13 +370,13 @@ class AsyncLogsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "logs", method="DELETE", params={"id": id}, request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -413,13 +413,13 @@ class AsyncLogsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"logs/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(PromptLogResponse, construct_type(type_=PromptLogResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(PromptLogResponse, construct_type(type_=PromptLogResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)

@@ -102,25 +102,25 @@ class ToolsClient:
             },
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                page=page + 1,
-                size=size,
-                name=name,
-                user_filter=user_filter,
-                sort_by=sort_by,
-                order=order,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -207,13 +207,13 @@ class ToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -269,13 +269,13 @@ class ToolsClient:
             params={"version_id": version_id, "environment": environment},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -311,13 +311,13 @@ class ToolsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -371,13 +371,13 @@ class ToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -433,13 +433,13 @@ class ToolsClient:
             params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -492,13 +492,13 @@ class ToolsClient:
             params={"environment_id": environment_id},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -549,13 +549,13 @@ class ToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -713,13 +713,13 @@ class ToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(CreateToolLogResponse, construct_type(type_=CreateToolLogResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(CreateToolLogResponse, construct_type(type_=CreateToolLogResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -782,13 +782,13 @@ class ToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -826,13 +826,13 @@ class ToolsClient:
         _response = self._client_wrapper.httpx_client.request(
             "tools/templates", method="GET", params={"tool_type": tool_type}, request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(typing.List[ToolTemplateResponse], construct_type(type_=typing.List[ToolTemplateResponse], object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[ToolTemplateResponse], construct_type(type_=typing.List[ToolTemplateResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -908,25 +908,25 @@ class AsyncToolsClient:
             },
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                page=page + 1,
-                size=size,
-                name=name,
-                user_filter=user_filter,
-                sort_by=sort_by,
-                order=order,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1013,13 +1013,13 @@ class AsyncToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1075,13 +1075,13 @@ class AsyncToolsClient:
             params={"version_id": version_id, "environment": environment},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1117,13 +1117,13 @@ class AsyncToolsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1177,13 +1177,13 @@ class AsyncToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1239,13 +1239,13 @@ class AsyncToolsClient:
             params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1298,13 +1298,13 @@ class AsyncToolsClient:
             params={"environment_id": environment_id},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1355,13 +1355,13 @@ class AsyncToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1519,13 +1519,13 @@ class AsyncToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(CreateToolLogResponse, construct_type(type_=CreateToolLogResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(CreateToolLogResponse, construct_type(type_=CreateToolLogResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1588,13 +1588,13 @@ class AsyncToolsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1632,13 +1632,13 @@ class AsyncToolsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "tools/templates", method="GET", params={"tool_type": tool_type}, request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(typing.List[ToolTemplateResponse], construct_type(type_=typing.List[ToolTemplateResponse], object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[ToolTemplateResponse], construct_type(type_=typing.List[ToolTemplateResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)

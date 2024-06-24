@@ -50,13 +50,13 @@ class SessionsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"sessions/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(SessionResponse, construct_type(type_=SessionResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(SessionResponse, construct_type(type_=SessionResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -92,13 +92,13 @@ class SessionsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"sessions/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -154,19 +154,19 @@ class SessionsClient:
             params={"file_id": file_id, "version_id": version_id, "page": page, "size": size},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedSessionResponse, construct_type(type_=PaginatedSessionResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                file_id=file_id, version_id=version_id, page=page + 1, size=size, request_options=request_options
-            )
-            _items = _parsed_response.records
-            return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedSessionResponse, construct_type(type_=PaginatedSessionResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    file_id=file_id, version_id=version_id, page=page + 1, size=size, request_options=request_options
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -208,13 +208,13 @@ class AsyncSessionsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"sessions/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(SessionResponse, construct_type(type_=SessionResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(SessionResponse, construct_type(type_=SessionResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -250,13 +250,13 @@ class AsyncSessionsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"sessions/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -312,19 +312,19 @@ class AsyncSessionsClient:
             params={"file_id": file_id, "version_id": version_id, "page": page, "size": size},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedSessionResponse, construct_type(type_=PaginatedSessionResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                file_id=file_id, version_id=version_id, page=page + 1, size=size, request_options=request_options
-            )
-            _items = _parsed_response.records
-            return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedSessionResponse, construct_type(type_=PaginatedSessionResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    file_id=file_id, version_id=version_id, page=page + 1, size=size, request_options=request_options
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)

@@ -95,25 +95,25 @@ class DatasetsClient:
             },
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedDatasetResponse, construct_type(type_=PaginatedDatasetResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                page=page + 1,
-                size=size,
-                name=name,
-                user_filter=user_filter,
-                sort_by=sort_by,
-                order=order,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedDatasetResponse, construct_type(type_=PaginatedDatasetResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -218,13 +218,13 @@ class DatasetsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -289,13 +289,13 @@ class DatasetsClient:
             params={"version_id": version_id, "environment": environment, "include_datapoints": include_datapoints},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -331,13 +331,13 @@ class DatasetsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -391,13 +391,13 @@ class DatasetsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -459,24 +459,24 @@ class DatasetsClient:
             params={"version_id": version_id, "environment": environment, "page": page, "size": size},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list_datapoints(
-                id,
-                version_id=version_id,
-                environment=environment,
-                page=page + 1,
-                size=size,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list_datapoints(
+                    id,
+                    version_id=version_id,
+                    environment=environment,
+                    page=page + 1,
+                    size=size,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -532,13 +532,13 @@ class DatasetsClient:
             params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ListDatasets, construct_type(type_=ListDatasets, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ListDatasets, construct_type(type_=ListDatasets, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -589,13 +589,13 @@ class DatasetsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -647,13 +647,13 @@ class DatasetsClient:
             params={"environment_id": environment_id},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -729,25 +729,25 @@ class AsyncDatasetsClient:
             },
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedDatasetResponse, construct_type(type_=PaginatedDatasetResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list(
-                page=page + 1,
-                size=size,
-                name=name,
-                user_filter=user_filter,
-                sort_by=sort_by,
-                order=order,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedDatasetResponse, construct_type(type_=PaginatedDatasetResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -852,13 +852,13 @@ class AsyncDatasetsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -923,13 +923,13 @@ class AsyncDatasetsClient:
             params={"version_id": version_id, "environment": environment, "include_datapoints": include_datapoints},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -965,13 +965,13 @@ class AsyncDatasetsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
         )
-        if 200 <= _response.status_code < 300:
-            return
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1025,13 +1025,13 @@ class AsyncDatasetsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1093,24 +1093,24 @@ class AsyncDatasetsClient:
             params={"version_id": version_id, "environment": environment, "page": page, "size": size},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
-            _has_next = True
-            _get_next = lambda: self.list_datapoints(
-                id,
-                version_id=version_id,
-                environment=environment,
-                page=page + 1,
-                size=size,
-                request_options=request_options,
-            )
-            _items = _parsed_response.records
-            return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
+                _has_next = True
+                _get_next = lambda: self.list_datapoints(
+                    id,
+                    version_id=version_id,
+                    environment=environment,
+                    page=page + 1,
+                    size=size,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1166,13 +1166,13 @@ class AsyncDatasetsClient:
             params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(ListDatasets, construct_type(type_=ListDatasets, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ListDatasets, construct_type(type_=ListDatasets, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1223,13 +1223,13 @@ class AsyncDatasetsClient:
             request_options=request_options,
             omit=OMIT,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -1281,13 +1281,13 @@ class AsyncDatasetsClient:
             params={"environment_id": environment_id},
             request_options=request_options,
         )
-        if 200 <= _response.status_code < 300:
-            return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-        if _response.status_code == 422:
-            raise UnprocessableEntityError(
-                typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-            )
         try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
