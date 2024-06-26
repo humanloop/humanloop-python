@@ -3,7 +3,6 @@
 [![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-SDK%20generated%20by%20Fern-brightgreen)](https://github.com/fern-api/fern)
 [![pypi](https://img.shields.io/pypi/v/humanloop)](https://pypi.python.org/pypi/humanloop)
 
-
 The Humanloop Python library provides convenient access to the Humanloop API from Python.
 
 ## Installation
