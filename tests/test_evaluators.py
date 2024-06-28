@@ -8,7 +8,7 @@ from humanloop.client import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -106,10 +106,10 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.evaluators.create(spec=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean"))
+    response = client.evaluators.upsert(spec=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean"))
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.create(
+    async_response = await async_client.evaluators.upsert(
         spec=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean")
     )
     validate_response(async_response, expected_response, expected_types)
@@ -227,7 +227,7 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     assert await async_client.evaluators.delete(id="id") is None  # type: ignore[func-returns-value]
 
 
-async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -325,14 +325,14 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.evaluators.update(id="id")
+    response = client.evaluators.move(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.update(id="id")
+    async_response = await async_client.evaluators.move(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "records": [
             {
@@ -401,10 +401,10 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             },
         )
     }
-    response = client.evaluators.list_versions(id="id")
+    response = client.evaluators.listversions(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.list_versions(id="id")
+    async_response = await async_client.evaluators.listversions(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -515,7 +515,7 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_list_default(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_listdefault(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
             "path": "path",
@@ -590,10 +590,10 @@ async def test_list_default(client: Humanloop, async_client: AsyncHumanloop) -> 
             }
         },
     )
-    response = client.evaluators.list_default()
+    response = client.evaluators.listdefault()
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.list_default()
+    async_response = await async_client.evaluators.listdefault()
     validate_response(async_response, expected_response, expected_types)
 
 

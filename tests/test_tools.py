@@ -7,7 +7,7 @@ from humanloop.client import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -73,10 +73,10 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.tools.create()
+    response = client.tools.upsert()
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.tools.create()
+    async_response = await async_client.tools.upsert()
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -160,7 +160,7 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     assert await async_client.tools.delete(id="id") is None  # type: ignore[func-returns-value]
 
 
-async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -226,14 +226,14 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.tools.update(id="id")
+    response = client.tools.move(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.tools.update(id="id")
+    async_response = await async_client.tools.move(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "records": [
             {
@@ -308,10 +308,10 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             },
         )
     }
-    response = client.tools.list_versions(id="id")
+    response = client.tools.listversions(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.tools.list_versions(id="id")
+    async_response = await async_client.tools.listversions(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -666,10 +666,3 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
 
     async_response = await async_client.tools.list_environments(id="id")
     validate_response(async_response, expected_response, expected_types)
-
-
-async def test_list_templates(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.tools.list_templates() is None  # type: ignore[func-returns-value]
-
-    assert await async_client.tools.list_templates() is None  # type: ignore[func-returns-value]

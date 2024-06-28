@@ -4,7 +4,7 @@ service:
   auth: false
   base-path: ''
   endpoints:
-    list:
+    listLogsForFile:
       path: /logs
       method: GET
       auth: true
@@ -14,7 +14,7 @@ service:
         results: $response.records
       display-name: List
       request:
-        name: LogsListRequest
+        name: ListLogsForFileLogsGetRequest
         query-parameters:
           file_id:
             type: string

@@ -411,7 +411,7 @@ service:
                 email_address: email_address
                 full_name: full_name
               updated_at: '2024-01-15T09:30:00Z'
-    update_status:
+    updatestatus:
       path: /evaluations/{id}/status
       method: PATCH
       auth: true
@@ -511,7 +511,7 @@ service:
                 email_address: email_address
                 full_name: full_name
               updated_at: '2024-01-15T09:30:00Z'
-    get_stats:
+    getstats:
       path: /evaluations/{id}/stats
       method: GET
       auth: true

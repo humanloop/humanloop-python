@@ -352,7 +352,7 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_status(
+    def updatestatus(
         self, id: str, *, status: EvaluationStatus, request_options: typing.Optional[RequestOptions] = None
     ) -> EvaluationResponse:
         """
@@ -383,7 +383,7 @@ class EvaluationsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluations.update_status(
+        client.evaluations.updatestatus(
             id="id",
             status="pending",
         )
@@ -407,7 +407,7 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_stats(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationStats:
+    def getstats(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationStats:
         """
         Get Evaluation Stats.
 
@@ -435,7 +435,7 @@ class EvaluationsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluations.get_stats(
+        client.evaluations.getstats(
             id="id",
         )
         """
@@ -784,7 +784,7 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_status(
+    async def updatestatus(
         self, id: str, *, status: EvaluationStatus, request_options: typing.Optional[RequestOptions] = None
     ) -> EvaluationResponse:
         """
@@ -815,7 +815,7 @@ class AsyncEvaluationsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.update_status(
+        await client.evaluations.updatestatus(
             id="id",
             status="pending",
         )
@@ -839,7 +839,7 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_stats(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationStats:
+    async def getstats(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationStats:
         """
         Get Evaluation Stats.
 
@@ -867,7 +867,7 @@ class AsyncEvaluationsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get_stats(
+        await client.evaluations.getstats(
             id="id",
         )
         """

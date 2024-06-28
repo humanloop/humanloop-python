@@ -8,7 +8,7 @@ from humanloop.client import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -53,10 +53,10 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.datasets.create(datapoints=[CreateDatapointRequest()])
+    response = client.datasets.upsert(datapoints=[CreateDatapointRequest()])
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.create(datapoints=[CreateDatapointRequest()])
+    async_response = await async_client.datasets.upsert(datapoints=[CreateDatapointRequest()])
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -119,7 +119,7 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     assert await async_client.datasets.delete(id="id") is None  # type: ignore[func-returns-value]
 
 
-async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -164,14 +164,14 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.datasets.update(id="id")
+    response = client.datasets.move(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.update(id="id")
+    async_response = await async_client.datasets.move(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "records": [
             {
@@ -215,10 +215,10 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             },
         )
     }
-    response = client.datasets.list_versions(id="id")
+    response = client.datasets.listversions(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.list_versions(id="id")
+    async_response = await async_client.datasets.listversions(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 

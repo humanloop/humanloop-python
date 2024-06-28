@@ -120,7 +120,7 @@ class EvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(
+    def upsert(
         self,
         *,
         spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec,
@@ -167,7 +167,7 @@ class EvaluatorsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluators.create(
+        client.evaluators.upsert(
             spec=LlmEvaluatorRequest(
                 arguments_type="target_free",
                 return_type="boolean",
@@ -297,7 +297,7 @@ class EvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def move(
         self,
         id: str,
         *,
@@ -334,7 +334,7 @@ class EvaluatorsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluators.update(
+        client.evaluators.move(
             id="id",
         )
         """
@@ -357,7 +357,7 @@ class EvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_versions(
+    def listversions(
         self,
         id: str,
         *,
@@ -397,7 +397,7 @@ class EvaluatorsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluators.list_versions(
+        client.evaluators.listversions(
             id="id",
         )
         """
@@ -476,9 +476,7 @@ class EvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_default(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[EvaluatorResponse]:
+    def listdefault(self, *, request_options: typing.Optional[RequestOptions] = None) -> typing.List[EvaluatorResponse]:
         """
         Get a list of default evaluators for the organization.
 
@@ -499,7 +497,7 @@ class EvaluatorsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluators.list_default()
+        client.evaluators.listdefault()
         """
         _response = self._client_wrapper.httpx_client.request(
             "evaluators/default", method="GET", request_options=request_options
@@ -850,7 +848,7 @@ class AsyncEvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(
+    async def upsert(
         self,
         *,
         spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec,
@@ -897,7 +895,7 @@ class AsyncEvaluatorsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluators.create(
+        await client.evaluators.upsert(
             spec=LlmEvaluatorRequest(
                 arguments_type="target_free",
                 return_type="boolean",
@@ -1027,7 +1025,7 @@ class AsyncEvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def move(
         self,
         id: str,
         *,
@@ -1064,7 +1062,7 @@ class AsyncEvaluatorsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluators.update(
+        await client.evaluators.move(
             id="id",
         )
         """
@@ -1087,7 +1085,7 @@ class AsyncEvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_versions(
+    async def listversions(
         self,
         id: str,
         *,
@@ -1127,7 +1125,7 @@ class AsyncEvaluatorsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluators.list_versions(
+        await client.evaluators.listversions(
             id="id",
         )
         """
@@ -1206,7 +1204,7 @@ class AsyncEvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_default(
+    async def listdefault(
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[EvaluatorResponse]:
         """
@@ -1229,7 +1227,7 @@ class AsyncEvaluatorsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluators.list_default()
+        await client.evaluators.listdefault()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "evaluators/default", method="GET", request_options=request_options

@@ -46,7 +46,7 @@ class PromptsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(
+    def list_prompts(
         self,
         *,
         page: typing.Optional[int] = None,
@@ -95,7 +95,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.list()
+        client.prompts.list_prompts()
         """
         page = page or 1
         _response = self._client_wrapper.httpx_client.request(
@@ -115,7 +115,7 @@ class PromptsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(ListPrompts, construct_type(type_=ListPrompts, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list(
+                _get_next = lambda: self.list_prompts(
                     page=page + 1,
                     size=size,
                     name=name,
@@ -135,7 +135,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(
+    def upsert(
         self,
         *,
         model: str,
@@ -238,7 +238,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.create(
+        client.prompts.upsert(
             model="model",
         )
         """
@@ -384,7 +384,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def move(
         self,
         id: str,
         *,
@@ -421,7 +421,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.update(
+        client.prompts.move(
             id="id",
         )
         """
@@ -444,7 +444,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_versions(
+    def listversions(
         self,
         id: str,
         *,
@@ -484,7 +484,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.list_versions(
+        client.prompts.listversions(
             id="id",
         )
         """
@@ -1178,7 +1178,7 @@ class AsyncPromptsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(
+    async def list_prompts(
         self,
         *,
         page: typing.Optional[int] = None,
@@ -1227,7 +1227,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list()
+        await client.prompts.list_prompts()
         """
         page = page or 1
         _response = await self._client_wrapper.httpx_client.request(
@@ -1247,7 +1247,7 @@ class AsyncPromptsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(ListPrompts, construct_type(type_=ListPrompts, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list(
+                _get_next = lambda: self.list_prompts(
                     page=page + 1,
                     size=size,
                     name=name,
@@ -1267,7 +1267,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(
+    async def upsert(
         self,
         *,
         model: str,
@@ -1370,7 +1370,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.create(
+        await client.prompts.upsert(
             model="model",
         )
         """
@@ -1516,7 +1516,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def move(
         self,
         id: str,
         *,
@@ -1553,7 +1553,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.update(
+        await client.prompts.move(
             id="id",
         )
         """
@@ -1576,7 +1576,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_versions(
+    async def listversions(
         self,
         id: str,
         *,
@@ -1616,7 +1616,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list_versions(
+        await client.prompts.listversions(
             id="id",
         )
         """

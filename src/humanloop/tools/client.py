@@ -126,7 +126,7 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(
+    def upsert(
         self,
         *,
         path: typing.Optional[str] = OMIT,
@@ -185,7 +185,7 @@ class ToolsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.create()
+        client.tools.upsert()
         """
         _response = self._client_wrapper.httpx_client.request(
             "tools",
@@ -318,7 +318,7 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def move(
         self,
         id: str,
         *,
@@ -355,7 +355,7 @@ class ToolsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.update(
+        client.tools.move(
             id="id",
         )
         """
@@ -378,7 +378,7 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_versions(
+    def listversions(
         self,
         id: str,
         *,
@@ -418,7 +418,7 @@ class ToolsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.list_versions(
+        client.tools.listversions(
             id="id",
         )
         """
@@ -887,37 +887,6 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_templates(self, *, request_options: typing.Optional[RequestOptions] = None) -> None:
-        """
-        Parameters
-        ----------
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.list_templates()
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "tools/templates", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
 
 class AsyncToolsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1012,7 +981,7 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(
+    async def upsert(
         self,
         *,
         path: typing.Optional[str] = OMIT,
@@ -1071,7 +1040,7 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.create()
+        await client.tools.upsert()
         """
         _response = await self._client_wrapper.httpx_client.request(
             "tools",
@@ -1204,7 +1173,7 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def move(
         self,
         id: str,
         *,
@@ -1241,7 +1210,7 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.update(
+        await client.tools.move(
             id="id",
         )
         """
@@ -1264,7 +1233,7 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_versions(
+    async def listversions(
         self,
         id: str,
         *,
@@ -1304,7 +1273,7 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.list_versions(
+        await client.tools.listversions(
             id="id",
         )
         """
@@ -1768,37 +1737,6 @@ class AsyncToolsClient:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
                 )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def list_templates(self, *, request_options: typing.Optional[RequestOptions] = None) -> None:
-        """
-        Parameters
-        ----------
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.tools.list_templates()
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "tools/templates", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)

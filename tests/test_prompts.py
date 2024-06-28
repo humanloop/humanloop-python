@@ -7,7 +7,7 @@ from humanloop.client import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -93,10 +93,10 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.prompts.create(model="model")
+    response = client.prompts.upsert(model="model")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.create(model="model")
+    async_response = await async_client.prompts.upsert(model="model")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -200,7 +200,7 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     assert await async_client.prompts.delete(id="id") is None  # type: ignore[func-returns-value]
 
 
-async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -286,14 +286,14 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.prompts.update(id="id")
+    response = client.prompts.move(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.update(id="id")
+    async_response = await async_client.prompts.move(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "records": [
             {
@@ -390,10 +390,10 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             },
         )
     }
-    response = client.prompts.list_versions(id="id")
+    response = client.prompts.listversions(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.list_versions(id="id")
+    async_response = await async_client.prompts.listversions(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 

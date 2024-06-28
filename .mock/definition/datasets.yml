@@ -69,7 +69,7 @@ service:
               page: 1
               size: 1
               total: 1
-    create:
+    upsert:
       path: /datasets
       method: POST
       auth: true
@@ -295,7 +295,7 @@ service:
       examples:
         - path-parameters:
             id: id
-    update:
+    move:
       path: /datasets/{id}
       method: PATCH
       auth: true
@@ -356,7 +356,7 @@ service:
                   target:
                     target: target
                   id: id
-    list_datapoints:
+    listdatapoints:
       path: /datasets/{id}/datapoints
       method: GET
       auth: true
@@ -405,7 +405,7 @@ service:
               page: 1
               size: 1
               total: 1
-    list_versions:
+    listversions:
       path: /datasets/{id}/versions
       method: GET
       auth: true

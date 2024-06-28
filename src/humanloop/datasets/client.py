@@ -120,7 +120,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(
+    def upsert(
         self,
         *,
         datapoints: typing.Sequence[CreateDatapointRequest],
@@ -196,7 +196,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.create(
+        client.datasets.upsert(
             datapoints=[CreateDatapointRequest()],
         )
         """
@@ -333,7 +333,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def move(
         self,
         id: str,
         *,
@@ -370,7 +370,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.update(
+        client.datasets.move(
             id="id",
         )
         """
@@ -393,7 +393,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_datapoints(
+    def listdatapoints(
         self,
         id: str,
         *,
@@ -438,7 +438,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.list_datapoints(
+        client.datasets.listdatapoints(
             id="id",
         )
         """
@@ -453,7 +453,7 @@ class DatasetsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list_datapoints(
+                _get_next = lambda: self.listdatapoints(
                     id,
                     version_id=version_id,
                     environment=environment,
@@ -472,7 +472,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_versions(
+    def listversions(
         self,
         id: str,
         *,
@@ -512,7 +512,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.list_versions(
+        client.datasets.listversions(
             id="id",
         )
         """
@@ -918,7 +918,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(
+    async def upsert(
         self,
         *,
         datapoints: typing.Sequence[CreateDatapointRequest],
@@ -994,7 +994,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.create(
+        await client.datasets.upsert(
             datapoints=[CreateDatapointRequest()],
         )
         """
@@ -1131,7 +1131,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def move(
         self,
         id: str,
         *,
@@ -1168,7 +1168,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.update(
+        await client.datasets.move(
             id="id",
         )
         """
@@ -1191,7 +1191,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_datapoints(
+    async def listdatapoints(
         self,
         id: str,
         *,
@@ -1236,7 +1236,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.list_datapoints(
+        await client.datasets.listdatapoints(
             id="id",
         )
         """
@@ -1251,7 +1251,7 @@ class AsyncDatasetsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list_datapoints(
+                _get_next = lambda: self.listdatapoints(
                     id,
                     version_id=version_id,
                     environment=environment,
@@ -1270,7 +1270,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_versions(
+    async def listversions(
         self,
         id: str,
         *,
@@ -1310,7 +1310,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.list_versions(
+        await client.datasets.listversions(
             id="id",
         )
         """

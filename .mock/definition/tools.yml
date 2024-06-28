@@ -79,7 +79,7 @@ service:
                       evaluator_version_id: evaluator_version_id
                       created_at: '2024-01-15T09:30:00Z'
                       updated_at: '2024-01-15T09:30:00Z'
-    create:
+    upsert:
       path: /tools
       method: POST
       auth: true
@@ -271,7 +271,7 @@ service:
       examples:
         - path-parameters:
             id: id
-    update:
+    move:
       path: /tools/{id}
       method: PATCH
       auth: true
@@ -345,7 +345,7 @@ service:
                   evaluator_version_id: evaluator_version_id
                   created_at: '2024-01-15T09:30:00Z'
                   updated_at: '2024-01-15T09:30:00Z'
-    list_versions:
+    listversions:
       path: /tools/{id}/versions
       method: GET
       auth: true
@@ -616,7 +616,7 @@ service:
               tool_id: tool_id
               version_id: version_id
               session_id: session_id
-    update_evaluators:
+    updateEvaluators:
       path: /tools/{id}/evaluators
       method: POST
       auth: true
@@ -862,9 +862,3 @@ service:
                       evaluator_version_id: evaluator_version_id
                       created_at: '2024-01-15T09:30:00Z'
                       updated_at: '2024-01-15T09:30:00Z'
-    list_templates:
-      path: /tools/templates
-      method: GET
-      auth: false
-      examples:
-        - {}

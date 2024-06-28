@@ -22,7 +22,7 @@ class LogsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(
+    def list_logs_for_file(
         self,
         *,
         file_id: str,
@@ -83,7 +83,7 @@ class LogsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.logs.list(
+        client.logs.list_logs_for_file(
             file_id="file_id",
         )
         """
@@ -108,7 +108,7 @@ class LogsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list(
+                _get_next = lambda: self.list_logs_for_file(
                     file_id=file_id,
                     page=page + 1,
                     size=size,
@@ -226,7 +226,7 @@ class AsyncLogsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(
+    async def list_logs_for_file(
         self,
         *,
         file_id: str,
@@ -287,7 +287,7 @@ class AsyncLogsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.logs.list(
+        await client.logs.list_logs_for_file(
             file_id="file_id",
         )
         """
@@ -312,7 +312,7 @@ class AsyncLogsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list(
+                _get_next = lambda: self.list_logs_for_file(
                     file_id=file_id,
                     page=page + 1,
                     size=size,

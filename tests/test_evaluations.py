@@ -447,7 +447,7 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_updatestatus(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "id",
         "dataset": {
@@ -578,14 +578,14 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "updated_at": "datetime",
     }
-    response = client.evaluations.update_status(id="id", status="pending")
+    response = client.evaluations.updatestatus(id="id", status="pending")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluations.update_status(id="id", status="pending")
+    async_response = await async_client.evaluations.updatestatus(id="id", status="pending")
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_get_stats(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_getstats(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "overall_stats": {"num_datapoints": 1, "total_logs": 1, "total_evaluator_logs": 1},
         "version_stats": [
@@ -643,8 +643,8 @@ async def test_get_stats(client: Humanloop, async_client: AsyncHumanloop) -> Non
             },
         ),
     }
-    response = client.evaluations.get_stats(id="id")
+    response = client.evaluations.getstats(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluations.get_stats(id="id")
+    async_response = await async_client.evaluations.getstats(id="id")
     validate_response(async_response, expected_response, expected_types)
