@@ -9,17 +9,17 @@ from .utilities import validate_response
 
 async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "tool",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
         "source_code": "source_code",
         "setup_values": {"setup_values": {"key": "value"}},
@@ -29,19 +29,28 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
         "signature": "signature",
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
         "source_code": None,
         "setup_values": ("dict", {0: (None, None)}),
@@ -51,6 +60,18 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
         "signature": None,
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.tools.create()
     validate_response(response, expected_response, expected_types)
@@ -61,17 +82,17 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "tool",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
         "source_code": "source_code",
         "setup_values": {"setup_values": {"key": "value"}},
@@ -81,19 +102,28 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
         "signature": "signature",
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
         "source_code": None,
         "setup_values": ("dict", {0: (None, None)}),
@@ -103,6 +133,18 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
         "signature": None,
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.tools.get(id="id")
     validate_response(response, expected_response, expected_types)
@@ -120,17 +162,17 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
 
 async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "tool",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
         "source_code": "source_code",
         "setup_values": {"setup_values": {"key": "value"}},
@@ -140,19 +182,28 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
         "signature": "signature",
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
         "source_code": None,
         "setup_values": ("dict", {0: (None, None)}),
@@ -162,6 +213,18 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
         "signature": None,
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.tools.update(id="id")
     validate_response(response, expected_response, expected_types)
@@ -174,17 +237,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "records": [
             {
+                "path": "path",
                 "id": "id",
                 "name": "name",
                 "version_id": "version_id",
-                "directory_id": "directory_id",
+                "type": "tool",
                 "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
                 "created_at": "2024-01-15T09:30:00Z",
                 "updated_at": "2024-01-15T09:30:00Z",
                 "created_by": {"id": "id", "email_address": "email_address"},
                 "status": "uncommitted",
                 "last_used_at": "2024-01-15T09:30:00Z",
-                "path": "path",
                 "function": {"name": "name", "description": "description"},
                 "source_code": "source_code",
                 "tool_type": "pinecone_search",
@@ -193,6 +256,15 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
                 "total_logs_count": 1,
                 "inputs": [{"name": "name"}],
                 "signature": "signature",
+                "evaluator_aggregates": [
+                    {
+                        "value": 1.1,
+                        "evaluator_id": "evaluator_id",
+                        "evaluator_version_id": "evaluator_version_id",
+                        "created_at": "2024-01-15T09:30:00Z",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                    }
+                ],
             }
         ]
     }
@@ -201,17 +273,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             "list",
             {
                 0: {
+                    "path": None,
                     "id": None,
                     "name": None,
                     "version_id": None,
-                    "directory_id": None,
+                    "type": None,
                     "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
                     "created_by": {"id": None, "email_address": None},
                     "status": None,
                     "last_used_at": "datetime",
-                    "path": None,
                     "function": {"name": None, "description": None},
                     "source_code": None,
                     "tool_type": None,
@@ -220,6 +292,18 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
                     "signature": None,
+                    "evaluator_aggregates": (
+                        "list",
+                        {
+                            0: {
+                                "value": None,
+                                "evaluator_id": None,
+                                "evaluator_version_id": None,
+                                "created_at": "datetime",
+                                "updated_at": "datetime",
+                            }
+                        },
+                    ),
                 }
             },
         )
@@ -231,71 +315,19 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = {
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "directory_id": "directory_id",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
-        "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
-        "source_code": "source_code",
-        "setup_values": {"setup_values": {"key": "value"}},
-        "tool_type": "pinecone_search",
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "signature": "signature",
-    }
-    expected_types: typing.Any = {
-        "id": None,
-        "name": None,
-        "version_id": None,
-        "directory_id": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
-        "status": None,
-        "last_used_at": "datetime",
-        "path": None,
-        "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
-        "source_code": None,
-        "setup_values": ("dict", {0: (None, None)}),
-        "tool_type": None,
-        "commit_message": None,
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-        "signature": None,
-    }
-    response = client.tools.deploy(id="id", version_id="version_id", environment_id="environment_id")
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.tools.deploy(id="id", version_id="version_id", environment_id="environment_id")
-    validate_response(async_response, expected_response, expected_types)
-
-
 async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "tool",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
         "source_code": "source_code",
         "setup_values": {"setup_values": {"key": "value"}},
@@ -305,19 +337,28 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
         "signature": "signature",
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
         "source_code": None,
         "setup_values": ("dict", {0: (None, None)}),
@@ -327,6 +368,18 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
         "signature": None,
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.tools.commit(id="id", version_id="version_id", commit_message="commit_message")
     validate_response(response, expected_response, expected_types)
@@ -352,17 +405,17 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
 
 async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "tool",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
         "source_code": "source_code",
         "setup_values": {"setup_values": {"key": "value"}},
@@ -372,19 +425,28 @@ async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
         "signature": "signature",
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
         "source_code": None,
         "setup_values": ("dict", {0: (None, None)}),
@@ -394,6 +456,18 @@ async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
         "signature": None,
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.tools.update_evaluators(id="id")
     validate_response(response, expected_response, expected_types)
@@ -402,30 +476,200 @@ async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_list_templates(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "path": "path",
+        "id": "id",
+        "name": "name",
+        "version_id": "version_id",
+        "type": "tool",
+        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
+        "created_at": "2024-01-15T09:30:00Z",
+        "updated_at": "2024-01-15T09:30:00Z",
+        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
+        "status": "uncommitted",
+        "last_used_at": "2024-01-15T09:30:00Z",
+        "function": {"name": "name", "description": "description", "parameters": {"parameters": {"key": "value"}}},
+        "source_code": "source_code",
+        "setup_values": {"setup_values": {"key": "value"}},
+        "tool_type": "pinecone_search",
+        "commit_message": "commit_message",
+        "version_logs_count": 1,
+        "total_logs_count": 1,
+        "inputs": [{"name": "name"}],
+        "signature": "signature",
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
+    }
+    expected_types: typing.Any = {
+        "path": None,
+        "id": None,
+        "name": None,
+        "version_id": None,
+        "type": None,
+        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+        "created_at": "datetime",
+        "updated_at": "datetime",
+        "created_by": {"id": None, "email_address": None, "full_name": None},
+        "status": None,
+        "last_used_at": "datetime",
+        "function": {"name": None, "description": None, "parameters": ("dict", {0: (None, None)})},
+        "source_code": None,
+        "setup_values": ("dict", {0: (None, None)}),
+        "tool_type": None,
+        "commit_message": None,
+        "version_logs_count": "integer",
+        "total_logs_count": "integer",
+        "inputs": ("list", {0: {"name": None}}),
+        "signature": None,
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
+    }
+    response = client.tools.deploy(id="id", environment_id="environment_id", version_id="version_id")
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.tools.deploy(id="id", environment_id="environment_id", version_id="version_id")
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    # Type ignore to avoid mypy complaining about the function not being meant to return a value
+    assert client.tools.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+
+    assert await async_client.tools.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+
+
+async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
+            "id": "id",
+            "created_at": "2024-01-15T09:30:00Z",
             "name": "name",
-            "description": "description",
-            "parameters": {"parameters": {"key": "value"}},
-            "signature": "signature",
-            "setup_schema": {"setup_schema": {"key": "value"}},
+            "tag": "default",
+            "file": {
+                "path": "path",
+                "id": "id",
+                "name": "name",
+                "version_id": "version_id",
+                "type": "prompt",
+                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+                "created_by": {"id": "id", "email_address": "email_address"},
+                "status": "uncommitted",
+                "last_used_at": "2024-01-15T09:30:00Z",
+                "model": "model",
+                "endpoint": "complete",
+                "template": "template",
+                "provider": "openai",
+                "max_tokens": 1,
+                "temperature": 1.1,
+                "top_p": 1.1,
+                "stop": "stop",
+                "presence_penalty": 1.1,
+                "frequency_penalty": 1.1,
+                "seed": 1,
+                "response_format": {"type": "json_object"},
+                "tools": [{"name": "name", "description": "description"}],
+                "linked_tools": [
+                    {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
+                ],
+                "commit_message": "commit_message",
+                "version_logs_count": 1,
+                "total_logs_count": 1,
+                "inputs": [{"name": "name"}],
+                "evaluator_aggregates": [
+                    {
+                        "value": 1.1,
+                        "evaluator_id": "evaluator_id",
+                        "evaluator_version_id": "evaluator_version_id",
+                        "created_at": "2024-01-15T09:30:00Z",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                    }
+                ],
+            },
         }
     ]
     expected_types: typing.Any = (
         "list",
         {
             0: {
+                "id": None,
+                "created_at": "datetime",
                 "name": None,
-                "description": None,
-                "parameters": ("dict", {0: (None, None)}),
-                "signature": None,
-                "setup_schema": ("dict", {0: (None, None)}),
+                "tag": None,
+                "file": {
+                    "path": None,
+                    "id": None,
+                    "name": None,
+                    "version_id": None,
+                    "type": None,
+                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                    "created_by": {"id": None, "email_address": None},
+                    "status": None,
+                    "last_used_at": "datetime",
+                    "model": None,
+                    "endpoint": None,
+                    "template": None,
+                    "provider": None,
+                    "max_tokens": "integer",
+                    "temperature": None,
+                    "top_p": None,
+                    "stop": None,
+                    "presence_penalty": None,
+                    "frequency_penalty": None,
+                    "seed": "integer",
+                    "response_format": {"type": None},
+                    "tools": ("list", {0: {"name": None, "description": None}}),
+                    "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+                    "commit_message": None,
+                    "version_logs_count": "integer",
+                    "total_logs_count": "integer",
+                    "inputs": ("list", {0: {"name": None}}),
+                    "evaluator_aggregates": (
+                        "list",
+                        {
+                            0: {
+                                "value": None,
+                                "evaluator_id": None,
+                                "evaluator_version_id": None,
+                                "created_at": "datetime",
+                                "updated_at": "datetime",
+                            }
+                        },
+                    ),
+                },
             }
         },
     )
-    response = client.tools.list_templates()
+    response = client.tools.list_environments(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.tools.list_templates()
+    async_response = await async_client.tools.list_environments(id="id")
     validate_response(async_response, expected_response, expected_types)
+
+
+async def test_list_templates(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    # Type ignore to avoid mypy complaining about the function not being meant to return a value
+    assert client.tools.list_templates() is None  # type: ignore[func-returns-value]
+
+    assert await async_client.tools.list_templates() is None  # type: ignore[func-returns-value]

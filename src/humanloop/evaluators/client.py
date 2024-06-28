@@ -12,6 +12,7 @@ from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.evaluation_debug_result_response import EvaluationDebugResultResponse
 from ..types.evaluator_response import EvaluatorResponse
+from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_evaluators import ListEvaluators
 from ..types.project_sort_by import ProjectSortBy
@@ -125,7 +126,6 @@ class EvaluatorsClient:
         spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        name: typing.Optional[str] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluatorResponse:
@@ -143,13 +143,10 @@ class EvaluatorsClient:
         spec : SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec
 
         path : typing.Optional[str]
-            Path of the Evaluator including the Evaluator name, which is used as a unique identifier.
+            Path of the Evaluator, including the name, which is used as a unique identifier.
 
         id : typing.Optional[str]
             ID for an existing Evaluator to update.
-
-        name : typing.Optional[str]
-            Name of the Evaluator, which is used as a unique identifier.
 
         commit_message : typing.Optional[str]
             Message describing the changes made.
@@ -180,7 +177,7 @@ class EvaluatorsClient:
         _response = self._client_wrapper.httpx_client.request(
             "evaluators",
             method="POST",
-            json={"path": path, "id": id, "name": name, "commit_message": commit_message, "spec": spec},
+            json={"path": path, "id": id, "commit_message": commit_message, "spec": spec},
             request_options=request_options,
             omit=OMIT,
         )
@@ -207,7 +204,7 @@ class EvaluatorsClient:
         """
         Retrieve the Evaluator with the given ID.
 
-        By default the deployed version of the Evaluator is returned. Use the query parameters
+        By default, the deployed version of the Evaluator is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Evaluator.
 
         Parameters
@@ -216,10 +213,10 @@ class EvaluatorsClient:
             Unique identifier for Evaluator.
 
         version_id : typing.Optional[str]
-            A specific Version Id of the Evaluator to retrieve.
+            A specific Version ID of the Evaluator to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -366,7 +363,7 @@ class EvaluatorsClient:
         *,
         status: typing.Optional[VersionStatus] = None,
         environment: typing.Optional[str] = None,
-        evaluation_aggregates: typing.Optional[bool] = None,
+        evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListEvaluators:
         """
@@ -381,9 +378,9 @@ class EvaluatorsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Filter versions by environment tag. If no environment is provided, all versions are returned.
+            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
 
-        evaluation_aggregates : typing.Optional[bool]
+        evaluator_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -407,71 +404,12 @@ class EvaluatorsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"evaluators/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
+            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(ListEvaluators, construct_type(type_=ListEvaluators, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def deploy(
-        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluatorResponse:
-        """
-        Deploy Evaluator to Environment.
-
-        Set the deployed Version for the specified Environment. This Evaluator Version
-        will be used for calls made to the Evaluator in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Evaluator.
-
-        version_id : str
-            Unique identifier for the specific version of the Evaluator.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EvaluatorResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.evaluators.deploy(
-            id="id",
-            version_id="version_id",
-            environment_id="environment_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
-            method="POST",
-            params={"environment_id": environment_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(EvaluatorResponse, construct_type(type_=EvaluatorResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -609,7 +547,7 @@ class EvaluatorsClient:
             The IDs of the evaluation datapoints on which to run the draft evaluator.
 
         prompt_version_id : typing.Optional[str]
-            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint` is provided; has no effect otherwise.
+            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -652,6 +590,163 @@ class EvaluatorsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(typing.List[EvaluationDebugResultResponse], construct_type(type_=typing.List[EvaluationDebugResultResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def deploy(
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> EvaluatorResponse:
+        """
+        Deploy Evaluator to Environment.
+
+        Set the deployed Version for the specified Environment. This Evaluator Version
+        will be used for calls made to the Evaluator in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Evaluator.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluatorResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluators.deploy(
+            id="id",
+            environment_id="environment_id",
+            version_id="version_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={"version_id": version_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(EvaluatorResponse, construct_type(type_=EvaluatorResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployment of Evaluator from Environment.
+
+        Remove the deployed Version for the specified Environment. This Evaluator Version
+        will no longer be used for calls made to the Evaluator in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluators.remove_deployment(
+            id="id",
+            environment_id="environment_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Evaluator.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluators.list_environments(
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -761,7 +856,6 @@ class AsyncEvaluatorsClient:
         spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        name: typing.Optional[str] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluatorResponse:
@@ -779,13 +873,10 @@ class AsyncEvaluatorsClient:
         spec : SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec
 
         path : typing.Optional[str]
-            Path of the Evaluator including the Evaluator name, which is used as a unique identifier.
+            Path of the Evaluator, including the name, which is used as a unique identifier.
 
         id : typing.Optional[str]
             ID for an existing Evaluator to update.
-
-        name : typing.Optional[str]
-            Name of the Evaluator, which is used as a unique identifier.
 
         commit_message : typing.Optional[str]
             Message describing the changes made.
@@ -816,7 +907,7 @@ class AsyncEvaluatorsClient:
         _response = await self._client_wrapper.httpx_client.request(
             "evaluators",
             method="POST",
-            json={"path": path, "id": id, "name": name, "commit_message": commit_message, "spec": spec},
+            json={"path": path, "id": id, "commit_message": commit_message, "spec": spec},
             request_options=request_options,
             omit=OMIT,
         )
@@ -843,7 +934,7 @@ class AsyncEvaluatorsClient:
         """
         Retrieve the Evaluator with the given ID.
 
-        By default the deployed version of the Evaluator is returned. Use the query parameters
+        By default, the deployed version of the Evaluator is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Evaluator.
 
         Parameters
@@ -852,10 +943,10 @@ class AsyncEvaluatorsClient:
             Unique identifier for Evaluator.
 
         version_id : typing.Optional[str]
-            A specific Version Id of the Evaluator to retrieve.
+            A specific Version ID of the Evaluator to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1002,7 +1093,7 @@ class AsyncEvaluatorsClient:
         *,
         status: typing.Optional[VersionStatus] = None,
         environment: typing.Optional[str] = None,
-        evaluation_aggregates: typing.Optional[bool] = None,
+        evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListEvaluators:
         """
@@ -1017,9 +1108,9 @@ class AsyncEvaluatorsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Filter versions by environment tag. If no environment is provided, all versions are returned.
+            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
 
-        evaluation_aggregates : typing.Optional[bool]
+        evaluator_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1043,71 +1134,12 @@ class AsyncEvaluatorsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluators/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
+            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(ListEvaluators, construct_type(type_=ListEvaluators, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def deploy(
-        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluatorResponse:
-        """
-        Deploy Evaluator to Environment.
-
-        Set the deployed Version for the specified Environment. This Evaluator Version
-        will be used for calls made to the Evaluator in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Evaluator.
-
-        version_id : str
-            Unique identifier for the specific version of the Evaluator.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EvaluatorResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.evaluators.deploy(
-            id="id",
-            version_id="version_id",
-            environment_id="environment_id",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
-            method="POST",
-            params={"environment_id": environment_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(EvaluatorResponse, construct_type(type_=EvaluatorResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -1245,7 +1277,7 @@ class AsyncEvaluatorsClient:
             The IDs of the evaluation datapoints on which to run the draft evaluator.
 
         prompt_version_id : typing.Optional[str]
-            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint` is provided; has no effect otherwise.
+            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1288,6 +1320,163 @@ class AsyncEvaluatorsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(typing.List[EvaluationDebugResultResponse], construct_type(type_=typing.List[EvaluationDebugResultResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def deploy(
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> EvaluatorResponse:
+        """
+        Deploy Evaluator to Environment.
+
+        Set the deployed Version for the specified Environment. This Evaluator Version
+        will be used for calls made to the Evaluator in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Evaluator.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluatorResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.evaluators.deploy(
+            id="id",
+            environment_id="environment_id",
+            version_id="version_id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={"version_id": version_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(EvaluatorResponse, construct_type(type_=EvaluatorResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployment of Evaluator from Environment.
+
+        Remove the deployed Version for the specified Environment. This Evaluator Version
+        will no longer be used for calls made to the Evaluator in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.evaluators.remove_deployment(
+            id="id",
+            environment_id="environment_id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Evaluator.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.evaluators.list_environments(
+            id="id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

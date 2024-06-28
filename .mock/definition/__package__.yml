@@ -34,6 +34,30 @@ types:
       model_config:
         type: ModelConfigRequest
         docs: Model config associated with the agent.
+  BaseMetricResponse:
+    properties:
+      id:
+        type: string
+        docs: ID of the metric. Starts with 'metric_'.
+      name:
+        type: string
+        docs: The name of the metric.
+      description:
+        type: string
+        docs: A description of what the metric measures.
+      code:
+        type: string
+        docs: Python code used to calculate a metric value on each logged datapoint.
+      default:
+        type: boolean
+        docs: >-
+          Whether the metric is a global default metric. Metrics with this flag
+          enabled cannot be deleted or modified.
+      active:
+        type: boolean
+        docs: If enabled, the metric is calculated for every logged datapoint.
+      created_at: datetime
+      updated_at: datetime
   BooleanEvaluatorVersionStats:
     docs: |-
       Base attributes for stats for an Evaluator Version-Evaluated Version pair
@@ -287,6 +311,11 @@ types:
       in the inheriting classes with documentation and appropriate Field
       definitions.
     properties:
+      path:
+        type: string
+        docs: >-
+          Path of the Dataset, including the name, which is used as a unique
+          identifier.
       id:
         type: string
         docs: Unique identifier for the Dataset. Starts with `ds_`.
@@ -299,7 +328,7 @@ types:
           Unique identifier for the specific Dataset Version. If no query params
           provided, the default deployed Dataset Version is returned. Starts
           with `dsv_`.
-      directory_id: optional<string>
+      type: optional<literal<"dataset">>
       environments:
         type: optional<list<EnvironmentResponse>>
         docs: The list of environments the Dataset Version is deployed to.
@@ -312,11 +341,6 @@ types:
         type: VersionStatus
         docs: The status of the Dataset Version.
       last_used_at: datetime
-      path:
-        type: string
-        docs: >-
-          Path of the Dataset, including the name, which is used as a unique
-          identifier.
       commit_message:
         type: optional<string>
         docs: >-
@@ -546,6 +570,19 @@ types:
         type: >-
           optional<list<EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem>>
         docs: Evaluators to deactivate. These will not be run on new Logs.
+  EvaluatorAggregate:
+    properties:
+      value:
+        type: double
+        docs: The aggregated value of the evaluator.
+      evaluator_id:
+        type: string
+        docs: ID of the evaluator.
+      evaluator_version_id:
+        type: string
+        docs: ID of the evaluator version.
+      created_at: datetime
+      updated_at: datetime
   EvaluatorArgumentsType:
     enum:
       - target_free
@@ -598,6 +635,11 @@ types:
   EvaluatorResponse:
     docs: Request model for creating a new Evaluator
     properties:
+      path:
+        type: string
+        docs: >-
+          Path of the Dataset including the Dataset name, which is used as a
+          unique identifier.
       id:
         type: string
         docs: Unique identifier for the Evaluator.
@@ -609,7 +651,7 @@ types:
         docs: >-
           Unique identifier for the specific Evaluator Version. If no query
           params provided, the default deployed Evaluator Version is returned.
-      directory_id: optional<string>
+      type: optional<literal<"evaluator">>
       environments:
         type: optional<list<EnvironmentResponse>>
         docs: The list of environments the Prompt Version is deployed to.
@@ -620,11 +662,6 @@ types:
         docs: The user who created the Prompt.
       status: VersionStatus
       last_used_at: datetime
-      path:
-        type: string
-        docs: >-
-          Path of the Dataset including the Dataset name, which is used as a
-          unique identifier.
       commit_message:
         type: optional<string>
         docs: Message describing the changes made.
@@ -640,11 +677,74 @@ types:
           Inputs associated to the Prompt. Inputs correspond to any of the
           variables used within the Prompt template.
         type: list<InputResponse>
+      evaluator_aggregates:
+        type: optional<list<EvaluatorAggregate>>
+        docs: Aggregation of Evaluator results for the Evaluator Version.
   EvaluatorReturnTypeEnum:
     enum:
       - boolean
       - number
     docs: Enum representing the possible return types of an evaluator.
+  ExperimentResponse:
+    properties:
+      id:
+        type: string
+        docs: String ID of experiment. Starts with `exp_`.
+      file_id:
+        type: string
+        docs: String ID of file the experiment belongs to.
+      name:
+        type: string
+        docs: Name of experiment.
+      status:
+        type: ExperimentStatus
+        docs: Status of experiment.
+      versions:
+        type: optional<list<ExperimentVersionResponse>>
+        docs: List of Versions associated to the experiment.
+      metric:
+        type: BaseMetricResponse
+        docs: Metric used as the experiment's objective.
+      positive_labels:
+        docs: >-
+          Feedback labels to treat as positive user feedback. Used to monitor
+          the performance of model configs in the experiment.
+        type: list<PositiveLabel>
+      created_at: datetime
+      updated_at: datetime
+  ExperimentStatus:
+    enum:
+      - Initialized
+      - value: In progress
+        name: InProgress
+    docs: An enumeration.
+  ExperimentVersionResponse:
+    properties:
+      mean:
+        type: optional<double>
+        docs: The mean performance of the Version.
+      spread:
+        type: optional<double>
+        docs: The spread of performance of the Version.
+      trials_count:
+        type: integer
+        docs: Number of datapoints with feedback associated to the experiment.
+      active:
+        type: boolean
+        docs: >-
+          Whether the Version is active in the experiment. Only active model
+          configs can be sampled from the experiment.
+      id:
+        type: string
+        docs: String ID of Version.
+      commit_message:
+        type: optional<string>
+        docs: Commit message of Version.
+      version_id:
+        type: string
+        docs: Version of the Prompt or Tool.
+      created_at: datetime
+      updated_at: datetime
   FeedbackClass:
     enum:
       - select
@@ -721,6 +821,33 @@ types:
           The allowed values for categorical feedback types. Not populated for
           `correction` and `comment`.
   FeedbackTypes: list<FeedbackTypeModel>
+  FileEnvironmentResponseFile:
+    discriminated: false
+    docs: >-
+      The version of the File that is deployed to the Environment, if one is
+      deployed.
+    union:
+      - PromptResponse
+      - ToolResponse
+      - DatasetResponse
+      - EvaluatorResponse
+  FileEnvironmentResponse:
+    docs: >-
+      Response model for the List Environments endpoint under Files.
+
+
+      Contains the deployed version of the File, if one is deployed to the
+      Environment.
+    properties:
+      id: string
+      created_at: datetime
+      name: string
+      tag: EnvironmentTag
+      file:
+        type: optional<FileEnvironmentResponseFile>
+        docs: >-
+          The version of the File that is deployed to the Environment, if one is
+          deployed.
   FunctionTool:
     docs: A function tool to be called by the model where user owns runtime.
     properties:
@@ -1420,6 +1547,10 @@ types:
       - supportadmin
       - user
     docs: An enumeration.
+  PositiveLabel:
+    properties:
+      type: string
+      value: string
   ProjectSortBy:
     enum:
       - created_at
@@ -1873,6 +2004,11 @@ types:
   PromptResponse:
     docs: Request model for creating a new Prompt
     properties:
+      path:
+        type: string
+        docs: >-
+          Path of the Prompt, including the name, which is used as a unique
+          identifier.
       id:
         type: string
         docs: Unique identifier for the Prompt.
@@ -1884,7 +2020,7 @@ types:
         docs: >-
           Unique identifier for the specific Prompt Version. If no query params
           provided, the default deployed Prompt Version is returned.
-      directory_id: optional<string>
+      type: optional<literal<"prompt">>
       environments:
         type: optional<list<EnvironmentResponse>>
         docs: The list of environments the Prompt Version is deployed to.
@@ -1897,11 +2033,6 @@ types:
         type: VersionStatus
         docs: The status of the Prompt Version.
       last_used_at: datetime
-      path:
-        type: string
-        docs: >-
-          Path of the Prompt, including the name, which is used as a unique
-          identifier.
       model:
         type: string
         docs: >-
@@ -1991,6 +2122,9 @@ types:
           Inputs associated to the Prompt. Inputs correspond to any of the
           variables used within the Prompt template.
         type: list<InputResponse>
+      evaluator_aggregates:
+        type: optional<list<EvaluatorAggregate>>
+        docs: Aggregation of Evaluator results for the Prompt Version.
   ProviderApiKeys:
     properties:
       openai: optional<string>
@@ -2173,26 +2307,6 @@ types:
 
       V4 uses organization and inline. Those are deprecated and will be removed
       in favour of tool and tool_version.
-  ToolTemplateResponse:
-    docs: Template for a Humanloop runnable tool.
-    properties:
-      name:
-        type: string
-        docs: Name for the tool referenced by the model.
-      description:
-        type: string
-        docs: Description of the tool referenced by the model
-      parameters:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Parameters needed to run the Tool, defined in JSON Schema format:
-          https://json-schema.org/
-      signature:
-        type: optional<string>
-        docs: Signature of the Tool.
-      setup_schema:
-        type: optional<map<string, unknown>>
-        docs: Schema required to setup the Tool runtime, e.g. API keys.
   UpdateDatesetAction:
     enum:
       - set
@@ -2352,6 +2466,11 @@ types:
   ToolResponse:
     docs: Request to create a new Tool.
     properties:
+      path:
+        type: string
+        docs: >-
+          Path of the Tool, including the name, which is used as a unique
+          identifier.
       id:
         type: string
         docs: Unique identifier for the Tool.
@@ -2363,7 +2482,7 @@ types:
         docs: >-
           Unique identifier for the specific Tool Version. If no query params
           provided, the default deployed Tool Version is returned.
-      directory_id: optional<string>
+      type: optional<literal<"tool">>
       environments:
         type: optional<list<EnvironmentResponse>>
         docs: The list of environments the Tool Version is deployed to.
@@ -2376,11 +2495,6 @@ types:
         type: VersionStatus
         docs: The status of the Tool Version.
       last_used_at: datetime
-      path:
-        type: string
-        docs: >-
-          Path of the Tool, including the name, which is used as a unique
-          identifier.
       function:
         type: optional<ToolFunction>
         docs: >-
@@ -2414,6 +2528,9 @@ types:
       signature:
         type: optional<string>
         docs: Signature of the Tool.
+      evaluator_aggregates:
+        type: optional<list<EvaluatorAggregate>>
+        docs: Aggregation of Evaluator results for the Tool Version.
   UserResponse:
     properties:
       id:

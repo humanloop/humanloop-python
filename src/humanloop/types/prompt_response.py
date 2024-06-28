@@ -7,6 +7,7 @@ from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .environment_response import EnvironmentResponse
+from .evaluator_aggregate import EvaluatorAggregate
 from .input_response import InputResponse
 from .linked_tool_response import LinkedToolResponse
 from .model_endpoints import ModelEndpoints
@@ -24,6 +25,11 @@ class PromptResponse(UncheckedBaseModel):
     Request model for creating a new Prompt
     """
 
+    path: str = pydantic_v1.Field()
+    """
+    Path of the Prompt, including the name, which is used as a unique identifier.
+    """
+
     id: str = pydantic_v1.Field()
     """
     Unique identifier for the Prompt.
@@ -39,7 +45,7 @@ class PromptResponse(UncheckedBaseModel):
     Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
     """
 
-    directory_id: typing.Optional[str] = None
+    type: typing.Optional[typing.Literal["prompt"]] = None
     environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic_v1.Field(default=None)
     """
     The list of environments the Prompt Version is deployed to.
@@ -58,11 +64,6 @@ class PromptResponse(UncheckedBaseModel):
     """
 
     last_used_at: dt.datetime
-    path: str = pydantic_v1.Field()
-    """
-    Path of the Prompt, including the name, which is used as a unique identifier.
-    """
-
     model: str = pydantic_v1.Field()
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
@@ -156,6 +157,11 @@ class PromptResponse(UncheckedBaseModel):
     inputs: typing.List[InputResponse] = pydantic_v1.Field()
     """
     Inputs associated to the Prompt. Inputs correspond to any of the variables used within the Prompt template.
+    """
+
+    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic_v1.Field(default=None)
+    """
+    Aggregation of Evaluator results for the Prompt Version.
     """
 
     def json(self, **kwargs: typing.Any) -> str:

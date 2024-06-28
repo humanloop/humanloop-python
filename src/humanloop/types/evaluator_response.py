@@ -7,6 +7,7 @@ from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .environment_response import EnvironmentResponse
+from .evaluator_aggregate import EvaluatorAggregate
 from .evaluator_response_spec import EvaluatorResponseSpec
 from .input_response import InputResponse
 from .user_response import UserResponse
@@ -16,6 +17,11 @@ from .version_status import VersionStatus
 class EvaluatorResponse(UncheckedBaseModel):
     """
     Request model for creating a new Evaluator
+    """
+
+    path: str = pydantic_v1.Field()
+    """
+    Path of the Dataset including the Dataset name, which is used as a unique identifier.
     """
 
     id: str = pydantic_v1.Field()
@@ -33,7 +39,7 @@ class EvaluatorResponse(UncheckedBaseModel):
     Unique identifier for the specific Evaluator Version. If no query params provided, the default deployed Evaluator Version is returned.
     """
 
-    directory_id: typing.Optional[str] = None
+    type: typing.Optional[typing.Literal["evaluator"]] = None
     environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic_v1.Field(default=None)
     """
     The list of environments the Prompt Version is deployed to.
@@ -48,11 +54,6 @@ class EvaluatorResponse(UncheckedBaseModel):
 
     status: VersionStatus
     last_used_at: dt.datetime
-    path: str = pydantic_v1.Field()
-    """
-    Path of the Dataset including the Dataset name, which is used as a unique identifier.
-    """
-
     commit_message: typing.Optional[str] = pydantic_v1.Field(default=None)
     """
     Message describing the changes made.
@@ -72,6 +73,11 @@ class EvaluatorResponse(UncheckedBaseModel):
     inputs: typing.List[InputResponse] = pydantic_v1.Field()
     """
     Inputs associated to the Prompt. Inputs correspond to any of the variables used within the Prompt template.
+    """
+
+    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic_v1.Field(default=None)
+    """
+    Aggregation of Evaluator results for the Evaluator Version.
     """
 
     def json(self, **kwargs: typing.Any) -> str:

@@ -18,6 +18,7 @@ from ..types.evaluator_activation_deactivation_request_evaluators_to_activate_it
 from ..types.evaluator_activation_deactivation_request_evaluators_to_deactivate_item import (
     EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem,
 )
+from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.files_tool_type import FilesToolType
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_tools import ListTools
@@ -26,7 +27,6 @@ from ..types.sort_order import SortOrder
 from ..types.tool_function import ToolFunction
 from ..types.tool_kernel_request import ToolKernelRequest
 from ..types.tool_response import ToolResponse
-from ..types.tool_template_response import ToolTemplateResponse
 from ..types.version_status import VersionStatus
 
 # this is used as the default value for optional parameters
@@ -134,7 +134,6 @@ class ToolsClient:
         function: typing.Optional[ToolFunction] = OMIT,
         source_code: typing.Optional[str] = OMIT,
         setup_values: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
-        name: typing.Optional[str] = OMIT,
         tool_type: typing.Optional[FilesToolType] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -151,7 +150,7 @@ class ToolsClient:
         Parameters
         ----------
         path : typing.Optional[str]
-            Path of the Tool including the Tool name, which is used as a unique identifier.
+            Path of the Tool, including the name, which is used as a unique identifier.
 
         id : typing.Optional[str]
             ID for an existing Tool to update.
@@ -164,9 +163,6 @@ class ToolsClient:
 
         setup_values : typing.Optional[typing.Dict[str, typing.Any]]
             Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
-
-        name : typing.Optional[str]
-            Name of the Tool, which is used as a unique identifier.
 
         tool_type : typing.Optional[FilesToolType]
             Type of Tool.
@@ -200,7 +196,6 @@ class ToolsClient:
                 "function": function,
                 "source_code": source_code,
                 "setup_values": setup_values,
-                "name": name,
                 "tool_type": tool_type,
                 "commit_message": commit_message,
             },
@@ -230,7 +225,7 @@ class ToolsClient:
         """
         Retrieve the Tool with the given ID.
 
-        By default the deployed version of the Tool is returned. Use the query parameters
+        By default, the deployed version of the Tool is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Tool.
 
         Parameters
@@ -239,10 +234,10 @@ class ToolsClient:
             Unique identifier for Tool.
 
         version_id : typing.Optional[str]
-            A specific Version Id of the Tool to retrieve.
+            A specific Version ID of the Tool to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -389,7 +384,7 @@ class ToolsClient:
         *,
         status: typing.Optional[VersionStatus] = None,
         environment: typing.Optional[str] = None,
-        evaluation_aggregates: typing.Optional[bool] = None,
+        evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListTools:
         """
@@ -404,9 +399,9 @@ class ToolsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Filter versions by environment tag. If no environment is provided, all versions are returned.
+            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
 
-        evaluation_aggregates : typing.Optional[bool]
+        evaluator_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -430,71 +425,12 @@ class ToolsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
+            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def deploy(
-        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> ToolResponse:
-        """
-        Deploy Tool to Environment.
-
-        Set the deployed Version for the specified Environment. This Tool Version
-        will be used for calls made to the Tool in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Tool.
-
-        version_id : str
-            Unique identifier for the specific version of the Tool.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ToolResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.deploy(
-            id="id",
-            version_id="version_id",
-            environment_id="environment_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
-            method="POST",
-            params={"environment_id": environment_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -602,10 +538,10 @@ class ToolsClient:
         Parameters
         ----------
         version_id : typing.Optional[str]
-            A specific version Id of the Tool to log to.
+            A specific Version ID of the Tool to log to.
 
         environment : typing.Optional[str]
-            An environment tag of the deployed version to log to.
+            Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
             Path of the Tool, including the name, which is used as a unique identifier.
@@ -794,25 +730,173 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_templates(
-        self,
-        *,
-        tool_type: typing.Optional[FilesToolType] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[ToolTemplateResponse]:
+    def deploy(
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> ToolResponse:
         """
+        Deploy Tool to Environment.
+
+        Set the deployed Version for the specified Environment. This Tool Version
+        will be used for calls made to the Tool in this Environment.
+
         Parameters
         ----------
-        tool_type : typing.Optional[FilesToolType]
-            Type of tool to return the template
+        id : str
+            Unique identifier for Tool.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Tool.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[ToolTemplateResponse]
+        ToolResponse
             Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.deploy(
+            id="id",
+            environment_id="environment_id",
+            version_id="version_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={"version_id": version_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployment of Tool from Environment.
+
+        Remove the deployed Version for the specified Environment. This Tool Version
+        will no longer be used for calls made to the Tool in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.remove_deployment(
+            id="id",
+            environment_id="environment_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.list_environments(
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_templates(self, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
 
         Examples
         --------
@@ -824,15 +908,11 @@ class ToolsClient:
         client.tools.list_templates()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "tools/templates", method="GET", params={"tool_type": tool_type}, request_options=request_options
+            "tools/templates", method="GET", request_options=request_options
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[ToolTemplateResponse], construct_type(type_=typing.List[ToolTemplateResponse], object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
+                return
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -940,7 +1020,6 @@ class AsyncToolsClient:
         function: typing.Optional[ToolFunction] = OMIT,
         source_code: typing.Optional[str] = OMIT,
         setup_values: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
-        name: typing.Optional[str] = OMIT,
         tool_type: typing.Optional[FilesToolType] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -957,7 +1036,7 @@ class AsyncToolsClient:
         Parameters
         ----------
         path : typing.Optional[str]
-            Path of the Tool including the Tool name, which is used as a unique identifier.
+            Path of the Tool, including the name, which is used as a unique identifier.
 
         id : typing.Optional[str]
             ID for an existing Tool to update.
@@ -970,9 +1049,6 @@ class AsyncToolsClient:
 
         setup_values : typing.Optional[typing.Dict[str, typing.Any]]
             Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
-
-        name : typing.Optional[str]
-            Name of the Tool, which is used as a unique identifier.
 
         tool_type : typing.Optional[FilesToolType]
             Type of Tool.
@@ -1006,7 +1082,6 @@ class AsyncToolsClient:
                 "function": function,
                 "source_code": source_code,
                 "setup_values": setup_values,
-                "name": name,
                 "tool_type": tool_type,
                 "commit_message": commit_message,
             },
@@ -1036,7 +1111,7 @@ class AsyncToolsClient:
         """
         Retrieve the Tool with the given ID.
 
-        By default the deployed version of the Tool is returned. Use the query parameters
+        By default, the deployed version of the Tool is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Tool.
 
         Parameters
@@ -1045,10 +1120,10 @@ class AsyncToolsClient:
             Unique identifier for Tool.
 
         version_id : typing.Optional[str]
-            A specific Version Id of the Tool to retrieve.
+            A specific Version ID of the Tool to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1195,7 +1270,7 @@ class AsyncToolsClient:
         *,
         status: typing.Optional[VersionStatus] = None,
         environment: typing.Optional[str] = None,
-        evaluation_aggregates: typing.Optional[bool] = None,
+        evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListTools:
         """
@@ -1210,9 +1285,9 @@ class AsyncToolsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Filter versions by environment tag. If no environment is provided, all versions are returned.
+            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
 
-        evaluation_aggregates : typing.Optional[bool]
+        evaluator_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1236,71 +1311,12 @@ class AsyncToolsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
+            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def deploy(
-        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> ToolResponse:
-        """
-        Deploy Tool to Environment.
-
-        Set the deployed Version for the specified Environment. This Tool Version
-        will be used for calls made to the Tool in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Tool.
-
-        version_id : str
-            Unique identifier for the specific version of the Tool.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ToolResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.tools.deploy(
-            id="id",
-            version_id="version_id",
-            environment_id="environment_id",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
-            method="POST",
-            params={"environment_id": environment_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -1408,10 +1424,10 @@ class AsyncToolsClient:
         Parameters
         ----------
         version_id : typing.Optional[str]
-            A specific version Id of the Tool to log to.
+            A specific Version ID of the Tool to log to.
 
         environment : typing.Optional[str]
-            An environment tag of the deployed version to log to.
+            Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
             Path of the Tool, including the name, which is used as a unique identifier.
@@ -1600,25 +1616,173 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_templates(
-        self,
-        *,
-        tool_type: typing.Optional[FilesToolType] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[ToolTemplateResponse]:
+    async def deploy(
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> ToolResponse:
         """
+        Deploy Tool to Environment.
+
+        Set the deployed Version for the specified Environment. This Tool Version
+        will be used for calls made to the Tool in this Environment.
+
         Parameters
         ----------
-        tool_type : typing.Optional[FilesToolType]
-            Type of tool to return the template
+        id : str
+            Unique identifier for Tool.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Tool.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[ToolTemplateResponse]
+        ToolResponse
             Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.tools.deploy(
+            id="id",
+            environment_id="environment_id",
+            version_id="version_id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={"version_id": version_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployment of Tool from Environment.
+
+        Remove the deployed Version for the specified Environment. This Tool Version
+        will no longer be used for calls made to the Tool in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.tools.remove_deployment(
+            id="id",
+            environment_id="environment_id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.tools.list_environments(
+            id="id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_templates(self, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
 
         Examples
         --------
@@ -1630,15 +1794,11 @@ class AsyncToolsClient:
         await client.tools.list_templates()
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "tools/templates", method="GET", params={"tool_type": tool_type}, request_options=request_options
+            "tools/templates", method="GET", request_options=request_options
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[ToolTemplateResponse], construct_type(type_=typing.List[ToolTemplateResponse], object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
+                return
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
