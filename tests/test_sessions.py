@@ -22,6 +22,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                 "output_cost": 1.1,
                 "finish_reason": "finish_reason",
                 "prompt": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -29,7 +30,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "model": "model",
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -69,6 +69,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "output_cost": None,
                     "finish_reason": None,
                     "prompt": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -76,7 +77,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "model": None,
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",

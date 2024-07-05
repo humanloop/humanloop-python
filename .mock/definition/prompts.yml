@@ -12,9 +12,9 @@ service:
       pagination:
         offset: $request.page
         results: $response.records
-      display-name: List Prompts
+      display-name: 'List '
       request:
-        name: PromptsListRequest
+        name: ListPromptsGetRequest
         query-parameters:
           page:
             type: optional<integer>
@@ -45,10 +45,11 @@ service:
         - response:
             body:
               records:
-                - id: id
+                - path: path
+                  id: id
                   name: name
                   version_id: version_id
-                  directory_id: directory_id
+                  type: prompt
                   environments:
                     - id: id
                       created_at: '2024-01-15T09:30:00Z'
@@ -61,7 +62,6 @@ service:
                     email_address: email_address
                   status: uncommitted
                   last_used_at: '2024-01-15T09:30:00Z'
-                  path: path
                   model: model
                   endpoint: complete
                   template: template
@@ -88,7 +88,13 @@ service:
                   total_logs_count: 1
                   inputs:
                     - name: name
-    create:
+                  evaluator_aggregates:
+                    - value: 1.1
+                      evaluator_id: evaluator_id
+                      evaluator_version_id: evaluator_version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
+    upsert:
       path: /prompts
       method: POST
       auth: true
@@ -107,7 +113,7 @@ service:
         committed version,
 
         an exception will be raised.
-      display-name: Upsert Prompt
+      display-name: Upsert
       request:
         name: PromptRequest
         body:
@@ -213,10 +219,11 @@ service:
             model: model
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: prompt
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -230,7 +237,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               model: model
               endpoint: complete
               template: template
@@ -260,6 +266,12 @@ service:
               total_logs_count: 1
               inputs:
                 - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
     get:
       path: /prompts/{id}
       method: GET
@@ -268,8 +280,8 @@ service:
         Retrieve the Prompt with the given ID.
 
 
-        By default the deployed version of the Prompt is returned. Use the query
-        parameters
+        By default, the deployed version of the Prompt is returned. Use the
+        query parameters
 
         `version_id` or `environment` to target a specific version of the
         Prompt.
@@ -277,16 +289,16 @@ service:
         id:
           type: string
           docs: Unique identifier for Prompt.
-      display-name: Get Prompt
+      display-name: Get
       request:
-        name: PromptsGetRequest
+        name: GetPromptsIdGetRequest
         query-parameters:
           version_id:
             type: optional<string>
-            docs: A specific Version Id  of the Prompt to retrieve.
+            docs: A specific Version ID of the Prompt to retrieve.
           environment:
             type: optional<string>
-            docs: An environment tag to retrieve a deployed Version from.
+            docs: Name of the Environment to retrieve a deployed Version from.
       response:
         docs: Successful Response
         type: root.PromptResponse
@@ -297,10 +309,11 @@ service:
             id: id
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: prompt
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -314,7 +327,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               model: model
               endpoint: complete
               template: template
@@ -344,6 +356,12 @@ service:
               total_logs_count: 1
               inputs:
                 - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
     delete:
       path: /prompts/{id}
       method: DELETE
@@ -353,13 +371,13 @@ service:
         id:
           type: string
           docs: Unique identifier for Prompt.
-      display-name: Delete Prompt
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
         - path-parameters:
             id: id
-    update:
+    move:
       path: /prompts/{id}
       method: PATCH
       auth: true
@@ -368,7 +386,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Prompt.
-      display-name: Move Prompt
+      display-name: Move
       request:
         name: UpdatePromptRequest
         body:
@@ -392,10 +410,11 @@ service:
           request: {}
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: prompt
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -409,7 +428,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               model: model
               endpoint: complete
               template: template
@@ -439,7 +457,13 @@ service:
               total_logs_count: 1
               inputs:
                 - name: name
-    list_versions:
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+    listVersions:
       path: /prompts/{id}/versions
       method: GET
       auth: true
@@ -450,7 +474,7 @@ service:
           docs: Unique identifier for Prompt.
       display-name: List Versions
       request:
-        name: PromptsListVersionsRequest
+        name: ListVersionsPromptsIdVersionsGetRequest
         query-parameters:
           status:
             type: optional<root.VersionStatus>
@@ -460,9 +484,9 @@ service:
           environment:
             type: optional<string>
             docs: >-
-              Filter versions by environment tag. If no environment is provided,
-              all versions are returned.
-          evaluation_aggregates: optional<boolean>
+              Name of the environment to filter versions by. If no environment
+              is provided, all versions are returned.
+          evaluator_aggregates: optional<boolean>
       response:
         docs: Successful Response
         type: root.ListPrompts
@@ -474,10 +498,11 @@ service:
           response:
             body:
               records:
-                - id: id
+                - path: path
+                  id: id
                   name: name
                   version_id: version_id
-                  directory_id: directory_id
+                  type: prompt
                   environments:
                     - id: id
                       created_at: '2024-01-15T09:30:00Z'
@@ -490,7 +515,6 @@ service:
                     email_address: email_address
                   status: uncommitted
                   last_used_at: '2024-01-15T09:30:00Z'
-                  path: path
                   model: model
                   endpoint: complete
                   template: template
@@ -517,92 +541,12 @@ service:
                   total_logs_count: 1
                   inputs:
                     - name: name
-    deploy:
-      path: /prompts/{id}/versions/{version_id}/deploy
-      method: POST
-      auth: true
-      docs: >-
-        Deploy Prompt to Environment.
-
-
-        Set the deployed Version for the specified Environment. This Prompt
-        Version
-
-        will be used for calls made to the Prompt in this Environment.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Prompt.
-        version_id:
-          type: string
-          docs: Unique identifier for the specific version of the Prompt.
-      display-name: Deploy
-      request:
-        name: PromptsDeployRequest
-        query-parameters:
-          environment_id:
-            type: string
-            docs: Unique identifier for the Environment to deploy the Version to.
-      response:
-        docs: Successful Response
-        type: root.PromptResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-            version_id: version_id
-          query-parameters:
-            environment_id: environment_id
-          response:
-            body:
-              id: id
-              name: name
-              version_id: version_id
-              directory_id: directory_id
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              path: path
-              model: model
-              endpoint: complete
-              template: template
-              provider: openai
-              max_tokens: 1
-              temperature: 1.1
-              top_p: 1.1
-              stop: stop
-              presence_penalty: 1.1
-              frequency_penalty: 1.1
-              other:
-                other:
-                  key: value
-              seed: 1
-              response_format:
-                type: json_object
-              tools:
-                - name: name
-                  description: description
-              linked_tools:
-                - name: name
-                  description: description
-                  id: id
-                  version_id: version_id
-              commit_message: commit_message
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
+                  evaluator_aggregates:
+                    - value: 1.1
+                      evaluator_id: evaluator_id
+                      evaluator_version_id: evaluator_version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
     commit:
       path: /prompts/{id}/versions/{version_id}/commit
       method: POST
@@ -631,10 +575,11 @@ service:
             commit_message: commit_message
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: prompt
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -648,7 +593,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               model: model
               endpoint: complete
               template: template
@@ -678,6 +622,12 @@ service:
               total_logs_count: 1
               inputs:
                 - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
     log:
       path: /prompts/log
       method: POST
@@ -709,10 +659,10 @@ service:
         query-parameters:
           version_id:
             type: optional<string>
-            docs: A specific version Id of the Prompt to log to.
+            docs: A specific Version ID of the Prompt to log to.
           environment:
             type: optional<string>
-            docs: An environment tag of the deployed version to log to.
+            docs: Name of the Environment identifying a deployed version to log to.
         body:
           properties:
             path:
@@ -819,6 +769,7 @@ service:
               docs: >-
                 Whether the request/response payloads will be stored on
                 Humanloop.
+              default: true
             source_datapoint_id:
               type: optional<string>
               docs: >-
@@ -888,10 +839,10 @@ service:
         query-parameters:
           version_id:
             type: optional<string>
-            docs: A specific version Id of the Prompt to log to.
+            docs: A specific Version ID of the Prompt to log to.
           environment:
             type: optional<string>
-            docs: An environment tag of the deployed version to log to.
+            docs: Name of the Environment identifying a deployed version to log to.
         body:
           properties:
             path:
@@ -956,6 +907,7 @@ service:
               docs: >-
                 Whether the request/response payloads will be stored on
                 Humanloop.
+              default: true
             source_datapoint_id:
               type: optional<string>
               docs: >-
@@ -992,12 +944,14 @@ service:
               docs: >-
                 If true, tokens will be sent as data-only server-sent events. If
                 num_samples > 1, samples are streamed back independently.
+              default: false
             return_inputs:
               type: optional<boolean>
               docs: >-
                 Whether to return the inputs in the response. If false, the
                 response will contain an empty dictionary under inputs. This is
                 useful for reducing the size of the response. Defaults to true.
+              default: true
             logprobs:
               type: optional<integer>
               docs: >-
@@ -1010,7 +964,7 @@ service:
                 Useful for completions that act like inserts.
       response:
         docs: Successful Response
-        type: PromptsCallResponse
+        type: CallPromptsCallPostResponse
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -1018,10 +972,11 @@ service:
           response:
             body:
               prompt:
+                path: path
                 id: id
                 name: name
                 version_id: version_id
-                directory_id: directory_id
+                type: prompt
                 environments:
                   - id: id
                     created_at: '2024-01-15T09:30:00Z'
@@ -1035,7 +990,6 @@ service:
                   full_name: full_name
                 status: uncommitted
                 last_used_at: '2024-01-15T09:30:00Z'
-                path: path
                 model: model
                 endpoint: complete
                 template: template
@@ -1065,6 +1019,12 @@ service:
                 total_logs_count: 1
                 inputs:
                   - name: name
+                evaluator_aggregates:
+                  - value: 1.1
+                    evaluator_id: evaluator_id
+                    evaluator_version_id: evaluator_version_id
+                    created_at: '2024-01-15T09:30:00Z'
+                    updated_at: '2024-01-15T09:30:00Z'
               messages:
                 - content: content
                   name: name
@@ -1106,7 +1066,7 @@ service:
                   output_cost: 1.1
                   finish_reason: finish_reason
                   index: 1
-    update_evaluators:
+    updateEvaluators:
       path: /prompts/{id}/evaluators
       method: POST
       auth: true
@@ -1131,10 +1091,11 @@ service:
           request: {}
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: prompt
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -1148,7 +1109,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               model: model
               endpoint: complete
               template: template
@@ -1178,6 +1138,204 @@ service:
               total_logs_count: 1
               inputs:
                 - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+    deploy:
+      path: /prompts/{id}/environments/{environment_id}
+      method: POST
+      auth: true
+      docs: >-
+        Deploy Prompt to Environment.
+
+
+        Set the deployed Version for the specified Environment. This Prompt
+        Version
+
+        will be used for calls made to the Prompt in this Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+        environment_id:
+          type: string
+          docs: Unique identifier for the Environment to deploy the Version to.
+      display-name: Deploy
+      request:
+        name: DeployPromptsIdEnvironmentsEnvironmentIdPostRequest
+        query-parameters:
+          version_id:
+            type: string
+            docs: Unique identifier for the specific version of the Prompt.
+      response:
+        docs: Successful Response
+        type: root.PromptResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            environment_id: environment_id
+          query-parameters:
+            version_id: version_id
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: prompt
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              model: model
+              endpoint: complete
+              template: template
+              provider: openai
+              max_tokens: 1
+              temperature: 1.1
+              top_p: 1.1
+              stop: stop
+              presence_penalty: 1.1
+              frequency_penalty: 1.1
+              other:
+                other:
+                  key: value
+              seed: 1
+              response_format:
+                type: json_object
+              tools:
+                - name: name
+                  description: description
+              linked_tools:
+                - name: name
+                  description: description
+                  id: id
+                  version_id: version_id
+              commit_message: commit_message
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+    removeDeployment:
+      path: /prompts/{id}/environments/{environment_id}
+      method: DELETE
+      auth: true
+      docs: >-
+        Remove deployment of Prompt from Environment.
+
+
+        Remove the deployed Version for the specified Environment. This Prompt
+        Version
+
+        will no longer be used for calls made to the Prompt in this Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+        environment_id:
+          type: string
+          docs: Unique identifier for the Environment to remove the deployment from.
+      display-name: Remove Deployment
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            environment_id: environment_id
+    listEnvironments:
+      path: /prompts/{id}/environments
+      method: GET
+      auth: true
+      docs: List all Environments and their deployed versions for the Prompt.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+      display-name: List Environments
+      response:
+        docs: Successful Response
+        type: list<root.FileEnvironmentResponse>
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              - id: id
+                created_at: '2024-01-15T09:30:00Z'
+                name: name
+                tag: default
+                file:
+                  path: path
+                  id: id
+                  name: name
+                  version_id: version_id
+                  type: prompt
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - name: name
+                      description: description
+                      id: id
+                      version_id: version_id
+                  commit_message: commit_message
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+                  evaluator_aggregates:
+                    - value: 1.1
+                      evaluator_id: evaluator_id
+                      evaluator_version_id: evaluator_version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
   display-name: Prompts
 docs: >+
   Prompts define how a large language model behaves.
@@ -1282,7 +1440,7 @@ types:
       - literal<"auto">
       - literal<"required">
       - root.ToolChoice
-  PromptsCallResponse:
+  CallPromptsCallPostResponse:
     discriminated: false
     union:
       - root.PromptCallResponse

@@ -12,17 +12,17 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "id",
         "dataset": {
+            "path": "path",
             "id": "id",
             "name": "name",
             "version_id": "version_id",
-            "directory_id": "directory_id",
+            "type": "dataset",
             "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
             "created_at": "2024-01-15T09:30:00Z",
             "updated_at": "2024-01-15T09:30:00Z",
             "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
             "status": "uncommitted",
             "last_used_at": "2024-01-15T09:30:00Z",
-            "path": "path",
             "commit_message": "commit_message",
             "datapoints_count": 1,
             "datapoints": [{"id": "id"}],
@@ -30,6 +30,7 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "evaluatees": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -37,7 +38,6 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "model": "model",
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -50,6 +50,7 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "evaluators": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -57,7 +58,6 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "spec": {"arguments_type": "target_free", "return_type": "boolean"},
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -74,17 +74,17 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_types: typing.Any = {
         "id": None,
         "dataset": {
+            "path": None,
             "id": None,
             "name": None,
             "version_id": None,
-            "directory_id": None,
+            "type": None,
             "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
             "created_at": "datetime",
             "updated_at": "datetime",
             "created_by": {"id": None, "email_address": None, "full_name": None},
             "status": None,
             "last_used_at": "datetime",
-            "path": None,
             "commit_message": None,
             "datapoints_count": "integer",
             "datapoints": ("list", {0: {"id": None}}),
@@ -94,6 +94,7 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -101,7 +102,6 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "model": None,
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -117,6 +117,7 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -124,7 +125,6 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "spec": {"arguments_type": None, "return_type": None},
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -158,17 +158,17 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "id",
         "dataset": {
+            "path": "path",
             "id": "id",
             "name": "name",
             "version_id": "version_id",
-            "directory_id": "directory_id",
+            "type": "dataset",
             "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
             "created_at": "2024-01-15T09:30:00Z",
             "updated_at": "2024-01-15T09:30:00Z",
             "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
             "status": "uncommitted",
             "last_used_at": "2024-01-15T09:30:00Z",
-            "path": "path",
             "commit_message": "commit_message",
             "datapoints_count": 1,
             "datapoints": [{"id": "id"}],
@@ -176,6 +176,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "evaluatees": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -183,7 +184,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "model": "model",
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -196,6 +196,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "evaluators": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -203,7 +204,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "spec": {"arguments_type": "target_free", "return_type": "boolean"},
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -220,17 +220,17 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_types: typing.Any = {
         "id": None,
         "dataset": {
+            "path": None,
             "id": None,
             "name": None,
             "version_id": None,
-            "directory_id": None,
+            "type": None,
             "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
             "created_at": "datetime",
             "updated_at": "datetime",
             "created_by": {"id": None, "email_address": None, "full_name": None},
             "status": None,
             "last_used_at": "datetime",
-            "path": None,
             "commit_message": None,
             "datapoints_count": "integer",
             "datapoints": ("list", {0: {"id": None}}),
@@ -240,6 +240,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -247,7 +248,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "model": None,
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -263,6 +263,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -270,7 +271,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "spec": {"arguments_type": None, "return_type": None},
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -303,17 +303,17 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "id",
         "dataset": {
+            "path": "path",
             "id": "id",
             "name": "name",
             "version_id": "version_id",
-            "directory_id": "directory_id",
+            "type": "dataset",
             "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
             "created_at": "2024-01-15T09:30:00Z",
             "updated_at": "2024-01-15T09:30:00Z",
             "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
             "status": "uncommitted",
             "last_used_at": "2024-01-15T09:30:00Z",
-            "path": "path",
             "commit_message": "commit_message",
             "datapoints_count": 1,
             "datapoints": [{"id": "id"}],
@@ -321,6 +321,7 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "evaluatees": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -328,7 +329,6 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "model": "model",
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -341,6 +341,7 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "evaluators": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -348,7 +349,6 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "spec": {"arguments_type": "target_free", "return_type": "boolean"},
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -365,17 +365,17 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_types: typing.Any = {
         "id": None,
         "dataset": {
+            "path": None,
             "id": None,
             "name": None,
             "version_id": None,
-            "directory_id": None,
+            "type": None,
             "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
             "created_at": "datetime",
             "updated_at": "datetime",
             "created_by": {"id": None, "email_address": None, "full_name": None},
             "status": None,
             "last_used_at": "datetime",
-            "path": None,
             "commit_message": None,
             "datapoints_count": "integer",
             "datapoints": ("list", {0: {"id": None}}),
@@ -385,6 +385,7 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -392,7 +393,6 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "model": None,
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -408,6 +408,7 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -415,7 +416,6 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "spec": {"arguments_type": None, "return_type": None},
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -451,17 +451,17 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "id": "id",
         "dataset": {
+            "path": "path",
             "id": "id",
             "name": "name",
             "version_id": "version_id",
-            "directory_id": "directory_id",
+            "type": "dataset",
             "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
             "created_at": "2024-01-15T09:30:00Z",
             "updated_at": "2024-01-15T09:30:00Z",
             "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
             "status": "uncommitted",
             "last_used_at": "2024-01-15T09:30:00Z",
-            "path": "path",
             "commit_message": "commit_message",
             "datapoints_count": 1,
             "datapoints": [{"id": "id"}],
@@ -469,6 +469,7 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
         "evaluatees": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -476,7 +477,6 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "model": "model",
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -489,6 +489,7 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
         "evaluators": [
             {
                 "version": {
+                    "path": "path",
                     "id": "id",
                     "name": "name",
                     "version_id": "version_id",
@@ -496,7 +497,6 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
                     "updated_at": "2024-01-15T09:30:00Z",
                     "status": "uncommitted",
                     "last_used_at": "2024-01-15T09:30:00Z",
-                    "path": "path",
                     "spec": {"arguments_type": "target_free", "return_type": "boolean"},
                     "version_logs_count": 1,
                     "total_logs_count": 1,
@@ -513,17 +513,17 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_types: typing.Any = {
         "id": None,
         "dataset": {
+            "path": None,
             "id": None,
             "name": None,
             "version_id": None,
-            "directory_id": None,
+            "type": None,
             "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
             "created_at": "datetime",
             "updated_at": "datetime",
             "created_by": {"id": None, "email_address": None, "full_name": None},
             "status": None,
             "last_used_at": "datetime",
-            "path": None,
             "commit_message": None,
             "datapoints_count": "integer",
             "datapoints": ("list", {0: {"id": None}}),
@@ -533,6 +533,7 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -540,7 +541,6 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "model": None,
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -556,6 +556,7 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
             {
                 0: {
                     "version": {
+                        "path": None,
                         "id": None,
                         "name": None,
                         "version_id": None,
@@ -563,7 +564,6 @@ async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) ->
                         "updated_at": "datetime",
                         "status": None,
                         "last_used_at": "datetime",
-                        "path": None,
                         "spec": {"arguments_type": None, "return_type": None},
                         "version_logs_count": "integer",
                         "total_logs_count": "integer",
@@ -647,4 +647,140 @@ async def test_get_stats(client: Humanloop, async_client: AsyncHumanloop) -> Non
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.evaluations.get_stats(id="id")
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_get_logs(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "records": [
+            {
+                "evaluated_version": {
+                    "path": "path",
+                    "id": "id",
+                    "name": "name",
+                    "version_id": "version_id",
+                    "created_at": "2024-01-15T09:30:00Z",
+                    "updated_at": "2024-01-15T09:30:00Z",
+                    "status": "uncommitted",
+                    "last_used_at": "2024-01-15T09:30:00Z",
+                    "model": "model",
+                    "version_logs_count": 1,
+                    "total_logs_count": 1,
+                    "inputs": [{"name": "name"}],
+                },
+                "datapoint": {"id": "id"},
+                "log": {
+                    "id": "id",
+                    "config": {"id": "id", "type": "model", "model": "model"},
+                    "evaluation_results": [
+                        {
+                            "id": "id",
+                            "evaluator_id": "evaluator_id",
+                            "evaluator_version_id": "evaluator_version_id",
+                            "log_id": "log_id",
+                            "updated_at": "2024-01-15T09:30:00Z",
+                            "created_at": "2024-01-15T09:30:00Z",
+                        }
+                    ],
+                    "observability_status": "pending",
+                    "updated_at": "2024-01-15T09:30:00Z",
+                },
+                "evaluator_logs": [
+                    {
+                        "id": "id",
+                        "config": {"id": "id", "type": "model", "model": "model"},
+                        "evaluation_results": [
+                            {
+                                "id": "id",
+                                "evaluator_id": "evaluator_id",
+                                "evaluator_version_id": "evaluator_version_id",
+                                "log_id": "log_id",
+                                "updated_at": "2024-01-15T09:30:00Z",
+                                "created_at": "2024-01-15T09:30:00Z",
+                            }
+                        ],
+                        "observability_status": "pending",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                    }
+                ],
+            }
+        ],
+        "page": 1,
+        "size": 1,
+        "total": 1,
+    }
+    expected_types: typing.Any = {
+        "records": (
+            "list",
+            {
+                0: {
+                    "evaluated_version": {
+                        "path": None,
+                        "id": None,
+                        "name": None,
+                        "version_id": None,
+                        "created_at": "datetime",
+                        "updated_at": "datetime",
+                        "status": None,
+                        "last_used_at": "datetime",
+                        "model": None,
+                        "version_logs_count": "integer",
+                        "total_logs_count": "integer",
+                        "inputs": ("list", {0: {"name": None}}),
+                    },
+                    "datapoint": {"id": None},
+                    "log": {
+                        "id": None,
+                        "config": {"id": None, "type": None, "model": None},
+                        "evaluation_results": (
+                            "list",
+                            {
+                                0: {
+                                    "id": None,
+                                    "evaluator_id": None,
+                                    "evaluator_version_id": None,
+                                    "log_id": None,
+                                    "updated_at": "datetime",
+                                    "created_at": "datetime",
+                                }
+                            },
+                        ),
+                        "observability_status": None,
+                        "updated_at": "datetime",
+                    },
+                    "evaluator_logs": (
+                        "list",
+                        {
+                            0: {
+                                "id": None,
+                                "config": {"id": None, "type": None, "model": None},
+                                "evaluation_results": (
+                                    "list",
+                                    {
+                                        0: {
+                                            "id": None,
+                                            "evaluator_id": None,
+                                            "evaluator_version_id": None,
+                                            "log_id": None,
+                                            "updated_at": "datetime",
+                                            "created_at": "datetime",
+                                        }
+                                    },
+                                ),
+                                "observability_status": None,
+                                "updated_at": "datetime",
+                            }
+                        },
+                    ),
+                }
+            },
+        ),
+        "page": "integer",
+        "size": "integer",
+        "total": "integer",
+    }
+    response = client.evaluations.get_logs(id="id")
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.evaluations.get_logs(id="id")
     validate_response(async_response, expected_response, expected_types)

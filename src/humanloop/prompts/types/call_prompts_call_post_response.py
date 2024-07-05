@@ -5,4 +5,4 @@ import typing
 from ...types.prompt_call_response import PromptCallResponse
 from ...types.prompt_call_stream_response import PromptCallStreamResponse
 
-PromptsCallResponse = typing.Union[PromptCallResponse, PromptCallStreamResponse]
+CallPromptsCallPostResponse = typing.Union[PromptCallResponse, PromptCallStreamResponse]

@@ -7,19 +7,19 @@ from humanloop.client import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "prompt",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "model": "model",
         "endpoint": "complete",
         "template": "template",
@@ -39,19 +39,28 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": 1,
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "model": None,
         "endpoint": None,
         "template": None,
@@ -71,27 +80,39 @@ async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
-    response = client.prompts.create(model="model")
+    response = client.prompts.upsert(model="model")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.create(model="model")
+    async_response = await async_client.prompts.upsert(model="model")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "prompt",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "model": "model",
         "endpoint": "complete",
         "template": "template",
@@ -111,19 +132,28 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": 1,
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "model": None,
         "endpoint": None,
         "template": None,
@@ -143,6 +173,18 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.prompts.get(id="id")
     validate_response(response, expected_response, expected_types)
@@ -158,19 +200,19 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     assert await async_client.prompts.delete(id="id") is None  # type: ignore[func-returns-value]
 
 
-async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "prompt",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "model": "model",
         "endpoint": "complete",
         "template": "template",
@@ -190,19 +232,28 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": 1,
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "model": None,
         "endpoint": None,
         "template": None,
@@ -222,11 +273,23 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
-    response = client.prompts.update(id="id")
+    response = client.prompts.move(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.update(id="id")
+    async_response = await async_client.prompts.move(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -234,17 +297,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "records": [
             {
+                "path": "path",
                 "id": "id",
                 "name": "name",
                 "version_id": "version_id",
-                "directory_id": "directory_id",
+                "type": "prompt",
                 "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
                 "created_at": "2024-01-15T09:30:00Z",
                 "updated_at": "2024-01-15T09:30:00Z",
                 "created_by": {"id": "id", "email_address": "email_address"},
                 "status": "uncommitted",
                 "last_used_at": "2024-01-15T09:30:00Z",
-                "path": "path",
                 "model": "model",
                 "endpoint": "complete",
                 "template": "template",
@@ -265,6 +328,15 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
                 "version_logs_count": 1,
                 "total_logs_count": 1,
                 "inputs": [{"name": "name"}],
+                "evaluator_aggregates": [
+                    {
+                        "value": 1.1,
+                        "evaluator_id": "evaluator_id",
+                        "evaluator_version_id": "evaluator_version_id",
+                        "created_at": "2024-01-15T09:30:00Z",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                    }
+                ],
             }
         ]
     }
@@ -273,17 +345,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             "list",
             {
                 0: {
+                    "path": None,
                     "id": None,
                     "name": None,
                     "version_id": None,
-                    "directory_id": None,
+                    "type": None,
                     "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
                     "created_by": {"id": None, "email_address": None},
                     "status": None,
                     "last_used_at": "datetime",
-                    "path": None,
                     "model": None,
                     "endpoint": None,
                     "template": None,
@@ -302,6 +374,18 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
+                    "evaluator_aggregates": (
+                        "list",
+                        {
+                            0: {
+                                "value": None,
+                                "evaluator_id": None,
+                                "evaluator_version_id": None,
+                                "created_at": "datetime",
+                                "updated_at": "datetime",
+                            }
+                        },
+                    ),
                 }
             },
         )
@@ -313,93 +397,19 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = {
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "directory_id": "directory_id",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
-        "model": "model",
-        "endpoint": "complete",
-        "template": "template",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "stop",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"other": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object"},
-        "tools": [{"name": "name", "description": "description"}],
-        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-    }
-    expected_types: typing.Any = {
-        "id": None,
-        "name": None,
-        "version_id": None,
-        "directory_id": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
-        "status": None,
-        "last_used_at": "datetime",
-        "path": None,
-        "model": None,
-        "endpoint": None,
-        "template": None,
-        "provider": None,
-        "max_tokens": "integer",
-        "temperature": None,
-        "top_p": None,
-        "stop": None,
-        "presence_penalty": None,
-        "frequency_penalty": None,
-        "other": ("dict", {0: (None, None)}),
-        "seed": "integer",
-        "response_format": {"type": None},
-        "tools": ("list", {0: {"name": None, "description": None}}),
-        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
-        "commit_message": None,
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
-    response = client.prompts.deploy(id="id", version_id="version_id", environment_id="environment_id")
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.prompts.deploy(
-        id="id", version_id="version_id", environment_id="environment_id"
-    )
-    validate_response(async_response, expected_response, expected_types)
-
-
 async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "prompt",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "model": "model",
         "endpoint": "complete",
         "template": "template",
@@ -419,19 +429,28 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": 1,
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "model": None,
         "endpoint": None,
         "template": None,
@@ -451,6 +470,18 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.prompts.commit(id="id", version_id="version_id", commit_message="commit_message")
     validate_response(response, expected_response, expected_types)
@@ -479,17 +510,17 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
 async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "prompt": {
+            "path": "path",
             "id": "id",
             "name": "name",
             "version_id": "version_id",
-            "directory_id": "directory_id",
+            "type": "prompt",
             "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
             "created_at": "2024-01-15T09:30:00Z",
             "updated_at": "2024-01-15T09:30:00Z",
             "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
             "status": "uncommitted",
             "last_used_at": "2024-01-15T09:30:00Z",
-            "path": "path",
             "model": "model",
             "endpoint": "complete",
             "template": "template",
@@ -509,6 +540,15 @@ async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "version_logs_count": 1,
             "total_logs_count": 1,
             "inputs": [{"name": "name"}],
+            "evaluator_aggregates": [
+                {
+                    "value": 1.1,
+                    "evaluator_id": "evaluator_id",
+                    "evaluator_version_id": "evaluator_version_id",
+                    "created_at": "2024-01-15T09:30:00Z",
+                    "updated_at": "2024-01-15T09:30:00Z",
+                }
+            ],
         },
         "messages": [
             {
@@ -550,17 +590,17 @@ async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
     }
     expected_types: typing.Any = {
         "prompt": {
+            "path": None,
             "id": None,
             "name": None,
             "version_id": None,
-            "directory_id": None,
+            "type": None,
             "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
             "created_at": "datetime",
             "updated_at": "datetime",
             "created_by": {"id": None, "email_address": None, "full_name": None},
             "status": None,
             "last_used_at": "datetime",
-            "path": None,
             "model": None,
             "endpoint": None,
             "template": None,
@@ -580,6 +620,18 @@ async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "version_logs_count": "integer",
             "total_logs_count": "integer",
             "inputs": ("list", {0: {"name": None}}),
+            "evaluator_aggregates": (
+                "list",
+                {
+                    0: {
+                        "value": None,
+                        "evaluator_id": None,
+                        "evaluator_version_id": None,
+                        "created_at": "datetime",
+                        "updated_at": "datetime",
+                    }
+                },
+            ),
         },
         "messages": (
             "list",
@@ -634,17 +686,17 @@ async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
 
 async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
+        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "directory_id": "directory_id",
+        "type": "prompt",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
-        "path": "path",
         "model": "model",
         "endpoint": "complete",
         "template": "template",
@@ -664,19 +716,28 @@ async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop
         "version_logs_count": 1,
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
     }
     expected_types: typing.Any = {
+        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "directory_id": None,
+        "type": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "path": None,
         "model": None,
         "endpoint": None,
         "template": None,
@@ -696,9 +757,235 @@ async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
     }
     response = client.prompts.update_evaluators(id="id")
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.prompts.update_evaluators(id="id")
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "path": "path",
+        "id": "id",
+        "name": "name",
+        "version_id": "version_id",
+        "type": "prompt",
+        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
+        "created_at": "2024-01-15T09:30:00Z",
+        "updated_at": "2024-01-15T09:30:00Z",
+        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
+        "status": "uncommitted",
+        "last_used_at": "2024-01-15T09:30:00Z",
+        "model": "model",
+        "endpoint": "complete",
+        "template": "template",
+        "provider": "openai",
+        "max_tokens": 1,
+        "temperature": 1.1,
+        "top_p": 1.1,
+        "stop": "stop",
+        "presence_penalty": 1.1,
+        "frequency_penalty": 1.1,
+        "other": {"other": {"key": "value"}},
+        "seed": 1,
+        "response_format": {"type": "json_object"},
+        "tools": [{"name": "name", "description": "description"}],
+        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
+        "commit_message": "commit_message",
+        "version_logs_count": 1,
+        "total_logs_count": 1,
+        "inputs": [{"name": "name"}],
+        "evaluator_aggregates": [
+            {
+                "value": 1.1,
+                "evaluator_id": "evaluator_id",
+                "evaluator_version_id": "evaluator_version_id",
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+            }
+        ],
+    }
+    expected_types: typing.Any = {
+        "path": None,
+        "id": None,
+        "name": None,
+        "version_id": None,
+        "type": None,
+        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+        "created_at": "datetime",
+        "updated_at": "datetime",
+        "created_by": {"id": None, "email_address": None, "full_name": None},
+        "status": None,
+        "last_used_at": "datetime",
+        "model": None,
+        "endpoint": None,
+        "template": None,
+        "provider": None,
+        "max_tokens": "integer",
+        "temperature": None,
+        "top_p": None,
+        "stop": None,
+        "presence_penalty": None,
+        "frequency_penalty": None,
+        "other": ("dict", {0: (None, None)}),
+        "seed": "integer",
+        "response_format": {"type": None},
+        "tools": ("list", {0: {"name": None, "description": None}}),
+        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+        "commit_message": None,
+        "version_logs_count": "integer",
+        "total_logs_count": "integer",
+        "inputs": ("list", {0: {"name": None}}),
+        "evaluator_aggregates": (
+            "list",
+            {
+                0: {
+                    "value": None,
+                    "evaluator_id": None,
+                    "evaluator_version_id": None,
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                }
+            },
+        ),
+    }
+    response = client.prompts.deploy(id="id", environment_id="environment_id", version_id="version_id")
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.prompts.deploy(
+        id="id", environment_id="environment_id", version_id="version_id"
+    )
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    # Type ignore to avoid mypy complaining about the function not being meant to return a value
+    assert client.prompts.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+
+    assert await async_client.prompts.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+
+
+async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = [
+        {
+            "id": "id",
+            "created_at": "2024-01-15T09:30:00Z",
+            "name": "name",
+            "tag": "default",
+            "file": {
+                "path": "path",
+                "id": "id",
+                "name": "name",
+                "version_id": "version_id",
+                "type": "prompt",
+                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+                "created_by": {"id": "id", "email_address": "email_address"},
+                "status": "uncommitted",
+                "last_used_at": "2024-01-15T09:30:00Z",
+                "model": "model",
+                "endpoint": "complete",
+                "template": "template",
+                "provider": "openai",
+                "max_tokens": 1,
+                "temperature": 1.1,
+                "top_p": 1.1,
+                "stop": "stop",
+                "presence_penalty": 1.1,
+                "frequency_penalty": 1.1,
+                "seed": 1,
+                "response_format": {"type": "json_object"},
+                "tools": [{"name": "name", "description": "description"}],
+                "linked_tools": [
+                    {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
+                ],
+                "commit_message": "commit_message",
+                "version_logs_count": 1,
+                "total_logs_count": 1,
+                "inputs": [{"name": "name"}],
+                "evaluator_aggregates": [
+                    {
+                        "value": 1.1,
+                        "evaluator_id": "evaluator_id",
+                        "evaluator_version_id": "evaluator_version_id",
+                        "created_at": "2024-01-15T09:30:00Z",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                    }
+                ],
+            },
+        }
+    ]
+    expected_types: typing.Any = (
+        "list",
+        {
+            0: {
+                "id": None,
+                "created_at": "datetime",
+                "name": None,
+                "tag": None,
+                "file": {
+                    "path": None,
+                    "id": None,
+                    "name": None,
+                    "version_id": None,
+                    "type": None,
+                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                    "created_by": {"id": None, "email_address": None},
+                    "status": None,
+                    "last_used_at": "datetime",
+                    "model": None,
+                    "endpoint": None,
+                    "template": None,
+                    "provider": None,
+                    "max_tokens": "integer",
+                    "temperature": None,
+                    "top_p": None,
+                    "stop": None,
+                    "presence_penalty": None,
+                    "frequency_penalty": None,
+                    "seed": "integer",
+                    "response_format": {"type": None},
+                    "tools": ("list", {0: {"name": None, "description": None}}),
+                    "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+                    "commit_message": None,
+                    "version_logs_count": "integer",
+                    "total_logs_count": "integer",
+                    "inputs": ("list", {0: {"name": None}}),
+                    "evaluator_aggregates": (
+                        "list",
+                        {
+                            0: {
+                                "value": None,
+                                "evaluator_id": None,
+                                "evaluator_version_id": None,
+                                "created_at": "datetime",
+                                "updated_at": "datetime",
+                            }
+                        },
+                    ),
+                },
+            }
+        },
+    )
+    response = client.prompts.list_environments(id="id")
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.prompts.list_environments(id="id")
     validate_response(async_response, expected_response, expected_types)

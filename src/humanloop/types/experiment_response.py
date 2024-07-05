@@ -6,37 +6,50 @@ import typing
 from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .base_metric_response import BaseMetricResponse
+from .experiment_status import ExperimentStatus
+from .experiment_version_response import ExperimentVersionResponse
+from .positive_label import PositiveLabel
 
 
-class ToolTemplateResponse(UncheckedBaseModel):
+class ExperimentResponse(UncheckedBaseModel):
+    id: str = pydantic_v1.Field()
     """
-    Template for a Humanloop runnable tool.
+    String ID of experiment. Starts with `exp_`.
+    """
+
+    file_id: str = pydantic_v1.Field()
+    """
+    String ID of file the experiment belongs to.
     """
 
     name: str = pydantic_v1.Field()
     """
-    Name for the tool referenced by the model.
+    Name of experiment.
     """
 
-    description: str = pydantic_v1.Field()
+    status: ExperimentStatus = pydantic_v1.Field()
     """
-    Description of the tool referenced by the model
-    """
-
-    parameters: typing.Optional[typing.Dict[str, typing.Any]] = pydantic_v1.Field(default=None)
-    """
-    Parameters needed to run the Tool, defined in JSON Schema format: https://json-schema.org/
+    Status of experiment.
     """
 
-    signature: typing.Optional[str] = pydantic_v1.Field(default=None)
+    versions: typing.Optional[typing.List[ExperimentVersionResponse]] = pydantic_v1.Field(default=None)
     """
-    Signature of the Tool.
+    List of Versions associated to the experiment.
     """
 
-    setup_schema: typing.Optional[typing.Dict[str, typing.Any]] = pydantic_v1.Field(default=None)
+    metric: BaseMetricResponse = pydantic_v1.Field()
     """
-    Schema required to setup the Tool runtime, e.g. API keys.
+    Metric used as the experiment's objective.
     """
+
+    positive_labels: typing.List[PositiveLabel] = pydantic_v1.Field()
+    """
+    Feedback labels to treat as positive user feedback. Used to monitor the performance of model configs in the experiment.
+    """
+
+    created_at: dt.datetime
+    updated_at: dt.datetime
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

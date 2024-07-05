@@ -14,7 +14,7 @@ service:
         results: $response.records
       display-name: 'List '
       request:
-        name: DatasetsListRequest
+        name: ListDatasetsGetRequest
         query-parameters:
           page:
             type: optional<integer>
@@ -45,10 +45,11 @@ service:
         - response:
             body:
               records:
-                - id: id
+                - path: path
+                  id: id
                   name: name
                   version_id: version_id
-                  directory_id: directory_id
+                  type: dataset
                   environments:
                     - id: id
                       created_at: '2024-01-15T09:30:00Z'
@@ -61,7 +62,6 @@ service:
                     email_address: email_address
                   status: uncommitted
                   last_used_at: '2024-01-15T09:30:00Z'
-                  path: path
                   commit_message: commit_message
                   datapoints_count: 1
                   datapoints:
@@ -69,7 +69,7 @@ service:
               page: 1
               size: 1
               total: 1
-    create:
+    upsert:
       path: /datasets
       method: POST
       auth: true
@@ -113,7 +113,7 @@ service:
 
         you can add a unique identifier to the Datapoint's inputs such as
         `{_dedupe_id: <unique ID>}`.
-      display-name: Upsert Dataset
+      display-name: Upsert
       request:
         name: DatasetsRequest
         query-parameters:
@@ -125,7 +125,7 @@ service:
           environment:
             type: optional<string>
             docs: >-
-              An environment tag to identify a deployed Version to base the
+              Name of the Environment identifying a deployed Version to base the
               created Version on. Only used when `action` is `"add"` or
               `"remove"`.
         body:
@@ -133,20 +133,11 @@ service:
             path:
               type: optional<string>
               docs: >-
-                Path of the Dataset including the Dataset name, which is used as
-                a unique identifier.
+                Path of the Dataset, including the name, which is used as a
+                unique identifier.
             id:
               type: optional<string>
               docs: ID for an existing Dataset to update.
-            name:
-              type: optional<string>
-              docs: Name of the Dataset, which is used as a unique identifier.
-            commit_message:
-              type: optional<string>
-              docs: >-
-                Message describing the changes made. If provided, a committed
-                version of the Dataset is created. Otherwise, an uncommitted
-                version is created.
             datapoints:
               docs: >-
                 The Datapoints to create this Dataset version with. Modify the
@@ -163,6 +154,12 @@ service:
 
                 If `"add"` or `"remove"`, one of the `version_id` or
                 `environment` query parameters may be provided.
+            commit_message:
+              type: optional<string>
+              docs: >-
+                Message describing the changes made. If provided, a committed
+                version of the Dataset is created. Otherwise, an uncommitted
+                version is created.
       response:
         docs: Successful Response
         type: root.DatasetResponse
@@ -174,10 +171,11 @@ service:
               - {}
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: dataset
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -191,7 +189,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               commit_message: commit_message
               datapoints_count: 1
               datapoints:
@@ -220,7 +217,7 @@ service:
         retrieve Datapoints for a large Dataset.
 
 
-        By default the deployed version of the Dataset is returned. Use the
+        By default, the deployed version of the Dataset is returned. Use the
         query parameters
 
         `version_id` or `environment` to target a specific version of the
@@ -229,16 +226,16 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-      display-name: Get Dataset
+      display-name: Get
       request:
-        name: DatasetsGetRequest
+        name: GetDatasetsIdGetRequest
         query-parameters:
           version_id:
             type: optional<string>
             docs: A specific Version ID of the Dataset to retrieve.
           environment:
             type: optional<string>
-            docs: An environment tag to retrieve a deployed Version from.
+            docs: Name of the Environment to retrieve a deployed Version from.
           include_datapoints:
             type: optional<boolean>
             docs: >-
@@ -255,10 +252,11 @@ service:
             id: id
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: dataset
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -272,7 +270,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               commit_message: commit_message
               datapoints_count: 1
               datapoints:
@@ -292,13 +289,13 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-      display-name: Delete Dataset
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
         - path-parameters:
             id: id
-    update:
+    move:
       path: /datasets/{id}
       method: PATCH
       auth: true
@@ -307,7 +304,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-      display-name: Move Dataset
+      display-name: Move
       request:
         name: UpdateDatasetRequest
         body:
@@ -331,10 +328,11 @@ service:
           request: {}
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: dataset
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -348,7 +346,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               commit_message: commit_message
               datapoints_count: 1
               datapoints:
@@ -359,7 +356,7 @@ service:
                   target:
                     target: target
                   id: id
-    list_datapoints:
+    listDatapoints:
       path: /datasets/{id}/datapoints
       method: GET
       auth: true
@@ -373,14 +370,14 @@ service:
           docs: Unique identifier for Dataset.
       display-name: List Datapoints
       request:
-        name: DatasetsListDatapointsRequest
+        name: ListDatapointsDatasetsIdDatapointsGetRequest
         query-parameters:
           version_id:
             type: optional<string>
             docs: A specific Version ID of the Dataset to retrieve.
           environment:
             type: optional<string>
-            docs: An environment tag to retrieve a deployed Version from.
+            docs: Name of the Environment to retrieve a deployed Version from.
           page:
             type: optional<integer>
             docs: Page number for pagination.
@@ -408,7 +405,7 @@ service:
               page: 1
               size: 1
               total: 1
-    list_versions:
+    listVersions:
       path: /datasets/{id}/versions
       method: GET
       auth: true
@@ -419,7 +416,7 @@ service:
           docs: Unique identifier for Dataset.
       display-name: List Versions
       request:
-        name: DatasetsListVersionsRequest
+        name: ListVersionsDatasetsIdVersionsGetRequest
         query-parameters:
           status:
             type: optional<root.VersionStatus>
@@ -429,8 +426,8 @@ service:
           environment:
             type: optional<string>
             docs: >-
-              Filter versions by environment tag. If no environment is provided,
-              all versions are returned.
+              Name of the environment to filter versions by. If no environment
+              is provided, all versions are returned.
           evaluation_aggregates: optional<boolean>
       response:
         docs: Successful Response
@@ -443,10 +440,11 @@ service:
           response:
             body:
               records:
-                - id: id
+                - path: path
+                  id: id
                   name: name
                   version_id: version_id
-                  directory_id: directory_id
+                  type: dataset
                   environments:
                     - id: id
                       created_at: '2024-01-15T09:30:00Z'
@@ -459,7 +457,6 @@ service:
                     email_address: email_address
                   status: uncommitted
                   last_used_at: '2024-01-15T09:30:00Z'
-                  path: path
                   commit_message: commit_message
                   datapoints_count: 1
                   datapoints:
@@ -492,10 +489,11 @@ service:
             commit_message: commit_message
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: dataset
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -509,7 +507,179 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              datapoints_count: 1
+              datapoints:
+                - inputs:
+                    inputs: inputs
+                  messages:
+                    - role: user
+                  target:
+                    target: target
+                  id: id
+    uploadCsv:
+      path: /datasets/{id}/datapoints/csv
+      method: POST
+      auth: true
+      docs: >-
+        Add Datapoints from a CSV file to a Dataset.
+
+
+        This will create a new committed version of the Dataset with the
+        Datapoints from the CSV file.
+
+
+        If either `version_id` or `environment` is provided, the new version
+        will be based on the specified version,
+
+        with the Datapoints from the CSV file added to the existing Datapoints
+        in the version.
+
+        If neither `version_id` nor `environment` is provided, the new version
+        will be based on the version
+
+        of the Dataset that is deployed to the default Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for the Dataset
+      display-name: Upload Csv
+      request:
+        name: Body_upload_csv_datasets__id__datapoints_csv_post
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: ID of the specific Dataset version to base the created Version on.
+          environment:
+            type: optional<string>
+            docs: >-
+              Name of the Environment identifying a deployed Version to base the
+              created Version on.
+        body:
+          properties:
+            file: file
+            commit_message:
+              type: string
+              docs: Commit message for the new Dataset version.
+        content-type: multipart/form-data
+      response:
+        docs: Successful Response
+        type: root.DatasetResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request:
+            commit_message: commit_message
+          response:
+            body:
               path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: dataset
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              datapoints_count: 1
+              datapoints:
+                - inputs:
+                    inputs: inputs
+                  messages:
+                    - role: user
+                  target:
+                    target: target
+                  id: id
+    fromLogs:
+      path: /datasets/{id}/datapoints/logs
+      method: POST
+      auth: true
+      docs: >-
+        Add Datapoints from Logs to a Dataset.
+
+
+        This will create a new committed version of the Dataset with the
+        Datapoints from the Logs.
+
+
+        If either `version_id` or `environment` is provided, the new version
+        will be based on the specified version,
+
+        with the Datapoints from the Logs added to the existing Datapoints in
+        the version.
+
+        If neither `version_id` nor `environment` is provided, the new version
+        will be based on the version
+
+        of the Dataset that is deployed to the default Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for the Dataset
+      display-name: From Logs
+      request:
+        name: BodyFromLogsDatasetsIdDatapointsLogsPost
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: ID of the specific Dataset version to base the created Version on.
+          environment:
+            type: optional<string>
+            docs: >-
+              Name of the Environment identifying a deployed Version to base the
+              created Version on.
+        body:
+          properties:
+            log_ids:
+              docs: List of Log IDs to create Datapoints from.
+              type: list<string>
+            commit_message:
+              type: string
+              docs: Commit message for the new Dataset version.
+      response:
+        docs: Successful Response
+        type: root.DatasetResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request:
+            log_ids:
+              - log_ids
+            commit_message: commit_message
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: dataset
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
               commit_message: commit_message
               datapoints_count: 1
               datapoints:
@@ -521,7 +691,7 @@ service:
                     target: target
                   id: id
     deploy:
-      path: /datasets/{id}/versions/{version_id}/deploy
+      path: /datasets/{id}/environments/{environment_id}
       method: POST
       auth: true
       docs: |-
@@ -532,16 +702,16 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-        version_id:
+        environment_id:
           type: string
-          docs: Unique identifier for the specific version of the Dataset.
+          docs: Unique identifier for the Environment to deploy the Version to.
       display-name: Deploy
       request:
-        name: DatasetsDeployRequest
+        name: DeployDatasetsIdEnvironmentsEnvironmentIdPostRequest
         query-parameters:
-          environment_id:
+          version_id:
             type: string
-            docs: Unique identifier for the Environment to deploy the Version to.
+            docs: Unique identifier for the specific version of the Dataset.
       response:
         docs: Successful Response
         type: root.DatasetResponse
@@ -550,15 +720,16 @@ service:
       examples:
         - path-parameters:
             id: id
-            version_id: version_id
-          query-parameters:
             environment_id: environment_id
+          query-parameters:
+            version_id: version_id
           response:
             body:
+              path: path
               id: id
               name: name
               version_id: version_id
-              directory_id: directory_id
+              type: dataset
               environments:
                 - id: id
                   created_at: '2024-01-15T09:30:00Z'
@@ -572,7 +743,6 @@ service:
                 full_name: full_name
               status: uncommitted
               last_used_at: '2024-01-15T09:30:00Z'
-              path: path
               commit_message: commit_message
               datapoints_count: 1
               datapoints:
@@ -583,6 +753,102 @@ service:
                   target:
                     target: target
                   id: id
+    removeDeployment:
+      path: /datasets/{id}/environments/{environment_id}
+      method: DELETE
+      auth: true
+      docs: |-
+        Remove deployment of Dataset from Environment.
+
+        Remove the deployed Version for the specified Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Dataset.
+        environment_id:
+          type: string
+          docs: Unique identifier for the Environment to remove the deployment from.
+      display-name: Remove Deployment
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            environment_id: environment_id
+    listEnvironments:
+      path: /datasets/{id}/environments
+      method: GET
+      auth: true
+      docs: List all Environments and their deployed versions for the Dataset.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Dataset.
+      display-name: List Environments
+      response:
+        docs: Successful Response
+        type: list<root.FileEnvironmentResponse>
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              - id: id
+                created_at: '2024-01-15T09:30:00Z'
+                name: name
+                tag: default
+                file:
+                  path: path
+                  id: id
+                  name: name
+                  version_id: version_id
+                  type: prompt
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - name: name
+                      description: description
+                      id: id
+                      version_id: version_id
+                  commit_message: commit_message
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+                  evaluator_aggregates:
+                    - value: 1.1
+                      evaluator_id: evaluator_id
+                      evaluator_version_id: evaluator_version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
   display-name: Datasets
 docs: >+
   Datasets are collections of input-output pairs that you can use within

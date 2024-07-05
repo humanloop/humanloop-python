@@ -37,6 +37,7 @@ service:
                   output_cost: 1.1
                   finish_reason: finish_reason
                   prompt:
+                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -44,7 +45,6 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
-                    path: path
                     model: model
                     version_logs_count: 1
                     total_logs_count: 1
@@ -92,7 +92,7 @@ service:
         results: $response.records
       display-name: 'List '
       request:
-        name: SessionsListRequest
+        name: ListSessionsGetRequest
         query-parameters:
           file_id:
             type: optional<string>
@@ -125,6 +125,7 @@ service:
                   logs:
                     - id: id
                       prompt:
+                        path: path
                         id: id
                         name: name
                         version_id: version_id
@@ -132,7 +133,6 @@ service:
                         updated_at: '2024-01-15T09:30:00Z'
                         status: uncommitted
                         last_used_at: '2024-01-15T09:30:00Z'
-                        path: path
                         model: model
                         version_logs_count: 1
                         total_logs_count: 1

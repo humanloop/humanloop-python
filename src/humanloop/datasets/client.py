@@ -3,6 +3,7 @@
 import typing
 from json.decoder import JSONDecodeError
 
+from .. import core
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.jsonable_encoder import jsonable_encoder
@@ -13,6 +14,7 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.create_datapoint_request import CreateDatapointRequest
 from ..types.datapoint_response import DatapointResponse
 from ..types.dataset_response import DatasetResponse
+from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_datasets import ListDatasets
 from ..types.paginated_datapoint_response import PaginatedDatapointResponse
@@ -124,7 +126,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(
+    def upsert(
         self,
         *,
         datapoints: typing.Sequence[CreateDatapointRequest],
@@ -132,9 +134,8 @@ class DatasetsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        name: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
+        commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
@@ -165,19 +166,13 @@ class DatasetsClient:
             ID of the specific Dataset version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
 
         environment : typing.Optional[str]
-            An environment tag to identify a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
+            Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
 
         path : typing.Optional[str]
-            Path of the Dataset including the Dataset name, which is used as a unique identifier.
+            Path of the Dataset, including the name, which is used as a unique identifier.
 
         id : typing.Optional[str]
             ID for an existing Dataset to update.
-
-        name : typing.Optional[str]
-            Name of the Dataset, which is used as a unique identifier.
-
-        commit_message : typing.Optional[str]
-            Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
 
         action : typing.Optional[UpdateDatesetAction]
             The action to take with the provided Datapoints.
@@ -187,6 +182,9 @@ class DatasetsClient:
              - If `"remove"`, the created version will contain the Datapoints in the target version except for the Datapoints provided in this request.
 
             If `"add"` or `"remove"`, one of the `version_id` or `environment` query parameters may be provided.
+
+        commit_message : typing.Optional[str]
+            Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -204,7 +202,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.create(
+        client.datasets.upsert(
             datapoints=[CreateDatapointRequest()],
         )
         """
@@ -212,14 +210,7 @@ class DatasetsClient:
             "datasets",
             method="POST",
             params={"version_id": version_id, "environment": environment},
-            json={
-                "path": path,
-                "id": id,
-                "name": name,
-                "commit_message": commit_message,
-                "datapoints": datapoints,
-                "action": action,
-            },
+            json={"path": path, "id": id, "datapoints": datapoints, "action": action, "commit_message": commit_message},
             request_options=request_options,
             omit=OMIT,
         )
@@ -252,7 +243,7 @@ class DatasetsClient:
         Use the List Datapoints endpoint (`GET /{id}/datapoints`) to efficiently
         retrieve Datapoints for a large Dataset.
 
-        By default the deployed version of the Dataset is returned. Use the query parameters
+        By default, the deployed version of the Dataset is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Dataset.
 
         Parameters
@@ -264,7 +255,7 @@ class DatasetsClient:
             A specific Version ID of the Dataset to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         include_datapoints : typing.Optional[bool]
             If set to `true`, include all Datapoints in the response. Defaults to `false`. Consider using the paginated List Datapoints endpoint instead.
@@ -348,7 +339,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def move(
         self,
         id: str,
         *,
@@ -385,7 +376,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.update(
+        client.datasets.move(
             id="id",
         )
         """
@@ -430,7 +421,7 @@ class DatasetsClient:
             A specific Version ID of the Dataset to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         page : typing.Optional[int]
             Page number for pagination.
@@ -513,7 +504,7 @@ class DatasetsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Filter versions by environment tag. If no environment is provided, all versions are returned.
+            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
 
         evaluation_aggregates : typing.Optional[bool]
 
@@ -611,8 +602,164 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def upload_csv(
+        self,
+        id: str,
+        *,
+        file: core.File,
+        commit_message: str,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Add Datapoints from a CSV file to a Dataset.
+
+        This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+
+        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+        with the Datapoints from the CSV file added to the existing Datapoints in the version.
+        If neither `version_id` nor `environment` is provided, the new version will be based on the version
+        of the Dataset that is deployed to the default Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for the Dataset
+
+        file : core.File
+            See core.File for more documentation
+
+        commit_message : str
+            Commit message for the new Dataset version.
+
+        version_id : typing.Optional[str]
+            ID of the specific Dataset version to base the created Version on.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed Version to base the created Version on.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.datasets.upload_csv(
+            id="id",
+            commit_message="commit_message",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/datapoints/csv",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            data={"commit_message": commit_message},
+            files={"file": file},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def from_logs(
+        self,
+        id: str,
+        *,
+        log_ids: typing.Sequence[str],
+        commit_message: str,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Add Datapoints from Logs to a Dataset.
+
+        This will create a new committed version of the Dataset with the Datapoints from the Logs.
+
+        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+        with the Datapoints from the Logs added to the existing Datapoints in the version.
+        If neither `version_id` nor `environment` is provided, the new version will be based on the version
+        of the Dataset that is deployed to the default Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for the Dataset
+
+        log_ids : typing.Sequence[str]
+            List of Log IDs to create Datapoints from.
+
+        commit_message : str
+            Commit message for the new Dataset version.
+
+        version_id : typing.Optional[str]
+            ID of the specific Dataset version to base the created Version on.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed Version to base the created Version on.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.datasets.from_logs(
+            id="id",
+            log_ids=["log_ids"],
+            commit_message="commit_message",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/datapoints/logs",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            json={"log_ids": log_ids, "commit_message": commit_message},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def deploy(
-        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> DatasetResponse:
         """
         Deploy Dataset to Environment.
@@ -624,11 +771,11 @@ class DatasetsClient:
         id : str
             Unique identifier for Dataset.
 
-        version_id : str
-            Unique identifier for the specific version of the Dataset.
-
         environment_id : str
             Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Dataset.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -647,19 +794,116 @@ class DatasetsClient:
         )
         client.datasets.deploy(
             id="id",
-            version_id="version_id",
             environment_id="environment_id",
+            version_id="version_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
+            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
             method="POST",
-            params={"environment_id": environment_id},
+            params={"version_id": version_id},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployment of Dataset from Environment.
+
+        Remove the deployed Version for the specified Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.datasets.remove_deployment(
+            id="id",
+            environment_id="environment_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Dataset.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.datasets.list_environments(
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -768,7 +1012,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(
+    async def upsert(
         self,
         *,
         datapoints: typing.Sequence[CreateDatapointRequest],
@@ -776,9 +1020,8 @@ class AsyncDatasetsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        name: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
+        commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
@@ -809,19 +1052,13 @@ class AsyncDatasetsClient:
             ID of the specific Dataset version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
 
         environment : typing.Optional[str]
-            An environment tag to identify a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
+            Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
 
         path : typing.Optional[str]
-            Path of the Dataset including the Dataset name, which is used as a unique identifier.
+            Path of the Dataset, including the name, which is used as a unique identifier.
 
         id : typing.Optional[str]
             ID for an existing Dataset to update.
-
-        name : typing.Optional[str]
-            Name of the Dataset, which is used as a unique identifier.
-
-        commit_message : typing.Optional[str]
-            Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
 
         action : typing.Optional[UpdateDatesetAction]
             The action to take with the provided Datapoints.
@@ -831,6 +1068,9 @@ class AsyncDatasetsClient:
              - If `"remove"`, the created version will contain the Datapoints in the target version except for the Datapoints provided in this request.
 
             If `"add"` or `"remove"`, one of the `version_id` or `environment` query parameters may be provided.
+
+        commit_message : typing.Optional[str]
+            Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -848,7 +1088,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.create(
+        await client.datasets.upsert(
             datapoints=[CreateDatapointRequest()],
         )
         """
@@ -856,14 +1096,7 @@ class AsyncDatasetsClient:
             "datasets",
             method="POST",
             params={"version_id": version_id, "environment": environment},
-            json={
-                "path": path,
-                "id": id,
-                "name": name,
-                "commit_message": commit_message,
-                "datapoints": datapoints,
-                "action": action,
-            },
+            json={"path": path, "id": id, "datapoints": datapoints, "action": action, "commit_message": commit_message},
             request_options=request_options,
             omit=OMIT,
         )
@@ -896,7 +1129,7 @@ class AsyncDatasetsClient:
         Use the List Datapoints endpoint (`GET /{id}/datapoints`) to efficiently
         retrieve Datapoints for a large Dataset.
 
-        By default the deployed version of the Dataset is returned. Use the query parameters
+        By default, the deployed version of the Dataset is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Dataset.
 
         Parameters
@@ -908,7 +1141,7 @@ class AsyncDatasetsClient:
             A specific Version ID of the Dataset to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         include_datapoints : typing.Optional[bool]
             If set to `true`, include all Datapoints in the response. Defaults to `false`. Consider using the paginated List Datapoints endpoint instead.
@@ -992,7 +1225,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def move(
         self,
         id: str,
         *,
@@ -1029,7 +1262,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.update(
+        await client.datasets.move(
             id="id",
         )
         """
@@ -1074,7 +1307,7 @@ class AsyncDatasetsClient:
             A specific Version ID of the Dataset to retrieve.
 
         environment : typing.Optional[str]
-            An environment tag to retrieve a deployed Version from.
+            Name of the Environment to retrieve a deployed Version from.
 
         page : typing.Optional[int]
             Page number for pagination.
@@ -1157,7 +1390,7 @@ class AsyncDatasetsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Filter versions by environment tag. If no environment is provided, all versions are returned.
+            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
 
         evaluation_aggregates : typing.Optional[bool]
 
@@ -1255,8 +1488,164 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def upload_csv(
+        self,
+        id: str,
+        *,
+        file: core.File,
+        commit_message: str,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Add Datapoints from a CSV file to a Dataset.
+
+        This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+
+        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+        with the Datapoints from the CSV file added to the existing Datapoints in the version.
+        If neither `version_id` nor `environment` is provided, the new version will be based on the version
+        of the Dataset that is deployed to the default Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for the Dataset
+
+        file : core.File
+            See core.File for more documentation
+
+        commit_message : str
+            Commit message for the new Dataset version.
+
+        version_id : typing.Optional[str]
+            ID of the specific Dataset version to base the created Version on.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed Version to base the created Version on.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.datasets.upload_csv(
+            id="id",
+            commit_message="commit_message",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/datapoints/csv",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            data={"commit_message": commit_message},
+            files={"file": file},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def from_logs(
+        self,
+        id: str,
+        *,
+        log_ids: typing.Sequence[str],
+        commit_message: str,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Add Datapoints from Logs to a Dataset.
+
+        This will create a new committed version of the Dataset with the Datapoints from the Logs.
+
+        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+        with the Datapoints from the Logs added to the existing Datapoints in the version.
+        If neither `version_id` nor `environment` is provided, the new version will be based on the version
+        of the Dataset that is deployed to the default Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for the Dataset
+
+        log_ids : typing.Sequence[str]
+            List of Log IDs to create Datapoints from.
+
+        commit_message : str
+            Commit message for the new Dataset version.
+
+        version_id : typing.Optional[str]
+            ID of the specific Dataset version to base the created Version on.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed Version to base the created Version on.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.datasets.from_logs(
+            id="id",
+            log_ids=["log_ids"],
+            commit_message="commit_message",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/datapoints/logs",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            json={"log_ids": log_ids, "commit_message": commit_message},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def deploy(
-        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> DatasetResponse:
         """
         Deploy Dataset to Environment.
@@ -1268,11 +1657,11 @@ class AsyncDatasetsClient:
         id : str
             Unique identifier for Dataset.
 
-        version_id : str
-            Unique identifier for the specific version of the Dataset.
-
         environment_id : str
             Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Dataset.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1291,19 +1680,116 @@ class AsyncDatasetsClient:
         )
         await client.datasets.deploy(
             id="id",
-            version_id="version_id",
             environment_id="environment_id",
+            version_id="version_id",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
+            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
             method="POST",
-            params={"environment_id": environment_id},
+            params={"version_id": version_id},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployment of Dataset from Environment.
+
+        Remove the deployed Version for the specified Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.datasets.remove_deployment(
+            id="id",
+            environment_id="environment_id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Dataset.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.datasets.list_environments(
+            id="id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
