@@ -6,50 +6,37 @@ import typing
 from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
-from .base_metric_response import BaseMetricResponse
-from .experiment_status import ExperimentStatus
-from .experiment_version_response import ExperimentVersionResponse
-from .positive_label import PositiveLabel
 
 
-class ExperimentResponse(UncheckedBaseModel):
-    id: str = pydantic_v1.Field()
+class ToolTemplateResponse(UncheckedBaseModel):
     """
-    String ID of experiment. Starts with `exp_`.
-    """
-
-    file_id: str = pydantic_v1.Field()
-    """
-    String ID of file the experiment belongs to.
+    Template for a Humanloop runnable tool.
     """
 
     name: str = pydantic_v1.Field()
     """
-    Name of experiment.
+    Name for the tool referenced by the model.
     """
 
-    status: ExperimentStatus = pydantic_v1.Field()
+    description: str = pydantic_v1.Field()
     """
-    Status of experiment.
-    """
-
-    versions: typing.Optional[typing.List[ExperimentVersionResponse]] = pydantic_v1.Field(default=None)
-    """
-    List of Versions associated to the experiment.
+    Description of the tool referenced by the model
     """
 
-    metric: BaseMetricResponse = pydantic_v1.Field()
+    parameters: typing.Optional[typing.Dict[str, typing.Any]] = pydantic_v1.Field(default=None)
     """
-    Metric used as the experiment's objective.
-    """
-
-    positive_labels: typing.List[PositiveLabel] = pydantic_v1.Field()
-    """
-    Feedback labels to treat as positive user feedback. Used to monitor the performance of model configs in the experiment.
+    Parameters needed to run the Tool, defined in JSON Schema format: https://json-schema.org/
     """
 
-    created_at: dt.datetime
-    updated_at: dt.datetime
+    signature: typing.Optional[str] = pydantic_v1.Field(default=None)
+    """
+    Signature of the Tool.
+    """
+
+    setup_schema: typing.Optional[typing.Dict[str, typing.Any]] = pydantic_v1.Field(default=None)
+    """
+    Schema required to setup the Tool runtime, e.g. API keys.
+    """
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

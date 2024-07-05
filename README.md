@@ -21,7 +21,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.upsert(
+client.prompts.create(
     model="model",
 )
 ```
@@ -36,7 +36,7 @@ from humanloop.client import AsyncHumanloop
 client = AsyncHumanloop(
     api_key="YOUR_API_KEY",
 )
-await client.prompts.upsert(
+await client.prompts.create(
     model="model",
 )
 ```

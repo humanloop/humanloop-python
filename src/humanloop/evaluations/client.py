@@ -17,7 +17,6 @@ from ..types.evaluation_status import EvaluationStatus
 from ..types.evaluations_dataset_request import EvaluationsDatasetRequest
 from ..types.evaluations_request import EvaluationsRequest
 from ..types.http_validation_error import HttpValidationError
-from ..types.paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
 from ..types.paginated_evaluation_response import PaginatedEvaluationResponse
 
 # this is used as the default value for optional parameters
@@ -460,68 +459,6 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_logs(
-        self,
-        id: str,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataEvaluationReportLogResponse:
-        """
-        Get Logs by Evaluation ID.
-
-        Each Evaluation Log corresponds to a (Datapoint, Evaluated Version) pair.
-        It has an optional generated Log and a list of Evaluator Logs.
-
-        Parameters
-        ----------
-        id : str
-            String ID of evaluation. Starts with `ev_` or `evr_`.
-
-        page : typing.Optional[int]
-            Page number for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Logs to fetch.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PaginatedDataEvaluationReportLogResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.evaluations.get_logs(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}/logs",
-            method="GET",
-            params={"page": page, "size": size},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(PaginatedDataEvaluationReportLogResponse, construct_type(type_=PaginatedDataEvaluationReportLogResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
 
 class AsyncEvaluationsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -950,68 +887,6 @@ class AsyncEvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(EvaluationStats, construct_type(type_=EvaluationStats, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def get_logs(
-        self,
-        id: str,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataEvaluationReportLogResponse:
-        """
-        Get Logs by Evaluation ID.
-
-        Each Evaluation Log corresponds to a (Datapoint, Evaluated Version) pair.
-        It has an optional generated Log and a list of Evaluator Logs.
-
-        Parameters
-        ----------
-        id : str
-            String ID of evaluation. Starts with `ev_` or `evr_`.
-
-        page : typing.Optional[int]
-            Page number for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Logs to fetch.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PaginatedDataEvaluationReportLogResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.evaluations.get_logs(
-            id="id",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}/logs",
-            method="GET",
-            params={"page": page, "size": size},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(PaginatedDataEvaluationReportLogResponse, construct_type(type_=PaginatedDataEvaluationReportLogResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

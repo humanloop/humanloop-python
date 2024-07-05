@@ -68,17 +68,17 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         ],
         "files": [
             {
-                "path": "path",
                 "id": "id",
                 "name": "name",
                 "version_id": "version_id",
-                "type": "prompt",
+                "directory_id": "directory_id",
                 "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
                 "created_at": "2024-01-15T09:30:00Z",
                 "updated_at": "2024-01-15T09:30:00Z",
                 "created_by": {"id": "id", "email_address": "email_address"},
                 "status": "uncommitted",
                 "last_used_at": "2024-01-15T09:30:00Z",
+                "path": "path",
                 "model": "model",
                 "endpoint": "complete",
                 "template": "template",
@@ -99,15 +99,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                 "version_logs_count": 1,
                 "total_logs_count": 1,
                 "inputs": [{"name": "name"}],
-                "evaluator_aggregates": [
-                    {
-                        "value": 1.1,
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "created_at": "2024-01-15T09:30:00Z",
-                        "updated_at": "2024-01-15T09:30:00Z",
-                    }
-                ],
             }
         ],
         "parents": [
@@ -134,17 +125,17 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "list",
             {
                 0: {
-                    "path": None,
                     "id": None,
                     "name": None,
                     "version_id": None,
-                    "type": None,
+                    "directory_id": None,
                     "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
                     "created_by": {"id": None, "email_address": None},
                     "status": None,
                     "last_used_at": "datetime",
+                    "path": None,
                     "model": None,
                     "endpoint": None,
                     "template": None,
@@ -163,18 +154,6 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
-                    "evaluator_aggregates": (
-                        "list",
-                        {
-                            0: {
-                                "value": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "created_at": "datetime",
-                                "updated_at": "datetime",
-                            }
-                        },
-                    ),
                 }
             },
         ),

@@ -20,11 +20,6 @@ class DatasetResponse(UncheckedBaseModel):
     in the inheriting classes with documentation and appropriate Field definitions.
     """
 
-    path: str = pydantic_v1.Field()
-    """
-    Path of the Dataset, including the name, which is used as a unique identifier.
-    """
-
     id: str = pydantic_v1.Field()
     """
     Unique identifier for the Dataset. Starts with `ds_`.
@@ -40,7 +35,7 @@ class DatasetResponse(UncheckedBaseModel):
     Unique identifier for the specific Dataset Version. If no query params provided, the default deployed Dataset Version is returned. Starts with `dsv_`.
     """
 
-    type: typing.Optional[typing.Literal["dataset"]] = None
+    directory_id: typing.Optional[str] = None
     environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic_v1.Field(default=None)
     """
     The list of environments the Dataset Version is deployed to.
@@ -59,6 +54,11 @@ class DatasetResponse(UncheckedBaseModel):
     """
 
     last_used_at: dt.datetime
+    path: str = pydantic_v1.Field()
+    """
+    Path of the Dataset, including the name, which is used as a unique identifier.
+    """
+
     commit_message: typing.Optional[str] = pydantic_v1.Field(default=None)
     """
     Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.

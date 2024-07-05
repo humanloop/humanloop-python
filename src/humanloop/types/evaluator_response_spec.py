@@ -3,10 +3,7 @@
 import typing
 
 from .code_evaluator_request import CodeEvaluatorRequest
-from .external_evaluator_request import ExternalEvaluatorRequest
 from .human_evaluator_request import HumanEvaluatorRequest
 from .llm_evaluator_request import LlmEvaluatorRequest
 
-EvaluatorResponseSpec = typing.Union[
-    LlmEvaluatorRequest, CodeEvaluatorRequest, HumanEvaluatorRequest, ExternalEvaluatorRequest
-]
+EvaluatorResponseSpec = typing.Union[LlmEvaluatorRequest, CodeEvaluatorRequest, HumanEvaluatorRequest]

@@ -19,7 +19,6 @@ from ..types.evaluator_activation_deactivation_request_evaluators_to_activate_it
 from ..types.evaluator_activation_deactivation_request_evaluators_to_deactivate_item import (
     EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem,
 )
-from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_prompts import ListPrompts
 from ..types.model_endpoints import ModelEndpoints
@@ -32,11 +31,11 @@ from ..types.response_format import ResponseFormat
 from ..types.sort_order import SortOrder
 from ..types.tool_function import ToolFunction
 from ..types.version_status import VersionStatus
-from .types.call_prompts_call_post_response import CallPromptsCallPostResponse
 from .types.prompt_call_request_tool_choice import PromptCallRequestToolChoice
 from .types.prompt_log_request_tool_choice import PromptLogRequestToolChoice
 from .types.prompt_request_stop import PromptRequestStop
 from .types.prompt_request_template import PromptRequestTemplate
+from .types.prompts_call_response import PromptsCallResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -140,7 +139,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def upsert(
+    def create(
         self,
         *,
         model: str,
@@ -243,7 +242,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.upsert(
+        client.prompts.create(
             model="model",
         )
         """
@@ -296,7 +295,7 @@ class PromptsClient:
         """
         Retrieve the Prompt with the given ID.
 
-        By default, the deployed version of the Prompt is returned. Use the query parameters
+        By default the deployed version of the Prompt is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Prompt.
 
         Parameters
@@ -305,10 +304,10 @@ class PromptsClient:
             Unique identifier for Prompt.
 
         version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to retrieve.
+            A specific Version Id of the Prompt to retrieve.
 
         environment : typing.Optional[str]
-            Name of the Environment to retrieve a deployed Version from.
+            An environment tag to retrieve a deployed Version from.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -389,7 +388,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def move(
+    def update(
         self,
         id: str,
         *,
@@ -426,7 +425,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.move(
+        client.prompts.update(
             id="id",
         )
         """
@@ -455,7 +454,7 @@ class PromptsClient:
         *,
         status: typing.Optional[VersionStatus] = None,
         environment: typing.Optional[str] = None,
-        evaluator_aggregates: typing.Optional[bool] = None,
+        evaluation_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListPrompts:
         """
@@ -470,9 +469,9 @@ class PromptsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
+            Filter versions by environment tag. If no environment is provided, all versions are returned.
 
-        evaluator_aggregates : typing.Optional[bool]
+        evaluation_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -496,12 +495,71 @@ class PromptsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
+            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(ListPrompts, construct_type(type_=ListPrompts, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def deploy(
+        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> PromptResponse:
+        """
+        Deploy Prompt to Environment.
+
+        Set the deployed Version for the specified Environment. This Prompt Version
+        will be used for calls made to the Prompt in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        version_id : str
+            Unique identifier for the specific version of the Prompt.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.prompts.deploy(
+            id="id",
+            version_id="version_id",
+            environment_id="environment_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
+            method="POST",
+            params={"environment_id": environment_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(PromptResponse, construct_type(type_=PromptResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -617,10 +675,10 @@ class PromptsClient:
         Parameters
         ----------
         version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+            A specific version Id of the Prompt to log to.
 
         environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+            An environment tag of the deployed version to log to.
 
         path : typing.Optional[str]
             Path of the Prompt, including the name, which is used as a unique identifier.
@@ -803,7 +861,7 @@ class PromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CallPromptsCallPostResponse:
+    ) -> PromptsCallResponse:
         """
         Call a Prompt.
 
@@ -821,10 +879,10 @@ class PromptsClient:
         Parameters
         ----------
         version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+            A specific version Id of the Prompt to log to.
 
         environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+            An environment tag of the deployed version to log to.
 
         path : typing.Optional[str]
             Path of the Prompt, including the name, which is used as a unique identifier.
@@ -898,7 +956,7 @@ class PromptsClient:
 
         Returns
         -------
-        CallPromptsCallPostResponse
+        PromptsCallResponse
             Successful Response
 
         Examples
@@ -942,7 +1000,7 @@ class PromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(CallPromptsCallPostResponse, construct_type(type_=CallPromptsCallPostResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(PromptsCallResponse, construct_type(type_=PromptsCallResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -1012,163 +1070,6 @@ class PromptsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(PromptResponse, construct_type(type_=PromptResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def deploy(
-        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> PromptResponse:
-        """
-        Deploy Prompt to Environment.
-
-        Set the deployed Version for the specified Environment. This Prompt Version
-        will be used for calls made to the Prompt in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        version_id : str
-            Unique identifier for the specific version of the Prompt.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PromptResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.deploy(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={"version_id": version_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(PromptResponse, construct_type(type_=PromptResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def remove_deployment(
-        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
-        """
-        Remove deployment of Prompt from Environment.
-
-        Remove the deployed Version for the specified Environment. This Prompt Version
-        will no longer be used for calls made to the Prompt in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        environment_id : str
-            Unique identifier for the Environment to remove the deployment from.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.remove_deployment(
-            id="id",
-            environment_id="environment_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def list_environments(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
-        """
-        List all Environments and their deployed versions for the Prompt.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[FileEnvironmentResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.list_environments(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -1277,7 +1178,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def upsert(
+    async def create(
         self,
         *,
         model: str,
@@ -1380,7 +1281,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.upsert(
+        await client.prompts.create(
             model="model",
         )
         """
@@ -1433,7 +1334,7 @@ class AsyncPromptsClient:
         """
         Retrieve the Prompt with the given ID.
 
-        By default, the deployed version of the Prompt is returned. Use the query parameters
+        By default the deployed version of the Prompt is returned. Use the query parameters
         `version_id` or `environment` to target a specific version of the Prompt.
 
         Parameters
@@ -1442,10 +1343,10 @@ class AsyncPromptsClient:
             Unique identifier for Prompt.
 
         version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to retrieve.
+            A specific Version Id of the Prompt to retrieve.
 
         environment : typing.Optional[str]
-            Name of the Environment to retrieve a deployed Version from.
+            An environment tag to retrieve a deployed Version from.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1526,7 +1427,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def move(
+    async def update(
         self,
         id: str,
         *,
@@ -1563,7 +1464,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.move(
+        await client.prompts.update(
             id="id",
         )
         """
@@ -1592,7 +1493,7 @@ class AsyncPromptsClient:
         *,
         status: typing.Optional[VersionStatus] = None,
         environment: typing.Optional[str] = None,
-        evaluator_aggregates: typing.Optional[bool] = None,
+        evaluation_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListPrompts:
         """
@@ -1607,9 +1508,9 @@ class AsyncPromptsClient:
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         environment : typing.Optional[str]
-            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
+            Filter versions by environment tag. If no environment is provided, all versions are returned.
 
-        evaluator_aggregates : typing.Optional[bool]
+        evaluation_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1633,12 +1534,71 @@ class AsyncPromptsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
+            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(ListPrompts, construct_type(type_=ListPrompts, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def deploy(
+        self, id: str, version_id: str, *, environment_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> PromptResponse:
+        """
+        Deploy Prompt to Environment.
+
+        Set the deployed Version for the specified Environment. This Prompt Version
+        will be used for calls made to the Prompt in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        version_id : str
+            Unique identifier for the specific version of the Prompt.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.prompts.deploy(
+            id="id",
+            version_id="version_id",
+            environment_id="environment_id",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/deploy",
+            method="POST",
+            params={"environment_id": environment_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(PromptResponse, construct_type(type_=PromptResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -1754,10 +1714,10 @@ class AsyncPromptsClient:
         Parameters
         ----------
         version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+            A specific version Id of the Prompt to log to.
 
         environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+            An environment tag of the deployed version to log to.
 
         path : typing.Optional[str]
             Path of the Prompt, including the name, which is used as a unique identifier.
@@ -1940,7 +1900,7 @@ class AsyncPromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CallPromptsCallPostResponse:
+    ) -> PromptsCallResponse:
         """
         Call a Prompt.
 
@@ -1958,10 +1918,10 @@ class AsyncPromptsClient:
         Parameters
         ----------
         version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+            A specific version Id of the Prompt to log to.
 
         environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+            An environment tag of the deployed version to log to.
 
         path : typing.Optional[str]
             Path of the Prompt, including the name, which is used as a unique identifier.
@@ -2035,7 +1995,7 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        CallPromptsCallPostResponse
+        PromptsCallResponse
             Successful Response
 
         Examples
@@ -2079,7 +2039,7 @@ class AsyncPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(CallPromptsCallPostResponse, construct_type(type_=CallPromptsCallPostResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(PromptsCallResponse, construct_type(type_=PromptsCallResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -2149,163 +2109,6 @@ class AsyncPromptsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(PromptResponse, construct_type(type_=PromptResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def deploy(
-        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> PromptResponse:
-        """
-        Deploy Prompt to Environment.
-
-        Set the deployed Version for the specified Environment. This Prompt Version
-        will be used for calls made to the Prompt in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        version_id : str
-            Unique identifier for the specific version of the Prompt.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PromptResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.prompts.deploy(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={"version_id": version_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(PromptResponse, construct_type(type_=PromptResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def remove_deployment(
-        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
-        """
-        Remove deployment of Prompt from Environment.
-
-        Remove the deployed Version for the specified Environment. This Prompt Version
-        will no longer be used for calls made to the Prompt in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        environment_id : str
-            Unique identifier for the Environment to remove the deployment from.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.prompts.remove_deployment(
-            id="id",
-            environment_id="environment_id",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def list_environments(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
-        """
-        List all Environments and their deployed versions for the Prompt.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[FileEnvironmentResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.prompts.list_environments(
-            id="id",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

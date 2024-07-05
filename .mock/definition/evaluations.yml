@@ -19,7 +19,7 @@ service:
         results: $response.records
       display-name: List Evaluations for File
       request:
-        name: ListEvaluationsGetRequest
+        name: EvaluationsListRequest
         query-parameters:
           file_id:
             type: string
@@ -45,7 +45,6 @@ service:
               records:
                 - id: id
                   dataset:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -53,10 +52,10 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     datapoints_count: 1
                   evaluatees:
                     - version:
-                        path: path
                         id: id
                         name: name
                         version_id: version_id
@@ -64,6 +63,7 @@ service:
                         updated_at: '2024-01-15T09:30:00Z'
                         status: uncommitted
                         last_used_at: '2024-01-15T09:30:00Z'
+                        path: path
                         model: model
                         version_logs_count: 1
                         total_logs_count: 1
@@ -72,7 +72,6 @@ service:
                       orchestrated: true
                   evaluators:
                     - version:
-                        path: path
                         id: id
                         name: name
                         version_id: version_id
@@ -80,6 +79,7 @@ service:
                         updated_at: '2024-01-15T09:30:00Z'
                         status: uncommitted
                         last_used_at: '2024-01-15T09:30:00Z'
+                        path: path
                         spec:
                           arguments_type: target_free
                           return_type: boolean
@@ -136,11 +136,10 @@ service:
             body:
               id: id
               dataset:
-                path: path
                 id: id
                 name: name
                 version_id: version_id
-                type: dataset
+                directory_id: directory_id
                 environments:
                   - id: id
                     created_at: '2024-01-15T09:30:00Z'
@@ -154,13 +153,13 @@ service:
                   full_name: full_name
                 status: uncommitted
                 last_used_at: '2024-01-15T09:30:00Z'
+                path: path
                 commit_message: commit_message
                 datapoints_count: 1
                 datapoints:
                   - id: id
               evaluatees:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -168,6 +167,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     model: model
                     version_logs_count: 1
                     total_logs_count: 1
@@ -177,7 +177,6 @@ service:
                   orchestrated: true
               evaluators:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -185,6 +184,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     spec:
                       arguments_type: target_free
                       return_type: boolean
@@ -225,11 +225,10 @@ service:
             body:
               id: id
               dataset:
-                path: path
                 id: id
                 name: name
                 version_id: version_id
-                type: dataset
+                directory_id: directory_id
                 environments:
                   - id: id
                     created_at: '2024-01-15T09:30:00Z'
@@ -243,13 +242,13 @@ service:
                   full_name: full_name
                 status: uncommitted
                 last_used_at: '2024-01-15T09:30:00Z'
+                path: path
                 commit_message: commit_message
                 datapoints_count: 1
                 datapoints:
                   - id: id
               evaluatees:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -257,6 +256,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     model: model
                     version_logs_count: 1
                     total_logs_count: 1
@@ -266,7 +266,6 @@ service:
                   orchestrated: true
               evaluators:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -274,6 +273,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     spec:
                       arguments_type: target_free
                       return_type: boolean
@@ -347,11 +347,10 @@ service:
             body:
               id: id
               dataset:
-                path: path
                 id: id
                 name: name
                 version_id: version_id
-                type: dataset
+                directory_id: directory_id
                 environments:
                   - id: id
                     created_at: '2024-01-15T09:30:00Z'
@@ -365,13 +364,13 @@ service:
                   full_name: full_name
                 status: uncommitted
                 last_used_at: '2024-01-15T09:30:00Z'
+                path: path
                 commit_message: commit_message
                 datapoints_count: 1
                 datapoints:
                   - id: id
               evaluatees:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -379,6 +378,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     model: model
                     version_logs_count: 1
                     total_logs_count: 1
@@ -388,7 +388,6 @@ service:
                   orchestrated: true
               evaluators:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -396,6 +395,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     spec:
                       arguments_type: target_free
                       return_type: boolean
@@ -411,7 +411,7 @@ service:
                 email_address: email_address
                 full_name: full_name
               updated_at: '2024-01-15T09:30:00Z'
-    updateStatus:
+    update_status:
       path: /evaluations/{id}/status
       method: PATCH
       auth: true
@@ -429,7 +429,7 @@ service:
           docs: Unique identifier for Evaluation.
       display-name: Update Status
       request:
-        name: BodyUpdateStatusEvaluationsIdStatusPatch
+        name: UpdateEvaluationStatusRequest
         body:
           properties:
             status: root.EvaluationStatus
@@ -447,11 +447,10 @@ service:
             body:
               id: id
               dataset:
-                path: path
                 id: id
                 name: name
                 version_id: version_id
-                type: dataset
+                directory_id: directory_id
                 environments:
                   - id: id
                     created_at: '2024-01-15T09:30:00Z'
@@ -465,13 +464,13 @@ service:
                   full_name: full_name
                 status: uncommitted
                 last_used_at: '2024-01-15T09:30:00Z'
+                path: path
                 commit_message: commit_message
                 datapoints_count: 1
                 datapoints:
                   - id: id
               evaluatees:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -479,6 +478,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     model: model
                     version_logs_count: 1
                     total_logs_count: 1
@@ -488,7 +488,6 @@ service:
                   orchestrated: true
               evaluators:
                 - version:
-                    path: path
                     id: id
                     name: name
                     version_id: version_id
@@ -496,6 +495,7 @@ service:
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
+                    path: path
                     spec:
                       arguments_type: target_free
                       return_type: boolean
@@ -511,7 +511,7 @@ service:
                 email_address: email_address
                 full_name: full_name
               updated_at: '2024-01-15T09:30:00Z'
-    getStats:
+    get_stats:
       path: /evaluations/{id}/stats
       method: GET
       auth: true
@@ -562,92 +562,6 @@ service:
                         '50': 0
                         '75': 0.6745
                         '100': 2.5
-    getLogs:
-      path: /evaluations/{id}/logs
-      method: GET
-      auth: true
-      docs: >-
-        Get Logs by Evaluation ID.
-
-
-        Each Evaluation Log corresponds to a (Datapoint, Evaluated Version)
-        pair.
-
-        It has an optional generated Log and a list of Evaluator Logs.
-      path-parameters:
-        id:
-          type: string
-          docs: String ID of evaluation. Starts with `ev_` or `evr_`.
-      display-name: Get Logs
-      request:
-        name: GetLogsEvaluationsIdLogsGetRequest
-        query-parameters:
-          page:
-            type: optional<integer>
-            docs: Page number for pagination.
-          size:
-            type: optional<integer>
-            docs: Page size for pagination. Number of Logs to fetch.
-      response:
-        docs: Successful Response
-        type: root.PaginatedDataEvaluationReportLogResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          response:
-            body:
-              records:
-                - evaluated_version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
-                    version_logs_count: 1
-                    total_logs_count: 1
-                    inputs:
-                      - name: name
-                  datapoint:
-                    id: id
-                  log:
-                    id: id
-                    config:
-                      id: id
-                      type: model
-                      model: model
-                    evaluation_results:
-                      - id: id
-                        evaluator_id: evaluator_id
-                        evaluator_version_id: evaluator_version_id
-                        log_id: log_id
-                        updated_at: '2024-01-15T09:30:00Z'
-                        created_at: '2024-01-15T09:30:00Z'
-                    observability_status: pending
-                    updated_at: '2024-01-15T09:30:00Z'
-                  evaluator_logs:
-                    - id: id
-                      config:
-                        id: id
-                        type: model
-                        model: model
-                      evaluation_results:
-                        - id: id
-                          evaluator_id: evaluator_id
-                          evaluator_version_id: evaluator_version_id
-                          log_id: log_id
-                          updated_at: '2024-01-15T09:30:00Z'
-                          created_at: '2024-01-15T09:30:00Z'
-                      observability_status: pending
-                      updated_at: '2024-01-15T09:30:00Z'
-              page: 1
-              size: 1
-              total: 1
   display-name: Evaluations
 docs: >+
   Evaluations help you measure the performance of your Prompts, Tools and LLM

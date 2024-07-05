@@ -8,19 +8,19 @@ from humanloop.client import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_create(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "type": "dataset",
+        "directory_id": "directory_id",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
+        "path": "path",
         "commit_message": "commit_message",
         "datapoints_count": 1,
         "datapoints": [
@@ -28,17 +28,17 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
         ],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "type": None,
+        "directory_id": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
+        "path": None,
         "commit_message": None,
         "datapoints_count": "integer",
         "datapoints": (
@@ -53,26 +53,26 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.datasets.upsert(datapoints=[CreateDatapointRequest()])
+    response = client.datasets.create(datapoints=[CreateDatapointRequest()])
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.upsert(datapoints=[CreateDatapointRequest()])
+    async_response = await async_client.datasets.create(datapoints=[CreateDatapointRequest()])
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "type": "dataset",
+        "directory_id": "directory_id",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
+        "path": "path",
         "commit_message": "commit_message",
         "datapoints_count": 1,
         "datapoints": [
@@ -80,17 +80,17 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         ],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "type": None,
+        "directory_id": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
+        "path": None,
         "commit_message": None,
         "datapoints_count": "integer",
         "datapoints": (
@@ -119,19 +119,19 @@ async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     assert await async_client.datasets.delete(id="id") is None  # type: ignore[func-returns-value]
 
 
-async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "type": "dataset",
+        "directory_id": "directory_id",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
+        "path": "path",
         "commit_message": "commit_message",
         "datapoints_count": 1,
         "datapoints": [
@@ -139,17 +139,17 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
         ],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "type": None,
+        "directory_id": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
+        "path": None,
         "commit_message": None,
         "datapoints_count": "integer",
         "datapoints": (
@@ -164,10 +164,10 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.datasets.move(id="id")
+    response = client.datasets.update(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.move(id="id")
+    async_response = await async_client.datasets.update(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -175,17 +175,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "records": [
             {
-                "path": "path",
                 "id": "id",
                 "name": "name",
                 "version_id": "version_id",
-                "type": "dataset",
+                "directory_id": "directory_id",
                 "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
                 "created_at": "2024-01-15T09:30:00Z",
                 "updated_at": "2024-01-15T09:30:00Z",
                 "created_by": {"id": "id", "email_address": "email_address"},
                 "status": "uncommitted",
                 "last_used_at": "2024-01-15T09:30:00Z",
+                "path": "path",
                 "commit_message": "commit_message",
                 "datapoints_count": 1,
                 "datapoints": [{"id": "id"}],
@@ -197,17 +197,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             "list",
             {
                 0: {
-                    "path": None,
                     "id": None,
                     "name": None,
                     "version_id": None,
-                    "type": None,
+                    "directory_id": None,
                     "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
                     "created_by": {"id": None, "email_address": None},
                     "status": None,
                     "last_used_at": "datetime",
+                    "path": None,
                     "commit_message": None,
                     "datapoints_count": "integer",
                     "datapoints": ("list", {0: {"id": None}}),
@@ -224,17 +224,17 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
 
 async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "type": "dataset",
+        "directory_id": "directory_id",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
+        "path": "path",
         "commit_message": "commit_message",
         "datapoints_count": 1,
         "datapoints": [
@@ -242,17 +242,17 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         ],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "type": None,
+        "directory_id": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
+        "path": None,
         "commit_message": None,
         "datapoints_count": "integer",
         "datapoints": (
@@ -276,73 +276,19 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_from_logs(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "type": "dataset",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
-        "datapoints_count": 1,
-        "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
-        ],
-    }
-    expected_types: typing.Any = {
-        "path": None,
-        "id": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
-        "status": None,
-        "last_used_at": "datetime",
-        "commit_message": None,
-        "datapoints_count": "integer",
-        "datapoints": (
-            "list",
-            {
-                0: {
-                    "inputs": ("dict", {0: (None, None)}),
-                    "messages": ("list", {0: {"role": None}}),
-                    "target": ("dict", {0: (None, None)}),
-                    "id": None,
-                }
-            },
-        ),
-    }
-    response = client.datasets.from_logs(id="id", log_ids=["log_ids"], commit_message="commit_message")
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.datasets.from_logs(
-        id="id", log_ids=["log_ids"], commit_message="commit_message"
-    )
-    validate_response(async_response, expected_response, expected_types)
-
-
 async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
         "id": "id",
         "name": "name",
         "version_id": "version_id",
-        "type": "dataset",
+        "directory_id": "directory_id",
         "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
         "created_at": "2024-01-15T09:30:00Z",
         "updated_at": "2024-01-15T09:30:00Z",
         "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
         "status": "uncommitted",
         "last_used_at": "2024-01-15T09:30:00Z",
+        "path": "path",
         "commit_message": "commit_message",
         "datapoints_count": 1,
         "datapoints": [
@@ -350,17 +296,17 @@ async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
         ],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
         "version_id": None,
-        "type": None,
+        "directory_id": None,
         "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
+        "path": None,
         "commit_message": None,
         "datapoints_count": "integer",
         "datapoints": (
@@ -375,129 +321,10 @@ async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
             },
         ),
     }
-    response = client.datasets.deploy(id="id", environment_id="environment_id", version_id="version_id")
+    response = client.datasets.deploy(id="id", version_id="version_id", environment_id="environment_id")
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.datasets.deploy(
-        id="id", environment_id="environment_id", version_id="version_id"
+        id="id", version_id="version_id", environment_id="environment_id"
     )
-    validate_response(async_response, expected_response, expected_types)
-
-
-async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.datasets.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
-
-    assert await async_client.datasets.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
-
-
-async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = [
-        {
-            "id": "id",
-            "created_at": "2024-01-15T09:30:00Z",
-            "name": "name",
-            "tag": "default",
-            "file": {
-                "path": "path",
-                "id": "id",
-                "name": "name",
-                "version_id": "version_id",
-                "type": "prompt",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": [
-                    {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
-                ],
-                "commit_message": "commit_message",
-                "version_logs_count": 1,
-                "total_logs_count": 1,
-                "inputs": [{"name": "name"}],
-                "evaluator_aggregates": [
-                    {
-                        "value": 1.1,
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "created_at": "2024-01-15T09:30:00Z",
-                        "updated_at": "2024-01-15T09:30:00Z",
-                    }
-                ],
-            },
-        }
-    ]
-    expected_types: typing.Any = (
-        "list",
-        {
-            0: {
-                "id": None,
-                "created_at": "datetime",
-                "name": None,
-                "tag": None,
-                "file": {
-                    "path": None,
-                    "id": None,
-                    "name": None,
-                    "version_id": None,
-                    "type": None,
-                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
-                    "status": None,
-                    "last_used_at": "datetime",
-                    "model": None,
-                    "endpoint": None,
-                    "template": None,
-                    "provider": None,
-                    "max_tokens": "integer",
-                    "temperature": None,
-                    "top_p": None,
-                    "stop": None,
-                    "presence_penalty": None,
-                    "frequency_penalty": None,
-                    "seed": "integer",
-                    "response_format": {"type": None},
-                    "tools": ("list", {0: {"name": None, "description": None}}),
-                    "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
-                    "commit_message": None,
-                    "version_logs_count": "integer",
-                    "total_logs_count": "integer",
-                    "inputs": ("list", {0: {"name": None}}),
-                    "evaluator_aggregates": (
-                        "list",
-                        {
-                            0: {
-                                "value": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "created_at": "datetime",
-                                "updated_at": "datetime",
-                            }
-                        },
-                    ),
-                },
-            }
-        },
-    )
-    response = client.datasets.list_environments(id="id")
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.datasets.list_environments(id="id")
     validate_response(async_response, expected_response, expected_types)

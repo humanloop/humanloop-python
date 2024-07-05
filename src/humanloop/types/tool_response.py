@@ -7,7 +7,6 @@ from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .environment_response import EnvironmentResponse
-from .evaluator_aggregate import EvaluatorAggregate
 from .files_tool_type import FilesToolType
 from .input_response import InputResponse
 from .tool_function import ToolFunction
@@ -18,11 +17,6 @@ from .version_status import VersionStatus
 class ToolResponse(UncheckedBaseModel):
     """
     Request to create a new Tool.
-    """
-
-    path: str = pydantic_v1.Field()
-    """
-    Path of the Tool, including the name, which is used as a unique identifier.
     """
 
     id: str = pydantic_v1.Field()
@@ -40,7 +34,7 @@ class ToolResponse(UncheckedBaseModel):
     Unique identifier for the specific Tool Version. If no query params provided, the default deployed Tool Version is returned.
     """
 
-    type: typing.Optional[typing.Literal["tool"]] = None
+    directory_id: typing.Optional[str] = None
     environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic_v1.Field(default=None)
     """
     The list of environments the Tool Version is deployed to.
@@ -59,6 +53,11 @@ class ToolResponse(UncheckedBaseModel):
     """
 
     last_used_at: dt.datetime
+    path: str = pydantic_v1.Field()
+    """
+    Path of the Tool, including the name, which is used as a unique identifier.
+    """
+
     function: typing.Optional[ToolFunction] = pydantic_v1.Field(default=None)
     """
     Callable function specification of the Tool shown to the model for tool calling.
@@ -102,11 +101,6 @@ class ToolResponse(UncheckedBaseModel):
     signature: typing.Optional[str] = pydantic_v1.Field(default=None)
     """
     Signature of the Tool.
-    """
-
-    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic_v1.Field(default=None)
-    """
-    Aggregation of Evaluator results for the Tool Version.
     """
 
     def json(self, **kwargs: typing.Any) -> str:
