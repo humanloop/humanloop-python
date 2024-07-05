@@ -95,7 +95,12 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.list_prompts()
+        response = client.prompts.list_prompts()
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = self._client_wrapper.httpx_client.request(
@@ -1227,7 +1232,12 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list_prompts()
+        response = await client.prompts.list_prompts()
+        async for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        async for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = await self._client_wrapper.httpx_client.request(

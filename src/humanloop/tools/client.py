@@ -86,7 +86,12 @@ class ToolsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.list()
+        response = client.tools.list()
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = self._client_wrapper.httpx_client.request(
@@ -941,7 +946,12 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.list()
+        response = await client.tools.list()
+        async for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        async for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = await self._client_wrapper.httpx_client.request(

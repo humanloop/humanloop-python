@@ -578,6 +578,7 @@ service:
               docs: >-
                 Whether the request/response payloads will be stored on
                 Humanloop.
+              default: true
             source_datapoint_id:
               type: optional<string>
               docs: >-

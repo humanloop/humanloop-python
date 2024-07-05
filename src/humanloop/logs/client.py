@@ -83,9 +83,14 @@ class LogsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.logs.list_logs_for_file(
+        response = client.logs.list_logs_for_file(
             file_id="file_id",
         )
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = self._client_wrapper.httpx_client.request(
@@ -287,9 +292,14 @@ class AsyncLogsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.logs.list_logs_for_file(
+        response = await client.logs.list_logs_for_file(
             file_id="file_id",
         )
+        async for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        async for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = await self._client_wrapper.httpx_client.request(

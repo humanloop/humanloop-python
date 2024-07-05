@@ -769,6 +769,7 @@ service:
               docs: >-
                 Whether the request/response payloads will be stored on
                 Humanloop.
+              default: true
             source_datapoint_id:
               type: optional<string>
               docs: >-
@@ -906,6 +907,7 @@ service:
               docs: >-
                 Whether the request/response payloads will be stored on
                 Humanloop.
+              default: true
             source_datapoint_id:
               type: optional<string>
               docs: >-
@@ -942,12 +944,14 @@ service:
               docs: >-
                 If true, tokens will be sent as data-only server-sent events. If
                 num_samples > 1, samples are streamed back independently.
+              default: false
             return_inputs:
               type: optional<boolean>
               docs: >-
                 Whether to return the inputs in the response. If false, the
                 response will contain an empty dictionary under inputs. This is
                 useful for reducing the size of the response. Defaults to true.
+              default: true
             logprobs:
               type: optional<integer>
               docs: >-

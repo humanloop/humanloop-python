@@ -115,6 +115,24 @@ client = Humanloop(...,
 )
 ```
 
+## Pagination
+
+Paginated requests will return a `SyncPager` or `AsyncPager`, which can be used as generators for the underlying object.
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.prompts.list_prompts()
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+```
+
 ## Contributing
 
 While we value open-source contributions to this SDK, this library is generated programmatically.

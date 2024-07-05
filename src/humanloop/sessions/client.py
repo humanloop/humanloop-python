@@ -145,7 +145,12 @@ class SessionsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.sessions.list()
+        response = client.sessions.list()
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = self._client_wrapper.httpx_client.request(
@@ -303,7 +308,12 @@ class AsyncSessionsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.sessions.list()
+        response = await client.sessions.list()
+        async for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        async for page in response.iter_pages():
+            yield page
         """
         page = page or 1
         _response = await self._client_wrapper.httpx_client.request(
