@@ -32,11 +32,11 @@ from ..types.response_format import ResponseFormat
 from ..types.sort_order import SortOrder
 from ..types.tool_function import ToolFunction
 from ..types.version_status import VersionStatus
+from .types.call_prompts_call_post_response import CallPromptsCallPostResponse
 from .types.prompt_call_request_tool_choice import PromptCallRequestToolChoice
 from .types.prompt_log_request_tool_choice import PromptLogRequestToolChoice
 from .types.prompt_request_stop import PromptRequestStop
 from .types.prompt_request_template import PromptRequestTemplate
-from .types.prompts_call_response import PromptsCallResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -46,7 +46,7 @@ class PromptsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list_prompts(
+    def list(
         self,
         *,
         page: typing.Optional[int] = None,
@@ -95,7 +95,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.prompts.list_prompts()
+        response = client.prompts.list()
         for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -120,7 +120,7 @@ class PromptsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(ListPrompts, construct_type(type_=ListPrompts, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list_prompts(
+                _get_next = lambda: self.list(
                     page=page + 1,
                     size=size,
                     name=name,
@@ -449,7 +449,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def listversions(
+    def list_versions(
         self,
         id: str,
         *,
@@ -489,7 +489,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.listversions(
+        client.prompts.list_versions(
             id="id",
         )
         """
@@ -803,7 +803,7 @@ class PromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptsCallResponse:
+    ) -> CallPromptsCallPostResponse:
         """
         Call a Prompt.
 
@@ -898,7 +898,7 @@ class PromptsClient:
 
         Returns
         -------
-        PromptsCallResponse
+        CallPromptsCallPostResponse
             Successful Response
 
         Examples
@@ -942,7 +942,7 @@ class PromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(PromptsCallResponse, construct_type(type_=PromptsCallResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(CallPromptsCallPostResponse, construct_type(type_=CallPromptsCallPostResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -1183,7 +1183,7 @@ class AsyncPromptsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list_prompts(
+    async def list(
         self,
         *,
         page: typing.Optional[int] = None,
@@ -1232,7 +1232,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.prompts.list_prompts()
+        response = await client.prompts.list()
         async for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -1257,7 +1257,7 @@ class AsyncPromptsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(ListPrompts, construct_type(type_=ListPrompts, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list_prompts(
+                _get_next = lambda: self.list(
                     page=page + 1,
                     size=size,
                     name=name,
@@ -1586,7 +1586,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def listversions(
+    async def list_versions(
         self,
         id: str,
         *,
@@ -1626,7 +1626,7 @@ class AsyncPromptsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.listversions(
+        await client.prompts.list_versions(
             id="id",
         )
         """
@@ -1940,7 +1940,7 @@ class AsyncPromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptsCallResponse:
+    ) -> CallPromptsCallPostResponse:
         """
         Call a Prompt.
 
@@ -2035,7 +2035,7 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptsCallResponse
+        CallPromptsCallPostResponse
             Successful Response
 
         Examples
@@ -2079,7 +2079,7 @@ class AsyncPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(PromptsCallResponse, construct_type(type_=PromptsCallResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(CallPromptsCallPostResponse, construct_type(type_=CallPromptsCallPostResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

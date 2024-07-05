@@ -3,6 +3,7 @@
 import typing
 from json.decoder import JSONDecodeError
 
+from .. import core
 from ..core.api_error import ApiError
 from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.jsonable_encoder import jsonable_encoder
@@ -398,7 +399,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def listdatapoints(
+    def list_datapoints(
         self,
         id: str,
         *,
@@ -443,7 +444,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.datasets.listdatapoints(
+        response = client.datasets.list_datapoints(
             id="id",
         )
         for item in response:
@@ -463,7 +464,7 @@ class DatasetsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.listdatapoints(
+                _get_next = lambda: self.list_datapoints(
                     id,
                     version_id=version_id,
                     environment=environment,
@@ -482,7 +483,7 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def listversions(
+    def list_versions(
         self,
         id: str,
         *,
@@ -522,7 +523,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.listversions(
+        client.datasets.list_versions(
             id="id",
         )
         """
@@ -601,7 +602,85 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def createdatapointsfromlogs(
+    def upload_csv(
+        self,
+        id: str,
+        *,
+        file: core.File,
+        commit_message: str,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Add Datapoints from a CSV file to a Dataset.
+
+        This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+
+        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+        with the Datapoints from the CSV file added to the existing Datapoints in the version.
+        If neither `version_id` nor `environment` is provided, the new version will be based on the version
+        of the Dataset that is deployed to the default Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for the Dataset
+
+        file : core.File
+            See core.File for more documentation
+
+        commit_message : str
+            Commit message for the new Dataset version.
+
+        version_id : typing.Optional[str]
+            ID of the specific Dataset version to base the created Version on.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed Version to base the created Version on.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.datasets.upload_csv(
+            id="id",
+            commit_message="commit_message",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/datapoints/csv",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            data={"commit_message": commit_message},
+            files={"file": file},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def from_logs(
         self,
         id: str,
         *,
@@ -653,7 +732,7 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.createdatapointsfromlogs(
+        client.datasets.from_logs(
             id="id",
             log_ids=["log_ids"],
             commit_message="commit_message",
@@ -1206,7 +1285,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def listdatapoints(
+    async def list_datapoints(
         self,
         id: str,
         *,
@@ -1251,7 +1330,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.datasets.listdatapoints(
+        response = await client.datasets.list_datapoints(
             id="id",
         )
         async for item in response:
@@ -1271,7 +1350,7 @@ class AsyncDatasetsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedDatapointResponse, construct_type(type_=PaginatedDatapointResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.listdatapoints(
+                _get_next = lambda: self.list_datapoints(
                     id,
                     version_id=version_id,
                     environment=environment,
@@ -1290,7 +1369,7 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def listversions(
+    async def list_versions(
         self,
         id: str,
         *,
@@ -1330,7 +1409,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.listversions(
+        await client.datasets.list_versions(
             id="id",
         )
         """
@@ -1409,7 +1488,85 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def createdatapointsfromlogs(
+    async def upload_csv(
+        self,
+        id: str,
+        *,
+        file: core.File,
+        commit_message: str,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Add Datapoints from a CSV file to a Dataset.
+
+        This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+
+        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+        with the Datapoints from the CSV file added to the existing Datapoints in the version.
+        If neither `version_id` nor `environment` is provided, the new version will be based on the version
+        of the Dataset that is deployed to the default Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for the Dataset
+
+        file : core.File
+            See core.File for more documentation
+
+        commit_message : str
+            Commit message for the new Dataset version.
+
+        version_id : typing.Optional[str]
+            ID of the specific Dataset version to base the created Version on.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed Version to base the created Version on.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.datasets.upload_csv(
+            id="id",
+            commit_message="commit_message",
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/datapoints/csv",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            data={"commit_message": commit_message},
+            files={"file": file},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def from_logs(
         self,
         id: str,
         *,
@@ -1461,7 +1618,7 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.createdatapointsfromlogs(
+        await client.datasets.from_logs(
             id="id",
             log_ids=["log_ids"],
             commit_message="commit_message",

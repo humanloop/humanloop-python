@@ -4,7 +4,7 @@ service:
   auth: false
   base-path: ''
   endpoints:
-    listPrompts:
+    list:
       path: /prompts
       method: GET
       auth: true
@@ -12,9 +12,9 @@ service:
       pagination:
         offset: $request.page
         results: $response.records
-      display-name: List Prompts
+      display-name: 'List '
       request:
-        name: PromptsListPromptsRequest
+        name: ListPromptsGetRequest
         query-parameters:
           page:
             type: optional<integer>
@@ -113,7 +113,7 @@ service:
         committed version,
 
         an exception will be raised.
-      display-name: Upsert Prompt
+      display-name: Upsert
       request:
         name: PromptRequest
         body:
@@ -289,9 +289,9 @@ service:
         id:
           type: string
           docs: Unique identifier for Prompt.
-      display-name: Get Prompt
+      display-name: Get
       request:
-        name: PromptsGetRequest
+        name: GetPromptsIdGetRequest
         query-parameters:
           version_id:
             type: optional<string>
@@ -371,7 +371,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Prompt.
-      display-name: Delete Prompt
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -386,7 +386,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Prompt.
-      display-name: Move Prompt
+      display-name: Move
       request:
         name: UpdatePromptRequest
         body:
@@ -463,7 +463,7 @@ service:
                   evaluator_version_id: evaluator_version_id
                   created_at: '2024-01-15T09:30:00Z'
                   updated_at: '2024-01-15T09:30:00Z'
-    listversions:
+    listVersions:
       path: /prompts/{id}/versions
       method: GET
       auth: true
@@ -474,7 +474,7 @@ service:
           docs: Unique identifier for Prompt.
       display-name: List Versions
       request:
-        name: PromptsListVersionsRequest
+        name: ListVersionsPromptsIdVersionsGetRequest
         query-parameters:
           status:
             type: optional<root.VersionStatus>
@@ -964,7 +964,7 @@ service:
                 Useful for completions that act like inserts.
       response:
         docs: Successful Response
-        type: PromptsCallResponse
+        type: CallPromptsCallPostResponse
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -1440,7 +1440,7 @@ types:
       - literal<"auto">
       - literal<"required">
       - root.ToolChoice
-  PromptsCallResponse:
+  CallPromptsCallPostResponse:
     discriminated: false
     union:
       - root.PromptCallResponse

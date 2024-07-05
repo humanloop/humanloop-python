@@ -233,7 +233,7 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "records": [
             {
@@ -308,10 +308,10 @@ async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> 
             },
         )
     }
-    response = client.tools.listversions(id="id")
+    response = client.tools.list_versions(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.tools.listversions(id="id")
+    async_response = await async_client.tools.list_versions(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 

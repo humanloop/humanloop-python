@@ -22,7 +22,7 @@ class LogsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list_logs_for_file(
+    def list(
         self,
         *,
         file_id: str,
@@ -83,7 +83,7 @@ class LogsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.logs.list_logs_for_file(
+        response = client.logs.list(
             file_id="file_id",
         )
         for item in response:
@@ -113,7 +113,7 @@ class LogsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list_logs_for_file(
+                _get_next = lambda: self.list(
                     file_id=file_id,
                     page=page + 1,
                     size=size,
@@ -231,7 +231,7 @@ class AsyncLogsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list_logs_for_file(
+    async def list(
         self,
         *,
         file_id: str,
@@ -292,7 +292,7 @@ class AsyncLogsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.logs.list_logs_for_file(
+        response = await client.logs.list(
             file_id="file_id",
         )
         async for item in response:
@@ -322,7 +322,7 @@ class AsyncLogsClient:
             if 200 <= _response.status_code < 300:
                 _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
-                _get_next = lambda: self.list_logs_for_file(
+                _get_next = lambda: self.list(
                     file_id=file_id,
                     page=page + 1,
                     size=size,

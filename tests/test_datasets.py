@@ -171,7 +171,7 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "records": [
             {
@@ -215,10 +215,10 @@ async def test_listversions(client: Humanloop, async_client: AsyncHumanloop) -> 
             },
         )
     }
-    response = client.datasets.listversions(id="id")
+    response = client.datasets.list_versions(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.listversions(id="id")
+    async_response = await async_client.datasets.list_versions(id="id")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -276,7 +276,7 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_createdatapointsfromlogs(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_from_logs(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -321,10 +321,10 @@ async def test_createdatapointsfromlogs(client: Humanloop, async_client: AsyncHu
             },
         ),
     }
-    response = client.datasets.createdatapointsfromlogs(id="id", log_ids=["log_ids"], commit_message="commit_message")
+    response = client.datasets.from_logs(id="id", log_ids=["log_ids"], commit_message="commit_message")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.createdatapointsfromlogs(
+    async_response = await async_client.datasets.from_logs(
         id="id", log_ids=["log_ids"], commit_message="commit_message"
     )
     validate_response(async_response, expected_response, expected_types)

@@ -447,7 +447,7 @@ async def test_update(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_updatestatus(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_update_status(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "id",
         "dataset": {
@@ -578,14 +578,14 @@ async def test_updatestatus(client: Humanloop, async_client: AsyncHumanloop) -> 
         "created_by": {"id": None, "email_address": None, "full_name": None},
         "updated_at": "datetime",
     }
-    response = client.evaluations.updatestatus(id="id", status="pending")
+    response = client.evaluations.update_status(id="id", status="pending")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluations.updatestatus(id="id", status="pending")
+    async_response = await async_client.evaluations.update_status(id="id", status="pending")
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_getstats(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_get_stats(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "overall_stats": {"num_datapoints": 1, "total_logs": 1, "total_evaluator_logs": 1},
         "version_stats": [
@@ -643,8 +643,144 @@ async def test_getstats(client: Humanloop, async_client: AsyncHumanloop) -> None
             },
         ),
     }
-    response = client.evaluations.getstats(id="id")
+    response = client.evaluations.get_stats(id="id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluations.getstats(id="id")
+    async_response = await async_client.evaluations.get_stats(id="id")
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_get_logs(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "records": [
+            {
+                "evaluated_version": {
+                    "path": "path",
+                    "id": "id",
+                    "name": "name",
+                    "version_id": "version_id",
+                    "created_at": "2024-01-15T09:30:00Z",
+                    "updated_at": "2024-01-15T09:30:00Z",
+                    "status": "uncommitted",
+                    "last_used_at": "2024-01-15T09:30:00Z",
+                    "model": "model",
+                    "version_logs_count": 1,
+                    "total_logs_count": 1,
+                    "inputs": [{"name": "name"}],
+                },
+                "datapoint": {"id": "id"},
+                "log": {
+                    "id": "id",
+                    "config": {"id": "id", "type": "model", "model": "model"},
+                    "evaluation_results": [
+                        {
+                            "id": "id",
+                            "evaluator_id": "evaluator_id",
+                            "evaluator_version_id": "evaluator_version_id",
+                            "log_id": "log_id",
+                            "updated_at": "2024-01-15T09:30:00Z",
+                            "created_at": "2024-01-15T09:30:00Z",
+                        }
+                    ],
+                    "observability_status": "pending",
+                    "updated_at": "2024-01-15T09:30:00Z",
+                },
+                "evaluator_logs": [
+                    {
+                        "id": "id",
+                        "config": {"id": "id", "type": "model", "model": "model"},
+                        "evaluation_results": [
+                            {
+                                "id": "id",
+                                "evaluator_id": "evaluator_id",
+                                "evaluator_version_id": "evaluator_version_id",
+                                "log_id": "log_id",
+                                "updated_at": "2024-01-15T09:30:00Z",
+                                "created_at": "2024-01-15T09:30:00Z",
+                            }
+                        ],
+                        "observability_status": "pending",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                    }
+                ],
+            }
+        ],
+        "page": 1,
+        "size": 1,
+        "total": 1,
+    }
+    expected_types: typing.Any = {
+        "records": (
+            "list",
+            {
+                0: {
+                    "evaluated_version": {
+                        "path": None,
+                        "id": None,
+                        "name": None,
+                        "version_id": None,
+                        "created_at": "datetime",
+                        "updated_at": "datetime",
+                        "status": None,
+                        "last_used_at": "datetime",
+                        "model": None,
+                        "version_logs_count": "integer",
+                        "total_logs_count": "integer",
+                        "inputs": ("list", {0: {"name": None}}),
+                    },
+                    "datapoint": {"id": None},
+                    "log": {
+                        "id": None,
+                        "config": {"id": None, "type": None, "model": None},
+                        "evaluation_results": (
+                            "list",
+                            {
+                                0: {
+                                    "id": None,
+                                    "evaluator_id": None,
+                                    "evaluator_version_id": None,
+                                    "log_id": None,
+                                    "updated_at": "datetime",
+                                    "created_at": "datetime",
+                                }
+                            },
+                        ),
+                        "observability_status": None,
+                        "updated_at": "datetime",
+                    },
+                    "evaluator_logs": (
+                        "list",
+                        {
+                            0: {
+                                "id": None,
+                                "config": {"id": None, "type": None, "model": None},
+                                "evaluation_results": (
+                                    "list",
+                                    {
+                                        0: {
+                                            "id": None,
+                                            "evaluator_id": None,
+                                            "evaluator_version_id": None,
+                                            "log_id": None,
+                                            "updated_at": "datetime",
+                                            "created_at": "datetime",
+                                        }
+                                    },
+                                ),
+                                "observability_status": None,
+                                "updated_at": "datetime",
+                            }
+                        },
+                    ),
+                }
+            },
+        ),
+        "page": "integer",
+        "size": "integer",
+        "total": "integer",
+    }
+    response = client.evaluations.get_logs(id="id")
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.evaluations.get_logs(id="id")
     validate_response(async_response, expected_response, expected_types)

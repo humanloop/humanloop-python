@@ -37,6 +37,7 @@ from .evaluatee_response import EvaluateeResponse
 from .evaluation_debug_result_response import EvaluationDebugResultResponse
 from .evaluation_debug_result_response_value import EvaluationDebugResultResponseValue
 from .evaluation_evaluator_response import EvaluationEvaluatorResponse
+from .evaluation_report_log_response import EvaluationReportLogResponse
 from .evaluation_response import EvaluationResponse
 from .evaluation_result_response import EvaluationResultResponse
 from .evaluation_result_response_value import EvaluationResultResponseValue
@@ -60,6 +61,7 @@ from .evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from .experiment_response import ExperimentResponse
 from .experiment_status import ExperimentStatus
 from .experiment_version_response import ExperimentVersionResponse
+from .external_evaluator_request import ExternalEvaluatorRequest
 from .feedback_class import FeedbackClass
 from .feedback_label_status import FeedbackLabelStatus
 from .feedback_response import FeedbackResponse
@@ -108,6 +110,7 @@ from .monitoring_evaluator_version_request import MonitoringEvaluatorVersionRequ
 from .numeric_evaluator_version_stats import NumericEvaluatorVersionStats
 from .observability_status import ObservabilityStatus
 from .overall_stats import OverallStats
+from .paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
 from .paginated_datapoint_response import PaginatedDatapointResponse
 from .paginated_dataset_response import PaginatedDatasetResponse
 from .paginated_evaluation_response import PaginatedEvaluationResponse
@@ -144,6 +147,7 @@ from .tool_response import ToolResponse
 from .tool_result_response import ToolResultResponse
 from .tool_source import ToolSource
 from .update_dateset_action import UpdateDatesetAction
+from .update_evaluation_status_request import UpdateEvaluationStatusRequest
 from .user_response import UserResponse
 from .validation_error import ValidationError
 from .validation_error_loc_item import ValidationErrorLocItem
@@ -194,6 +198,7 @@ __all__ = [
     "EvaluationDebugResultResponse",
     "EvaluationDebugResultResponseValue",
     "EvaluationEvaluatorResponse",
+    "EvaluationReportLogResponse",
     "EvaluationResponse",
     "EvaluationResultResponse",
     "EvaluationResultResponseValue",
@@ -213,6 +218,7 @@ __all__ = [
     "ExperimentResponse",
     "ExperimentStatus",
     "ExperimentVersionResponse",
+    "ExternalEvaluatorRequest",
     "FeedbackClass",
     "FeedbackLabelStatus",
     "FeedbackResponse",
@@ -261,6 +267,7 @@ __all__ = [
     "NumericEvaluatorVersionStats",
     "ObservabilityStatus",
     "OverallStats",
+    "PaginatedDataEvaluationReportLogResponse",
     "PaginatedDatapointResponse",
     "PaginatedDatasetResponse",
     "PaginatedEvaluationResponse",
@@ -297,6 +304,7 @@ __all__ = [
     "ToolResultResponse",
     "ToolSource",
     "UpdateDatesetAction",
+    "UpdateEvaluationStatusRequest",
     "UserResponse",
     "ValidationError",
     "ValidationErrorLocItem",

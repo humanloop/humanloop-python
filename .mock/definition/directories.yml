@@ -9,7 +9,7 @@ service:
       method: GET
       auth: true
       docs: Retrieve a list of all Directories.
-      display-name: List Directories
+      display-name: 'List '
       response:
         docs: Successful Response
         type: list<root.DirectoryResponse>
@@ -28,7 +28,7 @@ service:
       method: POST
       auth: true
       docs: Creates a Directory.
-      display-name: 'Create Directory '
+      display-name: Create
       request:
         name: CreateDirectoryRequest
         body:
@@ -64,7 +64,7 @@ service:
         id:
           type: string
           docs: String ID of directory. Starts with `dir_`.
-      display-name: Get Directory
+      display-name: Get
       response:
         docs: Successful Response
         type: root.DirectoryWithParentsAndChildrenResponse
@@ -154,7 +154,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Directory. Starts with `dir_`.
-      display-name: 'Delete Directory '
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -169,7 +169,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Directory. Starts with `dir_`.
-      display-name: 'Update Directory '
+      display-name: Update
       request:
         name: UpdateDirectoryRequest
         body:

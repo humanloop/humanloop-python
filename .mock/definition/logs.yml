@@ -4,7 +4,7 @@ service:
   auth: false
   base-path: ''
   endpoints:
-    listLogsForFile:
+    list:
       path: /logs
       method: GET
       auth: true
@@ -12,9 +12,9 @@ service:
       pagination:
         offset: $request.page
         results: $response.records
-      display-name: List
+      display-name: 'List '
       request:
-        name: ListLogsForFileLogsGetRequest
+        name: ListLogsGetRequest
         query-parameters:
           file_id:
             type: string

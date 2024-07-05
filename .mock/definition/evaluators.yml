@@ -4,519 +4,12 @@ service:
   auth: false
   base-path: ''
   endpoints:
-    list:
-      path: /evaluators
-      method: GET
-      auth: true
-      docs: Get a list of Evaluators.
-      pagination:
-        offset: $request.page
-        results: $response.records
-      display-name: 'List '
-      request:
-        name: EvaluatorsListRequest
-        query-parameters:
-          page:
-            type: optional<integer>
-            docs: Page offset for pagination.
-          size:
-            type: optional<integer>
-            docs: Page size for pagination. Number of Evaluators to fetch.
-          name:
-            type: optional<string>
-            docs: Case-insensitive filter for Evaluator name.
-          user_filter:
-            type: optional<string>
-            docs: >-
-              Case-insensitive filter for users in the Evaluator. This filter
-              matches against both email address and name of users.
-          sort_by:
-            type: optional<root.ProjectSortBy>
-            docs: Field to sort Evaluators by
-          order:
-            type: optional<root.SortOrder>
-            docs: Direction to sort by.
-      response:
-        docs: Successful Response
-        type: root.ListEvaluators
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - response:
-            body:
-              records:
-                - path: path
-                  id: id
-                  name: name
-                  version_id: version_id
-                  type: evaluator
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  commit_message: commit_message
-                  spec:
-                    arguments_type: target_free
-                    return_type: boolean
-                  version_logs_count: 1
-                  total_logs_count: 1
-                  inputs:
-                    - name: name
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
-    upsert:
-      path: /evaluators
-      method: POST
-      auth: true
-      docs: >-
-        Create an Evaluator or update it with a new version if it already
-        exists.
-
-
-        Evaluators are identified by the `ID` or their `path`. The spec provided
-        determines the version of the Evaluator.
-
-
-        If you provide a commit message, then the new version will be committed;
-
-        otherwise it will be uncommitted. If you try to commit an already
-        committed version,
-
-        an exception will be raised.
-      display-name: Upsert Evaluator
-      request:
-        name: EvaluatorsRequest
-        body:
-          properties:
-            path:
-              type: optional<string>
-              docs: >-
-                Path of the Evaluator, including the name, which is used as a
-                unique identifier.
-            id:
-              type: optional<string>
-              docs: ID for an existing Evaluator to update.
-            commit_message:
-              type: optional<string>
-              docs: Message describing the changes made.
-            spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec
-      response:
-        docs: Successful Response
-        type: root.EvaluatorResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - request:
-            spec:
-              arguments_type: target_free
-              return_type: boolean
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
-              spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    get:
-      path: /evaluators/{id}
-      method: GET
-      auth: true
-      docs: >-
-        Retrieve the Evaluator with the given ID.
-
-
-        By default, the deployed version of the Evaluator is returned. Use the
-        query parameters
-
-        `version_id` or `environment` to target a specific version of the
-        Evaluator.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Evaluator.
-      display-name: Get Evaluator
-      request:
-        name: EvaluatorsGetRequest
-        query-parameters:
-          version_id:
-            type: optional<string>
-            docs: A specific Version ID of the Evaluator to retrieve.
-          environment:
-            type: optional<string>
-            docs: Name of the Environment to retrieve a deployed Version from.
-      response:
-        docs: Successful Response
-        type: root.EvaluatorResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
-              spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    delete:
-      path: /evaluators/{id}
-      method: DELETE
-      auth: true
-      docs: Delete the Evaluator with the given ID.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Evaluator.
-      display-name: Delete Evaluator
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-    move:
-      path: /evaluators/{id}
-      method: PATCH
-      auth: true
-      docs: Move the Evaluator to a different path or change the name.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Evaluator.
-      display-name: Move Evaluator
-      request:
-        name: UpdateEvaluatorRequest
-        body:
-          properties:
-            path:
-              type: optional<string>
-              docs: >-
-                Path of the Evaluator including the Evaluator name, which is
-                used as a unique identifier.
-            name:
-              type: optional<string>
-              docs: Name of the Evaluator, which is used as a unique identifier.
-      response:
-        docs: Successful Response
-        type: root.EvaluatorResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          request: {}
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
-              spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    listversions:
-      path: /evaluators/{id}/versions
-      method: GET
-      auth: true
-      docs: Get a list of all the versions of an Evaluator.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for the Evaluator.
-      display-name: List Versions
-      request:
-        name: EvaluatorsListVersionsRequest
-        query-parameters:
-          status:
-            type: optional<root.VersionStatus>
-            docs: >-
-              Filter versions by status: 'uncommitted', 'committed'. If no
-              status is provided, all versions are returned.
-          environment:
-            type: optional<string>
-            docs: >-
-              Name of the environment to filter versions by. If no environment
-              is provided, all versions are returned.
-          evaluator_aggregates: optional<boolean>
-      response:
-        docs: Successful Response
-        type: root.ListEvaluators
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          response:
-            body:
-              records:
-                - path: path
-                  id: id
-                  name: name
-                  version_id: version_id
-                  type: evaluator
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  commit_message: commit_message
-                  spec:
-                    arguments_type: target_free
-                    return_type: boolean
-                  version_logs_count: 1
-                  total_logs_count: 1
-                  inputs:
-                    - name: name
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
-    commit:
-      path: /evaluators/{id}/versions/{version_id}/commit
-      method: POST
-      auth: true
-      docs: Commit the Evaluator Version with the given ID.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Prompt.
-        version_id:
-          type: string
-          docs: Unique identifier for the specific version of the Evaluator.
-      display-name: Commit
-      request:
-        body: root.CommitRequest
-      response:
-        docs: Successful Response
-        type: root.EvaluatorResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-            version_id: version_id
-          request:
-            commit_message: commit_message
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
-              spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    listdefault:
+    listDefault:
       path: /evaluators/default
       method: GET
       auth: true
       docs: Get a list of default evaluators for the organization.
-      display-name: List Default Evaluators
+      display-name: List Default
       response:
         docs: Successful Response
         type: list<root.EvaluatorResponse>
@@ -736,6 +229,513 @@ service:
                     - batch_ids
                 value: true
                 error: error
+    list:
+      path: /evaluators
+      method: GET
+      auth: true
+      docs: Get a list of Evaluators.
+      pagination:
+        offset: $request.page
+        results: $response.records
+      display-name: 'List '
+      request:
+        name: ListEvaluatorsGetRequest
+        query-parameters:
+          page:
+            type: optional<integer>
+            docs: Page offset for pagination.
+          size:
+            type: optional<integer>
+            docs: Page size for pagination. Number of Evaluators to fetch.
+          name:
+            type: optional<string>
+            docs: Case-insensitive filter for Evaluator name.
+          user_filter:
+            type: optional<string>
+            docs: >-
+              Case-insensitive filter for users in the Evaluator. This filter
+              matches against both email address and name of users.
+          sort_by:
+            type: optional<root.ProjectSortBy>
+            docs: Field to sort Evaluators by
+          order:
+            type: optional<root.SortOrder>
+            docs: Direction to sort by.
+      response:
+        docs: Successful Response
+        type: root.ListEvaluators
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - response:
+            body:
+              records:
+                - path: path
+                  id: id
+                  name: name
+                  version_id: version_id
+                  type: evaluator
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  commit_message: commit_message
+                  spec:
+                    arguments_type: target_free
+                    return_type: boolean
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+                  evaluator_aggregates:
+                    - value: 1.1
+                      evaluator_id: evaluator_id
+                      evaluator_version_id: evaluator_version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
+    upsert:
+      path: /evaluators
+      method: POST
+      auth: true
+      docs: >-
+        Create an Evaluator or update it with a new version if it already
+        exists.
+
+
+        Evaluators are identified by the `ID` or their `path`. The spec provided
+        determines the version of the Evaluator.
+
+
+        If you provide a commit message, then the new version will be committed;
+
+        otherwise it will be uncommitted. If you try to commit an already
+        committed version,
+
+        an exception will be raised.
+      display-name: Upsert
+      request:
+        name: EvaluatorsRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Evaluator, including the name, which is used as a
+                unique identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Evaluator to update.
+            commit_message:
+              type: optional<string>
+              docs: Message describing the changes made.
+            spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec
+      response:
+        docs: Successful Response
+        type: root.EvaluatorResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request:
+            spec:
+              arguments_type: target_free
+              return_type: boolean
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: evaluator
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              spec:
+                arguments_type: target_free
+                return_type: boolean
+                evaluator_type: llm
+                prompt:
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - linked_tools
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+    get:
+      path: /evaluators/{id}
+      method: GET
+      auth: true
+      docs: >-
+        Retrieve the Evaluator with the given ID.
+
+
+        By default, the deployed version of the Evaluator is returned. Use the
+        query parameters
+
+        `version_id` or `environment` to target a specific version of the
+        Evaluator.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluator.
+      display-name: Get
+      request:
+        name: GetEvaluatorsIdGetRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific Version ID of the Evaluator to retrieve.
+          environment:
+            type: optional<string>
+            docs: Name of the Environment to retrieve a deployed Version from.
+      response:
+        docs: Successful Response
+        type: root.EvaluatorResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: evaluator
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              spec:
+                arguments_type: target_free
+                return_type: boolean
+                evaluator_type: llm
+                prompt:
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - linked_tools
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+    delete:
+      path: /evaluators/{id}
+      method: DELETE
+      auth: true
+      docs: Delete the Evaluator with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluator.
+      display-name: Delete
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+    move:
+      path: /evaluators/{id}
+      method: PATCH
+      auth: true
+      docs: Move the Evaluator to a different path or change the name.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Evaluator.
+      display-name: Move
+      request:
+        name: UpdateEvaluatorRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Evaluator including the Evaluator name, which is
+                used as a unique identifier.
+            name:
+              type: optional<string>
+              docs: Name of the Evaluator, which is used as a unique identifier.
+      response:
+        docs: Successful Response
+        type: root.EvaluatorResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request: {}
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: evaluator
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              spec:
+                arguments_type: target_free
+                return_type: boolean
+                evaluator_type: llm
+                prompt:
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - linked_tools
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+    listVersions:
+      path: /evaluators/{id}/versions
+      method: GET
+      auth: true
+      docs: Get a list of all the versions of an Evaluator.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for the Evaluator.
+      display-name: List Versions
+      request:
+        name: ListVersionsEvaluatorsIdVersionsGetRequest
+        query-parameters:
+          status:
+            type: optional<root.VersionStatus>
+            docs: >-
+              Filter versions by status: 'uncommitted', 'committed'. If no
+              status is provided, all versions are returned.
+          environment:
+            type: optional<string>
+            docs: >-
+              Name of the environment to filter versions by. If no environment
+              is provided, all versions are returned.
+          evaluator_aggregates: optional<boolean>
+      response:
+        docs: Successful Response
+        type: root.ListEvaluators
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          response:
+            body:
+              records:
+                - path: path
+                  id: id
+                  name: name
+                  version_id: version_id
+                  type: evaluator
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
+                  commit_message: commit_message
+                  spec:
+                    arguments_type: target_free
+                    return_type: boolean
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: name
+                  evaluator_aggregates:
+                    - value: 1.1
+                      evaluator_id: evaluator_id
+                      evaluator_version_id: evaluator_version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
+    commit:
+      path: /evaluators/{id}/versions/{version_id}/commit
+      method: POST
+      auth: true
+      docs: Commit the Evaluator Version with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Prompt.
+        version_id:
+          type: string
+          docs: Unique identifier for the specific version of the Evaluator.
+      display-name: Commit
+      request:
+        body: root.CommitRequest
+      response:
+        docs: Successful Response
+        type: root.EvaluatorResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+            version_id: version_id
+          request:
+            commit_message: commit_message
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: evaluator
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              spec:
+                arguments_type: target_free
+                return_type: boolean
+                evaluator_type: llm
+                prompt:
+                  model: model
+                  endpoint: complete
+                  template: template
+                  provider: openai
+                  max_tokens: 1
+                  temperature: 1.1
+                  top_p: 1.1
+                  stop: stop
+                  presence_penalty: 1.1
+                  frequency_penalty: 1.1
+                  seed: 1
+                  response_format:
+                    type: json_object
+                  tools:
+                    - name: name
+                      description: description
+                  linked_tools:
+                    - linked_tools
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: name
+              evaluator_aggregates:
+                - value: 1.1
+                  evaluator_id: evaluator_id
+                  evaluator_version_id: evaluator_version_id
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
     deploy:
       path: /evaluators/{id}/environments/{environment_id}
       method: POST
@@ -929,15 +929,17 @@ service:
                       created_at: '2024-01-15T09:30:00Z'
                       updated_at: '2024-01-15T09:30:00Z'
 types:
-  SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec:
-    discriminated: false
-    union:
-      - root.LlmEvaluatorRequest
-      - root.CodeEvaluatorRequest
-      - root.HumanEvaluatorRequest
   RunSyncEvaluationRequestEvaluator:
     discriminated: false
     union:
       - root.LlmEvaluatorRequest
       - root.CodeEvaluatorRequest
       - root.HumanEvaluatorRequest
+      - root.ExternalEvaluatorRequest
+  SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec:
+    discriminated: false
+    union:
+      - root.LlmEvaluatorRequest
+      - root.CodeEvaluatorRequest
+      - root.HumanEvaluatorRequest
+      - root.ExternalEvaluatorRequest

@@ -92,7 +92,7 @@ service:
         results: $response.records
       display-name: 'List '
       request:
-        name: SessionsListRequest
+        name: ListSessionsGetRequest
         query-parameters:
           file_id:
             type: optional<string>

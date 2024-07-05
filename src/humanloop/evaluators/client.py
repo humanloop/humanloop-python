@@ -31,6 +31,129 @@ class EvaluatorsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    def list_default(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[EvaluatorResponse]:
+        """
+        Get a list of default evaluators for the organization.
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[EvaluatorResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluators.list_default()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "evaluators/default", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[EvaluatorResponse], construct_type(type_=typing.List[EvaluatorResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def debug(
+        self,
+        *,
+        file_id: str,
+        evaluator: RunSyncEvaluationRequestEvaluator,
+        evaluator_version_id: typing.Optional[str] = OMIT,
+        log_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        datapoint_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        prompt_version_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[EvaluationDebugResultResponse]:
+        """
+        Run a synchronous evaluator execution on a collection of datapoints.
+
+        Parameters
+        ----------
+        file_id : str
+            The ID of the Dataset that the datapoints belong to.
+
+        evaluator : RunSyncEvaluationRequestEvaluator
+
+        evaluator_version_id : typing.Optional[str]
+            The ID of the Evaluator Version being debugged if it already exists and is being edited.
+
+        log_ids : typing.Optional[typing.Sequence[str]]
+            The IDs of the logs on which to run the draft evaluator.Provide one of `log_ids` or `datapoint_ids`.
+
+        datapoint_ids : typing.Optional[typing.Sequence[str]]
+            The IDs of the evaluation datapoints on which to run the draft evaluator.
+
+        prompt_version_id : typing.Optional[str]
+            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[EvaluationDebugResultResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import LlmEvaluatorRequest
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluators.debug(
+            file_id="file_id",
+            evaluator=LlmEvaluatorRequest(
+                arguments_type="target_free",
+                return_type="boolean",
+            ),
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "evaluators/debug",
+            method="POST",
+            json={
+                "file_id": file_id,
+                "evaluator": evaluator,
+                "evaluator_version_id": evaluator_version_id,
+                "log_ids": log_ids,
+                "datapoint_ids": datapoint_ids,
+                "prompt_version_id": prompt_version_id,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[EvaluationDebugResultResponse], construct_type(type_=typing.List[EvaluationDebugResultResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def list(
         self,
         *,
@@ -362,7 +485,7 @@ class EvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def listversions(
+    def list_versions(
         self,
         id: str,
         *,
@@ -402,7 +525,7 @@ class EvaluatorsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluators.listversions(
+        client.evaluators.list_versions(
             id="id",
         )
         """
@@ -472,127 +595,6 @@ class EvaluatorsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(EvaluatorResponse, construct_type(type_=EvaluatorResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def listdefault(self, *, request_options: typing.Optional[RequestOptions] = None) -> typing.List[EvaluatorResponse]:
-        """
-        Get a list of default evaluators for the organization.
-
-        Parameters
-        ----------
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[EvaluatorResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.evaluators.listdefault()
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "evaluators/default", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[EvaluatorResponse], construct_type(type_=typing.List[EvaluatorResponse], object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def debug(
-        self,
-        *,
-        file_id: str,
-        evaluator: RunSyncEvaluationRequestEvaluator,
-        evaluator_version_id: typing.Optional[str] = OMIT,
-        log_ids: typing.Optional[typing.Sequence[str]] = OMIT,
-        datapoint_ids: typing.Optional[typing.Sequence[str]] = OMIT,
-        prompt_version_id: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[EvaluationDebugResultResponse]:
-        """
-        Run a synchronous evaluator execution on a collection of datapoints.
-
-        Parameters
-        ----------
-        file_id : str
-            The ID of the Dataset that the datapoints belong to.
-
-        evaluator : RunSyncEvaluationRequestEvaluator
-
-        evaluator_version_id : typing.Optional[str]
-            The ID of the Evaluator Version being debugged if it already exists and is being edited.
-
-        log_ids : typing.Optional[typing.Sequence[str]]
-            The IDs of the logs on which to run the draft evaluator.Provide one of `log_ids` or `datapoint_ids`.
-
-        datapoint_ids : typing.Optional[typing.Sequence[str]]
-            The IDs of the evaluation datapoints on which to run the draft evaluator.
-
-        prompt_version_id : typing.Optional[str]
-            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[EvaluationDebugResultResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import LlmEvaluatorRequest
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.evaluators.debug(
-            file_id="file_id",
-            evaluator=LlmEvaluatorRequest(
-                arguments_type="target_free",
-                return_type="boolean",
-            ),
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "evaluators/debug",
-            method="POST",
-            json={
-                "file_id": file_id,
-                "evaluator": evaluator,
-                "evaluator_version_id": evaluator_version_id,
-                "log_ids": log_ids,
-                "datapoint_ids": datapoint_ids,
-                "prompt_version_id": prompt_version_id,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[EvaluationDebugResultResponse], construct_type(type_=typing.List[EvaluationDebugResultResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -763,6 +765,129 @@ class EvaluatorsClient:
 class AsyncEvaluatorsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    async def list_default(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[EvaluatorResponse]:
+        """
+        Get a list of default evaluators for the organization.
+
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[EvaluatorResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.evaluators.list_default()
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "evaluators/default", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[EvaluatorResponse], construct_type(type_=typing.List[EvaluatorResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def debug(
+        self,
+        *,
+        file_id: str,
+        evaluator: RunSyncEvaluationRequestEvaluator,
+        evaluator_version_id: typing.Optional[str] = OMIT,
+        log_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        datapoint_ids: typing.Optional[typing.Sequence[str]] = OMIT,
+        prompt_version_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[EvaluationDebugResultResponse]:
+        """
+        Run a synchronous evaluator execution on a collection of datapoints.
+
+        Parameters
+        ----------
+        file_id : str
+            The ID of the Dataset that the datapoints belong to.
+
+        evaluator : RunSyncEvaluationRequestEvaluator
+
+        evaluator_version_id : typing.Optional[str]
+            The ID of the Evaluator Version being debugged if it already exists and is being edited.
+
+        log_ids : typing.Optional[typing.Sequence[str]]
+            The IDs of the logs on which to run the draft evaluator.Provide one of `log_ids` or `datapoint_ids`.
+
+        datapoint_ids : typing.Optional[typing.Sequence[str]]
+            The IDs of the evaluation datapoints on which to run the draft evaluator.
+
+        prompt_version_id : typing.Optional[str]
+            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[EvaluationDebugResultResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import LlmEvaluatorRequest
+        from humanloop.client import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+        await client.evaluators.debug(
+            file_id="file_id",
+            evaluator=LlmEvaluatorRequest(
+                arguments_type="target_free",
+                return_type="boolean",
+            ),
+        )
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "evaluators/debug",
+            method="POST",
+            json={
+                "file_id": file_id,
+                "evaluator": evaluator,
+                "evaluator_version_id": evaluator_version_id,
+                "log_ids": log_ids,
+                "datapoint_ids": datapoint_ids,
+                "prompt_version_id": prompt_version_id,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[EvaluationDebugResultResponse], construct_type(type_=typing.List[EvaluationDebugResultResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def list(
         self,
@@ -1095,7 +1220,7 @@ class AsyncEvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def listversions(
+    async def list_versions(
         self,
         id: str,
         *,
@@ -1135,7 +1260,7 @@ class AsyncEvaluatorsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluators.listversions(
+        await client.evaluators.list_versions(
             id="id",
         )
         """
@@ -1205,129 +1330,6 @@ class AsyncEvaluatorsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(EvaluatorResponse, construct_type(type_=EvaluatorResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def listdefault(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[EvaluatorResponse]:
-        """
-        Get a list of default evaluators for the organization.
-
-        Parameters
-        ----------
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[EvaluatorResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.evaluators.listdefault()
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "evaluators/default", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[EvaluatorResponse], construct_type(type_=typing.List[EvaluatorResponse], object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def debug(
-        self,
-        *,
-        file_id: str,
-        evaluator: RunSyncEvaluationRequestEvaluator,
-        evaluator_version_id: typing.Optional[str] = OMIT,
-        log_ids: typing.Optional[typing.Sequence[str]] = OMIT,
-        datapoint_ids: typing.Optional[typing.Sequence[str]] = OMIT,
-        prompt_version_id: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[EvaluationDebugResultResponse]:
-        """
-        Run a synchronous evaluator execution on a collection of datapoints.
-
-        Parameters
-        ----------
-        file_id : str
-            The ID of the Dataset that the datapoints belong to.
-
-        evaluator : RunSyncEvaluationRequestEvaluator
-
-        evaluator_version_id : typing.Optional[str]
-            The ID of the Evaluator Version being debugged if it already exists and is being edited.
-
-        log_ids : typing.Optional[typing.Sequence[str]]
-            The IDs of the logs on which to run the draft evaluator.Provide one of `log_ids` or `datapoint_ids`.
-
-        datapoint_ids : typing.Optional[typing.Sequence[str]]
-            The IDs of the evaluation datapoints on which to run the draft evaluator.
-
-        prompt_version_id : typing.Optional[str]
-            The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[EvaluationDebugResultResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import LlmEvaluatorRequest
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.evaluators.debug(
-            file_id="file_id",
-            evaluator=LlmEvaluatorRequest(
-                arguments_type="target_free",
-                return_type="boolean",
-            ),
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "evaluators/debug",
-            method="POST",
-            json={
-                "file_id": file_id,
-                "evaluator": evaluator,
-                "evaluator_version_id": evaluator_version_id,
-                "log_ids": log_ids,
-                "datapoint_ids": datapoint_ids,
-                "prompt_version_id": prompt_version_id,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[EvaluationDebugResultResponse], construct_type(type_=typing.List[EvaluationDebugResultResponse], object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

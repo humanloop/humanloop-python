@@ -1,6 +1,6 @@
 # Reference
 ## Prompts
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list_prompts</a>(...)</code></summary>
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -32,7 +32,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.prompts.list_prompts()
+response = client.prompts.list()
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -570,7 +570,7 @@ client.prompts.move(
 </dl>
 </details>
 
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">listversions</a>(...)</code></summary>
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list_versions</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -602,7 +602,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.listversions(
+client.prompts.list_versions(
     id="id",
 )
 
@@ -2148,7 +2148,7 @@ client.tools.move(
 </dl>
 </details>
 
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">listversions</a>(...)</code></summary>
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">list_versions</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2180,7 +2180,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.tools.listversions(
+client.tools.list_versions(
     id="id",
 )
 
@@ -3429,7 +3429,7 @@ client.datasets.move(
 </dl>
 </details>
 
-<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">listdatapoints</a>(...)</code></summary>
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">list_datapoints</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -3461,7 +3461,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.datasets.listdatapoints(
+response = client.datasets.list_datapoints(
     id="id",
 )
 for item in response:
@@ -3536,7 +3536,7 @@ for page in response.iter_pages():
 </dl>
 </details>
 
-<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">listversions</a>(...)</code></summary>
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">list_versions</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -3568,7 +3568,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.datasets.listversions(
+client.datasets.list_versions(
     id="id",
 )
 
@@ -3718,7 +3718,119 @@ client.datasets.commit(
 </dl>
 </details>
 
-<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">createdatapointsfromlogs</a>(...)</code></summary>
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">upload_csv</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add Datapoints from a CSV file to a Dataset.
+
+This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+
+If either `version_id` or `environment` is provided, the new version will be based on the specified version,
+with the Datapoints from the CSV file added to the existing Datapoints in the version.
+If neither `version_id` nor `environment` is provided, the new version will be based on the version
+of the Dataset that is deployed to the default Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.datasets.upload_csv(
+    id="id",
+    commit_message="commit_message",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for the Dataset
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file:** `from __future__ import annotations
+
+core.File` — See core.File for more documentation
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `str` — Commit message for the new Dataset version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — ID of the specific Dataset version to base the created Version on.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed Version to base the created Version on.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">from_logs</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -3757,7 +3869,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.datasets.createdatapointsfromlogs(
+client.datasets.from_logs(
     id="id",
     log_ids=["log_ids"],
     commit_message="commit_message",
@@ -4642,3 +4754,2087 @@ client.evaluations.create(
 </details>
 
 <details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get an Evaluation.
+
+Retrieve the Evaluation with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete an Evaluation.
+
+Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
+will not be deleted.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.delete(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update an Evaluation.
+
+Update the setup of an Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import (
+    EvaluateeRequest,
+    EvaluationsDatasetRequest,
+    EvaluationsRequest,
+)
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.update(
+    id="id",
+    dataset=EvaluationsDatasetRequest(
+        version_id="version_id",
+    ),
+    evaluatees=[
+        EvaluateeRequest(
+            version_id="version_id",
+        )
+    ],
+    evaluators=[
+        EvaluationsRequest(
+            version_id="version_id",
+        )
+    ],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**dataset:** `EvaluationsDatasetRequest` — The Dataset Version to use in this Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluatees:** `typing.Sequence[EvaluateeRequest]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluators:** `typing.Sequence[EvaluationsRequest]` — The Evaluators used to evaluate.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update_status</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the status of an Evaluation.
+
+Can be used to cancel a running Evaluation, or mark an Evaluation that uses external or human evaluators
+as completed.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.update_status(
+    id="id",
+    status="pending",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `EvaluationStatus` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">get_stats</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get Evaluation Stats.
+
+Retrieve aggregate stats for the specified Evaluation.
+This includes the number of generated Logs for every evaluatee and Evaluator metrics
+(such as the mean and percentiles for numeric Evaluators for every evaluatee).
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.get_stats(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">get_logs</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get Logs by Evaluation ID.
+
+Each Evaluation Log corresponds to a (Datapoint, Evaluated Version) pair.
+It has an optional generated Log and a list of Evaluator Logs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.get_logs(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — String ID of evaluation. Starts with `ev_` or `evr_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Logs to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Evaluators
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list_default</a>()</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of default evaluators for the organization.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.list_default()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">debug</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Run a synchronous evaluator execution on a collection of datapoints.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import LlmEvaluatorRequest
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.debug(
+    file_id="file_id",
+    evaluator=LlmEvaluatorRequest(
+        arguments_type="target_free",
+        return_type="boolean",
+    ),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**file_id:** `str` — The ID of the Dataset that the datapoints belong to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator:** `RunSyncEvaluationRequestEvaluator` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_version_id:** `typing.Optional[str]` — The ID of the Evaluator Version being debugged if it already exists and is being edited.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_ids:** `typing.Optional[typing.Sequence[str]]` — The IDs of the logs on which to run the draft evaluator.Provide one of `log_ids` or `datapoint_ids`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**datapoint_ids:** `typing.Optional[typing.Sequence[str]]` — The IDs of the evaluation datapoints on which to run the draft evaluator. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_version_id:** `typing.Optional[str]` — The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of Evaluators.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.evaluators.list()
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page offset for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Evaluators to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for Evaluator name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Evaluator. This filter matches against both email address and name of users.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Evaluators by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">upsert</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create an Evaluator or update it with a new version if it already exists.
+
+Evaluators are identified by the `ID` or their `path`. The spec provided determines the version of the Evaluator.
+
+If you provide a commit message, then the new version will be committed;
+otherwise it will be uncommitted. If you try to commit an already committed version,
+an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import LlmEvaluatorRequest
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.upsert(
+    spec=LlmEvaluatorRequest(
+        arguments_type="target_free",
+        return_type="boolean",
+    ),
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**spec:** `SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Evaluator, including the name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Evaluator to update.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Evaluator with the given ID.
+
+By default, the deployed version of the Evaluator is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Evaluator.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Evaluator to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Evaluator with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.delete(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">move</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Move the Evaluator to a different path or change the name.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.move(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Evaluator including the Evaluator name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Evaluator, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list_versions</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all the versions of an Evaluator.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.list_versions(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for the Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the environment to filter versions by. If no environment is provided, all versions are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_aggregates:** `typing.Optional[bool]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">commit</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Commit the Evaluator Version with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.commit(
+    id="id",
+    version_id="version_id",
+    commit_message="commit_message",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">deploy</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deploy Evaluator to Environment.
+
+Set the deployed Version for the specified Environment. This Evaluator Version
+will be used for calls made to the Evaluator in this Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.deploy(
+    id="id",
+    environment_id="environment_id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment_id:** `str` — Unique identifier for the Environment to deploy the Version to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">remove_deployment</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove deployment of Evaluator from Environment.
+
+Remove the deployed Version for the specified Environment. This Evaluator Version
+will no longer be used for calls made to the Evaluator in this Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.remove_deployment(
+    id="id",
+    environment_id="environment_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment_id:** `str` — Unique identifier for the Environment to remove the deployment from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list_environments</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List all Environments and their deployed versions for the Evaluator.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.list_environments(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Logs
+<details><summary><code>client.logs.<a href="src/humanloop/logs/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List Logs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.logs.list(
+    file_id="file_id",
+)
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**file_id:** `str` — Unique identifier for the File to list Logs for.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Logs to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — If provided, only Logs belonging to the specified Version will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_status:** `typing.Optional[VersionStatus]` — If provided, only Logs belonging to Versions with the specified status will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**search:** `typing.Optional[str]` — If provided, only Logs that contain the provided string in its inputs and output will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata_search:** `typing.Optional[str]` — If provided, only Logs that contain the provided string in its metadata will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_date:** `typing.Optional[dt.datetime]` — If provided, only Logs created after the specified date will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_date:** `typing.Optional[dt.datetime]` — If provided, only Logs created before the specified date will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.logs.<a href="src/humanloop/logs/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete Logs with the given IDs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.logs.delete(
+    id="string",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` — Unique identifiers for the Logs to delete.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.logs.<a href="src/humanloop/logs/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Log with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.logs.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Sessions
+<details><summary><code>client.sessions.<a href="src/humanloop/sessions/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Session with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.sessions.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Session.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.sessions.<a href="src/humanloop/sessions/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Session with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.sessions.delete(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Session.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.sessions.<a href="src/humanloop/sessions/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of Sessions.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.sessions.list()
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**file_id:** `typing.Optional[str]` — Unique identifier for File to return Sessions for. Sessions that contain any Logs associated to this File will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — Unique identifier for Version to return Sessions for. Sessions that contain any Logs associated to this Version will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Sessions to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+

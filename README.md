@@ -125,7 +125,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.prompts.list_prompts()
+response = client.prompts.list()
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page

@@ -14,7 +14,7 @@ service:
         results: $response.records
       display-name: 'List '
       request:
-        name: DatasetsListRequest
+        name: ListDatasetsGetRequest
         query-parameters:
           page:
             type: optional<integer>
@@ -113,7 +113,7 @@ service:
 
         you can add a unique identifier to the Datapoint's inputs such as
         `{_dedupe_id: <unique ID>}`.
-      display-name: Upsert Dataset
+      display-name: Upsert
       request:
         name: DatasetsRequest
         query-parameters:
@@ -226,9 +226,9 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-      display-name: Get Dataset
+      display-name: Get
       request:
-        name: DatasetsGetRequest
+        name: GetDatasetsIdGetRequest
         query-parameters:
           version_id:
             type: optional<string>
@@ -289,7 +289,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-      display-name: Delete Dataset
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -304,7 +304,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Dataset.
-      display-name: Move Dataset
+      display-name: Move
       request:
         name: UpdateDatasetRequest
         body:
@@ -356,7 +356,7 @@ service:
                   target:
                     target: target
                   id: id
-    listdatapoints:
+    listDatapoints:
       path: /datasets/{id}/datapoints
       method: GET
       auth: true
@@ -370,7 +370,7 @@ service:
           docs: Unique identifier for Dataset.
       display-name: List Datapoints
       request:
-        name: DatasetsListDatapointsRequest
+        name: ListDatapointsDatasetsIdDatapointsGetRequest
         query-parameters:
           version_id:
             type: optional<string>
@@ -405,7 +405,7 @@ service:
               page: 1
               size: 1
               total: 1
-    listversions:
+    listVersions:
       path: /datasets/{id}/versions
       method: GET
       auth: true
@@ -416,7 +416,7 @@ service:
           docs: Unique identifier for Dataset.
       display-name: List Versions
       request:
-        name: DatasetsListVersionsRequest
+        name: ListVersionsDatasetsIdVersionsGetRequest
         query-parameters:
           status:
             type: optional<root.VersionStatus>
@@ -517,7 +517,92 @@ service:
                   target:
                     target: target
                   id: id
-    createdatapointsfromlogs:
+    uploadCsv:
+      path: /datasets/{id}/datapoints/csv
+      method: POST
+      auth: true
+      docs: >-
+        Add Datapoints from a CSV file to a Dataset.
+
+
+        This will create a new committed version of the Dataset with the
+        Datapoints from the CSV file.
+
+
+        If either `version_id` or `environment` is provided, the new version
+        will be based on the specified version,
+
+        with the Datapoints from the CSV file added to the existing Datapoints
+        in the version.
+
+        If neither `version_id` nor `environment` is provided, the new version
+        will be based on the version
+
+        of the Dataset that is deployed to the default Environment.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for the Dataset
+      display-name: Upload Csv
+      request:
+        name: Body_upload_csv_datasets__id__datapoints_csv_post
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: ID of the specific Dataset version to base the created Version on.
+          environment:
+            type: optional<string>
+            docs: >-
+              Name of the Environment identifying a deployed Version to base the
+              created Version on.
+        body:
+          properties:
+            file: file
+            commit_message:
+              type: string
+              docs: Commit message for the new Dataset version.
+        content-type: multipart/form-data
+      response:
+        docs: Successful Response
+        type: root.DatasetResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - path-parameters:
+            id: id
+          request:
+            commit_message: commit_message
+          response:
+            body:
+              path: path
+              id: id
+              name: name
+              version_id: version_id
+              type: dataset
+              environments:
+                - id: id
+                  created_at: '2024-01-15T09:30:00Z'
+                  name: name
+                  tag: default
+              created_at: '2024-01-15T09:30:00Z'
+              updated_at: '2024-01-15T09:30:00Z'
+              created_by:
+                id: id
+                email_address: email_address
+                full_name: full_name
+              status: uncommitted
+              last_used_at: '2024-01-15T09:30:00Z'
+              commit_message: commit_message
+              datapoints_count: 1
+              datapoints:
+                - inputs:
+                    inputs: inputs
+                  messages:
+                    - role: user
+                  target:
+                    target: target
+                  id: id
+    fromLogs:
       path: /datasets/{id}/datapoints/logs
       method: POST
       auth: true
@@ -543,9 +628,9 @@ service:
         id:
           type: string
           docs: Unique identifier for the Dataset
-      display-name: Add Datapoints From Logs
+      display-name: From Logs
       request:
-        name: BodyDatasetsCreateDatapointsFromLogs
+        name: BodyFromLogsDatasetsIdDatapointsLogsPost
         query-parameters:
           version_id:
             type: optional<string>

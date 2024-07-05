@@ -480,6 +480,12 @@ types:
           Whether the Evaluator is orchestrated by Humanloop. Default is `True`.
           If `False`, a log for the Evaluator should be submitted by the user
           via the API.
+  EvaluationReportLogResponse:
+    properties:
+      evaluated_version: EvaluatedVersionResponse
+      datapoint: DatapointResponse
+      log: optional<LogResponse>
+      evaluator_logs: list<LogResponse>
   EvaluationResponse:
     properties:
       id:
@@ -633,6 +639,7 @@ types:
       - LlmEvaluatorRequest
       - CodeEvaluatorRequest
       - HumanEvaluatorRequest
+      - ExternalEvaluatorRequest
   EvaluatorResponse:
     docs: Request model for creating a new Evaluator
     properties:
@@ -746,6 +753,18 @@ types:
         docs: Version of the Prompt or Tool.
       created_at: datetime
       updated_at: datetime
+  ExternalEvaluatorRequest:
+    properties:
+      arguments_type:
+        type: EvaluatorArgumentsType
+        docs: Whether this evaluator is target-free or target-required.
+      return_type:
+        type: EvaluatorReturnTypeEnum
+        docs: The type of the return value of the evaluator.
+      evaluator_type: literal<"external">
+      metadata:
+        type: optional<map<string, unknown>>
+        docs: Metadata describing the external Evaluator.
   FeedbackClass:
     enum:
       - select
@@ -1522,6 +1541,12 @@ types:
   PaginatedDatasetResponse:
     properties:
       records: list<DatasetResponse>
+      page: integer
+      size: integer
+      total: integer
+  PaginatedDataEvaluationReportLogResponse:
+    properties:
+      records: list<EvaluationReportLogResponse>
       page: integer
       size: integer
       total: integer
@@ -2547,3 +2572,4 @@ types:
       full_name:
         type: optional<string>
         docs: The User's full name.
+  UpdateEvaluationStatusRequest: unknown

@@ -383,7 +383,7 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def listversions(
+    def list_versions(
         self,
         id: str,
         *,
@@ -423,7 +423,7 @@ class ToolsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.listversions(
+        client.tools.list_versions(
             id="id",
         )
         """
@@ -1243,7 +1243,7 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def listversions(
+    async def list_versions(
         self,
         id: str,
         *,
@@ -1283,7 +1283,7 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.listversions(
+        await client.tools.list_versions(
             id="id",
         )
         """

@@ -14,7 +14,7 @@ service:
         results: $response.records
       display-name: 'List '
       request:
-        name: ToolsListRequest
+        name: ListToolsGetRequest
         query-parameters:
           page:
             type: optional<integer>
@@ -97,7 +97,7 @@ service:
         committed version,
 
         an exception will be raised.
-      display-name: Upsert Tool
+      display-name: Upsert
       request:
         name: ToolRequest
         body:
@@ -195,9 +195,9 @@ service:
         id:
           type: string
           docs: Unique identifier for Tool.
-      display-name: Get Tool
+      display-name: Get
       request:
-        name: ToolsGetRequest
+        name: GetToolsIdGetRequest
         query-parameters:
           version_id:
             type: optional<string>
@@ -265,7 +265,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Tool.
-      display-name: Delete Tool
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -280,7 +280,7 @@ service:
         id:
           type: string
           docs: Unique identifier for Tool.
-      display-name: Move Tool
+      display-name: Move
       request:
         name: UpdateToolRequest
         body:
@@ -345,7 +345,7 @@ service:
                   evaluator_version_id: evaluator_version_id
                   created_at: '2024-01-15T09:30:00Z'
                   updated_at: '2024-01-15T09:30:00Z'
-    listversions:
+    listVersions:
       path: /tools/{id}/versions
       method: GET
       auth: true
@@ -356,7 +356,7 @@ service:
           docs: Unique identifier for the Tool.
       display-name: List Versions
       request:
-        name: ToolsListVersionsRequest
+        name: ListVersionsToolsIdVersionsGetRequest
         query-parameters:
           status:
             type: optional<root.VersionStatus>
