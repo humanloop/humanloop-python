@@ -563,7 +563,7 @@ Deprecated field: the seed is instead set as part of the request.config object.
 
 Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
+##### tool_choice: Union[`str`, `str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-str-toolchoice"></a>
 
 
 Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
@@ -709,7 +709,7 @@ Deprecated field: the seed is instead set as part of the request.config object.
 
 Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
+##### tool_choice: Union[`str`, `str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-str-toolchoice"></a>
 
 
 Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
@@ -861,7 +861,7 @@ Deprecated field: the seed is instead set as part of the request.config object.
 
 Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
+##### tool_choice: Union[`str`, `str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-str-toolchoice"></a>
 
 
 Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
@@ -1009,7 +1009,7 @@ Deprecated field: the seed is instead set as part of the request.config object.
 
 Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-##### tool_choice: Union[`str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-toolchoice"></a>
+##### tool_choice: Union[`str`, `str`, `str`, `ToolChoice`]<a id="tool_choice-unionstr-str-str-toolchoice"></a>
 
 
 Controls how the model uses tools. The following options are supported: 'none' forces the model to not call a tool; the default when no tools are provided as part of the model config. 'auto' the model can decide to call one of the provided tools; the default when tools are provided as part of the model config. Providing {'type': 'function', 'function': {name': <TOOL_NAME>}} forces the model to use the named function.
@@ -3873,7 +3873,7 @@ String ID of project. Starts with `pr_`.
 
 ### `humanloop.projects.delete_deployed_config`<a id="humanloopprojectsdelete_deployed_config"></a>
 
-Remove the verion deployed to environment.
+Remove the version deployed to environment.
 
 This has no effect if the project does not have an active version set.
 

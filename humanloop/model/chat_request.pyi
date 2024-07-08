@@ -119,6 +119,16 @@ class ChatRequest(
                         def AUTO(cls):
                             return cls("auto")
                     
+                    
+                    class any_of_2(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                        
+                        @schemas.classproperty
+                        def REQUIRED(cls):
+                            return cls("required")
+                    
                     @classmethod
                     @functools.lru_cache()
                     def any_of(cls):
@@ -132,6 +142,7 @@ class ChatRequest(
                         return [
                             cls.any_of_0,
                             cls.any_of_1,
+                            cls.any_of_2,
                             ToolChoice,
                         ]
             
