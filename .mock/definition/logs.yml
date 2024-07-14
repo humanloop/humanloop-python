@@ -8,7 +8,7 @@ service:
       path: /logs
       method: GET
       auth: true
-      docs: List Logs.
+      docs: List all Logs for the given filter criteria.
       pagination:
         offset: $request.page
         results: $response.records
@@ -61,53 +61,33 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - query-parameters:
-            file_id: file_id
+        - name: List logs
+          query-parameters:
+            file_id: file_123abc
+            size: 1
           response:
             body:
-              records:
-                - id: id
-                  output_message:
-                    role: user
-                  prompt_tokens: 1
-                  output_tokens: 1
-                  prompt_cost: 1.1
-                  output_cost: 1.1
-                  finish_reason: finish_reason
-                  prompt:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
-                    version_logs_count: 1
-                    total_logs_count: 1
-                    inputs:
-                      - name: name
-                  messages:
-                    - role: user
-                  tool_choice: none
-                  output: output
-                  raw_output: raw_output
-                  created_at: '2024-01-15T09:30:00Z'
-                  error: error
-                  provider_latency: 1.1
-                  session_id: session_id
-                  parent_id: parent_id
-                  source: source
-                  save: true
-                  source_datapoint_id: source_datapoint_id
-                  batches:
-                    - batches
-                  user: user
-                  environment: environment
               page: 1
               size: 1
               total: 1
+              records:
+                - id: log_123efg
+                  created_at: '2024-05-01T12:00:00Z'
+                  output: This is a sample output.
+                  prompt:
+                    id: pr_123abc
+                    name: Test Prompt
+                    path: test-prompt
+                    version_id: pv_456def
+                    created_at: '2024-05-01T12:00:00Z'
+                    updated_at: '2024-05-01T12:00:00Z'
+                    status: committed
+                    last_used_at: '2024-05-01T12:00:00Z'
+                    model: gpt-4
+                    version_logs_count: 1
+                    total_logs_count: 1
+                    inputs:
+                      - name: question
     delete:
       path: /logs
       method: DELETE
@@ -139,117 +119,28 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: Get log
+          path-parameters:
+            id: prv_Wu6zx1lAWJRqOyL8nWuZk
           response:
             body:
-              id: id
-              output_message:
-                content: content
-                name: name
-                tool_call_id: tool_call_id
-                role: user
-                tool_calls:
-                  - id: id
-                    type: function
-                    function:
-                      name: name
-              prompt_tokens: 1
-              output_tokens: 1
-              prompt_cost: 1.1
-              output_cost: 1.1
-              finish_reason: finish_reason
+              id: log_123efg
+              created_at: '2024-05-01T12:00:00Z'
+              output: This is a sample output.
               prompt:
-                path: path
-                id: id
-                name: name
-                version_id: version_id
-                type: prompt
-                environments:
-                  - id: id
-                    created_at: '2024-01-15T09:30:00Z'
-                    name: name
-                    tag: default
-                created_at: '2024-01-15T09:30:00Z'
-                updated_at: '2024-01-15T09:30:00Z'
-                created_by:
-                  id: id
-                  email_address: email_address
-                  full_name: full_name
-                status: uncommitted
-                last_used_at: '2024-01-15T09:30:00Z'
-                model: model
-                endpoint: complete
-                template: template
-                provider: openai
-                max_tokens: 1
-                temperature: 1.1
-                top_p: 1.1
-                stop: stop
-                presence_penalty: 1.1
-                frequency_penalty: 1.1
-                other:
-                  other:
-                    key: value
-                seed: 1
-                response_format:
-                  type: json_object
-                tools:
-                  - name: name
-                    description: description
-                linked_tools:
-                  - name: name
-                    description: description
-                    id: id
-                    version_id: version_id
-                commit_message: commit_message
+                id: pr_123abc
+                name: Test Prompt
+                path: test-prompt
+                version_id: pv_456def
+                created_at: '2024-05-01T12:00:00Z'
+                updated_at: '2024-05-01T12:00:00Z'
+                status: committed
+                last_used_at: '2024-05-01T12:00:00Z'
+                model: gpt-4
                 version_logs_count: 1
                 total_logs_count: 1
                 inputs:
-                  - name: name
-                evaluator_aggregates:
-                  - value: 1.1
-                    evaluator_id: evaluator_id
-                    evaluator_version_id: evaluator_version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-              messages:
-                - content: content
-                  name: name
-                  tool_call_id: tool_call_id
-                  role: user
-                  tool_calls:
-                    - id: id
-                      type: function
-                      function:
-                        name: name
-              tool_choice: none
-              output: output
-              raw_output: raw_output
-              created_at: '2024-01-15T09:30:00Z'
-              error: error
-              provider_latency: 1.1
-              provider_request:
-                provider_request:
-                  key: value
-              provider_response:
-                provider_response:
-                  key: value
-              session_id: session_id
-              parent_id: parent_id
-              inputs:
-                inputs:
-                  key: value
-              source: source
-              metadata:
-                metadata:
-                  key: value
-              save: true
-              source_datapoint_id: source_datapoint_id
-              batches:
-                - batches
-              user: user
-              environment: environment
+                  - name: question
   display-name: Logs
 docs: >+
   Logs contain the inputs and outputs of each time a Prompt, Tool or Evaluator

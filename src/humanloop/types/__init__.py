@@ -26,16 +26,11 @@ from .dashboard_configuration import DashboardConfiguration
 from .datapoint_response import DatapointResponse
 from .datapoint_response_target_value import DatapointResponseTargetValue
 from .dataset_response import DatasetResponse
-from .directory_response import DirectoryResponse
-from .directory_with_parents_and_children_response import DirectoryWithParentsAndChildrenResponse
-from .directory_with_parents_and_children_response_files_item import DirectoryWithParentsAndChildrenResponseFilesItem
 from .environment_response import EnvironmentResponse
 from .environment_tag import EnvironmentTag
 from .evaluated_version_response import EvaluatedVersionResponse
 from .evaluatee_request import EvaluateeRequest
 from .evaluatee_response import EvaluateeResponse
-from .evaluation_debug_result_response import EvaluationDebugResultResponse
-from .evaluation_debug_result_response_value import EvaluationDebugResultResponseValue
 from .evaluation_evaluator_response import EvaluationEvaluatorResponse
 from .evaluation_report_log_response import EvaluationReportLogResponse
 from .evaluation_response import EvaluationResponse
@@ -46,11 +41,9 @@ from .evaluation_status import EvaluationStatus
 from .evaluations_dataset_request import EvaluationsDatasetRequest
 from .evaluations_request import EvaluationsRequest
 from .evaluator_activation_deactivation_request import EvaluatorActivationDeactivationRequest
-from .evaluator_activation_deactivation_request_evaluators_to_activate_item import (
-    EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem,
-)
-from .evaluator_activation_deactivation_request_evaluators_to_deactivate_item import (
-    EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem,
+from .evaluator_activation_deactivation_request_activate_item import EvaluatorActivationDeactivationRequestActivateItem
+from .evaluator_activation_deactivation_request_deactivate_item import (
+    EvaluatorActivationDeactivationRequestDeactivateItem,
 )
 from .evaluator_aggregate import EvaluatorAggregate
 from .evaluator_arguments_type import EvaluatorArgumentsType
@@ -111,6 +104,9 @@ from .numeric_evaluator_version_stats import NumericEvaluatorVersionStats
 from .observability_status import ObservabilityStatus
 from .overall_stats import OverallStats
 from .paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
+from .paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
+from .paginated_data_prompt_response import PaginatedDataPromptResponse
+from .paginated_data_tool_response import PaginatedDataToolResponse
 from .paginated_datapoint_response import PaginatedDatapointResponse
 from .paginated_dataset_response import PaginatedDatasetResponse
 from .paginated_evaluation_response import PaginatedEvaluationResponse
@@ -187,16 +183,11 @@ __all__ = [
     "DatapointResponse",
     "DatapointResponseTargetValue",
     "DatasetResponse",
-    "DirectoryResponse",
-    "DirectoryWithParentsAndChildrenResponse",
-    "DirectoryWithParentsAndChildrenResponseFilesItem",
     "EnvironmentResponse",
     "EnvironmentTag",
     "EvaluatedVersionResponse",
     "EvaluateeRequest",
     "EvaluateeResponse",
-    "EvaluationDebugResultResponse",
-    "EvaluationDebugResultResponseValue",
     "EvaluationEvaluatorResponse",
     "EvaluationReportLogResponse",
     "EvaluationResponse",
@@ -207,8 +198,8 @@ __all__ = [
     "EvaluationsDatasetRequest",
     "EvaluationsRequest",
     "EvaluatorActivationDeactivationRequest",
-    "EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem",
-    "EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem",
+    "EvaluatorActivationDeactivationRequestActivateItem",
+    "EvaluatorActivationDeactivationRequestDeactivateItem",
     "EvaluatorAggregate",
     "EvaluatorArgumentsType",
     "EvaluatorConfigResponse",
@@ -268,6 +259,9 @@ __all__ = [
     "ObservabilityStatus",
     "OverallStats",
     "PaginatedDataEvaluationReportLogResponse",
+    "PaginatedDataEvaluatorResponse",
+    "PaginatedDataPromptResponse",
+    "PaginatedDataToolResponse",
     "PaginatedDatapointResponse",
     "PaginatedDatasetResponse",
     "PaginatedEvaluationResponse",

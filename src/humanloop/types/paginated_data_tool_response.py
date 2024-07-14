@@ -6,26 +6,14 @@ import typing
 from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .tool_response import ToolResponse
 
 
-class DirectoryResponse(UncheckedBaseModel):
-    name: str = pydantic_v1.Field()
-    """
-    Name of the directory to create.
-    """
-
-    parent_id: typing.Optional[str] = pydantic_v1.Field(default=None)
-    """
-    ID of the parent directory. Will be `None` if the directory is the root directory. Starts with `dir_`.
-    """
-
-    id: str = pydantic_v1.Field()
-    """
-    String ID of directory. Starts with `dir_`.
-    """
-
-    created_at: dt.datetime
-    updated_at: dt.datetime
+class PaginatedDataToolResponse(UncheckedBaseModel):
+    records: typing.List[ToolResponse]
+    page: int
+    size: int
+    total: int
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

@@ -6,25 +6,23 @@ import typing
 from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
-from .evaluator_activation_deactivation_request_evaluators_to_activate_item import (
-    EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem,
-)
-from .evaluator_activation_deactivation_request_evaluators_to_deactivate_item import (
-    EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem,
+from .evaluator_activation_deactivation_request_activate_item import EvaluatorActivationDeactivationRequestActivateItem
+from .evaluator_activation_deactivation_request_deactivate_item import (
+    EvaluatorActivationDeactivationRequestDeactivateItem,
 )
 
 
 class EvaluatorActivationDeactivationRequest(UncheckedBaseModel):
-    evaluators_to_activate: typing.Optional[
-        typing.List[EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem]
-    ] = pydantic_v1.Field(default=None)
+    activate: typing.Optional[typing.List[EvaluatorActivationDeactivationRequestActivateItem]] = pydantic_v1.Field(
+        default=None
+    )
     """
-    Monitoring Evaluators to activate. These will be automatically run on new Logs.
+    Evaluators to activate on Monitoring. These will be automatically run on new Logs.
     """
 
-    evaluators_to_deactivate: typing.Optional[
-        typing.List[EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem]
-    ] = pydantic_v1.Field(default=None)
+    deactivate: typing.Optional[typing.List[EvaluatorActivationDeactivationRequestDeactivateItem]] = pydantic_v1.Field(
+        default=None
+    )
     """
     Evaluators to deactivate. These will not be run on new Logs.
     """

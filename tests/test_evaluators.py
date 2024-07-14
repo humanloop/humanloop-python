@@ -2,652 +2,161 @@
 
 import typing
 
-from humanloop import LlmEvaluatorRequest
+from humanloop import CodeEvaluatorRequest
 from humanloop.client import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
 
 
-async def test_list_default(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = [
-        {
-            "path": "path",
-            "id": "id",
-            "name": "name",
-            "version_id": "version_id",
-            "type": "evaluator",
-            "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-            "created_at": "2024-01-15T09:30:00Z",
-            "updated_at": "2024-01-15T09:30:00Z",
-            "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-            "status": "uncommitted",
-            "last_used_at": "2024-01-15T09:30:00Z",
-            "commit_message": "commit_message",
-            "spec": {
-                "arguments_type": "target_free",
-                "return_type": "boolean",
-                "evaluator_type": "llm",
-                "prompt": {"model": "model"},
-            },
-            "version_logs_count": 1,
-            "total_logs_count": 1,
-            "inputs": [{"name": "name"}],
-            "evaluator_aggregates": [
-                {
-                    "value": 1.1,
-                    "evaluator_id": "evaluator_id",
-                    "evaluator_version_id": "evaluator_version_id",
-                    "created_at": "2024-01-15T09:30:00Z",
-                    "updated_at": "2024-01-15T09:30:00Z",
-                }
-            ],
-        }
-    ]
-    expected_types: typing.Any = (
-        "list",
-        {
-            0: {
-                "path": None,
-                "id": None,
-                "name": None,
-                "version_id": None,
-                "type": None,
-                "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-                "created_at": "datetime",
-                "updated_at": "datetime",
-                "created_by": {"id": None, "email_address": None, "full_name": None},
-                "status": None,
-                "last_used_at": "datetime",
-                "commit_message": None,
-                "spec": {
-                    "arguments_type": None,
-                    "return_type": None,
-                    "evaluator_type": None,
-                    "prompt": {"model": None},
-                },
-                "version_logs_count": "integer",
-                "total_logs_count": "integer",
-                "inputs": ("list", {0: {"name": None}}),
-                "evaluator_aggregates": (
-                    "list",
-                    {
-                        0: {
-                            "value": None,
-                            "evaluator_id": None,
-                            "evaluator_version_id": None,
-                            "created_at": "datetime",
-                            "updated_at": "datetime",
-                        }
-                    },
-                ),
-            }
-        },
-    )
-    response = client.evaluators.list_default()
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.evaluators.list_default()
-    validate_response(async_response, expected_response, expected_types)
-
-
-async def test_debug(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = [
-        {
-            "log_id": "log_id",
-            "log": {
-                "project": "project",
-                "project_id": "project_id",
-                "session_id": "session_id",
-                "session_reference_id": "session_reference_id",
-                "parent_id": "parent_id",
-                "parent_reference_id": "parent_reference_id",
-                "source": "source",
-                "save": True,
-                "source_datapoint_id": "source_datapoint_id",
-                "id": "id",
-                "reference_id": "reference_id",
-                "trial_id": "trial_id",
-                "messages": [{"role": "user"}],
-                "output": "output",
-                "judgment": True,
-                "config_id": "config_id",
-                "config": {"id": "id", "type": "model", "model": "model"},
-                "environment": "environment",
-                "feedback": [{"type": "rating", "value": 1.1, "id": "id"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "error": "error",
-                "duration": 1.1,
-                "output_message": {"role": "user"},
-                "prompt_tokens": 1,
-                "output_tokens": 1,
-                "prompt_cost": 1.1,
-                "output_cost": 1.1,
-                "user": "user",
-                "provider_latency": 1.1,
-                "tokens": 1,
-                "raw_output": "raw_output",
-                "finish_reason": "finish_reason",
-                "metric_values": [{"metric_id": "metric_id", "metric_name": "metric_name", "metric_value": 1.1}],
-                "tools": [{"id": "id", "name": "name", "signature": "signature", "result": "result"}],
-                "tool_choice": "none",
-                "evaluation_results": [
-                    {
-                        "id": "id",
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "log_id": "log_id",
-                        "updated_at": "2024-01-15T09:30:00Z",
-                        "created_at": "2024-01-15T09:30:00Z",
-                    }
-                ],
-                "observability_status": "pending",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "batch_ids": ["batch_ids"],
-            },
-            "datapoint_id": "datapoint_id",
-            "llm_evaluation_log": {
-                "project": "project",
-                "project_id": "project_id",
-                "session_id": "session_id",
-                "session_reference_id": "session_reference_id",
-                "parent_id": "parent_id",
-                "parent_reference_id": "parent_reference_id",
-                "source": "source",
-                "save": True,
-                "source_datapoint_id": "source_datapoint_id",
-                "id": "id",
-                "reference_id": "reference_id",
-                "trial_id": "trial_id",
-                "messages": [{"role": "user"}],
-                "output": "output",
-                "judgment": True,
-                "config_id": "config_id",
-                "config": {"id": "id", "type": "model", "model": "model"},
-                "environment": "environment",
-                "feedback": [{"type": "rating", "value": 1.1, "id": "id"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "error": "error",
-                "duration": 1.1,
-                "output_message": {"role": "user"},
-                "prompt_tokens": 1,
-                "output_tokens": 1,
-                "prompt_cost": 1.1,
-                "output_cost": 1.1,
-                "user": "user",
-                "provider_latency": 1.1,
-                "tokens": 1,
-                "raw_output": "raw_output",
-                "finish_reason": "finish_reason",
-                "metric_values": [{"metric_id": "metric_id", "metric_name": "metric_name", "metric_value": 1.1}],
-                "tools": [{"id": "id", "name": "name", "signature": "signature", "result": "result"}],
-                "tool_choice": "none",
-                "evaluation_results": [
-                    {
-                        "id": "id",
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "log_id": "log_id",
-                        "updated_at": "2024-01-15T09:30:00Z",
-                        "created_at": "2024-01-15T09:30:00Z",
-                    }
-                ],
-                "observability_status": "pending",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "batch_ids": ["batch_ids"],
-            },
-            "value": True,
-            "error": "error",
-        }
-    ]
-    expected_types: typing.Any = (
-        "list",
-        {
-            0: {
-                "log_id": None,
-                "log": {
-                    "project": None,
-                    "project_id": None,
-                    "session_id": None,
-                    "session_reference_id": None,
-                    "parent_id": None,
-                    "parent_reference_id": None,
-                    "source": None,
-                    "save": None,
-                    "source_datapoint_id": None,
-                    "id": None,
-                    "reference_id": None,
-                    "trial_id": None,
-                    "messages": ("list", {0: {"role": None}}),
-                    "output": None,
-                    "judgment": None,
-                    "config_id": None,
-                    "config": {"id": None, "type": None, "model": None},
-                    "environment": None,
-                    "feedback": ("list", {0: {"type": None, "value": None, "id": None}}),
-                    "created_at": "datetime",
-                    "error": None,
-                    "duration": None,
-                    "output_message": {"role": None},
-                    "prompt_tokens": "integer",
-                    "output_tokens": "integer",
-                    "prompt_cost": None,
-                    "output_cost": None,
-                    "user": None,
-                    "provider_latency": None,
-                    "tokens": "integer",
-                    "raw_output": None,
-                    "finish_reason": None,
-                    "metric_values": ("list", {0: {"metric_id": None, "metric_name": None, "metric_value": None}}),
-                    "tools": ("list", {0: {"id": None, "name": None, "signature": None, "result": None}}),
-                    "tool_choice": None,
-                    "evaluation_results": (
-                        "list",
-                        {
-                            0: {
-                                "id": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "log_id": None,
-                                "updated_at": "datetime",
-                                "created_at": "datetime",
-                            }
-                        },
-                    ),
-                    "observability_status": None,
-                    "updated_at": "datetime",
-                    "batch_ids": ("list", {0: None}),
-                },
-                "datapoint_id": None,
-                "llm_evaluation_log": {
-                    "project": None,
-                    "project_id": None,
-                    "session_id": None,
-                    "session_reference_id": None,
-                    "parent_id": None,
-                    "parent_reference_id": None,
-                    "source": None,
-                    "save": None,
-                    "source_datapoint_id": None,
-                    "id": None,
-                    "reference_id": None,
-                    "trial_id": None,
-                    "messages": ("list", {0: {"role": None}}),
-                    "output": None,
-                    "judgment": None,
-                    "config_id": None,
-                    "config": {"id": None, "type": None, "model": None},
-                    "environment": None,
-                    "feedback": ("list", {0: {"type": None, "value": None, "id": None}}),
-                    "created_at": "datetime",
-                    "error": None,
-                    "duration": None,
-                    "output_message": {"role": None},
-                    "prompt_tokens": "integer",
-                    "output_tokens": "integer",
-                    "prompt_cost": None,
-                    "output_cost": None,
-                    "user": None,
-                    "provider_latency": None,
-                    "tokens": "integer",
-                    "raw_output": None,
-                    "finish_reason": None,
-                    "metric_values": ("list", {0: {"metric_id": None, "metric_name": None, "metric_value": None}}),
-                    "tools": ("list", {0: {"id": None, "name": None, "signature": None, "result": None}}),
-                    "tool_choice": None,
-                    "evaluation_results": (
-                        "list",
-                        {
-                            0: {
-                                "id": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "log_id": None,
-                                "updated_at": "datetime",
-                                "created_at": "datetime",
-                            }
-                        },
-                    ),
-                    "observability_status": None,
-                    "updated_at": "datetime",
-                    "batch_ids": ("list", {0: None}),
-                },
-                "value": None,
-                "error": None,
-            }
-        },
-    )
-    response = client.evaluators.debug(
-        file_id="file_id", evaluator=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean")
-    )
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.evaluators.debug(
-        file_id="file_id", evaluator=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean")
-    )
-    validate_response(async_response, expected_response, expected_types)
-
-
 async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ev_890bcd",
+        "name": "Accuracy Evaluator",
+        "path": "Shared Evaluators/Accuracy Evaluator",
+        "version_id": "evv_012def",
         "type": "evaluator",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
         "spec": {
-            "arguments_type": "target_free",
-            "return_type": "boolean",
-            "evaluator_type": "llm",
-            "prompt": {
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": ["linked_tools"],
-            },
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "evaluator_type": "python",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
         },
         "version_logs_count": 1,
         "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
-            {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-            }
-        ],
+        "inputs": [{"name": "answer"}],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
+        "path": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
-        "spec": {
-            "arguments_type": None,
-            "return_type": None,
-            "evaluator_type": None,
-            "prompt": {
-                "model": None,
-                "endpoint": None,
-                "template": None,
-                "provider": None,
-                "max_tokens": "integer",
-                "temperature": None,
-                "top_p": None,
-                "stop": None,
-                "presence_penalty": None,
-                "frequency_penalty": None,
-                "seed": "integer",
-                "response_format": {"type": None},
-                "tools": ("list", {0: {"name": None, "description": None}}),
-                "linked_tools": ("list", {0: None}),
-            },
-        },
+        "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.evaluators.upsert(spec=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean"))
+    response = client.evaluators.upsert(
+        path="Shared Evaluators/Accuracy Evaluator",
+        spec=CodeEvaluatorRequest(
+            arguments_type="target_required",
+            return_type="number",
+            code="def evaluate(answer, target):\\n    return 0.5",
+        ),
+        commit_message="Initial commit",
+    )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.evaluators.upsert(
-        spec=LlmEvaluatorRequest(arguments_type="target_free", return_type="boolean")
+        path="Shared Evaluators/Accuracy Evaluator",
+        spec=CodeEvaluatorRequest(
+            arguments_type="target_required",
+            return_type="number",
+            code="def evaluate(answer, target):\\n    return 0.5",
+        ),
+        commit_message="Initial commit",
     )
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ev_890bcd",
+        "name": "Accuracy Evaluator",
+        "path": "Shared Evaluators/Accuracy Evaluator",
+        "version_id": "evv_012def",
         "type": "evaluator",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
         "spec": {
-            "arguments_type": "target_free",
-            "return_type": "boolean",
-            "evaluator_type": "llm",
-            "prompt": {
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": ["linked_tools"],
-            },
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "evaluator_type": "python",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
         },
         "version_logs_count": 1,
         "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
-            {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-            }
-        ],
+        "inputs": [{"name": "answer"}],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
+        "path": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
-        "spec": {
-            "arguments_type": None,
-            "return_type": None,
-            "evaluator_type": None,
-            "prompt": {
-                "model": None,
-                "endpoint": None,
-                "template": None,
-                "provider": None,
-                "max_tokens": "integer",
-                "temperature": None,
-                "top_p": None,
-                "stop": None,
-                "presence_penalty": None,
-                "frequency_penalty": None,
-                "seed": "integer",
-                "response_format": {"type": None},
-                "tools": ("list", {0: {"name": None, "description": None}}),
-                "linked_tools": ("list", {0: None}),
-            },
-        },
+        "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.evaluators.get(id="id")
+    response = client.evaluators.get(id="ev_890bcd")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.get(id="id")
+    async_response = await async_client.evaluators.get(id="ev_890bcd")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.evaluators.delete(id="id") is None  # type: ignore[func-returns-value]
+    assert client.evaluators.delete(id="ev_890bcd") is None  # type: ignore[func-returns-value]
 
-    assert await async_client.evaluators.delete(id="id") is None  # type: ignore[func-returns-value]
+    assert await async_client.evaluators.delete(id="ev_890bcd") is None  # type: ignore[func-returns-value]
 
 
 async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ev_890bcd",
+        "name": "Accuracy Evaluator",
+        "path": "Shared Evaluators/Accuracy Evaluator",
+        "version_id": "evv_012def",
         "type": "evaluator",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
         "spec": {
-            "arguments_type": "target_free",
-            "return_type": "boolean",
-            "evaluator_type": "llm",
-            "prompt": {
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": ["linked_tools"],
-            },
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "evaluator_type": "python",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
         },
         "version_logs_count": 1,
         "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
-            {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-            }
-        ],
+        "inputs": [{"name": "answer"}],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
+        "path": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
-        "spec": {
-            "arguments_type": None,
-            "return_type": None,
-            "evaluator_type": None,
-            "prompt": {
-                "model": None,
-                "endpoint": None,
-                "template": None,
-                "provider": None,
-                "max_tokens": "integer",
-                "temperature": None,
-                "top_p": None,
-                "stop": None,
-                "presence_penalty": None,
-                "frequency_penalty": None,
-                "seed": "integer",
-                "response_format": {"type": None},
-                "tools": ("list", {0: {"name": None, "description": None}}),
-                "linked_tools": ("list", {0: None}),
-            },
-        },
+        "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.evaluators.move(id="id")
+    response = client.evaluators.move(id="ev_890bcd", path="new directory/new name")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.move(id="id")
+    async_response = await async_client.evaluators.move(id="ev_890bcd", path="new directory/new name")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -655,31 +164,24 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "records": [
             {
-                "path": "path",
-                "id": "id",
-                "name": "name",
-                "version_id": "version_id",
+                "id": "ev_890bcd",
+                "name": "Accuracy Evaluator",
+                "path": "Shared Evaluators/Accuracy Evaluator",
+                "version_id": "evv_012def",
                 "type": "evaluator",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
-                "commit_message": "commit_message",
-                "spec": {"arguments_type": "target_free", "return_type": "boolean"},
+                "created_at": "2024-05-01T12:00:00Z",
+                "updated_at": "2024-05-01T12:00:00Z",
+                "status": "committed",
+                "last_used_at": "2024-05-01T12:00:00Z",
+                "spec": {
+                    "arguments_type": "target_required",
+                    "return_type": "number",
+                    "evaluator_type": "python",
+                    "code": "def evaluate(answer, target):\\n    return 0.5",
+                },
                 "version_logs_count": 1,
                 "total_logs_count": 1,
-                "inputs": [{"name": "name"}],
-                "evaluator_aggregates": [
-                    {
-                        "value": 1.1,
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "created_at": "2024-01-15T09:30:00Z",
-                        "updated_at": "2024-01-15T09:30:00Z",
-                    }
-                ],
+                "inputs": [{"name": "answer"}],
             }
         ]
     }
@@ -688,314 +190,153 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             "list",
             {
                 0: {
-                    "path": None,
                     "id": None,
                     "name": None,
+                    "path": None,
                     "version_id": None,
                     "type": None,
-                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
                     "status": None,
                     "last_used_at": "datetime",
-                    "commit_message": None,
-                    "spec": {"arguments_type": None, "return_type": None},
+                    "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
-                    "evaluator_aggregates": (
-                        "list",
-                        {
-                            0: {
-                                "value": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "created_at": "datetime",
-                                "updated_at": "datetime",
-                            }
-                        },
-                    ),
                 }
             },
         )
     }
-    response = client.evaluators.list_versions(id="id")
+    response = client.evaluators.list_versions(id="ev_890bcd")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.list_versions(id="id")
+    async_response = await async_client.evaluators.list_versions(id="ev_890bcd")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ev_890bcd",
+        "name": "Accuracy Evaluator",
+        "path": "Shared Evaluators/Accuracy Evaluator",
+        "version_id": "evv_012def",
         "type": "evaluator",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
         "spec": {
-            "arguments_type": "target_free",
-            "return_type": "boolean",
-            "evaluator_type": "llm",
-            "prompt": {
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": ["linked_tools"],
-            },
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "evaluator_type": "python",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
         },
         "version_logs_count": 1,
         "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
-            {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-            }
-        ],
+        "inputs": [{"name": "answer"}],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
+        "path": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
-        "spec": {
-            "arguments_type": None,
-            "return_type": None,
-            "evaluator_type": None,
-            "prompt": {
-                "model": None,
-                "endpoint": None,
-                "template": None,
-                "provider": None,
-                "max_tokens": "integer",
-                "temperature": None,
-                "top_p": None,
-                "stop": None,
-                "presence_penalty": None,
-                "frequency_penalty": None,
-                "seed": "integer",
-                "response_format": {"type": None},
-                "tools": ("list", {0: {"name": None, "description": None}}),
-                "linked_tools": ("list", {0: None}),
-            },
-        },
+        "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.evaluators.commit(id="id", version_id="version_id", commit_message="commit_message")
+    response = client.evaluators.commit(id="ev_890bcd", version_id="evv_012def", commit_message="Initial commit")
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.evaluators.commit(
-        id="id", version_id="version_id", commit_message="commit_message"
+        id="ev_890bcd", version_id="evv_012def", commit_message="Initial commit"
     )
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ev_890bcd",
+        "name": "Accuracy Evaluator",
+        "path": "Shared Evaluators/Accuracy Evaluator",
+        "version_id": "evv_012def",
         "type": "evaluator",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
         "spec": {
-            "arguments_type": "target_free",
-            "return_type": "boolean",
-            "evaluator_type": "llm",
-            "prompt": {
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": ["linked_tools"],
-            },
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "evaluator_type": "python",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
         },
         "version_logs_count": 1,
         "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
-            {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-            }
-        ],
+        "inputs": [{"name": "answer"}],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
         "name": None,
+        "path": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
-        "spec": {
-            "arguments_type": None,
-            "return_type": None,
-            "evaluator_type": None,
-            "prompt": {
-                "model": None,
-                "endpoint": None,
-                "template": None,
-                "provider": None,
-                "max_tokens": "integer",
-                "temperature": None,
-                "top_p": None,
-                "stop": None,
-                "presence_penalty": None,
-                "frequency_penalty": None,
-                "seed": "integer",
-                "response_format": {"type": None},
-                "tools": ("list", {0: {"name": None, "description": None}}),
-                "linked_tools": ("list", {0: None}),
-            },
-        },
+        "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.evaluators.deploy(id="id", environment_id="environment_id", version_id="version_id")
+    response = client.evaluators.set_deployment(id="ev_890bcd", environment_id="staging", version_id="evv_012def")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.deploy(
-        id="id", environment_id="environment_id", version_id="version_id"
+    async_response = await async_client.evaluators.set_deployment(
+        id="ev_890bcd", environment_id="staging", version_id="evv_012def"
     )
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
     # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.evaluators.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+    assert client.evaluators.remove_deployment(id="ev_890bcd", environment_id="staging") is None  # type: ignore[func-returns-value]
 
-    assert await async_client.evaluators.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+    assert await async_client.evaluators.remove_deployment(id="ev_890bcd", environment_id="staging") is None  # type: ignore[func-returns-value]
 
 
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
-            "id": "id",
-            "created_at": "2024-01-15T09:30:00Z",
-            "name": "name",
+            "id": "env_abc123",
+            "created_at": "2024-05-01T12:00:00Z",
+            "name": "production",
             "tag": "default",
             "file": {
-                "path": "path",
-                "id": "id",
-                "name": "name",
-                "version_id": "version_id",
-                "type": "prompt",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": [
-                    {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
-                ],
-                "commit_message": "commit_message",
+                "id": "ev_890bcd",
+                "name": "Accuracy Evaluator",
+                "path": "Shared Evaluators/Accuracy Evaluator",
+                "version_id": "evv_012def",
+                "type": "evaluator",
+                "created_at": "2024-05-01T12:00:00Z",
+                "updated_at": "2024-05-01T12:00:00Z",
+                "status": "committed",
+                "last_used_at": "2024-05-01T12:00:00Z",
+                "spec": {
+                    "arguments_type": "target_required",
+                    "return_type": "number",
+                    "evaluator_type": "python",
+                    "code": "def evaluate(answer, target):\\n    return 0.5",
+                },
                 "version_logs_count": 1,
                 "total_logs_count": 1,
-                "inputs": [{"name": "name"}],
-                "evaluator_aggregates": [
-                    {
-                        "value": 1.1,
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "created_at": "2024-01-15T09:30:00Z",
-                        "updated_at": "2024-01-15T09:30:00Z",
-                    }
-                ],
+                "inputs": [{"name": "answer"}],
             },
         }
     ]
@@ -1008,53 +349,25 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                 "name": None,
                 "tag": None,
                 "file": {
-                    "path": None,
                     "id": None,
                     "name": None,
+                    "path": None,
                     "version_id": None,
                     "type": None,
-                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
                     "status": None,
                     "last_used_at": "datetime",
-                    "model": None,
-                    "endpoint": None,
-                    "template": None,
-                    "provider": None,
-                    "max_tokens": "integer",
-                    "temperature": None,
-                    "top_p": None,
-                    "stop": None,
-                    "presence_penalty": None,
-                    "frequency_penalty": None,
-                    "seed": "integer",
-                    "response_format": {"type": None},
-                    "tools": ("list", {0: {"name": None, "description": None}}),
-                    "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
-                    "commit_message": None,
+                    "spec": {"arguments_type": None, "return_type": None, "evaluator_type": None, "code": None},
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
-                    "evaluator_aggregates": (
-                        "list",
-                        {
-                            0: {
-                                "value": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "created_at": "datetime",
-                                "updated_at": "datetime",
-                            }
-                        },
-                    ),
                 },
             }
         },
     )
-    response = client.evaluators.list_environments(id="id")
+    response = client.evaluators.list_environments(id="ev_890bcd")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.evaluators.list_environments(id="id")
+    async_response = await async_client.evaluators.list_environments(id="ev_890bcd")
     validate_response(async_response, expected_response, expected_types)

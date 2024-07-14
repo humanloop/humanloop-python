@@ -1,757 +1,5 @@
 # Reference
 ## Prompts
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Get a list of Prompts.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.prompts.list()
-for item in response:
-    yield item
-# alternatively, you can paginate page-by-page
-for page in response.iter_pages():
-    yield page
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**page:** `typing.Optional[int]` — Page number for pagination.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**size:** `typing.Optional[int]` — Page size for pagination. Number of Prompts to fetch.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Case-insensitive filter for Prompt name.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Prompt. This filter matches against both email address and name of users.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Prompts by
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**order:** `typing.Optional[SortOrder]` — Direction to sort by.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">upsert</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Create a Prompt or update it with a new version if it already exists.
-
-Prompts are identified by the `ID` or their `path`. The parameters (i.e. the prompt template, temperature, model etc.) determine the versions of the Prompt.
-
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.upsert(
-    model="model",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**model:** `str` — The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name, which is used as a unique identifier.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**id:** `typing.Optional[str]` — ID for an existing Prompt to update.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**endpoint:** `typing.Optional[ModelEndpoints]` — The provider model endpoint used.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**template:** `typing.Optional[PromptRequestTemplate]` — For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider:** `typing.Optional[ModelProviders]` — The company providing the underlying model service.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**max_tokens:** `typing.Optional[int]` — The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**temperature:** `typing.Optional[float]` — What sampling temperature to use when making a generation. Higher values means the model will be more creative.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**top_p:** `typing.Optional[float]` — An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**stop:** `typing.Optional[PromptRequestStop]` — The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**presence_penalty:** `typing.Optional[float]` — Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**frequency_penalty:** `typing.Optional[float]` — Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**other:** `typing.Optional[typing.Dict[str, typing.Any]]` — Other parameter values to be passed to the provider call.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**seed:** `typing.Optional[int]` — If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**response_format:** `typing.Optional[ResponseFormat]` — The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**tools:** `typing.Optional[typing.Sequence[ToolFunction]]` — The tool specification that the model can choose to call if Tool calling is supported.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**linked_tools:** `typing.Optional[typing.Sequence[str]]` — The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">get</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieve the Prompt with the given ID.
-
-By default, the deployed version of the Prompt is returned. Use the query parameters
-`version_id` or `environment` to target a specific version of the Prompt.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.get(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `typing.Optional[str]` — A specific Version ID of the Prompt to retrieve.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">delete</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Delete the Prompt with the given ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.delete(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">move</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Move the Prompt to a different path or change the name.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.move(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Prompt including the Prompt name, which is used as a unique identifier.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Name of the Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list_versions</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Get a list of all the versions of a Prompt.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.list_versions(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluator_aggregates:** `typing.Optional[bool]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit the Prompt Version with the given ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.commit(
-    id="id",
-    version_id="version_id",
-    commit_message="commit_message",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">log</a>(...)</code></summary>
 <dl>
 <dd>
@@ -766,7 +14,7 @@ client.prompts.commit(
 
 Log to a Prompt.
 
-You can use query parameters version_id, or environment, to target
+You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Prompt. Otherwise the default deployed version will be chosen.
 
 Instead of targeting an existing version explicitly, you can instead pass in
@@ -787,12 +35,31 @@ in the case where you are storing or deriving your Prompt details in code.
 <dd>
 
 ```python
+from humanloop import ChatMessage, PromptKernelRequest
 from humanloop.client import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.log()
+client.prompts.log(
+    path="persona",
+    prompt=PromptKernelRequest(
+        model="gpt-4",
+        template=[
+            ChatMessage(
+                role="system",
+                content="You are {{person}}. Answer questions as this person. Do not break character.",
+            )
+        ],
+    ),
+    messages=[
+        ChatMessage(
+            role="user",
+            content="What really happened at Roswell?",
+        )
+    ],
+    inputs={"person": "Trump"},
+)
 
 ```
 </dd>
@@ -1081,9 +348,9 @@ Controls how the model uses tools. The following options are supported:
 Call a Prompt.
 
 Calling a Prompt subsequently calls the model provider before logging
-the data to Humanloop.
+the request, responses and metadata to Humanloop.
 
-You can use query parameters version_id, or environment, to target
+You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Prompt. Otherwise the default deployed version will be chosen.
 
 Instead of targeting an existing version explicitly, you can instead pass in
@@ -1104,12 +371,32 @@ in the case where you are storing or deriving your Prompt details in code.
 <dd>
 
 ```python
+from humanloop import ChatMessage, PromptKernelRequest
 from humanloop.client import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.call()
+client.prompts.call(
+    path="persona",
+    prompt=PromptKernelRequest(
+        model="gpt-4",
+        template=[
+            ChatMessage(
+                role="system",
+                content="You are {{person}}. Answer any questions as this person. Do not break character.",
+            )
+        ],
+    ),
+    messages=[
+        ChatMessage(
+            role="user",
+            content="What really happened at Roswell?",
+        )
+    ],
+    inputs={"person": "Trump"},
+    stream=False,
+)
 
 ```
 </dd>
@@ -1327,7 +614,7 @@ Controls how the model uses tools. The following options are supported:
 </dl>
 </details>
 
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update_evaluators</a>(...)</code></summary>
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1339,10 +626,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-Activate and deactivate Evaluators for the Prompt.
-
-An activated Evaluator will automatically be run on all new Logs
-within the Prompt for monitoring purposes.
+Get a list of all Prompts.
 </dd>
 </dl>
 </dd>
@@ -1362,8 +646,786 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.update_evaluators(
-    id="id",
+response = client.prompts.list(
+    size=1,
+)
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Prompts to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for Prompt name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Prompt. This filter matches against both email address and name of users.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Prompts by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">upsert</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create a Prompt or update it with a new version if it already exists.
+
+Prompts are identified by the `ID` or their `path`. The parameters (i.e. the prompt template, temperature, model etc.) determine the versions of the Prompt.
+
+If you provide a commit message, then the new version will be committed;
+otherwise it will be uncommitted. If you try to commit an already committed version,
+an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import ChatMessage
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.upsert(
+    path="Personal Projects/Coding Assistant",
+    model="gpt-4o",
+    endpoint="chat",
+    template=[
+        ChatMessage(
+            content="You are a helpful coding assistant specialising in {{language}}",
+            role="system",
+        )
+    ],
+    provider="openai",
+    max_tokens=-1,
+    temperature=0.7,
+    top_p=1.0,
+    presence_penalty=0.0,
+    frequency_penalty=0.0,
+    other={},
+    tools=[],
+    linked_tools=[],
+    commit_message="Initial commit",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**model:** `str` — The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Prompt to update.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**endpoint:** `typing.Optional[ModelEndpoints]` — The provider model endpoint used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**template:** `typing.Optional[PromptRequestTemplate]` — For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider:** `typing.Optional[ModelProviders]` — The company providing the underlying model service.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**max_tokens:** `typing.Optional[int]` — The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**temperature:** `typing.Optional[float]` — What sampling temperature to use when making a generation. Higher values means the model will be more creative.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**top_p:** `typing.Optional[float]` — An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stop:** `typing.Optional[PromptRequestStop]` — The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presence_penalty:** `typing.Optional[float]` — Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**frequency_penalty:** `typing.Optional[float]` — Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**other:** `typing.Optional[typing.Dict[str, typing.Any]]` — Other parameter values to be passed to the provider call.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**seed:** `typing.Optional[int]` — If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**response_format:** `typing.Optional[ResponseFormat]` — The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tools:** `typing.Optional[typing.Sequence[ToolFunction]]` — The tool specification that the model can choose to call if Tool calling is supported.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**linked_tools:** `typing.Optional[typing.Sequence[str]]` — The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Prompt with the given ID.
+
+By default, the deployed version of the Prompt is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Prompt.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.get(
+    id="pr_30gco7dx6JDq4200GVOHa",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Prompt to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Prompt with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.delete(
+    id="pr_30gco7dx6JDq4200GVOHa",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">move</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Move the Prompt to a different path or change the name.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.move(
+    id="pr_30gco7dx6JDq4200GVOHa",
+    path="new directory/new name",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Prompt including the Prompt name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">list_versions</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all the versions of a Prompt.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.list_versions(
+    id="pr_30gco7dx6JDq4200GVOHa",
+    status="committed",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">commit</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Commit a version of the Prompt with a commit message.
+
+If the version is already committed, an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.commit(
+    id="pr_30gco7dx6JDq4200GVOHa",
+    version_id="prv_F34aba5f3asp0",
+    commit_message="Reiterated point about not discussing sentience",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Prompt.
+
+An activated Evaluator will automatically be run on all new Logs
+within the Prompt for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import MonitoringEvaluatorVersionRequest
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.update_monitoring(
+    id="pr_30gco7dx6JDq4200GVOHa",
+    activate=[
+        MonitoringEvaluatorVersionRequest(
+            evaluator_version_id="evv_1abc4308abd",
+        )
+    ],
 )
 
 ```
@@ -1388,11 +1450,9 @@ client.prompts.update_evaluators(
 <dl>
 <dd>
 
-**evaluators_to_activate:** `typing.Optional[
-    typing.Sequence[
-        EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem
-    ]
-]` — Monitoring Evaluators to activate. These will be automatically run on new Logs.
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]
+]` — Evaluators to activate on Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -1400,10 +1460,8 @@ client.prompts.update_evaluators(
 <dl>
 <dd>
 
-**evaluators_to_deactivate:** `typing.Optional[
-    typing.Sequence[
-        EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem
-    ]
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]
 ]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
@@ -1424,7 +1482,7 @@ client.prompts.update_evaluators(
 </dl>
 </details>
 
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">deploy</a>(...)</code></summary>
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1436,9 +1494,9 @@ client.prompts.update_evaluators(
 <dl>
 <dd>
 
-Deploy Prompt to Environment.
+Deploy Prompt to an Environment.
 
-Set the deployed Version for the specified Environment. This Prompt Version
+Set the deployed version for the specified Environment. This Prompt
 will be used for calls made to the Prompt in this Environment.
 </dd>
 </dl>
@@ -1459,7 +1517,7 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.deploy(
+client.prompts.set_deployment(
     id="id",
     environment_id="environment_id",
     version_id="version_id",
@@ -1527,9 +1585,9 @@ client.prompts.deploy(
 <dl>
 <dd>
 
-Remove deployment of Prompt from Environment.
+Remove deployed Prompt from the Environment.
 
-Remove the deployed Version for the specified Environment. This Prompt Version
+Remove the deployed version for the specified Environment. This Prompt
 will no longer be used for calls made to the Prompt in this Environment.
 </dd>
 </dl>
@@ -1630,7 +1688,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.prompts.list_environments(
-    id="id",
+    id="pr_30gco7dx6JDq4200GVOHa",
 )
 
 ```
@@ -1668,668 +1726,6 @@ client.prompts.list_environments(
 </details>
 
 ## Tools
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">list</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Get a list of Tools.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.tools.list()
-for item in response:
-    yield item
-# alternatively, you can paginate page-by-page
-for page in response.iter_pages():
-    yield page
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**page:** `typing.Optional[int]` — Page offset for pagination.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**size:** `typing.Optional[int]` — Page size for pagination. Number of Tools to fetch.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Case-insensitive filter for Tool name.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Tool. This filter matches against both email address and name of users.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Tools by
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**order:** `typing.Optional[SortOrder]` — Direction to sort by.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">upsert</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Create a Tool or update it with a new version if it already exists.
-
-Tools are identified by the `ID` or their `path`. The name, description and parameters determine the versions of the Tool.
-
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.upsert()
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Tool, including the name, which is used as a unique identifier.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**id:** `typing.Optional[str]` — ID for an existing Tool to update.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**function:** `typing.Optional[ToolFunction]` — Callable function specification of the Tool shown to the model for tool calling.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**source_code:** `typing.Optional[str]` — Code source of the Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**setup_values:** `typing.Optional[typing.Dict[str, typing.Any]]` — Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**tool_type:** `typing.Optional[FilesToolType]` — Type of Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">get</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieve the Tool with the given ID.
-
-By default, the deployed version of the Tool is returned. Use the query parameters
-`version_id` or `environment` to target a specific version of the Tool.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.get(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `typing.Optional[str]` — A specific Version ID of the Tool to retrieve.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">delete</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Delete the Tool with the given ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.delete(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">move</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Move the Tool to a different path or change the name.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.move(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Tool including the Tool name, which is used as a unique identifier.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Name of the Tool, which is used as a unique identifier.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">list_versions</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Get a list of all the versions of a Tool.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.list_versions(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for the Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluator_aggregates:** `typing.Optional[bool]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit the Tool Version with the given ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.commit(
-    id="id",
-    version_id="version_id",
-    commit_message="commit_message",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">log</a>(...)</code></summary>
 <dl>
 <dd>
@@ -2344,7 +1740,7 @@ client.tools.commit(
 
 Log to a Tool.
 
-You can use query parameters version_id, or environment, to target
+You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Tool. Otherwise the default deployed version will be chosen.
 
 Instead of targeting an existing version explicitly, you can instead pass in
@@ -2365,12 +1761,31 @@ in the case where you are storing or deriving your Tool details in code.
 <dd>
 
 ```python
+from humanloop import ToolFunction, ToolKernelRequest
 from humanloop.client import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.tools.log()
+client.tools.log(
+    path="math-tool",
+    tool=ToolKernelRequest(
+        function=ToolFunction(
+            name="multiply",
+            description="Multiply two numbers",
+            parameters={
+                "type": "object",
+                "properties": {
+                    "a": {"type": "number"},
+                    "b": {"type": "number"},
+                },
+                "required": ["a", "b"],
+            },
+        ),
+    ),
+    inputs={"a": 5, "b": 7},
+    output="35",
+)
 
 ```
 </dd>
@@ -2574,7 +1989,7 @@ client.tools.log()
 </dl>
 </details>
 
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">update_evaluators</a>(...)</code></summary>
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2586,10 +2001,7 @@ client.tools.log()
 <dl>
 <dd>
 
-Activate and deactivate Evaluators for the Tool.
-
-An activated Evaluator will automatically be run on all new Logs
-within the Tool for monitoring purposes.
+Get a list of all Tools.
 </dd>
 </dl>
 </dd>
@@ -2609,8 +2021,690 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.tools.update_evaluators(
-    id="id",
+response = client.tools.list(
+    size=1,
+)
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page offset for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Tools to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for Tool name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Tool. This filter matches against both email address and name of users.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Tools by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">upsert</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create a Tool or update it with a new version if it already exists.
+
+Tools are identified by the `ID` or their `path`. The name, description and parameters determine the versions of the Tool.
+
+If you provide a commit message, then the new version will be committed;
+otherwise it will be uncommitted. If you try to commit an already committed version,
+an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import ToolFunction
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.upsert(
+    path="math-tool",
+    function=ToolFunction(
+        name="multiply",
+        description="Multiply two numbers",
+        parameters={
+            "type": "object",
+            "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
+            "required": ["a", "b"],
+        },
+    ),
+    commit_message="Initial commit",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Tool, including the name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Tool to update.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**function:** `typing.Optional[ToolFunction]` — Callable function specification of the Tool shown to the model for tool calling.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_code:** `typing.Optional[str]` — Code source of the Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**setup_values:** `typing.Optional[typing.Dict[str, typing.Any]]` — Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_type:** `typing.Optional[FilesToolType]` — Type of Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Tool with the given ID.
+
+By default, the deployed version of the Tool is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Tool.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.get(
+    id="tl_789ghi",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Tool to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Tool with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.delete(
+    id="tl_789ghi",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">move</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Move the Tool to a different path or change the name.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.move(
+    id="tl_789ghi",
+    path="new directory/new name",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Tool including the Tool name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Tool, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">list_versions</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all the versions of a Tool.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.list_versions(
+    id="tl_789ghi",
+    status="committed",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for the Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">commit</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Commit a version of the Tool with a commit message.
+
+If the version is already committed, an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.commit(
+    id="tl_789ghi",
+    version_id="tv_012jkl",
+    commit_message="Initial commit",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Tool.
+
+An activated Evaluator will automatically be run on all new Logs
+within the Tool for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import MonitoringEvaluatorVersionRequest
+from humanloop.client import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.update_monitoring(
+    id="tl_789ghi",
+    activate=[
+        MonitoringEvaluatorVersionRequest(
+            evaluator_version_id="evv_1abc4308abd",
+        )
+    ],
 )
 
 ```
@@ -2635,11 +2729,9 @@ client.tools.update_evaluators(
 <dl>
 <dd>
 
-**evaluators_to_activate:** `typing.Optional[
-    typing.Sequence[
-        EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem
-    ]
-]` — Monitoring Evaluators to activate. These will be automatically run on new Logs.
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]
+]` — Evaluators to activate on Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -2647,10 +2739,8 @@ client.tools.update_evaluators(
 <dl>
 <dd>
 
-**evaluators_to_deactivate:** `typing.Optional[
-    typing.Sequence[
-        EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem
-    ]
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]
 ]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
@@ -2671,7 +2761,7 @@ client.tools.update_evaluators(
 </dl>
 </details>
 
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">deploy</a>(...)</code></summary>
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -2683,9 +2773,9 @@ client.tools.update_evaluators(
 <dl>
 <dd>
 
-Deploy Tool to Environment.
+Deploy Tool to an Environment.
 
-Set the deployed Version for the specified Environment. This Tool Version
+Set the deployed version for the specified Environment. This Prompt
 will be used for calls made to the Tool in this Environment.
 </dd>
 </dl>
@@ -2706,10 +2796,10 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.tools.deploy(
-    id="id",
-    environment_id="environment_id",
-    version_id="version_id",
+client.tools.set_deployment(
+    id="tl_789ghi",
+    environment_id="staging",
+    version_id="tv_012jkl",
 )
 
 ```
@@ -2774,9 +2864,9 @@ client.tools.deploy(
 <dl>
 <dd>
 
-Remove deployment of Tool from Environment.
+Remove deployed Tool from the Environment.
 
-Remove the deployed Version for the specified Environment. This Tool Version
+Remove the deployed version for the specified Environment. This Tool
 will no longer be used for calls made to the Tool in this Environment.
 </dd>
 </dl>
@@ -2798,8 +2888,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.tools.remove_deployment(
-    id="id",
-    environment_id="environment_id",
+    id="tl_789ghi",
+    environment_id="staging",
 )
 
 ```
@@ -2877,7 +2967,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.tools.list_environments(
-    id="id",
+    id="tl_789ghi",
 )
 
 ```
@@ -2927,7 +3017,7 @@ client.tools.list_environments(
 <dl>
 <dd>
 
-Get a list of Datasets.
+List a list of all Datasets.
 </dd>
 </dl>
 </dd>
@@ -2947,7 +3037,9 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.datasets.list()
+response = client.datasets.list(
+    size=1,
+)
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -3078,7 +3170,19 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.datasets.upsert(
-    datapoints=[CreateDatapointRequest()],
+    path="test-questions",
+    datapoints=[
+        CreateDatapointRequest(
+            inputs={"question": "What is the capital of France?"},
+            target={"answer": "Paris"},
+        ),
+        CreateDatapointRequest(
+            inputs={"question": "Who wrote Hamlet?"},
+            target={"answer": "William Shakespeare"},
+        ),
+    ],
+    action="add",
+    commit_message="Add two new questions and answers",
 )
 
 ```
@@ -3212,7 +3316,9 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.datasets.get(
-    id="id",
+    id="ds_b0baF1ca7652",
+    version_id="dsv_6L78pqrdFi2xa",
+    include_datapoints=True,
 )
 
 ```
@@ -3462,7 +3568,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 response = client.datasets.list_datapoints(
-    id="id",
+    id="ds_b0baF1ca7652",
+    size=1,
 )
 for item in response:
     yield item
@@ -3569,7 +3676,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.datasets.list_versions(
-    id="id",
+    id="ds_b0baF1ca7652",
+    status="committed",
 )
 
 ```
@@ -3602,22 +3710,6 @@ client.datasets.list_versions(
 <dl>
 <dd>
 
-**environment:** `typing.Optional[str]` — Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluation_aggregates:** `typing.Optional[bool]` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -3642,7 +3734,9 @@ client.datasets.list_versions(
 <dl>
 <dd>
 
-Commit the Dataset Version with the given ID.
+Commit a version of the Dataset with a commit message.
+
+If the version is already committed, an exception will be raised.
 </dd>
 </dl>
 </dd>
@@ -3663,9 +3757,9 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.datasets.commit(
-    id="id",
-    version_id="version_id",
-    commit_message="commit_message",
+    id="ds_b0baF1ca7652",
+    version_id="dsv_6L78pqrdFi2xa",
+    commit_message="initial commit",
 )
 
 ```
@@ -3830,118 +3924,7 @@ core.File` — See core.File for more documentation
 </dl>
 </details>
 
-<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">from_logs</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Add Datapoints from Logs to a Dataset.
-
-This will create a new committed version of the Dataset with the Datapoints from the Logs.
-
-If either `version_id` or `environment` is provided, the new version will be based on the specified version,
-with the Datapoints from the Logs added to the existing Datapoints in the version.
-If neither `version_id` nor `environment` is provided, the new version will be based on the version
-of the Dataset that is deployed to the default Environment.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.from_logs(
-    id="id",
-    log_ids=["log_ids"],
-    commit_message="commit_message",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for the Dataset
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**log_ids:** `typing.Sequence[str]` — List of Log IDs to create Datapoints from.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Commit message for the new Dataset version.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `typing.Optional[str]` — ID of the specific Dataset version to base the created Version on.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed Version to base the created Version on.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">deploy</a>(...)</code></summary>
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -3955,7 +3938,7 @@ client.datasets.from_logs(
 
 Deploy Dataset to Environment.
 
-Set the deployed Version for the specified Environment.
+Set the deployed version for the specified Environment.
 </dd>
 </dl>
 </dd>
@@ -3975,10 +3958,10 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.datasets.deploy(
-    id="id",
-    environment_id="environment_id",
-    version_id="version_id",
+client.datasets.set_deployment(
+    id="ds_b0baF1ca7652",
+    environment_id="staging",
+    version_id="dsv_6L78pqrdFi2xa",
 )
 
 ```
@@ -4043,9 +4026,9 @@ client.datasets.deploy(
 <dl>
 <dd>
 
-Remove deployment of Dataset from Environment.
+Remove deployed Dataset from Environment.
 
-Remove the deployed Version for the specified Environment.
+Remove the deployed version for the specified Environment.
 </dd>
 </dl>
 </dd>
@@ -4066,8 +4049,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.datasets.remove_deployment(
-    id="id",
-    environment_id="environment_id",
+    id="ds_b0baF1ca7652",
+    environment_id="staging",
 )
 
 ```
@@ -4182,374 +4165,6 @@ client.datasets.list_environments(
 </dl>
 </details>
 
-## Directories
-<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">list</a>()</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieve a list of all Directories.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.list()
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">create</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates a Directory.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.create(
-    name="name",
-    parent_id="parent_id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**name:** `str` — Name of the directory to create.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parent_id:** `str` — ID of the parent directory. Starts with `dir_`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">get</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Fetches a directory by ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.get(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — String ID of directory. Starts with `dir_`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">delete</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Delete the Directory with the given ID.
-
-The Directory must be empty (i.e. contain no Directories or Files).
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.delete(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Directory. Starts with `dir_`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">update</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Update the Directory with the given ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.update(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Directory. Starts with `dir_`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Name to set for the directory.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parent_id:** `typing.Optional[str]` — ID of the parent directory. Specify this to move directories. Starts with `dir_`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 ## Evaluations
 <details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">list</a>(...)</code></summary>
 <dl>
@@ -4563,7 +4178,7 @@ client.directories.update(
 <dl>
 <dd>
 
-List Evaluations for the given File.
+List all Evaluations for the specified `file_id`.
 
 Retrieve a list of Evaluations that evaluate versions of the specified File.
 </dd>
@@ -4586,7 +4201,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 response = client.evaluations.list(
-    file_id="file_id",
+    file_id="pr_30gco7dx6JDq4200GVOHa",
+    size=1,
 )
 for item in response:
     yield item
@@ -4608,7 +4224,7 @@ for page in response.iter_pages():
 <dl>
 <dd>
 
-**file_id:** `str` — Filter by File ID. If provided, only Evaluation for the specified File will be returned.
+**file_id:** `str` — Filter by File ID. Only Evaluations for the specified File will be returned.
     
 </dd>
 </dl>
@@ -4658,11 +4274,16 @@ for page in response.iter_pages():
 
 Create an Evaluation.
 
-Create a new Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
-Humanloop will automatically start generating Logs and running Evaluators.
+Create a new Evaluation by specifying the Dataset, versions to be
+evaluated (Evaluatees), and which Evaluators to provide judgments.
 
-To keep updated on the progress of the Evaluation, you can poll the Evaluation
-and check its status.
+Humanloop will automatically start generating Logs and running Evaluators where
+`orchestrated=true`. If you own the runtime for the Evaluatee or Evaluator, you
+can set `orchestrated=false` and then generate and submit the required logs using
+your runtime.
+
+To keep updated on the progress of the Evaluation, you can poll the Evaluation using
+the GET /evaluations/{id} endpoint and check its status.
 </dd>
 </dl>
 </dd>
@@ -4689,16 +4310,18 @@ client = Humanloop(
 )
 client.evaluations.create(
     dataset=EvaluationsDatasetRequest(
-        version_id="version_id",
+        version_id="dsv_6L78pqrdFi2xa",
     ),
     evaluatees=[
         EvaluateeRequest(
-            version_id="version_id",
+            version_id="prv_7ZlQREDScH0xkhUwtXruN",
+            orchestrated=False,
         )
     ],
     evaluators=[
         EvaluationsRequest(
-            version_id="version_id",
+            version_id="evv_012def",
+            orchestrated=False,
         )
     ],
 )
@@ -4766,8 +4389,6 @@ client.evaluations.create(
 <dd>
 
 Get an Evaluation.
-
-Retrieve the Evaluation with the given ID.
 </dd>
 </dl>
 </dd>
@@ -4788,7 +4409,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluations.get(
-    id="id",
+    id="ev_567yza",
 )
 
 ```
@@ -4861,7 +4482,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluations.delete(
-    id="id",
+    id="ev_567yza",
 )
 
 ```
@@ -4898,7 +4519,7 @@ client.evaluations.delete(
 </dl>
 </details>
 
-<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update_setup</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -4912,7 +4533,8 @@ client.evaluations.delete(
 
 Update an Evaluation.
 
-Update the setup of an Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
+Update the setup of an Evaluation by specifying the Dataset, versions to be
+evaluated (Evaluatees), and which Evaluators to provide judgments.
 </dd>
 </dl>
 </dd>
@@ -4937,19 +4559,21 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.evaluations.update(
-    id="id",
+client.evaluations.update_setup(
+    id="ev_567yza",
     dataset=EvaluationsDatasetRequest(
-        version_id="version_id",
+        version_id="dsv_6L78pqrdFi2xa",
     ),
     evaluatees=[
         EvaluateeRequest(
-            version_id="version_id",
+            version_id="prv_7ZlQREDScH0xkhUwtXruN",
+            orchestrated=False,
         )
     ],
     evaluators=[
         EvaluationsRequest(
-            version_id="version_id",
+            version_id="evv_012def",
+            orchestrated=False,
         )
     ],
 )
@@ -5026,8 +4650,8 @@ client.evaluations.update(
 
 Update the status of an Evaluation.
 
-Can be used to cancel a running Evaluation, or mark an Evaluation that uses external or human evaluators
-as completed.
+Can be used to cancel a running Evaluation, or mark an Evaluation that uses
+external or human evaluators as completed.
 </dd>
 </dl>
 </dd>
@@ -5109,8 +4733,8 @@ client.evaluations.update_status(
 Get Evaluation Stats.
 
 Retrieve aggregate stats for the specified Evaluation.
-This includes the number of generated Logs for every evaluatee and Evaluator metrics
-(such as the mean and percentiles for numeric Evaluators for every evaluatee).
+This includes the number of generated Logs for each evaluated version and the
+corresponding Evaluator statistics (such as the mean and percentiles).
 </dd>
 </dl>
 </dd>
@@ -5180,10 +4804,10 @@ client.evaluations.get_stats(
 <dl>
 <dd>
 
-Get Logs by Evaluation ID.
+Get the Logs associated to a specific Evaluation.
 
-Each Evaluation Log corresponds to a (Datapoint, Evaluated Version) pair.
-It has an optional generated Log and a list of Evaluator Logs.
+Each Datapoint in your Dataset will have a corresponding Log for each File version evaluated.
+e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will be 100 Logs associated with the Evaluation.
 </dd>
 </dl>
 </dd>
@@ -5258,181 +4882,6 @@ client.evaluations.get_logs(
 </details>
 
 ## Evaluators
-<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list_default</a>()</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Get a list of default evaluators for the organization.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.list_default()
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">debug</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Run a synchronous evaluator execution on a collection of datapoints.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import LlmEvaluatorRequest
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.debug(
-    file_id="file_id",
-    evaluator=LlmEvaluatorRequest(
-        arguments_type="target_free",
-        return_type="boolean",
-    ),
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**file_id:** `str` — The ID of the Dataset that the datapoints belong to.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluator:** `RunSyncEvaluationRequestEvaluator` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluator_version_id:** `typing.Optional[str]` — The ID of the Evaluator Version being debugged if it already exists and is being edited.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**log_ids:** `typing.Optional[typing.Sequence[str]]` — The IDs of the logs on which to run the draft evaluator.Provide one of `log_ids` or `datapoint_ids`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**datapoint_ids:** `typing.Optional[typing.Sequence[str]]` — The IDs of the evaluation datapoints on which to run the draft evaluator. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**prompt_version_id:** `typing.Optional[str]` — The ID of the Prompt Version to use generate datapoints for the evaluation datapoints. Only required if `datapoint_ids` is provided; has no effect otherwise.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
@@ -5445,7 +4894,7 @@ client.evaluators.debug(
 <dl>
 <dd>
 
-Get a list of Evaluators.
+Get a list of all Evaluators.
 </dd>
 </dl>
 </dd>
@@ -5465,7 +4914,9 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.evaluators.list()
+response = client.evaluators.list(
+    size=1,
+)
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -5579,17 +5030,20 @@ an exception will be raised.
 <dd>
 
 ```python
-from humanloop import LlmEvaluatorRequest
+from humanloop import CodeEvaluatorRequest
 from humanloop.client import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.upsert(
-    spec=LlmEvaluatorRequest(
-        arguments_type="target_free",
-        return_type="boolean",
+    path="Shared Evaluators/Accuracy Evaluator",
+    spec=CodeEvaluatorRequest(
+        arguments_type="target_required",
+        return_type="number",
+        code="def evaluate(answer, target):\\n    return 0.5",
     ),
+    commit_message="Initial commit",
 )
 
 ```
@@ -5686,7 +5140,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.get(
-    id="id",
+    id="ev_890bcd",
 )
 
 ```
@@ -5772,7 +5226,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.delete(
-    id="id",
+    id="ev_890bcd",
 )
 
 ```
@@ -5842,7 +5296,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.move(
-    id="id",
+    id="ev_890bcd",
+    path="new directory/new name",
 )
 
 ```
@@ -5928,7 +5383,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.list_versions(
-    id="id",
+    id="ev_890bcd",
 )
 
 ```
@@ -5961,15 +5416,7 @@ client.evaluators.list_versions(
 <dl>
 <dd>
 
-**environment:** `typing.Optional[str]` — Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluator_aggregates:** `typing.Optional[bool]` 
+**evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
     
 </dd>
 </dl>
@@ -6001,7 +5448,9 @@ client.evaluators.list_versions(
 <dl>
 <dd>
 
-Commit the Evaluator Version with the given ID.
+Commit a version of the Evaluator with a commit message.
+
+If the version is already committed, an exception will be raised.
 </dd>
 </dl>
 </dd>
@@ -6022,9 +5471,9 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.commit(
-    id="id",
-    version_id="version_id",
-    commit_message="commit_message",
+    id="ev_890bcd",
+    version_id="evv_012def",
+    commit_message="Initial commit",
 )
 
 ```
@@ -6077,7 +5526,7 @@ client.evaluators.commit(
 </dl>
 </details>
 
-<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">deploy</a>(...)</code></summary>
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -6089,9 +5538,9 @@ client.evaluators.commit(
 <dl>
 <dd>
 
-Deploy Evaluator to Environment.
+Deploy Evaluator to an Environment.
 
-Set the deployed Version for the specified Environment. This Evaluator Version
+Set the deployed version for the specified Environment. This Evaluator
 will be used for calls made to the Evaluator in this Environment.
 </dd>
 </dl>
@@ -6112,10 +5561,10 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.evaluators.deploy(
-    id="id",
-    environment_id="environment_id",
-    version_id="version_id",
+client.evaluators.set_deployment(
+    id="ev_890bcd",
+    environment_id="staging",
+    version_id="evv_012def",
 )
 
 ```
@@ -6180,9 +5629,9 @@ client.evaluators.deploy(
 <dl>
 <dd>
 
-Remove deployment of Evaluator from Environment.
+Remove deployed Evaluator from the Environment.
 
-Remove the deployed Version for the specified Environment. This Evaluator Version
+Remove the deployed version for the specified Environment. This Evaluator
 will no longer be used for calls made to the Evaluator in this Environment.
 </dd>
 </dl>
@@ -6204,8 +5653,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.remove_deployment(
-    id="id",
-    environment_id="environment_id",
+    id="ev_890bcd",
+    environment_id="staging",
 )
 
 ```
@@ -6283,7 +5732,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluators.list_environments(
-    id="id",
+    id="ev_890bcd",
 )
 
 ```
@@ -6333,7 +5782,7 @@ client.evaluators.list_environments(
 <dl>
 <dd>
 
-List Logs.
+List all Logs for the given filter criteria.
 </dd>
 </dl>
 </dd>
@@ -6354,7 +5803,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 response = client.logs.list(
-    file_id="file_id",
+    file_id="file_123abc",
+    size=1,
 )
 for item in response:
     yield item
@@ -6563,7 +6013,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.logs.get(
-    id="id",
+    id="prv_Wu6zx1lAWJRqOyL8nWuZk",
 )
 
 ```
@@ -6634,7 +6084,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.sessions.get(
-    id="id",
+    id="sesh_123abc",
 )
 
 ```
@@ -6704,7 +6154,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.sessions.delete(
-    id="id",
+    id="sesh_123abc",
 )
 
 ```
@@ -6773,7 +6223,10 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.sessions.list()
+response = client.sessions.list(
+    size=1,
+    file_id="pr_123abc",
+)
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page

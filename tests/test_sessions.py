@@ -9,47 +9,28 @@ from .utilities import validate_response
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "id": "id",
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
+        "id": "sesh_456hij",
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
         "logs": [
             {
-                "id": "id",
-                "output_message": {"role": "user"},
-                "prompt_tokens": 1,
-                "output_tokens": 1,
-                "prompt_cost": 1.1,
-                "output_cost": 1.1,
-                "finish_reason": "finish_reason",
+                "id": "log_123efg",
+                "created_at": "2024-05-01T12:00:00Z",
+                "output": "This is a sample output.",
                 "prompt": {
-                    "path": "path",
-                    "id": "id",
-                    "name": "name",
-                    "version_id": "version_id",
-                    "created_at": "2024-01-15T09:30:00Z",
-                    "updated_at": "2024-01-15T09:30:00Z",
-                    "status": "uncommitted",
-                    "last_used_at": "2024-01-15T09:30:00Z",
-                    "model": "model",
+                    "id": "pr_123abc",
+                    "name": "Test Prompt",
+                    "path": "test-prompt",
+                    "version_id": "pv_456def",
+                    "created_at": "2024-05-01T12:00:00Z",
+                    "updated_at": "2024-05-01T12:00:00Z",
+                    "status": "committed",
+                    "last_used_at": "2024-05-01T12:00:00Z",
+                    "model": "gpt-4",
                     "version_logs_count": 1,
                     "total_logs_count": 1,
-                    "inputs": [{"name": "name"}],
+                    "inputs": [{"name": "question"}],
                 },
-                "messages": [{"role": "user"}],
-                "tool_choice": "none",
-                "output": "output",
-                "raw_output": "raw_output",
-                "created_at": "2024-01-15T09:30:00Z",
-                "error": "error",
-                "provider_latency": 1.1,
-                "session_id": "session_id",
-                "parent_id": "parent_id",
-                "source": "source",
-                "save": True,
-                "source_datapoint_id": "source_datapoint_id",
-                "batches": ["batches"],
-                "user": "user",
-                "environment": "environment",
             }
         ],
     }
@@ -62,16 +43,12 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
             {
                 0: {
                     "id": None,
-                    "output_message": {"role": None},
-                    "prompt_tokens": "integer",
-                    "output_tokens": "integer",
-                    "prompt_cost": None,
-                    "output_cost": None,
-                    "finish_reason": None,
+                    "created_at": "datetime",
+                    "output": None,
                     "prompt": {
-                        "path": None,
                         "id": None,
                         "name": None,
+                        "path": None,
                         "version_id": None,
                         "created_at": "datetime",
                         "updated_at": "datetime",
@@ -82,34 +59,19 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
                         "total_logs_count": "integer",
                         "inputs": ("list", {0: {"name": None}}),
                     },
-                    "messages": ("list", {0: {"role": None}}),
-                    "tool_choice": None,
-                    "output": None,
-                    "raw_output": None,
-                    "created_at": "datetime",
-                    "error": None,
-                    "provider_latency": None,
-                    "session_id": None,
-                    "parent_id": None,
-                    "source": None,
-                    "save": None,
-                    "source_datapoint_id": None,
-                    "batches": ("list", {0: None}),
-                    "user": None,
-                    "environment": None,
                 }
             },
         ),
     }
-    response = client.sessions.get(id="id")
+    response = client.sessions.get(id="sesh_123abc")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.sessions.get(id="id")
+    async_response = await async_client.sessions.get(id="sesh_123abc")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.sessions.delete(id="id") is None  # type: ignore[func-returns-value]
+    assert client.sessions.delete(id="sesh_123abc") is None  # type: ignore[func-returns-value]
 
-    assert await async_client.sessions.delete(id="id") is None  # type: ignore[func-returns-value]
+    assert await async_client.sessions.delete(id="sesh_123abc") is None  # type: ignore[func-returns-value]

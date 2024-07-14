@@ -12,10 +12,25 @@ from .log_response import LogResponse
 
 
 class EvaluationReportLogResponse(UncheckedBaseModel):
-    evaluated_version: EvaluatedVersionResponse
-    datapoint: DatapointResponse
-    log: typing.Optional[LogResponse] = None
-    evaluator_logs: typing.List[LogResponse]
+    evaluated_version: EvaluatedVersionResponse = pydantic_v1.Field()
+    """
+    The version of the Prompt, Tool or Evaluator that the Log belongs to.
+    """
+
+    datapoint: DatapointResponse = pydantic_v1.Field()
+    """
+    The Datapoint used to generate the log
+    """
+
+    log: typing.Optional[LogResponse] = pydantic_v1.Field(default=None)
+    """
+    The Log that was evaluated by the Evaluator.
+    """
+
+    evaluator_logs: typing.List[LogResponse] = pydantic_v1.Field()
+    """
+    The Evaluator logs containing the judgments for the Log.
+    """
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

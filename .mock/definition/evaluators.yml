@@ -4,236 +4,11 @@ service:
   auth: false
   base-path: ''
   endpoints:
-    listDefault:
-      path: /evaluators/default
-      method: GET
-      auth: true
-      docs: Get a list of default evaluators for the organization.
-      display-name: List Default
-      response:
-        docs: Successful Response
-        type: list<root.EvaluatorResponse>
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - response:
-            body:
-              - path: path
-                id: id
-                name: name
-                version_id: version_id
-                type: evaluator
-                environments:
-                  - id: id
-                    created_at: '2024-01-15T09:30:00Z'
-                    name: name
-                    tag: default
-                created_at: '2024-01-15T09:30:00Z'
-                updated_at: '2024-01-15T09:30:00Z'
-                created_by:
-                  id: id
-                  email_address: email_address
-                  full_name: full_name
-                status: uncommitted
-                last_used_at: '2024-01-15T09:30:00Z'
-                commit_message: commit_message
-                spec:
-                  arguments_type: target_free
-                  return_type: boolean
-                  evaluator_type: llm
-                  prompt:
-                    model: model
-                version_logs_count: 1
-                total_logs_count: 1
-                inputs:
-                  - name: name
-                evaluator_aggregates:
-                  - value: 1.1
-                    evaluator_id: evaluator_id
-                    evaluator_version_id: evaluator_version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-    debug:
-      path: /evaluators/debug
-      method: POST
-      auth: true
-      docs: Run a synchronous evaluator execution on a collection of datapoints.
-      display-name: Debug
-      request:
-        name: RunSyncEvaluationRequest
-        body:
-          properties:
-            file_id:
-              type: string
-              docs: The ID of the Dataset that the datapoints belong to.
-            evaluator: RunSyncEvaluationRequestEvaluator
-            evaluator_version_id:
-              type: optional<string>
-              docs: >-
-                The ID of the Evaluator Version being debugged if it already
-                exists and is being edited.
-            log_ids:
-              type: optional<list<string>>
-              docs: >-
-                The IDs of the logs on which to run the draft evaluator.Provide
-                one of `log_ids` or `datapoint_ids`.
-            datapoint_ids:
-              type: optional<list<string>>
-              docs: >-
-                The IDs of the evaluation datapoints on which to run the draft
-                evaluator. 
-            prompt_version_id:
-              type: optional<string>
-              docs: >-
-                The ID of the Prompt Version to use generate datapoints for the
-                evaluation datapoints. Only required if `datapoint_ids` is
-                provided; has no effect otherwise.
-      response:
-        docs: Successful Response
-        type: list<root.EvaluationDebugResultResponse>
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - request:
-            file_id: file_id
-            evaluator:
-              arguments_type: target_free
-              return_type: boolean
-          response:
-            body:
-              - log_id: log_id
-                log:
-                  project: project
-                  project_id: project_id
-                  session_id: session_id
-                  session_reference_id: session_reference_id
-                  parent_id: parent_id
-                  parent_reference_id: parent_reference_id
-                  source: source
-                  save: true
-                  source_datapoint_id: source_datapoint_id
-                  id: id
-                  reference_id: reference_id
-                  trial_id: trial_id
-                  messages:
-                    - role: user
-                  output: output
-                  judgment: true
-                  config_id: config_id
-                  config:
-                    id: id
-                    type: model
-                    model: model
-                  environment: environment
-                  feedback:
-                    - type: rating
-                      value: 1.1
-                      id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  error: error
-                  duration: 1.1
-                  output_message:
-                    role: user
-                  prompt_tokens: 1
-                  output_tokens: 1
-                  prompt_cost: 1.1
-                  output_cost: 1.1
-                  user: user
-                  provider_latency: 1.1
-                  tokens: 1
-                  raw_output: raw_output
-                  finish_reason: finish_reason
-                  metric_values:
-                    - metric_id: metric_id
-                      metric_name: metric_name
-                      metric_value: 1.1
-                  tools:
-                    - id: id
-                      name: name
-                      signature: signature
-                      result: result
-                  tool_choice: none
-                  evaluation_results:
-                    - id: id
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      log_id: log_id
-                      updated_at: '2024-01-15T09:30:00Z'
-                      created_at: '2024-01-15T09:30:00Z'
-                  observability_status: pending
-                  updated_at: '2024-01-15T09:30:00Z'
-                  batch_ids:
-                    - batch_ids
-                datapoint_id: datapoint_id
-                llm_evaluation_log:
-                  project: project
-                  project_id: project_id
-                  session_id: session_id
-                  session_reference_id: session_reference_id
-                  parent_id: parent_id
-                  parent_reference_id: parent_reference_id
-                  source: source
-                  save: true
-                  source_datapoint_id: source_datapoint_id
-                  id: id
-                  reference_id: reference_id
-                  trial_id: trial_id
-                  messages:
-                    - role: user
-                  output: output
-                  judgment: true
-                  config_id: config_id
-                  config:
-                    id: id
-                    type: model
-                    model: model
-                  environment: environment
-                  feedback:
-                    - type: rating
-                      value: 1.1
-                      id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  error: error
-                  duration: 1.1
-                  output_message:
-                    role: user
-                  prompt_tokens: 1
-                  output_tokens: 1
-                  prompt_cost: 1.1
-                  output_cost: 1.1
-                  user: user
-                  provider_latency: 1.1
-                  tokens: 1
-                  raw_output: raw_output
-                  finish_reason: finish_reason
-                  metric_values:
-                    - metric_id: metric_id
-                      metric_name: metric_name
-                      metric_value: 1.1
-                  tools:
-                    - id: id
-                      name: name
-                      signature: signature
-                      result: result
-                  tool_choice: none
-                  evaluation_results:
-                    - id: id
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      log_id: log_id
-                      updated_at: '2024-01-15T09:30:00Z'
-                      created_at: '2024-01-15T09:30:00Z'
-                  observability_status: pending
-                  updated_at: '2024-01-15T09:30:00Z'
-                  batch_ids:
-                    - batch_ids
-                value: true
-                error: error
     list:
       path: /evaluators
       method: GET
       auth: true
-      docs: Get a list of Evaluators.
+      docs: Get a list of all Evaluators.
       pagination:
         offset: $request.page
         results: $response.records
@@ -263,44 +38,37 @@ service:
             docs: Direction to sort by.
       response:
         docs: Successful Response
-        type: root.ListEvaluators
+        type: root.PaginatedDataEvaluatorResponse
       errors:
         - root.UnprocessableEntityError
       examples:
-        - response:
+        - name: List evaluators
+          query-parameters:
+            size: 1
+          response:
             body:
               records:
-                - path: path
-                  id: id
-                  name: name
-                  version_id: version_id
+                - id: ev_890bcd
+                  name: Accuracy Evaluator
+                  path: Shared Evaluators/Accuracy Evaluator
+                  version_id: evv_012def
                   type: evaluator
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  commit_message: commit_message
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: committed
+                  last_used_at: '2024-05-01T12:00:00Z'
                   spec:
-                    arguments_type: target_free
-                    return_type: boolean
+                    arguments_type: target_required
+                    return_type: number
+                    evaluator_type: python
+                    code: def evaluate(answer, target):\n    return 0.5
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
-                    - name: name
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
+                    - name: answer
+              page: 0
+              size: 1
+              total: 1
     upsert:
       path: /evaluators
       method: POST
@@ -343,64 +111,35 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - request:
+        - name: Create evaluator
+          request:
+            path: Shared Evaluators/Accuracy Evaluator
             spec:
-              arguments_type: target_free
-              return_type: boolean
+              arguments_type: target_required
+              return_type: number
+              evaluator_type: python
+              code: def evaluate(answer, target):\n    return 0.5
+            commit_message: Initial commit
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: ev_890bcd
+              name: Accuracy Evaluator
+              path: Shared Evaluators/Accuracy Evaluator
+              version_id: evv_012def
               type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
+                arguments_type: target_required
+                return_type: number
+                evaluator_type: python
+                code: def evaluate(answer, target):\n    return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
+                - name: answer
     get:
       path: /evaluators/{id}
       method: GET
@@ -434,62 +173,29 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: Get specific evaluator
+          path-parameters:
+            id: ev_890bcd
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: ev_890bcd
+              name: Accuracy Evaluator
+              path: Shared Evaluators/Accuracy Evaluator
+              version_id: evv_012def
               type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
+                arguments_type: target_required
+                return_type: number
+                evaluator_type: python
+                code: def evaluate(answer, target):\n    return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
+                - name: answer
     delete:
       path: /evaluators/{id}
       method: DELETE
@@ -503,8 +209,9 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: Delete evaluator
+          path-parameters:
+            id: ev_890bcd
     move:
       path: /evaluators/{id}
       method: PATCH
@@ -533,63 +240,31 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-          request: {}
+        - name: Move evaluator
+          path-parameters:
+            id: ev_890bcd
+          request:
+            path: new directory/new name
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: ev_890bcd
+              name: Accuracy Evaluator
+              path: Shared Evaluators/Accuracy Evaluator
+              version_id: evv_012def
               type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
+                arguments_type: target_required
+                return_type: number
+                evaluator_type: python
+                code: def evaluate(answer, target):\n    return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
+                - name: answer
     listVersions:
       path: /evaluators/{id}/versions
       method: GET
@@ -608,59 +283,49 @@ service:
             docs: >-
               Filter versions by status: 'uncommitted', 'committed'. If no
               status is provided, all versions are returned.
-          environment:
-            type: optional<string>
+          evaluator_aggregates:
+            type: optional<boolean>
             docs: >-
-              Name of the environment to filter versions by. If no environment
-              is provided, all versions are returned.
-          evaluator_aggregates: optional<boolean>
+              Whether to include Evaluator aggregate results for the versions in
+              the response
       response:
         docs: Successful Response
         type: root.ListEvaluators
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: List versions
+          path-parameters:
+            id: ev_890bcd
           response:
             body:
               records:
-                - path: path
-                  id: id
-                  name: name
-                  version_id: version_id
+                - id: ev_890bcd
+                  name: Accuracy Evaluator
+                  path: Shared Evaluators/Accuracy Evaluator
+                  version_id: evv_012def
                   type: evaluator
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  commit_message: commit_message
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: committed
+                  last_used_at: '2024-05-01T12:00:00Z'
                   spec:
-                    arguments_type: target_free
-                    return_type: boolean
+                    arguments_type: target_required
+                    return_type: number
+                    evaluator_type: python
+                    code: def evaluate(answer, target):\n    return 0.5
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
-                    - name: name
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
+                    - name: answer
     commit:
       path: /evaluators/{id}/versions/{version_id}/commit
       method: POST
       auth: true
-      docs: Commit the Evaluator Version with the given ID.
+      docs: |-
+        Commit a version of the Evaluator with a commit message.
+
+        If the version is already committed, an exception will be raised.
       path-parameters:
         id:
           type: string
@@ -677,76 +342,40 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-            version_id: version_id
+        - name: Commit version
+          path-parameters:
+            id: ev_890bcd
+            version_id: evv_012def
           request:
-            commit_message: commit_message
+            commit_message: Initial commit
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: ev_890bcd
+              name: Accuracy Evaluator
+              path: Shared Evaluators/Accuracy Evaluator
+              version_id: evv_012def
               type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
+                arguments_type: target_required
+                return_type: number
+                evaluator_type: python
+                code: def evaluate(answer, target):\n    return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    deploy:
+                - name: answer
+    setDeployment:
       path: /evaluators/{id}/environments/{environment_id}
       method: POST
       auth: true
-      docs: >-
-        Deploy Evaluator to Environment.
+      docs: |-
+        Deploy Evaluator to an Environment.
 
-
-        Set the deployed Version for the specified Environment. This Evaluator
-        Version
-
+        Set the deployed version for the specified Environment. This Evaluator
         will be used for calls made to the Evaluator in this Environment.
       path-parameters:
         id:
@@ -755,9 +384,9 @@ service:
         environment_id:
           type: string
           docs: Unique identifier for the Environment to deploy the Version to.
-      display-name: Deploy
+      display-name: Set Deployment
       request:
-        name: DeployEvaluatorsIdEnvironmentsEnvironmentIdPostRequest
+        name: SetDeploymentEvaluatorsIdEnvironmentsEnvironmentIdPostRequest
         query-parameters:
           version_id:
             type: string
@@ -768,75 +397,42 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-            environment_id: environment_id
+        - name: Deploy
+          path-parameters:
+            id: ev_890bcd
+            environment_id: staging
           query-parameters:
-            version_id: version_id
+            version_id: evv_012def
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: ev_890bcd
+              name: Accuracy Evaluator
+              path: Shared Evaluators/Accuracy Evaluator
+              version_id: evv_012def
               type: evaluator
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               spec:
-                arguments_type: target_free
-                return_type: boolean
-                evaluator_type: llm
-                prompt:
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - linked_tools
+                arguments_type: target_required
+                return_type: number
+                evaluator_type: python
+                code: def evaluate(answer, target):\n    return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
+                - name: answer
     removeDeployment:
       path: /evaluators/{id}/environments/{environment_id}
       method: DELETE
       auth: true
       docs: >-
-        Remove deployment of Evaluator from Environment.
+        Remove deployed Evaluator from the Environment.
 
 
-        Remove the deployed Version for the specified Environment. This
-        Evaluator Version
+        Remove the deployed version for the specified Environment. This
+        Evaluator
 
         will no longer be used for calls made to the Evaluator in this
         Environment.
@@ -851,9 +447,10 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-            environment_id: environment_id
+        - name: Delete environment
+          path-parameters:
+            id: ev_890bcd
+            environment_id: staging
     listEnvironments:
       path: /evaluators/{id}/environments
       method: GET
@@ -870,72 +467,35 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: List environments
+          path-parameters:
+            id: ev_890bcd
           response:
             body:
-              - id: id
-                created_at: '2024-01-15T09:30:00Z'
-                name: name
+              - id: env_abc123
+                created_at: '2024-05-01T12:00:00Z'
+                name: production
                 tag: default
                 file:
-                  path: path
-                  id: id
-                  name: name
-                  version_id: version_id
-                  type: prompt
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - name: name
-                      description: description
-                      id: id
-                      version_id: version_id
-                  commit_message: commit_message
+                  id: ev_890bcd
+                  name: Accuracy Evaluator
+                  path: Shared Evaluators/Accuracy Evaluator
+                  version_id: evv_012def
+                  type: evaluator
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: committed
+                  last_used_at: '2024-05-01T12:00:00Z'
+                  spec:
+                    arguments_type: target_required
+                    return_type: number
+                    evaluator_type: python
+                    code: def evaluate(answer, target):\n    return 0.5
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
-                    - name: name
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
+                    - name: answer
 types:
-  RunSyncEvaluationRequestEvaluator:
-    discriminated: false
-    union:
-      - root.LlmEvaluatorRequest
-      - root.CodeEvaluatorRequest
-      - root.HumanEvaluatorRequest
-      - root.ExternalEvaluatorRequest
   SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec:
     discriminated: false
     union:

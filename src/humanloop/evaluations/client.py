@@ -37,14 +37,14 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[EvaluationResponse]:
         """
-        List Evaluations for the given File.
+        List all Evaluations for the specified `file_id`.
 
         Retrieve a list of Evaluations that evaluate versions of the specified File.
 
         Parameters
         ----------
         file_id : str
-            Filter by File ID. If provided, only Evaluation for the specified File will be returned.
+            Filter by File ID. Only Evaluations for the specified File will be returned.
 
         page : typing.Optional[int]
             Page number for pagination.
@@ -68,7 +68,8 @@ class EvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         response = client.evaluations.list(
-            file_id="file_id",
+            file_id="pr_30gco7dx6JDq4200GVOHa",
+            size=1,
         )
         for item in response:
             yield item
@@ -112,11 +113,16 @@ class EvaluationsClient:
         """
         Create an Evaluation.
 
-        Create a new Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
-        Humanloop will automatically start generating Logs and running Evaluators.
+        Create a new Evaluation by specifying the Dataset, versions to be
+        evaluated (Evaluatees), and which Evaluators to provide judgments.
 
-        To keep updated on the progress of the Evaluation, you can poll the Evaluation
-        and check its status.
+        Humanloop will automatically start generating Logs and running Evaluators where
+        `orchestrated=true`. If you own the runtime for the Evaluatee or Evaluator, you
+        can set `orchestrated=false` and then generate and submit the required logs using
+        your runtime.
+
+        To keep updated on the progress of the Evaluation, you can poll the Evaluation using
+        the GET /evaluations/{id} endpoint and check its status.
 
         Parameters
         ----------
@@ -151,16 +157,18 @@ class EvaluationsClient:
         )
         client.evaluations.create(
             dataset=EvaluationsDatasetRequest(
-                version_id="version_id",
+                version_id="dsv_6L78pqrdFi2xa",
             ),
             evaluatees=[
                 EvaluateeRequest(
-                    version_id="version_id",
+                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
+                    orchestrated=False,
                 )
             ],
             evaluators=[
                 EvaluationsRequest(
-                    version_id="version_id",
+                    version_id="evv_012def",
+                    orchestrated=False,
                 )
             ],
         )
@@ -188,8 +196,6 @@ class EvaluationsClient:
         """
         Get an Evaluation.
 
-        Retrieve the Evaluation with the given ID.
-
         Parameters
         ----------
         id : str
@@ -211,7 +217,7 @@ class EvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         client.evaluations.get(
-            id="id",
+            id="ev_567yza",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -256,7 +262,7 @@ class EvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         client.evaluations.delete(
-            id="id",
+            id="ev_567yza",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -274,7 +280,7 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def update_setup(
         self,
         id: str,
         *,
@@ -286,7 +292,8 @@ class EvaluationsClient:
         """
         Update an Evaluation.
 
-        Update the setup of an Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
+        Update the setup of an Evaluation by specifying the Dataset, versions to be
+        evaluated (Evaluatees), and which Evaluators to provide judgments.
 
         Parameters
         ----------
@@ -322,19 +329,21 @@ class EvaluationsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluations.update(
-            id="id",
+        client.evaluations.update_setup(
+            id="ev_567yza",
             dataset=EvaluationsDatasetRequest(
-                version_id="version_id",
+                version_id="dsv_6L78pqrdFi2xa",
             ),
             evaluatees=[
                 EvaluateeRequest(
-                    version_id="version_id",
+                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
+                    orchestrated=False,
                 )
             ],
             evaluators=[
                 EvaluationsRequest(
-                    version_id="version_id",
+                    version_id="evv_012def",
+                    orchestrated=False,
                 )
             ],
         )
@@ -364,8 +373,8 @@ class EvaluationsClient:
         """
         Update the status of an Evaluation.
 
-        Can be used to cancel a running Evaluation, or mark an Evaluation that uses external or human evaluators
-        as completed.
+        Can be used to cancel a running Evaluation, or mark an Evaluation that uses
+        external or human evaluators as completed.
 
         Parameters
         ----------
@@ -418,8 +427,8 @@ class EvaluationsClient:
         Get Evaluation Stats.
 
         Retrieve aggregate stats for the specified Evaluation.
-        This includes the number of generated Logs for every evaluatee and Evaluator metrics
-        (such as the mean and percentiles for numeric Evaluators for every evaluatee).
+        This includes the number of generated Logs for each evaluated version and the
+        corresponding Evaluator statistics (such as the mean and percentiles).
 
         Parameters
         ----------
@@ -469,10 +478,10 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedDataEvaluationReportLogResponse:
         """
-        Get Logs by Evaluation ID.
+        Get the Logs associated to a specific Evaluation.
 
-        Each Evaluation Log corresponds to a (Datapoint, Evaluated Version) pair.
-        It has an optional generated Log and a list of Evaluator Logs.
+        Each Datapoint in your Dataset will have a corresponding Log for each File version evaluated.
+        e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will be 100 Logs associated with the Evaluation.
 
         Parameters
         ----------
@@ -536,14 +545,14 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[EvaluationResponse]:
         """
-        List Evaluations for the given File.
+        List all Evaluations for the specified `file_id`.
 
         Retrieve a list of Evaluations that evaluate versions of the specified File.
 
         Parameters
         ----------
         file_id : str
-            Filter by File ID. If provided, only Evaluation for the specified File will be returned.
+            Filter by File ID. Only Evaluations for the specified File will be returned.
 
         page : typing.Optional[int]
             Page number for pagination.
@@ -567,7 +576,8 @@ class AsyncEvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         response = await client.evaluations.list(
-            file_id="file_id",
+            file_id="pr_30gco7dx6JDq4200GVOHa",
+            size=1,
         )
         async for item in response:
             yield item
@@ -611,11 +621,16 @@ class AsyncEvaluationsClient:
         """
         Create an Evaluation.
 
-        Create a new Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
-        Humanloop will automatically start generating Logs and running Evaluators.
+        Create a new Evaluation by specifying the Dataset, versions to be
+        evaluated (Evaluatees), and which Evaluators to provide judgments.
 
-        To keep updated on the progress of the Evaluation, you can poll the Evaluation
-        and check its status.
+        Humanloop will automatically start generating Logs and running Evaluators where
+        `orchestrated=true`. If you own the runtime for the Evaluatee or Evaluator, you
+        can set `orchestrated=false` and then generate and submit the required logs using
+        your runtime.
+
+        To keep updated on the progress of the Evaluation, you can poll the Evaluation using
+        the GET /evaluations/{id} endpoint and check its status.
 
         Parameters
         ----------
@@ -650,16 +665,18 @@ class AsyncEvaluationsClient:
         )
         await client.evaluations.create(
             dataset=EvaluationsDatasetRequest(
-                version_id="version_id",
+                version_id="dsv_6L78pqrdFi2xa",
             ),
             evaluatees=[
                 EvaluateeRequest(
-                    version_id="version_id",
+                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
+                    orchestrated=False,
                 )
             ],
             evaluators=[
                 EvaluationsRequest(
-                    version_id="version_id",
+                    version_id="evv_012def",
+                    orchestrated=False,
                 )
             ],
         )
@@ -687,8 +704,6 @@ class AsyncEvaluationsClient:
         """
         Get an Evaluation.
 
-        Retrieve the Evaluation with the given ID.
-
         Parameters
         ----------
         id : str
@@ -710,7 +725,7 @@ class AsyncEvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         await client.evaluations.get(
-            id="id",
+            id="ev_567yza",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -755,7 +770,7 @@ class AsyncEvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         await client.evaluations.delete(
-            id="id",
+            id="ev_567yza",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -773,7 +788,7 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def update_setup(
         self,
         id: str,
         *,
@@ -785,7 +800,8 @@ class AsyncEvaluationsClient:
         """
         Update an Evaluation.
 
-        Update the setup of an Evaluation by specifying the Dataset, Evaluatees, and Evaluators.
+        Update the setup of an Evaluation by specifying the Dataset, versions to be
+        evaluated (Evaluatees), and which Evaluators to provide judgments.
 
         Parameters
         ----------
@@ -821,19 +837,21 @@ class AsyncEvaluationsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.update(
-            id="id",
+        await client.evaluations.update_setup(
+            id="ev_567yza",
             dataset=EvaluationsDatasetRequest(
-                version_id="version_id",
+                version_id="dsv_6L78pqrdFi2xa",
             ),
             evaluatees=[
                 EvaluateeRequest(
-                    version_id="version_id",
+                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
+                    orchestrated=False,
                 )
             ],
             evaluators=[
                 EvaluationsRequest(
-                    version_id="version_id",
+                    version_id="evv_012def",
+                    orchestrated=False,
                 )
             ],
         )
@@ -863,8 +881,8 @@ class AsyncEvaluationsClient:
         """
         Update the status of an Evaluation.
 
-        Can be used to cancel a running Evaluation, or mark an Evaluation that uses external or human evaluators
-        as completed.
+        Can be used to cancel a running Evaluation, or mark an Evaluation that uses
+        external or human evaluators as completed.
 
         Parameters
         ----------
@@ -917,8 +935,8 @@ class AsyncEvaluationsClient:
         Get Evaluation Stats.
 
         Retrieve aggregate stats for the specified Evaluation.
-        This includes the number of generated Logs for every evaluatee and Evaluator metrics
-        (such as the mean and percentiles for numeric Evaluators for every evaluatee).
+        This includes the number of generated Logs for each evaluated version and the
+        corresponding Evaluator statistics (such as the mean and percentiles).
 
         Parameters
         ----------
@@ -968,10 +986,10 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedDataEvaluationReportLogResponse:
         """
-        Get Logs by Evaluation ID.
+        Get the Logs associated to a specific Evaluation.
 
-        Each Evaluation Log corresponds to a (Datapoint, Evaluated Version) pair.
-        It has an optional generated Log and a list of Evaluator Logs.
+        Each Datapoint in your Dataset will have a corresponding Log for each File version evaluated.
+        e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will be 100 Logs associated with the Evaluation.
 
         Parameters
         ----------

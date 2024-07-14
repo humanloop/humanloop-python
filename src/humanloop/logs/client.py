@@ -37,7 +37,7 @@ class LogsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[PromptLogResponse]:
         """
-        List Logs.
+        List all Logs for the given filter criteria.
 
         Parameters
         ----------
@@ -84,7 +84,8 @@ class LogsClient:
             api_key="YOUR_API_KEY",
         )
         response = client.logs.list(
-            file_id="file_id",
+            file_id="file_123abc",
+            size=1,
         )
         for item in response:
             yield item
@@ -208,7 +209,7 @@ class LogsClient:
             api_key="YOUR_API_KEY",
         )
         client.logs.get(
-            id="id",
+            id="prv_Wu6zx1lAWJRqOyL8nWuZk",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -246,7 +247,7 @@ class AsyncLogsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[PromptLogResponse]:
         """
-        List Logs.
+        List all Logs for the given filter criteria.
 
         Parameters
         ----------
@@ -293,7 +294,8 @@ class AsyncLogsClient:
             api_key="YOUR_API_KEY",
         )
         response = await client.logs.list(
-            file_id="file_id",
+            file_id="file_123abc",
+            size=1,
         )
         async for item in response:
             yield item
@@ -417,7 +419,7 @@ class AsyncLogsClient:
             api_key="YOUR_API_KEY",
         )
         await client.logs.get(
-            id="id",
+            id="prv_Wu6zx1lAWJRqOyL8nWuZk",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(

@@ -4,485 +4,6 @@ service:
   auth: false
   base-path: ''
   endpoints:
-    list:
-      path: /tools
-      method: GET
-      auth: true
-      docs: Get a list of Tools.
-      pagination:
-        offset: $request.page
-        results: $response.records
-      display-name: 'List '
-      request:
-        name: ListToolsGetRequest
-        query-parameters:
-          page:
-            type: optional<integer>
-            docs: Page offset for pagination.
-          size:
-            type: optional<integer>
-            docs: Page size for pagination. Number of Tools to fetch.
-          name:
-            type: optional<string>
-            docs: Case-insensitive filter for Tool name.
-          user_filter:
-            type: optional<string>
-            docs: >-
-              Case-insensitive filter for users in the Tool. This filter matches
-              against both email address and name of users.
-          sort_by:
-            type: optional<root.ProjectSortBy>
-            docs: Field to sort Tools by
-          order:
-            type: optional<root.SortOrder>
-            docs: Direction to sort by.
-      response:
-        docs: Successful Response
-        type: root.ListTools
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - response:
-            body:
-              records:
-                - path: path
-                  id: id
-                  name: name
-                  version_id: version_id
-                  type: tool
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  function:
-                    name: name
-                    description: description
-                  source_code: source_code
-                  tool_type: pinecone_search
-                  commit_message: commit_message
-                  version_logs_count: 1
-                  total_logs_count: 1
-                  inputs:
-                    - name: name
-                  signature: signature
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
-    upsert:
-      path: /tools
-      method: POST
-      auth: true
-      docs: >-
-        Create a Tool or update it with a new version if it already exists.
-
-
-        Tools are identified by the `ID` or their `path`. The name, description
-        and parameters determine the versions of the Tool.
-
-
-        If you provide a commit message, then the new version will be committed;
-
-        otherwise it will be uncommitted. If you try to commit an already
-        committed version,
-
-        an exception will be raised.
-      display-name: Upsert
-      request:
-        name: ToolRequest
-        body:
-          properties:
-            path:
-              type: optional<string>
-              docs: >-
-                Path of the Tool, including the name, which is used as a unique
-                identifier.
-            id:
-              type: optional<string>
-              docs: ID for an existing Tool to update.
-            function:
-              type: optional<root.ToolFunction>
-              docs: >-
-                Callable function specification of the Tool shown to the model
-                for tool calling.
-            source_code:
-              type: optional<string>
-              docs: Code source of the Tool.
-            setup_values:
-              type: optional<map<string, unknown>>
-              docs: >-
-                Values needed to setup the Tool, defined in JSON Schema format:
-                https://json-schema.org/
-            tool_type:
-              type: optional<root.FilesToolType>
-              docs: Type of Tool.
-            commit_message:
-              type: optional<string>
-              docs: Message describing the changes made.
-      response:
-        docs: Successful Response
-        type: root.ToolResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - request: {}
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: tool
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              function:
-                name: name
-                description: description
-                parameters:
-                  parameters:
-                    key: value
-              source_code: source_code
-              setup_values:
-                setup_values:
-                  key: value
-              tool_type: pinecone_search
-              commit_message: commit_message
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              signature: signature
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    get:
-      path: /tools/{id}
-      method: GET
-      auth: true
-      docs: >-
-        Retrieve the Tool with the given ID.
-
-
-        By default, the deployed version of the Tool is returned. Use the query
-        parameters
-
-        `version_id` or `environment` to target a specific version of the Tool.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Tool.
-      display-name: Get
-      request:
-        name: GetToolsIdGetRequest
-        query-parameters:
-          version_id:
-            type: optional<string>
-            docs: A specific Version ID of the Tool to retrieve.
-          environment:
-            type: optional<string>
-            docs: Name of the Environment to retrieve a deployed Version from.
-      response:
-        docs: Successful Response
-        type: root.ToolResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: tool
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              function:
-                name: name
-                description: description
-                parameters:
-                  parameters:
-                    key: value
-              source_code: source_code
-              setup_values:
-                setup_values:
-                  key: value
-              tool_type: pinecone_search
-              commit_message: commit_message
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              signature: signature
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    delete:
-      path: /tools/{id}
-      method: DELETE
-      auth: true
-      docs: Delete the Tool with the given ID.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Tool.
-      display-name: Delete
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-    move:
-      path: /tools/{id}
-      method: PATCH
-      auth: true
-      docs: Move the Tool to a different path or change the name.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Tool.
-      display-name: Move
-      request:
-        name: UpdateToolRequest
-        body:
-          properties:
-            path:
-              type: optional<string>
-              docs: >-
-                Path of the Tool including the Tool name, which is used as a
-                unique identifier.
-            name:
-              type: optional<string>
-              docs: Name of the Tool, which is used as a unique identifier.
-      response:
-        docs: Successful Response
-        type: root.ToolResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          request: {}
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: tool
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              function:
-                name: name
-                description: description
-                parameters:
-                  parameters:
-                    key: value
-              source_code: source_code
-              setup_values:
-                setup_values:
-                  key: value
-              tool_type: pinecone_search
-              commit_message: commit_message
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              signature: signature
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    listVersions:
-      path: /tools/{id}/versions
-      method: GET
-      auth: true
-      docs: Get a list of all the versions of a Tool.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for the Tool.
-      display-name: List Versions
-      request:
-        name: ListVersionsToolsIdVersionsGetRequest
-        query-parameters:
-          status:
-            type: optional<root.VersionStatus>
-            docs: >-
-              Filter versions by status: 'uncommitted', 'committed'. If no
-              status is provided, all versions are returned.
-          environment:
-            type: optional<string>
-            docs: >-
-              Name of the environment to filter versions by. If no environment
-              is provided, all versions are returned.
-          evaluator_aggregates: optional<boolean>
-      response:
-        docs: Successful Response
-        type: root.ListTools
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-          response:
-            body:
-              records:
-                - path: path
-                  id: id
-                  name: name
-                  version_id: version_id
-                  type: tool
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  function:
-                    name: name
-                    description: description
-                  source_code: source_code
-                  tool_type: pinecone_search
-                  commit_message: commit_message
-                  version_logs_count: 1
-                  total_logs_count: 1
-                  inputs:
-                    - name: name
-                  signature: signature
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
-    commit:
-      path: /tools/{id}/versions/{version_id}/commit
-      method: POST
-      auth: true
-      docs: Commit the Tool Version with the given ID.
-      path-parameters:
-        id:
-          type: string
-          docs: Unique identifier for Tool.
-        version_id:
-          type: string
-          docs: Unique identifier for the specific version of the Tool.
-      display-name: Commit
-      request:
-        body: root.CommitRequest
-      response:
-        docs: Successful Response
-        type: root.ToolResponse
-      errors:
-        - root.UnprocessableEntityError
-      examples:
-        - path-parameters:
-            id: id
-            version_id: version_id
-          request:
-            commit_message: commit_message
-          response:
-            body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
-              type: tool
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              function:
-                name: name
-                description: description
-                parameters:
-                  parameters:
-                    key: value
-              source_code: source_code
-              setup_values:
-                setup_values:
-                  key: value
-              tool_type: pinecone_search
-              commit_message: commit_message
-              version_logs_count: 1
-              total_logs_count: 1
-              inputs:
-                - name: name
-              signature: signature
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
     log:
       path: /tools/log
       method: POST
@@ -491,7 +12,7 @@ service:
         Log to a Tool.
 
 
-        You can use query parameters version_id, or environment, to target
+        You can use query parameters `version_id`, or `environment`, to target
 
         an existing version of the Tool. Otherwise the default deployed version
         will be chosen.
@@ -610,25 +131,402 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - request: {}
+        - name: Tool log
+          request:
+            path: math-tool
+            tool:
+              function:
+                name: multiply
+                description: Multiply two numbers
+                parameters:
+                  type: object
+                  properties:
+                    a:
+                      type: number
+                    b:
+                      type: number
+                  required:
+                    - a
+                    - b
+            inputs:
+              a: 5
+              b: 7
+            output: '35'
           response:
             body:
-              id: id
-              tool_id: tool_id
-              version_id: version_id
-              session_id: session_id
-    updateEvaluators:
+              id: data_abc123
+              tool_id: tl_def456
+              version_id: tv_ghi789
+              session_id: sesh_hw012
+    list:
+      path: /tools
+      method: GET
+      auth: true
+      docs: Get a list of all Tools.
+      pagination:
+        offset: $request.page
+        results: $response.records
+      display-name: 'List '
+      request:
+        name: ListToolsGetRequest
+        query-parameters:
+          page:
+            type: optional<integer>
+            docs: Page offset for pagination.
+          size:
+            type: optional<integer>
+            docs: Page size for pagination. Number of Tools to fetch.
+          name:
+            type: optional<string>
+            docs: Case-insensitive filter for Tool name.
+          user_filter:
+            type: optional<string>
+            docs: >-
+              Case-insensitive filter for users in the Tool. This filter matches
+              against both email address and name of users.
+          sort_by:
+            type: optional<root.ProjectSortBy>
+            docs: Field to sort Tools by
+          order:
+            type: optional<root.SortOrder>
+            docs: Direction to sort by.
+      response:
+        docs: Successful Response
+        type: root.PaginatedDataToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: List tools
+          query-parameters:
+            size: 1
+          response:
+            body:
+              records:
+                - id: tl_789ghi
+                  path: math-tool
+                  name: math-tool
+                  version_id: tv_012jkl
+                  type: tool
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: committed
+                  last_used_at: '2024-05-01T12:00:00Z'
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: operation
+              page: 0
+              size: 1
+              total: 1
+    upsert:
+      path: /tools
+      method: POST
+      auth: true
+      docs: >-
+        Create a Tool or update it with a new version if it already exists.
+
+
+        Tools are identified by the `ID` or their `path`. The name, description
+        and parameters determine the versions of the Tool.
+
+
+        If you provide a commit message, then the new version will be committed;
+
+        otherwise it will be uncommitted. If you try to commit an already
+        committed version,
+
+        an exception will be raised.
+      display-name: Upsert
+      request:
+        name: ToolRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Tool, including the name, which is used as a unique
+                identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Tool to update.
+            function:
+              type: optional<root.ToolFunction>
+              docs: >-
+                Callable function specification of the Tool shown to the model
+                for tool calling.
+            source_code:
+              type: optional<string>
+              docs: Code source of the Tool.
+            setup_values:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Values needed to setup the Tool, defined in JSON Schema format:
+                https://json-schema.org/
+            tool_type:
+              type: optional<root.FilesToolType>
+              docs: Type of Tool.
+            commit_message:
+              type: optional<string>
+              docs: Message describing the changes made.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: Create tool
+          request:
+            path: math-tool
+            function:
+              name: multiply
+              description: Multiply two numbers
+              parameters:
+                type: object
+                properties:
+                  a:
+                    type: number
+                  b:
+                    type: number
+                required:
+                  - a
+                  - b
+            commit_message: Initial commit
+          response:
+            body:
+              id: tl_789ghi
+              path: math-tool
+              name: math-tool
+              version_id: tv_012jkl
+              type: tool
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: operation
+    get:
+      path: /tools/{id}
+      method: GET
+      auth: true
+      docs: >-
+        Retrieve the Tool with the given ID.
+
+
+        By default, the deployed version of the Tool is returned. Use the query
+        parameters
+
+        `version_id` or `environment` to target a specific version of the Tool.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+      display-name: Get
+      request:
+        name: GetToolsIdGetRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: A specific Version ID of the Tool to retrieve.
+          environment:
+            type: optional<string>
+            docs: Name of the Environment to retrieve a deployed Version from.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: Get specific tool
+          path-parameters:
+            id: tl_789ghi
+          response:
+            body:
+              id: tl_789ghi
+              path: math-tool
+              name: math-tool
+              version_id: tv_012jkl
+              type: tool
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: operation
+    delete:
+      path: /tools/{id}
+      method: DELETE
+      auth: true
+      docs: Delete the Tool with the given ID.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+      display-name: Delete
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: Delete tool
+          path-parameters:
+            id: tl_789ghi
+    move:
+      path: /tools/{id}
+      method: PATCH
+      auth: true
+      docs: Move the Tool to a different path or change the name.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+      display-name: Move
+      request:
+        name: UpdateToolRequest
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Tool including the Tool name, which is used as a
+                unique identifier.
+            name:
+              type: optional<string>
+              docs: Name of the Tool, which is used as a unique identifier.
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: Move tool
+          path-parameters:
+            id: tl_789ghi
+          request:
+            path: new directory/new name
+          response:
+            body:
+              id: tl_789ghi
+              path: math-tool
+              name: math-tool
+              version_id: tv_012jkl
+              type: tool
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: operation
+    listVersions:
+      path: /tools/{id}/versions
+      method: GET
+      auth: true
+      docs: Get a list of all the versions of a Tool.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for the Tool.
+      display-name: List Versions
+      request:
+        name: ListVersionsToolsIdVersionsGetRequest
+        query-parameters:
+          status:
+            type: optional<root.VersionStatus>
+            docs: >-
+              Filter versions by status: 'uncommitted', 'committed'. If no
+              status is provided, all versions are returned.
+          evaluator_aggregates:
+            type: optional<boolean>
+            docs: >-
+              Whether to include Evaluator aggregate results for the versions in
+              the response
+      response:
+        docs: Successful Response
+        type: root.ListTools
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: List versions
+          path-parameters:
+            id: tl_789ghi
+          query-parameters:
+            status: committed
+          response:
+            body:
+              records:
+                - id: tl_789ghi
+                  path: math-tool
+                  name: math-tool
+                  version_id: tv_012jkl
+                  type: tool
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: committed
+                  last_used_at: '2024-05-01T12:00:00Z'
+                  version_logs_count: 1
+                  total_logs_count: 1
+                  inputs:
+                    - name: operation
+    commit:
+      path: /tools/{id}/versions/{version_id}/commit
+      method: POST
+      auth: true
+      docs: |-
+        Commit a version of the Tool with a commit message.
+
+        If the version is already committed, an exception will be raised.
+      path-parameters:
+        id:
+          type: string
+          docs: Unique identifier for Tool.
+        version_id:
+          type: string
+          docs: Unique identifier for the specific version of the Tool.
+      display-name: Commit
+      request:
+        body: root.CommitRequest
+      response:
+        docs: Successful Response
+        type: root.ToolResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - name: Commit version
+          path-parameters:
+            id: tl_789ghi
+            version_id: tv_012jkl
+          request:
+            commit_message: Initial commit
+          response:
+            body:
+              id: tl_789ghi
+              path: math-tool
+              name: math-tool
+              version_id: tv_012jkl
+              type: tool
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
+              version_logs_count: 1
+              total_logs_count: 1
+              inputs:
+                - name: operation
+    updateMonitoring:
       path: /tools/{id}/evaluators
       method: POST
       auth: true
       docs: |-
-        Activate and deactivate Evaluators for the Tool.
+        Activate and deactivate Evaluators for monitoring the Tool.
 
         An activated Evaluator will automatically be run on all new Logs
         within the Tool for monitoring purposes.
       path-parameters:
         id: string
-      display-name: Update Evaluators
+      display-name: Update Monitoring
       request:
         body: root.EvaluatorActivationDeactivationRequest
       response:
@@ -637,63 +535,35 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-          request: {}
+        - name: Update monitoring
+          path-parameters:
+            id: tl_789ghi
+          request:
+            activate:
+              - evaluator_version_id: evv_1abc4308abd
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: tl_789ghi
+              path: math-tool
+              name: math-tool
+              version_id: tv_012jkl
               type: tool
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              function:
-                name: name
-                description: description
-                parameters:
-                  parameters:
-                    key: value
-              source_code: source_code
-              setup_values:
-                setup_values:
-                  key: value
-              tool_type: pinecone_search
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              signature: signature
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-    deploy:
+                - name: operation
+    setDeployment:
       path: /tools/{id}/environments/{environment_id}
       method: POST
       auth: true
-      docs: >-
-        Deploy Tool to Environment.
+      docs: |-
+        Deploy Tool to an Environment.
 
-
-        Set the deployed Version for the specified Environment. This Tool
-        Version
-
+        Set the deployed version for the specified Environment. This Prompt
         will be used for calls made to the Tool in this Environment.
       path-parameters:
         id:
@@ -702,9 +572,9 @@ service:
         environment_id:
           type: string
           docs: Unique identifier for the Environment to deploy the Version to.
-      display-name: Deploy
+      display-name: Set Deployment
       request:
-        name: DeployToolsIdEnvironmentsEnvironmentIdPostRequest
+        name: SetDeploymentToolsIdEnvironmentsEnvironmentIdPostRequest
         query-parameters:
           version_id:
             type: string
@@ -715,65 +585,35 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-            environment_id: environment_id
+        - name: Deploy
+          path-parameters:
+            id: tl_789ghi
+            environment_id: staging
           query-parameters:
-            version_id: version_id
+            version_id: tv_012jkl
           response:
             body:
-              path: path
-              id: id
-              name: name
-              version_id: version_id
+              id: tl_789ghi
+              path: math-tool
+              name: math-tool
+              version_id: tv_012jkl
               type: tool
-              environments:
-                - id: id
-                  created_at: '2024-01-15T09:30:00Z'
-                  name: name
-                  tag: default
-              created_at: '2024-01-15T09:30:00Z'
-              updated_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              status: uncommitted
-              last_used_at: '2024-01-15T09:30:00Z'
-              function:
-                name: name
-                description: description
-                parameters:
-                  parameters:
-                    key: value
-              source_code: source_code
-              setup_values:
-                setup_values:
-                  key: value
-              tool_type: pinecone_search
-              commit_message: commit_message
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
               version_logs_count: 1
               total_logs_count: 1
               inputs:
-                - name: name
-              signature: signature
-              evaluator_aggregates:
-                - value: 1.1
-                  evaluator_id: evaluator_id
-                  evaluator_version_id: evaluator_version_id
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
+                - name: operation
     removeDeployment:
       path: /tools/{id}/environments/{environment_id}
       method: DELETE
       auth: true
-      docs: >-
-        Remove deployment of Tool from Environment.
+      docs: |-
+        Remove deployed Tool from the Environment.
 
-
-        Remove the deployed Version for the specified Environment. This Tool
-        Version
-
+        Remove the deployed version for the specified Environment. This Tool
         will no longer be used for calls made to the Tool in this Environment.
       path-parameters:
         id:
@@ -786,9 +626,10 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-            environment_id: environment_id
+        - name: Delete environment
+          path-parameters:
+            id: tl_789ghi
+            environment_id: staging
     listEnvironments:
       path: /tools/{id}/environments
       method: GET
@@ -805,61 +646,26 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: List environments
+          path-parameters:
+            id: tl_789ghi
           response:
             body:
-              - id: id
-                created_at: '2024-01-15T09:30:00Z'
-                name: name
+              - id: tl_789ghi
+                created_at: '2024-05-01T12:00:00Z'
+                name: production
                 tag: default
                 file:
-                  path: path
-                  id: id
-                  name: name
-                  version_id: version_id
-                  type: prompt
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
-                  model: model
-                  endpoint: complete
-                  template: template
-                  provider: openai
-                  max_tokens: 1
-                  temperature: 1.1
-                  top_p: 1.1
-                  stop: stop
-                  presence_penalty: 1.1
-                  frequency_penalty: 1.1
-                  seed: 1
-                  response_format:
-                    type: json_object
-                  tools:
-                    - name: name
-                      description: description
-                  linked_tools:
-                    - name: name
-                      description: description
-                      id: id
-                      version_id: version_id
-                  commit_message: commit_message
+                  id: tl_789ghi
+                  path: math-tool
+                  name: math-tool
+                  version_id: tv_012jkl
+                  type: tool
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: committed
+                  last_used_at: '2024-05-01T12:00:00Z'
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
-                    - name: name
-                  evaluator_aggregates:
-                    - value: 1.1
-                      evaluator_id: evaluator_id
-                      evaluator_version_id: evaluator_version_id
-                      created_at: '2024-01-15T09:30:00Z'
-                      updated_at: '2024-01-15T09:30:00Z'
+                    - name: operation

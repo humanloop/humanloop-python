@@ -2,7 +2,8 @@
 
 import typing
 
+from .evaluator_response import EvaluatorResponse
 from .prompt_response import PromptResponse
 from .tool_response import ToolResponse
 
-EvaluatedVersionResponse = typing.Union[PromptResponse, ToolResponse]
+EvaluatedVersionResponse = typing.Union[PromptResponse, ToolResponse, EvaluatorResponse]

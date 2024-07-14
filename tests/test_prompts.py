@@ -2,52 +2,203 @@
 
 import typing
 
+from humanloop import ChatMessage, MonitoringEvaluatorVersionRequest, PromptKernelRequest
 from humanloop.client import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
 
 
-async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "type": "prompt",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "model": "model",
-        "endpoint": "complete",
-        "template": "template",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "stop",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"other": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object"},
-        "tools": [{"name": "name", "description": "description"}],
-        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
+        "id": "data_fIfEb1SoKZooqeFbi9IFs",
+        "prompt_id": "pr_3usCu3dAkgrXTlufrvPs7",
+        "version_id": "prv_Wu6zx1lAWJRqOyL8nWuZk",
+    }
+    expected_types: typing.Any = {"id": None, "prompt_id": None, "version_id": None}
+    response = client.prompts.log(
+        path="persona",
+        prompt=PromptKernelRequest(
+            model="gpt-4",
+            template=[
+                ChatMessage(
+                    role="system",
+                    content="You are {{person}}. Answer questions as this person. Do not break character.",
+                )
+            ],
+        ),
+        messages=[ChatMessage(role="user", content="What really happened at Roswell?")],
+        inputs={"person": "Trump"},
+    )
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.prompts.log(
+        path="persona",
+        prompt=PromptKernelRequest(
+            model="gpt-4",
+            template=[
+                ChatMessage(
+                    role="system",
+                    content="You are {{person}}. Answer questions as this person. Do not break character.",
+                )
+            ],
+        ),
+        messages=[ChatMessage(role="user", content="What really happened at Roswell?")],
+        inputs={"person": "Trump"},
+    )
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "prompt": {
+            "id": "pr_3usCu3dAkgrXTlufrvPs7",
+            "path": "persona",
+            "name": "persona",
+            "version_id": "prv_Wu6zx1lAWJRqOyL8nWuZk",
+            "type": "prompt",
+            "created_at": "2024-05-01T12:00:00Z",
+            "updated_at": "2024-05-01T12:00:00Z",
+            "status": "committed",
+            "last_used_at": "2024-05-01T12:00:00Z",
+            "model": "gpt-4",
+            "template": [
+                {
+                    "role": "system",
+                    "content": "You are {{person}}. Answer any questions as this person. Do not break character.",
+                }
+            ],
+            "provider": "openai",
+            "version_logs_count": 1,
+            "total_logs_count": 1,
+            "inputs": [{"name": "person"}],
+        },
+        "id": "data_fIfEb1SoKZooqeFbi9IFs",
+        "logs": [
             {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
+                "output": "Well, let me tell you, there are a lot of stories about Roswell, and I hear them all the time. People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!",
+                "raw_output": "Well, let me tell you, there are a lot of stories about Roswell, and I hear them all the time. People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!",
+                "created_at": "2024-05-01T12:00:00Z",
+                "finish_reason": "stop",
+                "output_message": {
+                    "content": "Well, let me tell you, there are a lot of stories about Roswell, and I hear them all the time. People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!",
+                    "role": "assistant",
+                },
+                "prompt_tokens": 34,
+                "output_tokens": 125,
+                "index": 0,
             }
         ],
+    }
+    expected_types: typing.Any = {
+        "prompt": {
+            "id": None,
+            "path": None,
+            "name": None,
+            "version_id": None,
+            "type": None,
+            "created_at": "datetime",
+            "updated_at": "datetime",
+            "status": None,
+            "last_used_at": "datetime",
+            "model": None,
+            "template": ("list", {0: {"role": None, "content": None}}),
+            "provider": None,
+            "version_logs_count": "integer",
+            "total_logs_count": "integer",
+            "inputs": ("list", {0: {"name": None}}),
+        },
+        "id": None,
+        "logs": (
+            "list",
+            {
+                0: {
+                    "output": None,
+                    "raw_output": None,
+                    "created_at": "datetime",
+                    "finish_reason": None,
+                    "output_message": {"content": None, "role": None},
+                    "prompt_tokens": "integer",
+                    "output_tokens": "integer",
+                    "index": "integer",
+                }
+            },
+        ),
+    }
+    response = client.prompts.call(
+        path="persona",
+        prompt=PromptKernelRequest(
+            model="gpt-4",
+            template=[
+                ChatMessage(
+                    role="system",
+                    content="You are {{person}}. Answer any questions as this person. Do not break character.",
+                )
+            ],
+        ),
+        messages=[ChatMessage(role="user", content="What really happened at Roswell?")],
+        inputs={"person": "Trump"},
+        stream=False,
+    )
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.prompts.call(
+        path="persona",
+        prompt=PromptKernelRequest(
+            model="gpt-4",
+            template=[
+                ChatMessage(
+                    role="system",
+                    content="You are {{person}}. Answer any questions as this person. Do not break character.",
+                )
+            ],
+        ),
+        messages=[ChatMessage(role="user", content="What really happened at Roswell?")],
+        inputs={"person": "Trump"},
+        stream=False,
+    )
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "path": "Personal Projects/Coding Assistant",
+        "id": "pr_30gco7dx6JDq4200GVOHa",
+        "name": "Coding Assistant",
+        "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
+        "type": "prompt",
+        "environments": [
+            {
+                "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                "created_at": "2023-06-27T23:16:07.992339",
+                "name": "development",
+                "tag": "default",
+            }
+        ],
+        "created_at": "2024-07-08T22:40:35.656915",
+        "updated_at": "2024-07-08T22:40:35.656915",
+        "created_by": {
+            "id": "usr_01RJO1k2spBVqNUt1ASef",
+            "email_address": "raza@humanloop.com",
+            "full_name": "Raza Habib",
+        },
+        "status": "committed",
+        "last_used_at": "2024-07-08T22:40:35.656915",
+        "model": "gpt-4o",
+        "endpoint": "chat",
+        "template": [{"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}],
+        "provider": "openai",
+        "max_tokens": -1,
+        "temperature": 0.7,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "other": {},
+        "tools": [],
+        "linked_tools": [],
+        "commit_message": "Initial commit",
+        "version_logs_count": 0,
+        "total_logs_count": 0,
+        "inputs": [{"name": "messages"}],
     }
     expected_types: typing.Any = {
         "path": None,
@@ -63,84 +214,102 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "last_used_at": "datetime",
         "model": None,
         "endpoint": None,
-        "template": None,
+        "template": ("list", {0: {"content": None, "role": None}}),
         "provider": None,
         "max_tokens": "integer",
         "temperature": None,
         "top_p": None,
-        "stop": None,
         "presence_penalty": None,
         "frequency_penalty": None,
-        "other": ("dict", {0: (None, None)}),
-        "seed": "integer",
-        "response_format": {"type": None},
-        "tools": ("list", {0: {"name": None, "description": None}}),
-        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+        "other": ("dict", {}),
+        "tools": ("list", {}),
+        "linked_tools": ("list", {}),
         "commit_message": None,
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.prompts.upsert(model="model")
+    response = client.prompts.upsert(
+        path="Personal Projects/Coding Assistant",
+        model="gpt-4o",
+        endpoint="chat",
+        template=[
+            ChatMessage(content="You are a helpful coding assistant specialising in {{language}}", role="system")
+        ],
+        provider="openai",
+        max_tokens=-1,
+        temperature=0.7,
+        top_p=1.0,
+        presence_penalty=0.0,
+        frequency_penalty=0.0,
+        other={},
+        tools=[],
+        linked_tools=[],
+        commit_message="Initial commit",
+    )
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.upsert(model="model")
+    async_response = await async_client.prompts.upsert(
+        path="Personal Projects/Coding Assistant",
+        model="gpt-4o",
+        endpoint="chat",
+        template=[
+            ChatMessage(content="You are a helpful coding assistant specialising in {{language}}", role="system")
+        ],
+        provider="openai",
+        max_tokens=-1,
+        temperature=0.7,
+        top_p=1.0,
+        presence_penalty=0.0,
+        frequency_penalty=0.0,
+        other={},
+        tools=[],
+        linked_tools=[],
+        commit_message="Initial commit",
+    )
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "path": "Personal Projects/Coding Assistant",
+        "id": "pr_30gco7dx6JDq4200GVOHa",
+        "name": "Coding Assistant",
+        "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
         "type": "prompt",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "model": "model",
-        "endpoint": "complete",
-        "template": "template",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "stop",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"other": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object"},
-        "tools": [{"name": "name", "description": "description"}],
-        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
+        "environments": [
             {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
+                "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                "created_at": "2023-06-27T23:16:07.992339",
+                "name": "development",
+                "tag": "default",
             }
         ],
+        "created_at": "2024-07-08T22:40:35.656915",
+        "updated_at": "2024-07-08T22:40:35.656915",
+        "created_by": {
+            "id": "usr_01RJO1k2spBVqNUt1ASef",
+            "email_address": "raza@humanloop.com",
+            "full_name": "Raza Habib",
+        },
+        "status": "committed",
+        "last_used_at": "2024-07-08T22:40:35.656915",
+        "model": "gpt-4o",
+        "endpoint": "chat",
+        "template": [{"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}],
+        "provider": "openai",
+        "max_tokens": -1,
+        "temperature": 0.7,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "other": {},
+        "tools": [],
+        "linked_tools": [],
+        "commit_message": "Initial commit",
+        "version_logs_count": 0,
+        "total_logs_count": 0,
+        "inputs": [{"name": "messages"}],
     }
     expected_types: typing.Any = {
         "path": None,
@@ -156,91 +325,75 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "last_used_at": "datetime",
         "model": None,
         "endpoint": None,
-        "template": None,
+        "template": ("list", {0: {"content": None, "role": None}}),
         "provider": None,
         "max_tokens": "integer",
         "temperature": None,
         "top_p": None,
-        "stop": None,
         "presence_penalty": None,
         "frequency_penalty": None,
-        "other": ("dict", {0: (None, None)}),
-        "seed": "integer",
-        "response_format": {"type": None},
-        "tools": ("list", {0: {"name": None, "description": None}}),
-        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+        "other": ("dict", {}),
+        "tools": ("list", {}),
+        "linked_tools": ("list", {}),
         "commit_message": None,
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.prompts.get(id="id")
+    response = client.prompts.get(id="pr_30gco7dx6JDq4200GVOHa")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.get(id="id")
+    async_response = await async_client.prompts.get(id="pr_30gco7dx6JDq4200GVOHa")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_delete(client: Humanloop, async_client: AsyncHumanloop) -> None:
     # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.prompts.delete(id="id") is None  # type: ignore[func-returns-value]
+    assert client.prompts.delete(id="pr_30gco7dx6JDq4200GVOHa") is None  # type: ignore[func-returns-value]
 
-    assert await async_client.prompts.delete(id="id") is None  # type: ignore[func-returns-value]
+    assert await async_client.prompts.delete(id="pr_30gco7dx6JDq4200GVOHa") is None  # type: ignore[func-returns-value]
 
 
 async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "path": "Personal Projects/Coding Assistant",
+        "id": "pr_30gco7dx6JDq4200GVOHa",
+        "name": "Coding Assistant",
+        "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
         "type": "prompt",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "model": "model",
-        "endpoint": "complete",
-        "template": "template",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "stop",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"other": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object"},
-        "tools": [{"name": "name", "description": "description"}],
-        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
+        "environments": [
             {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
+                "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                "created_at": "2023-06-27T23:16:07.992339",
+                "name": "development",
+                "tag": "default",
             }
         ],
+        "created_at": "2024-07-08T22:40:35.656915",
+        "updated_at": "2024-07-08T22:40:35.656915",
+        "created_by": {
+            "id": "usr_01RJO1k2spBVqNUt1ASef",
+            "email_address": "raza@humanloop.com",
+            "full_name": "Raza Habib",
+        },
+        "status": "committed",
+        "last_used_at": "2024-07-08T22:40:35.656915",
+        "model": "gpt-4o",
+        "endpoint": "chat",
+        "template": [{"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}],
+        "provider": "openai",
+        "max_tokens": -1,
+        "temperature": 0.7,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "other": {},
+        "tools": [],
+        "linked_tools": [],
+        "commit_message": "Initial commit",
+        "version_logs_count": 0,
+        "total_logs_count": 0,
+        "inputs": [{"name": "messages"}],
     }
     expected_types: typing.Any = {
         "path": None,
@@ -256,40 +409,25 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "last_used_at": "datetime",
         "model": None,
         "endpoint": None,
-        "template": None,
+        "template": ("list", {0: {"content": None, "role": None}}),
         "provider": None,
         "max_tokens": "integer",
         "temperature": None,
         "top_p": None,
-        "stop": None,
         "presence_penalty": None,
         "frequency_penalty": None,
-        "other": ("dict", {0: (None, None)}),
-        "seed": "integer",
-        "response_format": {"type": None},
-        "tools": ("list", {0: {"name": None, "description": None}}),
-        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+        "other": ("dict", {}),
+        "tools": ("list", {}),
+        "linked_tools": ("list", {}),
         "commit_message": None,
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.prompts.move(id="id")
+    response = client.prompts.move(id="pr_30gco7dx6JDq4200GVOHa", path="new directory/new name")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.move(id="id")
+    async_response = await async_client.prompts.move(id="pr_30gco7dx6JDq4200GVOHa", path="new directory/new name")
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -297,46 +435,46 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "records": [
             {
-                "path": "path",
-                "id": "id",
-                "name": "name",
-                "version_id": "version_id",
+                "path": "Personal Projects/Coding Assistant",
+                "id": "pr_30gco7dx6JDq4200GVOHa",
+                "name": "Coding Assistant",
+                "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
                 "type": "prompt",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": [
-                    {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
-                ],
-                "commit_message": "commit_message",
-                "version_logs_count": 1,
-                "total_logs_count": 1,
-                "inputs": [{"name": "name"}],
-                "evaluator_aggregates": [
+                "environments": [
                     {
-                        "value": 1.1,
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "created_at": "2024-01-15T09:30:00Z",
-                        "updated_at": "2024-01-15T09:30:00Z",
+                        "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                        "created_at": "2023-06-27T23:16:07.992339",
+                        "name": "development",
+                        "tag": "default",
                     }
                 ],
+                "created_at": "2024-07-08T22:40:35.656915",
+                "updated_at": "2024-07-08T22:40:35.656915",
+                "created_by": {
+                    "id": "usr_01RJO1k2spBVqNUt1ASef",
+                    "email_address": "raza@humanloop.com",
+                    "full_name": "Raza Habib",
+                },
+                "status": "committed",
+                "last_used_at": "2024-07-08T22:40:35.656915",
+                "model": "gpt-4o",
+                "endpoint": "chat",
+                "template": [
+                    {"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}
+                ],
+                "provider": "openai",
+                "max_tokens": -1,
+                "temperature": 0.7,
+                "top_p": 1,
+                "presence_penalty": 0,
+                "frequency_penalty": 0,
+                "other": {},
+                "tools": [],
+                "linked_tools": [],
+                "commit_message": "Initial commit",
+                "version_logs_count": 0,
+                "total_logs_count": 0,
+                "inputs": [{"name": "messages"}],
             }
         ]
     }
@@ -353,91 +491,76 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
                     "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
+                    "created_by": {"id": None, "email_address": None, "full_name": None},
                     "status": None,
                     "last_used_at": "datetime",
                     "model": None,
                     "endpoint": None,
-                    "template": None,
+                    "template": ("list", {0: {"content": None, "role": None}}),
                     "provider": None,
                     "max_tokens": "integer",
                     "temperature": None,
                     "top_p": None,
-                    "stop": None,
                     "presence_penalty": None,
                     "frequency_penalty": None,
-                    "seed": "integer",
-                    "response_format": {"type": None},
-                    "tools": ("list", {0: {"name": None, "description": None}}),
-                    "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+                    "other": ("dict", {}),
+                    "tools": ("list", {}),
+                    "linked_tools": ("list", {}),
                     "commit_message": None,
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
-                    "evaluator_aggregates": (
-                        "list",
-                        {
-                            0: {
-                                "value": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "created_at": "datetime",
-                                "updated_at": "datetime",
-                            }
-                        },
-                    ),
                 }
             },
         )
     }
-    response = client.prompts.list_versions(id="id")
+    response = client.prompts.list_versions(id="pr_30gco7dx6JDq4200GVOHa", status="committed")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.list_versions(id="id")
+    async_response = await async_client.prompts.list_versions(id="pr_30gco7dx6JDq4200GVOHa", status="committed")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "path": "Personal Projects/Coding Assistant",
+        "id": "pr_30gco7dx6JDq4200GVOHa",
+        "name": "Coding Assistant",
+        "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
         "type": "prompt",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "model": "model",
-        "endpoint": "complete",
-        "template": "template",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "stop",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"other": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object"},
-        "tools": [{"name": "name", "description": "description"}],
-        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
+        "environments": [
             {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
+                "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                "created_at": "2023-06-27T23:16:07.992339",
+                "name": "development",
+                "tag": "default",
             }
         ],
+        "created_at": "2024-07-08T22:40:35.656915",
+        "updated_at": "2024-07-08T22:40:35.656915",
+        "created_by": {
+            "id": "usr_01RJO1k2spBVqNUt1ASef",
+            "email_address": "raza@humanloop.com",
+            "full_name": "Raza Habib",
+        },
+        "status": "committed",
+        "last_used_at": "2024-07-08T22:40:35.656915",
+        "model": "gpt-4o",
+        "endpoint": "chat",
+        "template": [{"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}],
+        "provider": "openai",
+        "max_tokens": -1,
+        "temperature": 0.7,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "other": {},
+        "tools": [],
+        "linked_tools": [],
+        "commit_message": "Initial commit",
+        "version_logs_count": 0,
+        "total_logs_count": 0,
+        "inputs": [{"name": "messages"}],
     }
     expected_types: typing.Any = {
         "path": None,
@@ -453,238 +576,120 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "last_used_at": "datetime",
         "model": None,
         "endpoint": None,
-        "template": None,
+        "template": ("list", {0: {"content": None, "role": None}}),
         "provider": None,
         "max_tokens": "integer",
         "temperature": None,
         "top_p": None,
-        "stop": None,
         "presence_penalty": None,
         "frequency_penalty": None,
-        "other": ("dict", {0: (None, None)}),
-        "seed": "integer",
-        "response_format": {"type": None},
-        "tools": ("list", {0: {"name": None, "description": None}}),
-        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+        "other": ("dict", {}),
+        "tools": ("list", {}),
+        "linked_tools": ("list", {}),
         "commit_message": None,
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
     }
-    response = client.prompts.commit(id="id", version_id="version_id", commit_message="commit_message")
+    response = client.prompts.commit(
+        id="pr_30gco7dx6JDq4200GVOHa",
+        version_id="prv_F34aba5f3asp0",
+        commit_message="Reiterated point about not discussing sentience",
+    )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.prompts.commit(
-        id="id", version_id="version_id", commit_message="commit_message"
+        id="pr_30gco7dx6JDq4200GVOHa",
+        version_id="prv_F34aba5f3asp0",
+        commit_message="Reiterated point about not discussing sentience",
     )
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_update_monitoring(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "id": "id",
-        "prompt_id": "prompt_id",
-        "version_id": "version_id",
-        "session_id": "session_id",
-    }
-    expected_types: typing.Any = {"id": None, "prompt_id": None, "version_id": None, "session_id": None}
-    response = client.prompts.log()
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.prompts.log()
-    validate_response(async_response, expected_response, expected_types)
-
-
-async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = {
-        "prompt": {
-            "path": "path",
-            "id": "id",
-            "name": "name",
-            "version_id": "version_id",
-            "type": "prompt",
-            "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-            "created_at": "2024-01-15T09:30:00Z",
-            "updated_at": "2024-01-15T09:30:00Z",
-            "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-            "status": "uncommitted",
-            "last_used_at": "2024-01-15T09:30:00Z",
-            "model": "model",
-            "endpoint": "complete",
-            "template": "template",
-            "provider": "openai",
-            "max_tokens": 1,
-            "temperature": 1.1,
-            "top_p": 1.1,
-            "stop": "stop",
-            "presence_penalty": 1.1,
-            "frequency_penalty": 1.1,
-            "other": {"other": {"key": "value"}},
-            "seed": 1,
-            "response_format": {"type": "json_object"},
-            "tools": [{"name": "name", "description": "description"}],
-            "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-            "commit_message": "commit_message",
-            "version_logs_count": 1,
-            "total_logs_count": 1,
-            "inputs": [{"name": "name"}],
-            "evaluator_aggregates": [
-                {
-                    "value": 1.1,
-                    "evaluator_id": "evaluator_id",
-                    "evaluator_version_id": "evaluator_version_id",
-                    "created_at": "2024-01-15T09:30:00Z",
-                    "updated_at": "2024-01-15T09:30:00Z",
-                }
-            ],
+        "path": "Personal Projects/Coding Assistant",
+        "id": "pr_30gco7dx6JDq4200GVOHa",
+        "name": "Coding Assistant",
+        "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
+        "type": "prompt",
+        "environments": [
+            {
+                "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                "created_at": "2023-06-27T23:16:07.992339",
+                "name": "development",
+                "tag": "default",
+            }
+        ],
+        "created_at": "2024-07-08T22:40:35.656915",
+        "updated_at": "2024-07-08T22:40:35.656915",
+        "created_by": {
+            "id": "usr_01RJO1k2spBVqNUt1ASef",
+            "email_address": "raza@humanloop.com",
+            "full_name": "Raza Habib",
         },
-        "messages": [
-            {
-                "content": "content",
-                "name": "name",
-                "tool_call_id": "tool_call_id",
-                "role": "user",
-                "tool_calls": [{"id": "id", "type": "function", "function": {"name": "name"}}],
-            }
-        ],
-        "tool_choice": "none",
-        "session_id": "session_id",
-        "parent_id": "parent_id",
-        "inputs": {"inputs": {"key": "value"}},
-        "source": "source",
-        "metadata": {"metadata": {"key": "value"}},
-        "save": True,
-        "source_datapoint_id": "source_datapoint_id",
-        "batches": ["batches"],
-        "user": "user",
-        "environment": "environment",
-        "id": "id",
-        "logs": [
-            {
-                "output": "output",
-                "raw_output": "raw_output",
-                "created_at": "2024-01-15T09:30:00Z",
-                "error": "error",
-                "provider_latency": 1.1,
-                "output_message": {"role": "user"},
-                "prompt_tokens": 1,
-                "output_tokens": 1,
-                "prompt_cost": 1.1,
-                "output_cost": 1.1,
-                "finish_reason": "finish_reason",
-                "index": 1,
-            }
-        ],
+        "status": "committed",
+        "last_used_at": "2024-07-08T22:40:35.656915",
+        "model": "gpt-4o",
+        "endpoint": "chat",
+        "template": [{"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}],
+        "provider": "openai",
+        "max_tokens": -1,
+        "temperature": 0.7,
+        "top_p": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "other": {},
+        "tools": [],
+        "linked_tools": [],
+        "commit_message": "Initial commit",
+        "version_logs_count": 0,
+        "total_logs_count": 0,
+        "inputs": [{"name": "messages"}],
     }
     expected_types: typing.Any = {
-        "prompt": {
-            "path": None,
-            "id": None,
-            "name": None,
-            "version_id": None,
-            "type": None,
-            "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-            "created_at": "datetime",
-            "updated_at": "datetime",
-            "created_by": {"id": None, "email_address": None, "full_name": None},
-            "status": None,
-            "last_used_at": "datetime",
-            "model": None,
-            "endpoint": None,
-            "template": None,
-            "provider": None,
-            "max_tokens": "integer",
-            "temperature": None,
-            "top_p": None,
-            "stop": None,
-            "presence_penalty": None,
-            "frequency_penalty": None,
-            "other": ("dict", {0: (None, None)}),
-            "seed": "integer",
-            "response_format": {"type": None},
-            "tools": ("list", {0: {"name": None, "description": None}}),
-            "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
-            "commit_message": None,
-            "version_logs_count": "integer",
-            "total_logs_count": "integer",
-            "inputs": ("list", {0: {"name": None}}),
-            "evaluator_aggregates": (
-                "list",
-                {
-                    0: {
-                        "value": None,
-                        "evaluator_id": None,
-                        "evaluator_version_id": None,
-                        "created_at": "datetime",
-                        "updated_at": "datetime",
-                    }
-                },
-            ),
-        },
-        "messages": (
-            "list",
-            {
-                0: {
-                    "content": None,
-                    "name": None,
-                    "tool_call_id": None,
-                    "role": None,
-                    "tool_calls": ("list", {0: {"id": None, "type": None, "function": {"name": None}}}),
-                }
-            },
-        ),
-        "tool_choice": None,
-        "session_id": None,
-        "parent_id": None,
-        "inputs": ("dict", {0: (None, None)}),
-        "source": None,
-        "metadata": ("dict", {0: (None, None)}),
-        "save": None,
-        "source_datapoint_id": None,
-        "batches": ("list", {0: None}),
-        "user": None,
-        "environment": None,
+        "path": None,
         "id": None,
-        "logs": (
-            "list",
-            {
-                0: {
-                    "output": None,
-                    "raw_output": None,
-                    "created_at": "datetime",
-                    "error": None,
-                    "provider_latency": None,
-                    "output_message": {"role": None},
-                    "prompt_tokens": "integer",
-                    "output_tokens": "integer",
-                    "prompt_cost": None,
-                    "output_cost": None,
-                    "finish_reason": None,
-                    "index": "integer",
-                }
-            },
-        ),
+        "name": None,
+        "version_id": None,
+        "type": None,
+        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+        "created_at": "datetime",
+        "updated_at": "datetime",
+        "created_by": {"id": None, "email_address": None, "full_name": None},
+        "status": None,
+        "last_used_at": "datetime",
+        "model": None,
+        "endpoint": None,
+        "template": ("list", {0: {"content": None, "role": None}}),
+        "provider": None,
+        "max_tokens": "integer",
+        "temperature": None,
+        "top_p": None,
+        "presence_penalty": None,
+        "frequency_penalty": None,
+        "other": ("dict", {}),
+        "tools": ("list", {}),
+        "linked_tools": ("list", {}),
+        "commit_message": None,
+        "version_logs_count": "integer",
+        "total_logs_count": "integer",
+        "inputs": ("list", {0: {"name": None}}),
     }
-    response = client.prompts.call()
+    response = client.prompts.update_monitoring(
+        id="pr_30gco7dx6JDq4200GVOHa",
+        activate=[MonitoringEvaluatorVersionRequest(evaluator_version_id="evv_1abc4308abd")],
+    )
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.call()
+    async_response = await async_client.prompts.update_monitoring(
+        id="pr_30gco7dx6JDq4200GVOHa",
+        activate=[MonitoringEvaluatorVersionRequest(evaluator_version_id="evv_1abc4308abd")],
+    )
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
@@ -770,103 +775,10 @@ async def test_update_evaluators(client: Humanloop, async_client: AsyncHumanloop
             },
         ),
     }
-    response = client.prompts.update_evaluators(id="id")
+    response = client.prompts.set_deployment(id="id", environment_id="environment_id", version_id="version_id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.update_evaluators(id="id")
-    validate_response(async_response, expected_response, expected_types)
-
-
-async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "type": "prompt",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "model": "model",
-        "endpoint": "complete",
-        "template": "template",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "stop",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"other": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object"},
-        "tools": [{"name": "name", "description": "description"}],
-        "linked_tools": [{"name": "name", "description": "description", "id": "id", "version_id": "version_id"}],
-        "commit_message": "commit_message",
-        "version_logs_count": 1,
-        "total_logs_count": 1,
-        "inputs": [{"name": "name"}],
-        "evaluator_aggregates": [
-            {
-                "value": 1.1,
-                "evaluator_id": "evaluator_id",
-                "evaluator_version_id": "evaluator_version_id",
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-            }
-        ],
-    }
-    expected_types: typing.Any = {
-        "path": None,
-        "id": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
-        "status": None,
-        "last_used_at": "datetime",
-        "model": None,
-        "endpoint": None,
-        "template": None,
-        "provider": None,
-        "max_tokens": "integer",
-        "temperature": None,
-        "top_p": None,
-        "stop": None,
-        "presence_penalty": None,
-        "frequency_penalty": None,
-        "other": ("dict", {0: (None, None)}),
-        "seed": "integer",
-        "response_format": {"type": None},
-        "tools": ("list", {0: {"name": None, "description": None}}),
-        "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
-        "commit_message": None,
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-        "evaluator_aggregates": (
-            "list",
-            {
-                0: {
-                    "value": None,
-                    "evaluator_id": None,
-                    "evaluator_version_id": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                }
-            },
-        ),
-    }
-    response = client.prompts.deploy(id="id", environment_id="environment_id", version_id="version_id")
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.prompts.deploy(
+    async_response = await async_client.prompts.set_deployment(
         id="id", environment_id="environment_id", version_id="version_id"
     )
     validate_response(async_response, expected_response, expected_types)
@@ -882,51 +794,51 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
-            "id": "id",
-            "created_at": "2024-01-15T09:30:00Z",
-            "name": "name",
+            "id": "pr_30gco7dx6JDq4200GVOHa",
+            "created_at": "2024-05-01T12:00:00Z",
+            "name": "production",
             "tag": "default",
             "file": {
-                "path": "path",
-                "id": "id",
-                "name": "name",
-                "version_id": "version_id",
+                "path": "Personal Projects/Coding Assistant",
+                "id": "pr_30gco7dx6JDq4200GVOHa",
+                "name": "Coding Assistant",
+                "version_id": "prv_7ZlQREDScH0xkhUwtXruN",
                 "type": "prompt",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
-                "model": "model",
-                "endpoint": "complete",
-                "template": "template",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "stop",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "seed": 1,
-                "response_format": {"type": "json_object"},
-                "tools": [{"name": "name", "description": "description"}],
-                "linked_tools": [
-                    {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
-                ],
-                "commit_message": "commit_message",
-                "version_logs_count": 1,
-                "total_logs_count": 1,
-                "inputs": [{"name": "name"}],
-                "evaluator_aggregates": [
+                "environments": [
                     {
-                        "value": 1.1,
-                        "evaluator_id": "evaluator_id",
-                        "evaluator_version_id": "evaluator_version_id",
-                        "created_at": "2024-01-15T09:30:00Z",
-                        "updated_at": "2024-01-15T09:30:00Z",
+                        "id": "env_ffSVxEBzJcBZ1H5jcNMVj",
+                        "created_at": "2023-06-27T23:16:07.992339",
+                        "name": "development",
+                        "tag": "default",
                     }
                 ],
+                "created_at": "2024-07-08T22:40:35.656915",
+                "updated_at": "2024-07-08T22:40:35.656915",
+                "created_by": {
+                    "id": "usr_01RJO1k2spBVqNUt1ASef",
+                    "email_address": "raza@humanloop.com",
+                    "full_name": "Raza Habib",
+                },
+                "status": "committed",
+                "last_used_at": "2024-07-08T22:40:35.656915",
+                "model": "gpt-4o",
+                "endpoint": "chat",
+                "template": [
+                    {"content": "You are a helpful coding assistant specialising in {{language}}", "role": "system"}
+                ],
+                "provider": "openai",
+                "max_tokens": -1,
+                "temperature": 0.7,
+                "top_p": 1,
+                "presence_penalty": 0,
+                "frequency_penalty": 0,
+                "other": {},
+                "tools": [],
+                "linked_tools": [],
+                "commit_message": "Initial commit",
+                "version_logs_count": 0,
+                "total_logs_count": 0,
+                "inputs": [{"name": "messages"}],
             },
         }
     ]
@@ -947,45 +859,31 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                     "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
+                    "created_by": {"id": None, "email_address": None, "full_name": None},
                     "status": None,
                     "last_used_at": "datetime",
                     "model": None,
                     "endpoint": None,
-                    "template": None,
+                    "template": ("list", {0: {"content": None, "role": None}}),
                     "provider": None,
                     "max_tokens": "integer",
                     "temperature": None,
                     "top_p": None,
-                    "stop": None,
                     "presence_penalty": None,
                     "frequency_penalty": None,
-                    "seed": "integer",
-                    "response_format": {"type": None},
-                    "tools": ("list", {0: {"name": None, "description": None}}),
-                    "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
+                    "other": ("dict", {}),
+                    "tools": ("list", {}),
+                    "linked_tools": ("list", {}),
                     "commit_message": None,
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),
-                    "evaluator_aggregates": (
-                        "list",
-                        {
-                            0: {
-                                "value": None,
-                                "evaluator_id": None,
-                                "evaluator_version_id": None,
-                                "created_at": "datetime",
-                                "updated_at": "datetime",
-                            }
-                        },
-                    ),
                 },
             }
         },
     )
-    response = client.prompts.list_environments(id="id")
+    response = client.prompts.list_environments(id="pr_30gco7dx6JDq4200GVOHa")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.prompts.list_environments(id="id")
+    async_response = await async_client.prompts.list_environments(id="pr_30gco7dx6JDq4200GVOHa")
     validate_response(async_response, expected_response, expected_types)

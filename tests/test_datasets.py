@@ -10,105 +10,102 @@ from .utilities import validate_response
 
 async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ds_mno345",
+        "path": "test-questions",
+        "name": "test-questions",
+        "version_id": "dsv_pqr678",
         "type": "dataset",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
-        "datapoints_count": 1,
-        "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
-        ],
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
+        "datapoints_count": 4,
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
+        "path": None,
         "name": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
         "datapoints_count": "integer",
-        "datapoints": (
-            "list",
-            {
-                0: {
-                    "inputs": ("dict", {0: (None, None)}),
-                    "messages": ("list", {0: {"role": None}}),
-                    "target": ("dict", {0: (None, None)}),
-                    "id": None,
-                }
-            },
-        ),
     }
-    response = client.datasets.upsert(datapoints=[CreateDatapointRequest()])
+    response = client.datasets.upsert(
+        path="test-questions",
+        datapoints=[
+            CreateDatapointRequest(inputs={"question": "What is the capital of France?"}, target={"answer": "Paris"}),
+            CreateDatapointRequest(inputs={"question": "Who wrote Hamlet?"}, target={"answer": "William Shakespeare"}),
+        ],
+        action="add",
+        commit_message="Add two new questions and answers",
+    )
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.upsert(datapoints=[CreateDatapointRequest()])
+    async_response = await async_client.datasets.upsert(
+        path="test-questions",
+        datapoints=[
+            CreateDatapointRequest(inputs={"question": "What is the capital of France?"}, target={"answer": "Paris"}),
+            CreateDatapointRequest(inputs={"question": "Who wrote Hamlet?"}, target={"answer": "William Shakespeare"}),
+        ],
+        action="add",
+        commit_message="Add two new questions and answers",
+    )
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ds_345mno",
+        "path": "test-questions",
+        "name": "test-questions",
+        "version_id": "dsv_678pqr",
         "type": "dataset",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
-        "datapoints_count": 1,
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "status": "committed",
+        "last_used_at": "2024-05-01T12:00:00Z",
+        "datapoints_count": 2,
         "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
+            {
+                "id": "dp_123456",
+                "inputs": {"question": "What is the capital of France?"},
+                "target": {"answer": "Paris"},
+            },
+            {
+                "id": "dp_789012",
+                "inputs": {"question": "Who wrote Hamlet?"},
+                "target": {"answer": "William Shakespeare"},
+            },
         ],
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
+        "path": None,
         "name": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
         "status": None,
         "last_used_at": "datetime",
-        "commit_message": None,
         "datapoints_count": "integer",
         "datapoints": (
             "list",
             {
-                0: {
-                    "inputs": ("dict", {0: (None, None)}),
-                    "messages": ("list", {0: {"role": None}}),
-                    "target": ("dict", {0: (None, None)}),
-                    "id": None,
-                }
+                0: {"id": None, "inputs": ("dict", {0: (None, None)}), "target": ("dict", {0: (None, None)})},
+                1: {"id": None, "inputs": ("dict", {0: (None, None)}), "target": ("dict", {0: (None, None)})},
             },
         ),
     }
-    response = client.datasets.get(id="id")
+    response = client.datasets.get(id="ds_b0baF1ca7652", version_id="dsv_6L78pqrdFi2xa", include_datapoints=True)
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.get(id="id")
+    async_response = await async_client.datasets.get(
+        id="ds_b0baF1ca7652", version_id="dsv_6L78pqrdFi2xa", include_datapoints=True
+    )
     validate_response(async_response, expected_response, expected_types)
 
 
@@ -175,20 +172,22 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
     expected_response: typing.Any = {
         "records": [
             {
-                "path": "path",
-                "id": "id",
-                "name": "name",
-                "version_id": "version_id",
+                "id": "ds_345mno",
+                "path": "test-questions",
+                "name": "test-questions",
+                "version_id": "dsv_678pqr",
                 "type": "dataset",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
-                "commit_message": "commit_message",
-                "datapoints_count": 1,
-                "datapoints": [{"id": "id"}],
+                "created_at": "2024-05-01T12:00:00Z",
+                "updated_at": "2024-05-01T12:00:00Z",
+                "created_by": {
+                    "id": "usr_v23rSVAgas2a",
+                    "full_name": "Jordan Burges",
+                    "email_address": "jordan@humanloop.com",
+                },
+                "status": "committed",
+                "commit_message": "initial commit",
+                "last_used_at": "2024-05-01T12:00:00Z",
+                "datapoints_count": 2,
             }
         ]
     }
@@ -197,198 +196,114 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             "list",
             {
                 0: {
-                    "path": None,
                     "id": None,
+                    "path": None,
                     "name": None,
                     "version_id": None,
                     "type": None,
-                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
                     "created_at": "datetime",
                     "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
+                    "created_by": {"id": None, "full_name": None, "email_address": None},
                     "status": None,
-                    "last_used_at": "datetime",
                     "commit_message": None,
+                    "last_used_at": "datetime",
                     "datapoints_count": "integer",
-                    "datapoints": ("list", {0: {"id": None}}),
                 }
             },
         )
     }
-    response = client.datasets.list_versions(id="id")
+    response = client.datasets.list_versions(id="ds_b0baF1ca7652", status="committed")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.list_versions(id="id")
+    async_response = await async_client.datasets.list_versions(id="ds_b0baF1ca7652", status="committed")
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ds_345mno",
+        "path": "test-questions",
+        "name": "test-questions",
+        "version_id": "dsv_678pqr",
         "type": "dataset",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
-        "datapoints_count": 1,
-        "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
-        ],
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "created_by": {"id": "usr_v23rSVAgas2a", "full_name": "Jordan Burges", "email_address": "jordan@humanloop.com"},
+        "status": "committed",
+        "commit_message": "initial commit",
+        "last_used_at": "2024-05-01T12:00:00Z",
+        "datapoints_count": 2,
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
+        "path": None,
         "name": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
+        "created_by": {"id": None, "full_name": None, "email_address": None},
         "status": None,
-        "last_used_at": "datetime",
         "commit_message": None,
+        "last_used_at": "datetime",
         "datapoints_count": "integer",
-        "datapoints": (
-            "list",
-            {
-                0: {
-                    "inputs": ("dict", {0: (None, None)}),
-                    "messages": ("list", {0: {"role": None}}),
-                    "target": ("dict", {0: (None, None)}),
-                    "id": None,
-                }
-            },
-        ),
     }
-    response = client.datasets.commit(id="id", version_id="version_id", commit_message="commit_message")
+    response = client.datasets.commit(
+        id="ds_b0baF1ca7652", version_id="dsv_6L78pqrdFi2xa", commit_message="initial commit"
+    )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.datasets.commit(
-        id="id", version_id="version_id", commit_message="commit_message"
+        id="ds_b0baF1ca7652", version_id="dsv_6L78pqrdFi2xa", commit_message="initial commit"
     )
     validate_response(async_response, expected_response, expected_types)
 
 
-async def test_from_logs(client: Humanloop, async_client: AsyncHumanloop) -> None:
+async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
+        "id": "ds_345mno",
+        "path": "test-questions",
+        "name": "test-questions",
+        "version_id": "dsv_678pqr",
         "type": "dataset",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
-        "datapoints_count": 1,
-        "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
-        ],
+        "created_at": "2024-05-01T12:00:00Z",
+        "updated_at": "2024-05-01T12:00:00Z",
+        "created_by": {"id": "usr_v23rSVAgas2a", "full_name": "Jordan Burges", "email_address": "jordan@humanloop.com"},
+        "status": "committed",
+        "commit_message": "initial commit",
+        "last_used_at": "2024-05-01T12:00:00Z",
+        "datapoints_count": 2,
     }
     expected_types: typing.Any = {
-        "path": None,
         "id": None,
+        "path": None,
         "name": None,
         "version_id": None,
         "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
         "created_at": "datetime",
         "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
+        "created_by": {"id": None, "full_name": None, "email_address": None},
         "status": None,
-        "last_used_at": "datetime",
         "commit_message": None,
+        "last_used_at": "datetime",
         "datapoints_count": "integer",
-        "datapoints": (
-            "list",
-            {
-                0: {
-                    "inputs": ("dict", {0: (None, None)}),
-                    "messages": ("list", {0: {"role": None}}),
-                    "target": ("dict", {0: (None, None)}),
-                    "id": None,
-                }
-            },
-        ),
     }
-    response = client.datasets.from_logs(id="id", log_ids=["log_ids"], commit_message="commit_message")
-    validate_response(response, expected_response, expected_types)
-
-    async_response = await async_client.datasets.from_logs(
-        id="id", log_ids=["log_ids"], commit_message="commit_message"
+    response = client.datasets.set_deployment(
+        id="ds_b0baF1ca7652", environment_id="staging", version_id="dsv_6L78pqrdFi2xa"
     )
-    validate_response(async_response, expected_response, expected_types)
-
-
-async def test_deploy(client: Humanloop, async_client: AsyncHumanloop) -> None:
-    expected_response: typing.Any = {
-        "path": "path",
-        "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "type": "dataset",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
-        "commit_message": "commit_message",
-        "datapoints_count": 1,
-        "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
-        ],
-    }
-    expected_types: typing.Any = {
-        "path": None,
-        "id": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
-        "status": None,
-        "last_used_at": "datetime",
-        "commit_message": None,
-        "datapoints_count": "integer",
-        "datapoints": (
-            "list",
-            {
-                0: {
-                    "inputs": ("dict", {0: (None, None)}),
-                    "messages": ("list", {0: {"role": None}}),
-                    "target": ("dict", {0: (None, None)}),
-                    "id": None,
-                }
-            },
-        ),
-    }
-    response = client.datasets.deploy(id="id", environment_id="environment_id", version_id="version_id")
     validate_response(response, expected_response, expected_types)
 
-    async_response = await async_client.datasets.deploy(
-        id="id", environment_id="environment_id", version_id="version_id"
+    async_response = await async_client.datasets.set_deployment(
+        id="ds_b0baF1ca7652", environment_id="staging", version_id="dsv_6L78pqrdFi2xa"
     )
     validate_response(async_response, expected_response, expected_types)
 
 
 async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop) -> None:
     # Type ignore to avoid mypy complaining about the function not being meant to return a value
-    assert client.datasets.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+    assert client.datasets.remove_deployment(id="ds_b0baF1ca7652", environment_id="staging") is None  # type: ignore[func-returns-value]
 
-    assert await async_client.datasets.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
+    assert await async_client.datasets.remove_deployment(id="ds_b0baF1ca7652", environment_id="staging") is None  # type: ignore[func-returns-value]
 
 
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:

@@ -21,7 +21,7 @@ class EvaluationResponse(UncheckedBaseModel):
 
     dataset: DatasetResponse = pydantic_v1.Field()
     """
-    The Dataset Version used in the Evaluation.
+    The Dataset used in the Evaluation.
     """
 
     evaluatees: typing.List[EvaluateeResponse] = pydantic_v1.Field()

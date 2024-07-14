@@ -6,23 +6,14 @@ import typing
 from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
-from .evaluation_debug_result_response_value import EvaluationDebugResultResponseValue
-from .log_response import LogResponse
+from .prompt_response import PromptResponse
 
 
-class EvaluationDebugResultResponse(UncheckedBaseModel):
-    """
-    This is similar to an `EvaluationResult` but is ephemeral as it is only for synchronous
-    debug runs. It does not have an ID, or a reference to an evaluation run or even an evaluation
-    function.
-    """
-
-    log_id: str
-    log: LogResponse
-    datapoint_id: typing.Optional[str] = None
-    llm_evaluation_log: typing.Optional[LogResponse] = None
-    value: typing.Optional[EvaluationDebugResultResponseValue] = None
-    error: typing.Optional[str] = None
+class PaginatedDataPromptResponse(UncheckedBaseModel):
+    records: typing.List[PromptResponse]
+    page: int
+    size: int
+    total: int
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

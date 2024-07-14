@@ -44,7 +44,7 @@ class DatasetsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[DatasetResponse]:
         """
-        Get a list of Datasets.
+        List a list of all Datasets.
 
         Parameters
         ----------
@@ -81,7 +81,9 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.datasets.list()
+        response = client.datasets.list(
+            size=1,
+        )
         for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -203,7 +205,19 @@ class DatasetsClient:
             api_key="YOUR_API_KEY",
         )
         client.datasets.upsert(
-            datapoints=[CreateDatapointRequest()],
+            path="test-questions",
+            datapoints=[
+                CreateDatapointRequest(
+                    inputs={"question": "What is the capital of France?"},
+                    target={"answer": "Paris"},
+                ),
+                CreateDatapointRequest(
+                    inputs={"question": "Who wrote Hamlet?"},
+                    target={"answer": "William Shakespeare"},
+                ),
+            ],
+            action="add",
+            commit_message="Add two new questions and answers",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -276,7 +290,9 @@ class DatasetsClient:
             api_key="YOUR_API_KEY",
         )
         client.datasets.get(
-            id="id",
+            id="ds_b0baF1ca7652",
+            version_id="dsv_6L78pqrdFi2xa",
+            include_datapoints=True,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -445,7 +461,8 @@ class DatasetsClient:
             api_key="YOUR_API_KEY",
         )
         response = client.datasets.list_datapoints(
-            id="id",
+            id="ds_b0baF1ca7652",
+            size=1,
         )
         for item in response:
             yield item
@@ -488,8 +505,6 @@ class DatasetsClient:
         id: str,
         *,
         status: typing.Optional[VersionStatus] = None,
-        environment: typing.Optional[str] = None,
-        evaluation_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasets:
         """
@@ -502,11 +517,6 @@ class DatasetsClient:
 
         status : typing.Optional[VersionStatus]
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-
-        environment : typing.Optional[str]
-            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-
-        evaluation_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -524,13 +534,14 @@ class DatasetsClient:
             api_key="YOUR_API_KEY",
         )
         client.datasets.list_versions(
-            id="id",
+            id="ds_b0baF1ca7652",
+            status="committed",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
+            params={"status": status},
             request_options=request_options,
         )
         try:
@@ -549,7 +560,9 @@ class DatasetsClient:
         self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
     ) -> DatasetResponse:
         """
-        Commit the Dataset Version with the given ID.
+        Commit a version of the Dataset with a commit message.
+
+        If the version is already committed, an exception will be raised.
 
         Parameters
         ----------
@@ -578,9 +591,9 @@ class DatasetsClient:
             api_key="YOUR_API_KEY",
         )
         client.datasets.commit(
-            id="id",
-            version_id="version_id",
-            commit_message="commit_message",
+            id="ds_b0baF1ca7652",
+            version_id="dsv_6L78pqrdFi2xa",
+            commit_message="initial commit",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -680,91 +693,13 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def from_logs(
-        self,
-        id: str,
-        *,
-        log_ids: typing.Sequence[str],
-        commit_message: str,
-        version_id: typing.Optional[str] = None,
-        environment: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> DatasetResponse:
-        """
-        Add Datapoints from Logs to a Dataset.
-
-        This will create a new committed version of the Dataset with the Datapoints from the Logs.
-
-        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
-        with the Datapoints from the Logs added to the existing Datapoints in the version.
-        If neither `version_id` nor `environment` is provided, the new version will be based on the version
-        of the Dataset that is deployed to the default Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for the Dataset
-
-        log_ids : typing.Sequence[str]
-            List of Log IDs to create Datapoints from.
-
-        commit_message : str
-            Commit message for the new Dataset version.
-
-        version_id : typing.Optional[str]
-            ID of the specific Dataset version to base the created Version on.
-
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed Version to base the created Version on.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        DatasetResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.datasets.from_logs(
-            id="id",
-            log_ids=["log_ids"],
-            commit_message="commit_message",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/datapoints/logs",
-            method="POST",
-            params={"version_id": version_id, "environment": environment},
-            json={"log_ids": log_ids, "commit_message": commit_message},
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def deploy(
+    def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> DatasetResponse:
         """
         Deploy Dataset to Environment.
 
-        Set the deployed Version for the specified Environment.
+        Set the deployed version for the specified Environment.
 
         Parameters
         ----------
@@ -792,10 +727,10 @@ class DatasetsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.datasets.deploy(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
+        client.datasets.set_deployment(
+            id="ds_b0baF1ca7652",
+            environment_id="staging",
+            version_id="dsv_6L78pqrdFi2xa",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -820,9 +755,9 @@ class DatasetsClient:
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Remove deployment of Dataset from Environment.
+        Remove deployed Dataset from Environment.
 
-        Remove the deployed Version for the specified Environment.
+        Remove the deployed version for the specified Environment.
 
         Parameters
         ----------
@@ -847,8 +782,8 @@ class DatasetsClient:
             api_key="YOUR_API_KEY",
         )
         client.datasets.remove_deployment(
-            id="id",
-            environment_id="environment_id",
+            id="ds_b0baF1ca7652",
+            environment_id="staging",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -930,7 +865,7 @@ class AsyncDatasetsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[DatasetResponse]:
         """
-        Get a list of Datasets.
+        List a list of all Datasets.
 
         Parameters
         ----------
@@ -967,7 +902,9 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.datasets.list()
+        response = await client.datasets.list(
+            size=1,
+        )
         async for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -1089,7 +1026,19 @@ class AsyncDatasetsClient:
             api_key="YOUR_API_KEY",
         )
         await client.datasets.upsert(
-            datapoints=[CreateDatapointRequest()],
+            path="test-questions",
+            datapoints=[
+                CreateDatapointRequest(
+                    inputs={"question": "What is the capital of France?"},
+                    target={"answer": "Paris"},
+                ),
+                CreateDatapointRequest(
+                    inputs={"question": "Who wrote Hamlet?"},
+                    target={"answer": "William Shakespeare"},
+                ),
+            ],
+            action="add",
+            commit_message="Add two new questions and answers",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1162,7 +1111,9 @@ class AsyncDatasetsClient:
             api_key="YOUR_API_KEY",
         )
         await client.datasets.get(
-            id="id",
+            id="ds_b0baF1ca7652",
+            version_id="dsv_6L78pqrdFi2xa",
+            include_datapoints=True,
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1331,7 +1282,8 @@ class AsyncDatasetsClient:
             api_key="YOUR_API_KEY",
         )
         response = await client.datasets.list_datapoints(
-            id="id",
+            id="ds_b0baF1ca7652",
+            size=1,
         )
         async for item in response:
             yield item
@@ -1374,8 +1326,6 @@ class AsyncDatasetsClient:
         id: str,
         *,
         status: typing.Optional[VersionStatus] = None,
-        environment: typing.Optional[str] = None,
-        evaluation_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasets:
         """
@@ -1388,11 +1338,6 @@ class AsyncDatasetsClient:
 
         status : typing.Optional[VersionStatus]
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-
-        environment : typing.Optional[str]
-            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-
-        evaluation_aggregates : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1410,13 +1355,14 @@ class AsyncDatasetsClient:
             api_key="YOUR_API_KEY",
         )
         await client.datasets.list_versions(
-            id="id",
+            id="ds_b0baF1ca7652",
+            status="committed",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluation_aggregates": evaluation_aggregates},
+            params={"status": status},
             request_options=request_options,
         )
         try:
@@ -1435,7 +1381,9 @@ class AsyncDatasetsClient:
         self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
     ) -> DatasetResponse:
         """
-        Commit the Dataset Version with the given ID.
+        Commit a version of the Dataset with a commit message.
+
+        If the version is already committed, an exception will be raised.
 
         Parameters
         ----------
@@ -1464,9 +1412,9 @@ class AsyncDatasetsClient:
             api_key="YOUR_API_KEY",
         )
         await client.datasets.commit(
-            id="id",
-            version_id="version_id",
-            commit_message="commit_message",
+            id="ds_b0baF1ca7652",
+            version_id="dsv_6L78pqrdFi2xa",
+            commit_message="initial commit",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1566,91 +1514,13 @@ class AsyncDatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def from_logs(
-        self,
-        id: str,
-        *,
-        log_ids: typing.Sequence[str],
-        commit_message: str,
-        version_id: typing.Optional[str] = None,
-        environment: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> DatasetResponse:
-        """
-        Add Datapoints from Logs to a Dataset.
-
-        This will create a new committed version of the Dataset with the Datapoints from the Logs.
-
-        If either `version_id` or `environment` is provided, the new version will be based on the specified version,
-        with the Datapoints from the Logs added to the existing Datapoints in the version.
-        If neither `version_id` nor `environment` is provided, the new version will be based on the version
-        of the Dataset that is deployed to the default Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for the Dataset
-
-        log_ids : typing.Sequence[str]
-            List of Log IDs to create Datapoints from.
-
-        commit_message : str
-            Commit message for the new Dataset version.
-
-        version_id : typing.Optional[str]
-            ID of the specific Dataset version to base the created Version on.
-
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed Version to base the created Version on.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        DatasetResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.datasets.from_logs(
-            id="id",
-            log_ids=["log_ids"],
-            commit_message="commit_message",
-        )
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/datapoints/logs",
-            method="POST",
-            params={"version_id": version_id, "environment": environment},
-            json={"log_ids": log_ids, "commit_message": commit_message},
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(DatasetResponse, construct_type(type_=DatasetResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def deploy(
+    async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> DatasetResponse:
         """
         Deploy Dataset to Environment.
 
-        Set the deployed Version for the specified Environment.
+        Set the deployed version for the specified Environment.
 
         Parameters
         ----------
@@ -1678,10 +1548,10 @@ class AsyncDatasetsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.deploy(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
+        await client.datasets.set_deployment(
+            id="ds_b0baF1ca7652",
+            environment_id="staging",
+            version_id="dsv_6L78pqrdFi2xa",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1706,9 +1576,9 @@ class AsyncDatasetsClient:
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Remove deployment of Dataset from Environment.
+        Remove deployed Dataset from Environment.
 
-        Remove the deployed Version for the specified Environment.
+        Remove the deployed version for the specified Environment.
 
         Parameters
         ----------
@@ -1733,8 +1603,8 @@ class AsyncDatasetsClient:
             api_key="YOUR_API_KEY",
         )
         await client.datasets.remove_deployment(
-            id="id",
-            environment_id="environment_id",
+            id="ds_b0baF1ca7652",
+            environment_id="staging",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(

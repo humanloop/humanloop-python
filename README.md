@@ -16,13 +16,30 @@ pip install humanloop
 Instantiate and use the client with the following:
 
 ```python
+from humanloop import ChatMessage, PromptKernelRequest
 from humanloop.client import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.upsert(
-    model="model",
+client.prompts.log(
+    path="persona",
+    prompt=PromptKernelRequest(
+        model="gpt-4",
+        template=[
+            ChatMessage(
+                role="system",
+                content="You are {{person}}. Answer questions as this person. Do not break character.",
+            )
+        ],
+    ),
+    messages=[
+        ChatMessage(
+            role="user",
+            content="What really happened at Roswell?",
+        )
+    ],
+    inputs={"person": "Trump"},
 )
 ```
 
@@ -31,13 +48,30 @@ client.prompts.upsert(
 The SDK also exports an `async` client so that you can make non-blocking calls to our API.
 
 ```python
+from humanloop import ChatMessage, PromptKernelRequest
 from humanloop.client import AsyncHumanloop
 
 client = AsyncHumanloop(
     api_key="YOUR_API_KEY",
 )
-await client.prompts.upsert(
-    model="model",
+await client.prompts.log(
+    path="persona",
+    prompt=PromptKernelRequest(
+        model="gpt-4",
+        template=[
+            ChatMessage(
+                role="system",
+                content="You are {{person}}. Answer questions as this person. Do not break character.",
+            )
+        ],
+    ),
+    messages=[
+        ChatMessage(
+            role="user",
+            content="What really happened at Roswell?",
+        )
+    ],
+    inputs={"person": "Trump"},
 )
 ```
 
@@ -125,7 +159,9 @@ from humanloop.client import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.prompts.list()
+response = client.prompts.list(
+    size=1,
+)
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page

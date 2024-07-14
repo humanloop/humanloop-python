@@ -12,16 +12,17 @@ from ..core.request_options import RequestOptions
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.create_tool_log_response import CreateToolLogResponse
-from ..types.evaluator_activation_deactivation_request_evaluators_to_activate_item import (
-    EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem,
+from ..types.evaluator_activation_deactivation_request_activate_item import (
+    EvaluatorActivationDeactivationRequestActivateItem,
 )
-from ..types.evaluator_activation_deactivation_request_evaluators_to_deactivate_item import (
-    EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem,
+from ..types.evaluator_activation_deactivation_request_deactivate_item import (
+    EvaluatorActivationDeactivationRequestDeactivateItem,
 )
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.files_tool_type import FilesToolType
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_tools import ListTools
+from ..types.paginated_data_tool_response import PaginatedDataToolResponse
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..types.tool_function import ToolFunction
@@ -37,6 +38,189 @@ class ToolsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    def log(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        output: typing.Optional[str] = OMIT,
+        raw_output: typing.Optional[str] = OMIT,
+        created_at: typing.Optional[dt.datetime] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        provider_latency: typing.Optional[float] = OMIT,
+        provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        tool_log_request_environment: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequest] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CreateToolLogResponse:
+        """
+        Log to a Tool.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Tool. Otherwise the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Tool details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Tool, if not we will create a new version. This is helpful
+        in the case where you are storing or deriving your Tool details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Tool to log to.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to log to.
+
+        path : typing.Optional[str]
+            Path of the Tool, including the name, which is used as a unique identifier.
+
+        id : typing.Optional[str]
+            ID for an existing Tool to update.
+
+        output : typing.Optional[str]
+            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+
+        raw_output : typing.Optional[str]
+            Raw output from the provider.
+
+        created_at : typing.Optional[dt.datetime]
+            User defined timestamp for when the log was created.
+
+        error : typing.Optional[str]
+            Error message if the log is an error.
+
+        provider_latency : typing.Optional[float]
+            Duration of the logged event in seconds.
+
+        provider_request : typing.Optional[typing.Dict[str, typing.Any]]
+            Raw request sent to provider.
+
+        provider_response : typing.Optional[typing.Dict[str, typing.Any]]
+            Raw response received the provider.
+
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Any]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Any]]
+            Any additional metadata to record.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        batches : typing.Optional[typing.Sequence[str]]
+            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        tool_log_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        tool : typing.Optional[ToolKernelRequest]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CreateToolLogResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import ToolFunction, ToolKernelRequest
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.log(
+            path="math-tool",
+            tool=ToolKernelRequest(
+                function=ToolFunction(
+                    name="multiply",
+                    description="Multiply two numbers",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "a": {"type": "number"},
+                            "b": {"type": "number"},
+                        },
+                        "required": ["a", "b"],
+                    },
+                ),
+            ),
+            inputs={"a": 5, "b": 7},
+            output="35",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "tools/log",
+            method="POST",
+            params={"version_id": version_id, "environment": environment},
+            json={
+                "path": path,
+                "id": id,
+                "output": output,
+                "raw_output": raw_output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "session_id": session_id,
+                "parent_id": parent_id,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "save": save,
+                "source_datapoint_id": source_datapoint_id,
+                "batches": batches,
+                "user": user,
+                "environment": tool_log_request_environment,
+                "tool": tool,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(CreateToolLogResponse, construct_type(type_=CreateToolLogResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def list(
         self,
         *,
@@ -49,7 +233,7 @@ class ToolsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[ToolResponse]:
         """
-        Get a list of Tools.
+        Get a list of all Tools.
 
         Parameters
         ----------
@@ -86,7 +270,9 @@ class ToolsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.tools.list()
+        response = client.tools.list(
+            size=1,
+        )
         for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -109,7 +295,7 @@ class ToolsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
+                _parsed_response = typing.cast(PaginatedDataToolResponse, construct_type(type_=PaginatedDataToolResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
                 _get_next = lambda: self.list(
                     page=page + 1,
@@ -185,12 +371,25 @@ class ToolsClient:
 
         Examples
         --------
+        from humanloop import ToolFunction
         from humanloop.client import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.upsert()
+        client.tools.upsert(
+            path="math-tool",
+            function=ToolFunction(
+                name="multiply",
+                description="Multiply two numbers",
+                parameters={
+                    "type": "object",
+                    "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
+                    "required": ["a", "b"],
+                },
+            ),
+            commit_message="Initial commit",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "tools",
@@ -260,7 +459,7 @@ class ToolsClient:
             api_key="YOUR_API_KEY",
         )
         client.tools.get(
-            id="id",
+            id="tl_789ghi",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -305,7 +504,7 @@ class ToolsClient:
             api_key="YOUR_API_KEY",
         )
         client.tools.delete(
-            id="id",
+            id="tl_789ghi",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -361,7 +560,8 @@ class ToolsClient:
             api_key="YOUR_API_KEY",
         )
         client.tools.move(
-            id="id",
+            id="tl_789ghi",
+            path="new directory/new name",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -388,7 +588,6 @@ class ToolsClient:
         id: str,
         *,
         status: typing.Optional[VersionStatus] = None,
-        environment: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListTools:
@@ -403,10 +602,8 @@ class ToolsClient:
         status : typing.Optional[VersionStatus]
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
-        environment : typing.Optional[str]
-            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-
         evaluator_aggregates : typing.Optional[bool]
+            Whether to include Evaluator aggregate results for the versions in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -424,13 +621,14 @@ class ToolsClient:
             api_key="YOUR_API_KEY",
         )
         client.tools.list_versions(
-            id="id",
+            id="tl_789ghi",
+            status="committed",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
+            params={"status": status, "evaluator_aggregates": evaluator_aggregates},
             request_options=request_options,
         )
         try:
@@ -449,7 +647,9 @@ class ToolsClient:
         self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ToolResponse:
         """
-        Commit the Tool Version with the given ID.
+        Commit a version of the Tool with a commit message.
+
+        If the version is already committed, an exception will be raised.
 
         Parameters
         ----------
@@ -478,9 +678,9 @@ class ToolsClient:
             api_key="YOUR_API_KEY",
         )
         client.tools.commit(
-            id="id",
-            version_id="version_id",
-            commit_message="commit_message",
+            id="tl_789ghi",
+            version_id="tv_012jkl",
+            commit_message="Initial commit",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -502,7 +702,237 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def log(
+    def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ToolResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Tool.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Tool for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
+            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ToolResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import MonitoringEvaluatorVersionRequest
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.update_monitoring(
+            id="tl_789ghi",
+            activate=[
+                MonitoringEvaluatorVersionRequest(
+                    evaluator_version_id="evv_1abc4308abd",
+                )
+            ],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={"activate": activate, "deactivate": deactivate},
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def set_deployment(
+        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> ToolResponse:
+        """
+        Deploy Tool to an Environment.
+
+        Set the deployed version for the specified Environment. This Prompt
+        will be used for calls made to the Tool in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        environment_id : str
+            Unique identifier for the Environment to deploy the Version to.
+
+        version_id : str
+            Unique identifier for the specific version of the Tool.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ToolResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.set_deployment(
+            id="tl_789ghi",
+            environment_id="staging",
+            version_id="tv_012jkl",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={"version_id": version_id},
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_deployment(
+        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove deployed Tool from the Environment.
+
+        Remove the deployed version for the specified Environment. This Tool
+        will no longer be used for calls made to the Tool in this Environment.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        environment_id : str
+            Unique identifier for the Environment to remove the deployment from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.remove_deployment(
+            id="tl_789ghi",
+            environment_id="staging",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list_environments(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentResponse]:
+        """
+        List all Environments and their deployed versions for the Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop.client import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.list_environments(
+            id="tl_789ghi",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+
+class AsyncToolsClient:
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
+        self._client_wrapper = client_wrapper
+
+    async def log(
         self,
         *,
         version_id: typing.Optional[str] = None,
@@ -532,7 +962,7 @@ class ToolsClient:
         """
         Log to a Tool.
 
-        You can use query parameters version_id, or environment, to target
+        You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Tool. Otherwise the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
@@ -618,14 +1048,33 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import ToolFunction, ToolKernelRequest
+        from humanloop.client import AsyncHumanloop
 
-        client = Humanloop(
+        client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        client.tools.log()
+        await client.tools.log(
+            path="math-tool",
+            tool=ToolKernelRequest(
+                function=ToolFunction(
+                    name="multiply",
+                    description="Multiply two numbers",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "a": {"type": "number"},
+                            "b": {"type": "number"},
+                        },
+                        "required": ["a", "b"],
+                    },
+                ),
+            ),
+            inputs={"a": 5, "b": 7},
+            output="35",
+        )
         """
-        _response = self._client_wrapper.httpx_client.request(
+        _response = await self._client_wrapper.httpx_client.request(
             "tools/log",
             method="POST",
             params={"version_id": version_id, "environment": environment},
@@ -666,237 +1115,6 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_evaluators(
-        self,
-        id: str,
-        *,
-        evaluators_to_activate: typing.Optional[
-            typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem]
-        ] = OMIT,
-        evaluators_to_deactivate: typing.Optional[
-            typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem]
-        ] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
-        """
-        Activate and deactivate Evaluators for the Tool.
-
-        An activated Evaluator will automatically be run on all new Logs
-        within the Tool for monitoring purposes.
-
-        Parameters
-        ----------
-        id : str
-
-        evaluators_to_activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem]]
-            Monitoring Evaluators to activate. These will be automatically run on new Logs.
-
-        evaluators_to_deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem]]
-            Evaluators to deactivate. These will not be run on new Logs.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ToolResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.update_evaluators(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "evaluators_to_activate": evaluators_to_activate,
-                "evaluators_to_deactivate": evaluators_to_deactivate,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def deploy(
-        self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> ToolResponse:
-        """
-        Deploy Tool to Environment.
-
-        Set the deployed Version for the specified Environment. This Tool Version
-        will be used for calls made to the Tool in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Tool.
-
-        environment_id : str
-            Unique identifier for the Environment to deploy the Version to.
-
-        version_id : str
-            Unique identifier for the specific version of the Tool.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ToolResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.deploy(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={"version_id": version_id},
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(ToolResponse, construct_type(type_=ToolResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def remove_deployment(
-        self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
-        """
-        Remove deployment of Tool from Environment.
-
-        Remove the deployed Version for the specified Environment. This Tool Version
-        will no longer be used for calls made to the Tool in this Environment.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Tool.
-
-        environment_id : str
-            Unique identifier for the Environment to remove the deployment from.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.remove_deployment(
-            id="id",
-            environment_id="environment_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def list_environments(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
-        """
-        List all Environments and their deployed versions for the Tool.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Tool.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[FileEnvironmentResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.list_environments(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(typing.List[FileEnvironmentResponse], construct_type(type_=typing.List[FileEnvironmentResponse], object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-
-class AsyncToolsClient:
-    def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
-
     async def list(
         self,
         *,
@@ -909,7 +1127,7 @@ class AsyncToolsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[ToolResponse]:
         """
-        Get a list of Tools.
+        Get a list of all Tools.
 
         Parameters
         ----------
@@ -946,7 +1164,9 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.tools.list()
+        response = await client.tools.list(
+            size=1,
+        )
         async for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -969,7 +1189,7 @@ class AsyncToolsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(ListTools, construct_type(type_=ListTools, object_=_response.json()))  # type: ignore
+                _parsed_response = typing.cast(PaginatedDataToolResponse, construct_type(type_=PaginatedDataToolResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
                 _get_next = lambda: self.list(
                     page=page + 1,
@@ -1045,12 +1265,25 @@ class AsyncToolsClient:
 
         Examples
         --------
+        from humanloop import ToolFunction
         from humanloop.client import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.upsert()
+        await client.tools.upsert(
+            path="math-tool",
+            function=ToolFunction(
+                name="multiply",
+                description="Multiply two numbers",
+                parameters={
+                    "type": "object",
+                    "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
+                    "required": ["a", "b"],
+                },
+            ),
+            commit_message="Initial commit",
+        )
         """
         _response = await self._client_wrapper.httpx_client.request(
             "tools",
@@ -1120,7 +1353,7 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.get(
-            id="id",
+            id="tl_789ghi",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1165,7 +1398,7 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.delete(
-            id="id",
+            id="tl_789ghi",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1221,7 +1454,8 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.move(
-            id="id",
+            id="tl_789ghi",
+            path="new directory/new name",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1248,7 +1482,6 @@ class AsyncToolsClient:
         id: str,
         *,
         status: typing.Optional[VersionStatus] = None,
-        environment: typing.Optional[str] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListTools:
@@ -1263,10 +1496,8 @@ class AsyncToolsClient:
         status : typing.Optional[VersionStatus]
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
-        environment : typing.Optional[str]
-            Name of the environment to filter versions by. If no environment is provided, all versions are returned.
-
         evaluator_aggregates : typing.Optional[bool]
+            Whether to include Evaluator aggregate results for the versions in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1284,13 +1515,14 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.list_versions(
-            id="id",
+            id="tl_789ghi",
+            status="committed",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions",
             method="GET",
-            params={"status": status, "environment": environment, "evaluator_aggregates": evaluator_aggregates},
+            params={"status": status, "evaluator_aggregates": evaluator_aggregates},
             request_options=request_options,
         )
         try:
@@ -1309,7 +1541,9 @@ class AsyncToolsClient:
         self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ToolResponse:
         """
-        Commit the Tool Version with the given ID.
+        Commit a version of the Tool with a commit message.
+
+        If the version is already committed, an exception will be raised.
 
         Parameters
         ----------
@@ -1338,9 +1572,9 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.commit(
-            id="id",
-            version_id="version_id",
-            commit_message="commit_message",
+            id="tl_789ghi",
+            version_id="tv_012jkl",
+            commit_message="Initial commit",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1362,184 +1596,16 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def log(
-        self,
-        *,
-        version_id: typing.Optional[str] = None,
-        environment: typing.Optional[str] = None,
-        path: typing.Optional[str] = OMIT,
-        id: typing.Optional[str] = OMIT,
-        output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
-        created_at: typing.Optional[dt.datetime] = OMIT,
-        error: typing.Optional[str] = OMIT,
-        provider_latency: typing.Optional[float] = OMIT,
-        provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
-        provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
-        inputs: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
-        source: typing.Optional[str] = OMIT,
-        metadata: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
-        source_datapoint_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
-        user: typing.Optional[str] = OMIT,
-        tool_log_request_environment: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequest] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateToolLogResponse:
-        """
-        Log to a Tool.
-
-        You can use query parameters version_id, or environment, to target
-        an existing version of the Tool. Otherwise the default deployed version will be chosen.
-
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Tool details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Tool, if not we will create a new version. This is helpful
-        in the case where you are storing or deriving your Tool details in code.
-
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Tool to log to.
-
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
-
-        path : typing.Optional[str]
-            Path of the Tool, including the name, which is used as a unique identifier.
-
-        id : typing.Optional[str]
-            ID for an existing Tool to update.
-
-        output : typing.Optional[str]
-            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
-
-        created_at : typing.Optional[dt.datetime]
-            User defined timestamp for when the log was created.
-
-        error : typing.Optional[str]
-            Error message if the log is an error.
-
-        provider_latency : typing.Optional[float]
-            Duration of the logged event in seconds.
-
-        provider_request : typing.Optional[typing.Dict[str, typing.Any]]
-            Raw request sent to provider.
-
-        provider_response : typing.Optional[typing.Dict[str, typing.Any]]
-            Raw response received the provider.
-
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
-        inputs : typing.Optional[typing.Dict[str, typing.Any]]
-            The inputs passed to the prompt template.
-
-        source : typing.Optional[str]
-            Identifies where the model was called from.
-
-        metadata : typing.Optional[typing.Dict[str, typing.Any]]
-            Any additional metadata to record.
-
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
-
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
-
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
-
-        user : typing.Optional[str]
-            End-user ID related to the Log.
-
-        tool_log_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
-
-        tool : typing.Optional[ToolKernelRequest]
-            Details of your Tool. A new Tool version will be created if the provided details are new.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        CreateToolLogResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop.client import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-        await client.tools.log()
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "tools/log",
-            method="POST",
-            params={"version_id": version_id, "environment": environment},
-            json={
-                "path": path,
-                "id": id,
-                "output": output,
-                "raw_output": raw_output,
-                "created_at": created_at,
-                "error": error,
-                "provider_latency": provider_latency,
-                "provider_request": provider_request,
-                "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
-                "inputs": inputs,
-                "source": source,
-                "metadata": metadata,
-                "save": save,
-                "source_datapoint_id": source_datapoint_id,
-                "batches": batches,
-                "user": user,
-                "environment": tool_log_request_environment,
-                "tool": tool,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(CreateToolLogResponse, construct_type(type_=CreateToolLogResponse, object_=_response.json()))  # type: ignore
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def update_evaluators(
+    async def update_monitoring(
         self,
         id: str,
         *,
-        evaluators_to_activate: typing.Optional[
-            typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem]
-        ] = OMIT,
-        evaluators_to_deactivate: typing.Optional[
-            typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem]
-        ] = OMIT,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ToolResponse:
         """
-        Activate and deactivate Evaluators for the Tool.
+        Activate and deactivate Evaluators for monitoring the Tool.
 
         An activated Evaluator will automatically be run on all new Logs
         within the Tool for monitoring purposes.
@@ -1548,10 +1614,10 @@ class AsyncToolsClient:
         ----------
         id : str
 
-        evaluators_to_activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem]]
-            Monitoring Evaluators to activate. These will be automatically run on new Logs.
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
+            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
 
-        evaluators_to_deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem]]
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
             Evaluators to deactivate. These will not be run on new Logs.
 
         request_options : typing.Optional[RequestOptions]
@@ -1564,22 +1630,25 @@ class AsyncToolsClient:
 
         Examples
         --------
+        from humanloop import MonitoringEvaluatorVersionRequest
         from humanloop.client import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.update_evaluators(
-            id="id",
+        await client.tools.update_monitoring(
+            id="tl_789ghi",
+            activate=[
+                MonitoringEvaluatorVersionRequest(
+                    evaluator_version_id="evv_1abc4308abd",
+                )
+            ],
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/evaluators",
             method="POST",
-            json={
-                "evaluators_to_activate": evaluators_to_activate,
-                "evaluators_to_deactivate": evaluators_to_deactivate,
-            },
+            json={"activate": activate, "deactivate": deactivate},
             request_options=request_options,
             omit=OMIT,
         )
@@ -1595,13 +1664,13 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def deploy(
+    async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ToolResponse:
         """
-        Deploy Tool to Environment.
+        Deploy Tool to an Environment.
 
-        Set the deployed Version for the specified Environment. This Tool Version
+        Set the deployed version for the specified Environment. This Prompt
         will be used for calls made to the Tool in this Environment.
 
         Parameters
@@ -1630,10 +1699,10 @@ class AsyncToolsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.deploy(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
+        await client.tools.set_deployment(
+            id="tl_789ghi",
+            environment_id="staging",
+            version_id="tv_012jkl",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1658,9 +1727,9 @@ class AsyncToolsClient:
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Remove deployment of Tool from Environment.
+        Remove deployed Tool from the Environment.
 
-        Remove the deployed Version for the specified Environment. This Tool Version
+        Remove the deployed version for the specified Environment. This Tool
         will no longer be used for calls made to the Tool in this Environment.
 
         Parameters
@@ -1686,8 +1755,8 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.remove_deployment(
-            id="id",
-            environment_id="environment_id",
+            id="tl_789ghi",
+            environment_id="staging",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -1734,7 +1803,7 @@ class AsyncToolsClient:
             api_key="YOUR_API_KEY",
         )
         await client.tools.list_environments(
-            id="id",
+            id="tl_789ghi",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(

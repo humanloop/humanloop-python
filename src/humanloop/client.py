@@ -8,7 +8,6 @@ import httpx
 from .core.api_error import ApiError
 from .core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from .datasets.client import AsyncDatasetsClient, DatasetsClient
-from .directories.client import AsyncDirectoriesClient, DirectoriesClient
 from .environment import HumanloopEnvironment
 from .evaluations.client import AsyncEvaluationsClient, EvaluationsClient
 from .evaluators.client import AsyncEvaluatorsClient, EvaluatorsClient
@@ -83,7 +82,6 @@ class Humanloop:
         self.prompts = PromptsClient(client_wrapper=self._client_wrapper)
         self.tools = ToolsClient(client_wrapper=self._client_wrapper)
         self.datasets = DatasetsClient(client_wrapper=self._client_wrapper)
-        self.directories = DirectoriesClient(client_wrapper=self._client_wrapper)
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
         self.evaluators = EvaluatorsClient(client_wrapper=self._client_wrapper)
         self.logs = LogsClient(client_wrapper=self._client_wrapper)
@@ -155,7 +153,6 @@ class AsyncHumanloop:
         self.prompts = AsyncPromptsClient(client_wrapper=self._client_wrapper)
         self.tools = AsyncToolsClient(client_wrapper=self._client_wrapper)
         self.datasets = AsyncDatasetsClient(client_wrapper=self._client_wrapper)
-        self.directories = AsyncDirectoriesClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
         self.evaluators = AsyncEvaluatorsClient(client_wrapper=self._client_wrapper)
         self.logs = AsyncLogsClient(client_wrapper=self._client_wrapper)

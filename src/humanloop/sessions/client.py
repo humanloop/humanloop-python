@@ -44,7 +44,7 @@ class SessionsClient:
             api_key="YOUR_API_KEY",
         )
         client.sessions.get(
-            id="id",
+            id="sesh_123abc",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -86,7 +86,7 @@ class SessionsClient:
             api_key="YOUR_API_KEY",
         )
         client.sessions.delete(
-            id="id",
+            id="sesh_123abc",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -145,7 +145,10 @@ class SessionsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.sessions.list()
+        response = client.sessions.list(
+            size=1,
+            file_id="pr_123abc",
+        )
         for item in response:
             yield item
         # alternatively, you can paginate page-by-page
@@ -207,7 +210,7 @@ class AsyncSessionsClient:
             api_key="YOUR_API_KEY",
         )
         await client.sessions.get(
-            id="id",
+            id="sesh_123abc",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -249,7 +252,7 @@ class AsyncSessionsClient:
             api_key="YOUR_API_KEY",
         )
         await client.sessions.delete(
-            id="id",
+            id="sesh_123abc",
         )
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -308,7 +311,10 @@ class AsyncSessionsClient:
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.sessions.list()
+        response = await client.sessions.list(
+            size=1,
+            file_id="pr_123abc",
+        )
         async for item in response:
             yield item
         # alternatively, you can paginate page-by-page

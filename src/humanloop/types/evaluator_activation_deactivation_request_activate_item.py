@@ -5,6 +5,6 @@ import typing
 from .monitoring_evaluator_environment_request import MonitoringEvaluatorEnvironmentRequest
 from .monitoring_evaluator_version_request import MonitoringEvaluatorVersionRequest
 
-EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem = typing.Union[
+EvaluatorActivationDeactivationRequestActivateItem = typing.Union[
     MonitoringEvaluatorVersionRequest, MonitoringEvaluatorEnvironmentRequest
 ]

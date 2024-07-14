@@ -355,52 +355,6 @@ types:
         docs: >-
           The list of Datapoints in this Dataset version. Only provided if
           explicitly requested.
-  DirectoryResponse:
-    properties:
-      name:
-        type: string
-        docs: Name of the directory to create.
-      parent_id:
-        type: optional<string>
-        docs: >-
-          ID of the parent directory. Will be `None` if the directory is the
-          root directory. Starts with `dir_`.
-      id:
-        type: string
-        docs: String ID of directory. Starts with `dir_`.
-      created_at: datetime
-      updated_at: datetime
-  DirectoryWithParentsAndChildrenResponseFilesItem:
-    discriminated: false
-    union:
-      - PromptResponse
-      - ToolResponse
-      - EvaluatorResponse
-      - DatasetResponse
-  DirectoryWithParentsAndChildrenResponse:
-    properties:
-      name:
-        type: string
-        docs: Name of the directory to create.
-      parent_id:
-        type: optional<string>
-        docs: >-
-          ID of the parent directory. Will be `None` if the directory is the
-          root directory. Starts with `dir_`.
-      id:
-        type: string
-        docs: String ID of directory. Starts with `dir_`.
-      created_at: datetime
-      updated_at: datetime
-      subdirectories:
-        docs: List of subdirectories in the directory.
-        type: list<DirectoryResponse>
-      files:
-        docs: List of files in the directory.
-        type: list<DirectoryWithParentsAndChildrenResponseFilesItem>
-      parents:
-        docs: List of parent directories of the directory.
-        type: list<DirectoryResponse>
   EnvironmentResponse:
     properties:
       id: string
@@ -417,6 +371,7 @@ types:
     union:
       - PromptResponse
       - ToolResponse
+      - EvaluatorResponse
   EvaluateeRequest:
     properties:
       version_id:
@@ -437,6 +392,7 @@ types:
           the user via the API.
         default: true
   EvaluateeResponse:
+    docs: Version of the Evaluatee being evaluated.
     properties:
       version: EvaluatedVersionResponse
       batch_id:
@@ -450,27 +406,6 @@ types:
           Whether the Prompt/Tool is orchestrated by Humanloop. Default is
           `True`. If `False`, a log for the Prompt/Tool should be submitted by
           the user via the API.
-  EvaluationDebugResultResponseValue:
-    discriminated: false
-    union:
-      - boolean
-      - double
-  EvaluationDebugResultResponse:
-    docs: >-
-      This is similar to an `EvaluationResult` but is ephemeral as it is only
-      for synchronous
-
-      debug runs. It does not have an ID, or a reference to an evaluation run or
-      even an evaluation
-
-      function.
-    properties:
-      log_id: string
-      log: LogResponse
-      datapoint_id: optional<string>
-      llm_evaluation_log: optional<LogResponse>
-      value: optional<EvaluationDebugResultResponseValue>
-      error: optional<string>
   EvaluationEvaluatorResponse:
     properties:
       version: EvaluatorResponse
@@ -482,10 +417,18 @@ types:
           via the API.
   EvaluationReportLogResponse:
     properties:
-      evaluated_version: EvaluatedVersionResponse
-      datapoint: DatapointResponse
-      log: optional<LogResponse>
-      evaluator_logs: list<LogResponse>
+      evaluated_version:
+        type: EvaluatedVersionResponse
+        docs: The version of the Prompt, Tool or Evaluator that the Log belongs to.
+      datapoint:
+        type: DatapointResponse
+        docs: The Datapoint used to generate the log
+      log:
+        type: optional<LogResponse>
+        docs: The Log that was evaluated by the Evaluator.
+      evaluator_logs:
+        docs: The Evaluator logs containing the judgments for the Log.
+        type: list<LogResponse>
   EvaluationResponse:
     properties:
       id:
@@ -493,7 +436,7 @@ types:
         docs: Unique identifier for the Evaluation. Starts with `evr`.
       dataset:
         type: DatasetResponse
-        docs: The Dataset Version used in the Evaluation.
+        docs: The Dataset used in the Evaluation.
       evaluatees:
         docs: The Prompt/Tool Versions included in the Evaluation.
         type: list<EvaluateeResponse>
@@ -555,27 +498,25 @@ types:
       - cancelled
       - failed
     docs: Status of an evaluation.
-  EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem:
+  EvaluatorActivationDeactivationRequestActivateItem:
     discriminated: false
     union:
       - MonitoringEvaluatorVersionRequest
       - MonitoringEvaluatorEnvironmentRequest
-  EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem:
+  EvaluatorActivationDeactivationRequestDeactivateItem:
     discriminated: false
     union:
       - MonitoringEvaluatorVersionRequest
       - MonitoringEvaluatorEnvironmentRequest
   EvaluatorActivationDeactivationRequest:
     properties:
-      evaluators_to_activate:
-        type: >-
-          optional<list<EvaluatorActivationDeactivationRequestEvaluatorsToActivateItem>>
+      activate:
+        type: optional<list<EvaluatorActivationDeactivationRequestActivateItem>>
         docs: >-
-          Monitoring Evaluators to activate. These will be automatically run on
-          new Logs.
-      evaluators_to_deactivate:
-        type: >-
-          optional<list<EvaluatorActivationDeactivationRequestEvaluatorsToDeactivateItem>>
+          Evaluators to activate on Monitoring. These will be automatically run
+          on new Logs.
+      deactivate:
+        type: optional<list<EvaluatorActivationDeactivationRequestDeactivateItem>>
         docs: Evaluators to deactivate. These will not be run on new Logs.
   EvaluatorAggregate:
     properties:
@@ -641,12 +582,12 @@ types:
       - HumanEvaluatorRequest
       - ExternalEvaluatorRequest
   EvaluatorResponse:
-    docs: Request model for creating a new Evaluator
+    docs: Version of the Evaluator used to provide judgments.
     properties:
       path:
         type: string
         docs: >-
-          Path of the Dataset including the Dataset name, which is used as a
+          Path of the Evaluator including the Evaluator name, which is used as a
           unique identifier.
       id:
         type: string
@@ -685,6 +626,11 @@ types:
           Inputs associated to the Prompt. Inputs correspond to any of the
           variables used within the Prompt template.
         type: list<InputResponse>
+      evaluators:
+        type: optional<list<MonitoringEvaluatorResponse>>
+        docs: >-
+          Evaluators that have been attached to this Prompt that are used for
+          monitoring logs.
       evaluator_aggregates:
         type: optional<list<EvaluatorAggregate>>
         docs: Aggregation of Evaluator results for the Evaluator Version.
@@ -1436,10 +1382,8 @@ types:
     enum:
       - openai
       - openai_azure
-      - ai21
       - mock
       - anthropic
-      - langchain
       - cohere
       - replicate
       - google
@@ -1556,15 +1500,33 @@ types:
       page: integer
       size: integer
       total: integer
+  PaginatedDataEvaluatorResponse:
+    properties:
+      records: list<EvaluatorResponse>
+      page: integer
+      size: integer
+      total: integer
   PaginatedPromptLogResponse:
     properties:
       records: list<PromptLogResponse>
       page: integer
       size: integer
       total: integer
+  PaginatedDataPromptResponse:
+    properties:
+      records: list<PromptResponse>
+      page: integer
+      size: integer
+      total: integer
   PaginatedSessionResponse:
     properties:
       records: list<SessionResponse>
+      page: integer
+      size: integer
+      total: integer
+  PaginatedDataToolResponse:
+    properties:
+      records: list<ToolResponse>
       page: integer
       size: integer
       total: integer
@@ -2151,6 +2113,11 @@ types:
           Inputs associated to the Prompt. Inputs correspond to any of the
           variables used within the Prompt template.
         type: list<InputResponse>
+      evaluators:
+        type: optional<list<MonitoringEvaluatorResponse>>
+        docs: >-
+          Evaluators that have been attached to this Prompt that are used for
+          monitoring logs.
       evaluator_aggregates:
         type: optional<list<EvaluatorAggregate>>
         docs: Aggregation of Evaluator results for the Prompt Version.
@@ -2555,6 +2522,11 @@ types:
           Inputs associated to the Prompt. Inputs correspond to any of the
           variables used within the Tool template.
         type: list<InputResponse>
+      evaluators:
+        type: optional<list<MonitoringEvaluatorResponse>>
+        docs: >-
+          Evaluators that have been attached to this Tool that are used for
+          monitoring logs.
       signature:
         type: optional<string>
         docs: Signature of the Tool.

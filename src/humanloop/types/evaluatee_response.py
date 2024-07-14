@@ -10,6 +10,10 @@ from .evaluated_version_response import EvaluatedVersionResponse
 
 
 class EvaluateeResponse(UncheckedBaseModel):
+    """
+    Version of the Evaluatee being evaluated.
+    """
+
     version: EvaluatedVersionResponse
     batch_id: typing.Optional[str] = pydantic_v1.Field(default=None)
     """

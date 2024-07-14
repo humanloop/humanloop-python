@@ -6,42 +6,14 @@ import typing
 from ..core.datetime_utils import serialize_datetime
 from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
 from ..core.unchecked_base_model import UncheckedBaseModel
-from .directory_response import DirectoryResponse
-from .directory_with_parents_and_children_response_files_item import DirectoryWithParentsAndChildrenResponseFilesItem
+from .evaluator_response import EvaluatorResponse
 
 
-class DirectoryWithParentsAndChildrenResponse(UncheckedBaseModel):
-    name: str = pydantic_v1.Field()
-    """
-    Name of the directory to create.
-    """
-
-    parent_id: typing.Optional[str] = pydantic_v1.Field(default=None)
-    """
-    ID of the parent directory. Will be `None` if the directory is the root directory. Starts with `dir_`.
-    """
-
-    id: str = pydantic_v1.Field()
-    """
-    String ID of directory. Starts with `dir_`.
-    """
-
-    created_at: dt.datetime
-    updated_at: dt.datetime
-    subdirectories: typing.List[DirectoryResponse] = pydantic_v1.Field()
-    """
-    List of subdirectories in the directory.
-    """
-
-    files: typing.List[DirectoryWithParentsAndChildrenResponseFilesItem] = pydantic_v1.Field()
-    """
-    List of files in the directory.
-    """
-
-    parents: typing.List[DirectoryResponse] = pydantic_v1.Field()
-    """
-    List of parent directories of the directory.
-    """
+class PaginatedDataEvaluatorResponse(UncheckedBaseModel):
+    records: typing.List[EvaluatorResponse]
+    page: int
+    size: int
+    total: int
 
     def json(self, **kwargs: typing.Any) -> str:
         kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}

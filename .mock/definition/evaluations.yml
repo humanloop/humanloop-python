@@ -9,7 +9,7 @@ service:
       method: GET
       auth: true
       docs: >-
-        List Evaluations for the given File.
+        List all Evaluations for the specified `file_id`.
 
 
         Retrieve a list of Evaluations that evaluate versions of the specified
@@ -17,15 +17,15 @@ service:
       pagination:
         offset: $request.page
         results: $response.records
-      display-name: List Evaluations for File
+      display-name: 'List '
       request:
         name: ListEvaluationsGetRequest
         query-parameters:
           file_id:
             type: string
             docs: >-
-              Filter by File ID. If provided, only Evaluation for the specified
-              File will be returned.
+              Filter by File ID. Only Evaluations for the specified File will be
+              returned.
           page:
             type: optional<integer>
             docs: Page number for pagination.
@@ -38,65 +38,99 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - query-parameters:
-            file_id: file_id
+        - name: List evaluations for file
+          query-parameters:
+            file_id: pr_30gco7dx6JDq4200GVOHa
+            size: 1
           response:
             body:
+              page: 1
+              size: 10
+              total: 1
               records:
-                - id: id
+                - id: ev_567yza
+                  created_at: '2024-05-01T12:00:00Z'
+                  updated_at: '2024-05-01T12:00:00Z'
+                  status: completed
                   dataset:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
-                    datapoints_count: 1
+                    id: ds_345mno
+                    path: test-questions
+                    name: test-questions
+                    version_id: dsv_678pqr
+                    type: dataset
+                    created_at: '2024-05-01T12:00:00Z'
+                    updated_at: '2024-05-01T12:00:00Z'
+                    created_by:
+                      id: usr_v23rSVAgas2a
+                      full_name: Jordan Burges
+                      email_address: jordan@humanloop.com
+                    status: committed
+                    commit_message: initial commit
+                    last_used_at: '2024-05-01T12:00:00Z'
+                    datapoints_count: 2
                   evaluatees:
                     - version:
-                        path: path
-                        id: id
-                        name: name
-                        version_id: version_id
-                        created_at: '2024-01-15T09:30:00Z'
-                        updated_at: '2024-01-15T09:30:00Z'
-                        status: uncommitted
-                        last_used_at: '2024-01-15T09:30:00Z'
-                        model: model
-                        version_logs_count: 1
-                        total_logs_count: 1
+                        path: Personal Projects/Coding Assistant
+                        id: pr_30gco7dx6JDq4200GVOHa
+                        name: Coding Assistant
+                        version_id: prv_7ZlQREDScH0xkhUwtXruN
+                        type: prompt
+                        environments:
+                          - id: env_ffSVxEBzJcBZ1H5jcNMVj
+                            created_at: '2023-06-27T23:16:07.992339'
+                            name: development
+                            tag: default
+                        created_at: '2024-07-08T22:40:35.656915'
+                        updated_at: '2024-07-08T22:40:35.656915'
+                        created_by:
+                          id: usr_01RJO1k2spBVqNUt1ASef
+                          email_address: raza@humanloop.com
+                          full_name: Raza Habib
+                        status: committed
+                        last_used_at: '2024-07-08T22:40:35.656915'
+                        model: gpt-4o
+                        endpoint: chat
+                        template:
+                          - content: >-
+                              You are a helpful coding assistant specialising in
+                              {{language}}
+                            role: system
+                        provider: openai
+                        max_tokens: -1
+                        temperature: 0.7
+                        top_p: 1
+                        presence_penalty: 0
+                        frequency_penalty: 0
+                        other: {}
+                        tools: []
+                        linked_tools: []
+                        commit_message: Initial commit
+                        version_logs_count: 0
+                        total_logs_count: 0
                         inputs:
-                          - name: name
-                      orchestrated: true
+                          - name: messages
+                      orchestrated: false
                   evaluators:
                     - version:
-                        path: path
-                        id: id
-                        name: name
-                        version_id: version_id
-                        created_at: '2024-01-15T09:30:00Z'
-                        updated_at: '2024-01-15T09:30:00Z'
-                        status: uncommitted
-                        last_used_at: '2024-01-15T09:30:00Z'
+                        id: ev_890bcd
+                        name: Accuracy Evaluator
+                        path: Shared Evaluators/Accuracy Evaluator
+                        version_id: evv_012def
+                        type: evaluator
+                        created_at: '2024-05-01T12:00:00Z'
+                        updated_at: '2024-05-01T12:00:00Z'
+                        status: committed
+                        last_used_at: '2024-05-01T12:00:00Z'
                         spec:
-                          arguments_type: target_free
-                          return_type: boolean
+                          arguments_type: target_required
+                          return_type: number
+                          evaluator_type: python
+                          code: def evaluate(answer, target):\n    return 0.5
                         version_logs_count: 1
                         total_logs_count: 1
                         inputs:
-                          - name: name
-                      orchestrated: true
-                  status: pending
-                  created_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  updated_at: '2024-01-15T09:30:00Z'
-              page: 1
-              size: 1
-              total: 1
+                          - name: answer
+                      orchestrated: false
     create:
       path: /evaluations
       method: POST
@@ -105,18 +139,28 @@ service:
         Create an Evaluation.
 
 
-        Create a new Evaluation by specifying the Dataset, Evaluatees, and
-        Evaluators.
+        Create a new Evaluation by specifying the Dataset, versions to be
+
+        evaluated (Evaluatees), and which Evaluators to provide judgments.
+
 
         Humanloop will automatically start generating Logs and running
-        Evaluators.
+        Evaluators where
+
+        `orchestrated=true`. If you own the runtime for the Evaluatee or
+        Evaluator, you
+
+        can set `orchestrated=false` and then generate and submit the required
+        logs using
+
+        your runtime.
 
 
         To keep updated on the progress of the Evaluation, you can poll the
-        Evaluation
+        Evaluation using
 
-        and check its status.
-      display-name: Create Evaluation
+        the GET /evaluations/{id} endpoint and check its status.
+      display-name: Create
       request:
         body: root.CreateEvaluationRequest
       response:
@@ -125,170 +169,205 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - request:
+        - name: Create evaluation
+          request:
             dataset:
-              version_id: version_id
+              version_id: dsv_6L78pqrdFi2xa
             evaluatees:
-              - version_id: version_id
+              - version_id: prv_7ZlQREDScH0xkhUwtXruN
+                orchestrated: false
             evaluators:
-              - version_id: version_id
+              - version_id: evv_012def
+                orchestrated: false
           response:
             body:
-              id: id
+              id: ev_567yza
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: completed
               dataset:
-                path: path
-                id: id
-                name: name
-                version_id: version_id
+                id: ds_345mno
+                path: test-questions
+                name: test-questions
+                version_id: dsv_678pqr
                 type: dataset
-                environments:
-                  - id: id
-                    created_at: '2024-01-15T09:30:00Z'
-                    name: name
-                    tag: default
-                created_at: '2024-01-15T09:30:00Z'
-                updated_at: '2024-01-15T09:30:00Z'
+                created_at: '2024-05-01T12:00:00Z'
+                updated_at: '2024-05-01T12:00:00Z'
                 created_by:
-                  id: id
-                  email_address: email_address
-                  full_name: full_name
-                status: uncommitted
-                last_used_at: '2024-01-15T09:30:00Z'
-                commit_message: commit_message
-                datapoints_count: 1
-                datapoints:
-                  - id: id
+                  id: usr_v23rSVAgas2a
+                  full_name: Jordan Burges
+                  email_address: jordan@humanloop.com
+                status: committed
+                commit_message: initial commit
+                last_used_at: '2024-05-01T12:00:00Z'
+                datapoints_count: 2
               evaluatees:
                 - version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
-                    version_logs_count: 1
-                    total_logs_count: 1
+                    path: Personal Projects/Coding Assistant
+                    id: pr_30gco7dx6JDq4200GVOHa
+                    name: Coding Assistant
+                    version_id: prv_7ZlQREDScH0xkhUwtXruN
+                    type: prompt
+                    environments:
+                      - id: env_ffSVxEBzJcBZ1H5jcNMVj
+                        created_at: '2023-06-27T23:16:07.992339'
+                        name: development
+                        tag: default
+                    created_at: '2024-07-08T22:40:35.656915'
+                    updated_at: '2024-07-08T22:40:35.656915'
+                    created_by:
+                      id: usr_01RJO1k2spBVqNUt1ASef
+                      email_address: raza@humanloop.com
+                      full_name: Raza Habib
+                    status: committed
+                    last_used_at: '2024-07-08T22:40:35.656915'
+                    model: gpt-4o
+                    endpoint: chat
+                    template:
+                      - content: >-
+                          You are a helpful coding assistant specialising in
+                          {{language}}
+                        role: system
+                    provider: openai
+                    max_tokens: -1
+                    temperature: 0.7
+                    top_p: 1
+                    presence_penalty: 0
+                    frequency_penalty: 0
+                    other: {}
+                    tools: []
+                    linked_tools: []
+                    commit_message: Initial commit
+                    version_logs_count: 0
+                    total_logs_count: 0
                     inputs:
-                      - name: name
-                  batch_id: batch_id
-                  orchestrated: true
+                      - name: messages
+                  orchestrated: false
               evaluators:
                 - version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
+                    id: ev_890bcd
+                    name: Accuracy Evaluator
+                    path: Shared Evaluators/Accuracy Evaluator
+                    version_id: evv_012def
+                    type: evaluator
+                    created_at: '2024-05-01T12:00:00Z'
+                    updated_at: '2024-05-01T12:00:00Z'
+                    status: committed
+                    last_used_at: '2024-05-01T12:00:00Z'
                     spec:
-                      arguments_type: target_free
-                      return_type: boolean
+                      arguments_type: target_required
+                      return_type: number
+                      evaluator_type: python
+                      code: def evaluate(answer, target):\n    return 0.5
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
-                      - name: name
-                  orchestrated: true
-              status: pending
-              created_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              updated_at: '2024-01-15T09:30:00Z'
+                      - name: answer
+                  orchestrated: false
     get:
       path: /evaluations/{id}
       method: GET
       auth: true
-      docs: |-
-        Get an Evaluation.
-
-        Retrieve the Evaluation with the given ID.
+      docs: Get an Evaluation.
       path-parameters:
         id:
           type: string
           docs: Unique identifier for Evaluation.
-      display-name: Get Evaluation
+      display-name: Get
       response:
         docs: Successful Response
         type: root.EvaluationResponse
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: Get evaluation
+          path-parameters:
+            id: ev_567yza
           response:
             body:
-              id: id
+              id: ev_567yza
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: completed
               dataset:
-                path: path
-                id: id
-                name: name
-                version_id: version_id
+                id: ds_345mno
+                path: test-questions
+                name: test-questions
+                version_id: dsv_678pqr
                 type: dataset
-                environments:
-                  - id: id
-                    created_at: '2024-01-15T09:30:00Z'
-                    name: name
-                    tag: default
-                created_at: '2024-01-15T09:30:00Z'
-                updated_at: '2024-01-15T09:30:00Z'
+                created_at: '2024-05-01T12:00:00Z'
+                updated_at: '2024-05-01T12:00:00Z'
                 created_by:
-                  id: id
-                  email_address: email_address
-                  full_name: full_name
-                status: uncommitted
-                last_used_at: '2024-01-15T09:30:00Z'
-                commit_message: commit_message
-                datapoints_count: 1
-                datapoints:
-                  - id: id
+                  id: usr_v23rSVAgas2a
+                  full_name: Jordan Burges
+                  email_address: jordan@humanloop.com
+                status: committed
+                commit_message: initial commit
+                last_used_at: '2024-05-01T12:00:00Z'
+                datapoints_count: 2
               evaluatees:
                 - version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
-                    version_logs_count: 1
-                    total_logs_count: 1
+                    path: Personal Projects/Coding Assistant
+                    id: pr_30gco7dx6JDq4200GVOHa
+                    name: Coding Assistant
+                    version_id: prv_7ZlQREDScH0xkhUwtXruN
+                    type: prompt
+                    environments:
+                      - id: env_ffSVxEBzJcBZ1H5jcNMVj
+                        created_at: '2023-06-27T23:16:07.992339'
+                        name: development
+                        tag: default
+                    created_at: '2024-07-08T22:40:35.656915'
+                    updated_at: '2024-07-08T22:40:35.656915'
+                    created_by:
+                      id: usr_01RJO1k2spBVqNUt1ASef
+                      email_address: raza@humanloop.com
+                      full_name: Raza Habib
+                    status: committed
+                    last_used_at: '2024-07-08T22:40:35.656915'
+                    model: gpt-4o
+                    endpoint: chat
+                    template:
+                      - content: >-
+                          You are a helpful coding assistant specialising in
+                          {{language}}
+                        role: system
+                    provider: openai
+                    max_tokens: -1
+                    temperature: 0.7
+                    top_p: 1
+                    presence_penalty: 0
+                    frequency_penalty: 0
+                    other: {}
+                    tools: []
+                    linked_tools: []
+                    commit_message: Initial commit
+                    version_logs_count: 0
+                    total_logs_count: 0
                     inputs:
-                      - name: name
-                  batch_id: batch_id
-                  orchestrated: true
+                      - name: messages
+                  orchestrated: false
               evaluators:
                 - version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
+                    id: ev_890bcd
+                    name: Accuracy Evaluator
+                    path: Shared Evaluators/Accuracy Evaluator
+                    version_id: evv_012def
+                    type: evaluator
+                    created_at: '2024-05-01T12:00:00Z'
+                    updated_at: '2024-05-01T12:00:00Z'
+                    status: committed
+                    last_used_at: '2024-05-01T12:00:00Z'
                     spec:
-                      arguments_type: target_free
-                      return_type: boolean
+                      arguments_type: target_required
+                      return_type: number
+                      evaluator_type: python
+                      code: def evaluate(answer, target):\n    return 0.5
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
-                      - name: name
-                  orchestrated: true
-              status: pending
-              created_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              updated_at: '2024-01-15T09:30:00Z'
+                      - name: answer
+                  orchestrated: false
     delete:
       path: /evaluations/{id}
       method: DELETE
@@ -305,13 +384,14 @@ service:
         id:
           type: string
           docs: Unique identifier for Evaluation.
-      display-name: Delete Evaluation
+      display-name: Delete
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
-    update:
+        - name: Delete evaluation
+          path-parameters:
+            id: ev_567yza
+    updateSetup:
       path: /evaluations/{id}
       method: PATCH
       auth: true
@@ -319,13 +399,15 @@ service:
         Update an Evaluation.
 
 
-        Update the setup of an Evaluation by specifying the Dataset, Evaluatees,
-        and Evaluators.
+        Update the setup of an Evaluation by specifying the Dataset, versions to
+        be
+
+        evaluated (Evaluatees), and which Evaluators to provide judgments.
       path-parameters:
         id:
           type: string
           docs: Unique identifier for Evaluation.
-      display-name: Update Evaluation
+      display-name: Update Setup
       request:
         body: root.CreateEvaluationRequest
       response:
@@ -334,83 +416,103 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - path-parameters:
-            id: id
+        - name: Update evaluation
+          path-parameters:
+            id: ev_567yza
           request:
             dataset:
-              version_id: version_id
+              version_id: dsv_6L78pqrdFi2xa
             evaluatees:
-              - version_id: version_id
+              - version_id: prv_7ZlQREDScH0xkhUwtXruN
+                orchestrated: false
             evaluators:
-              - version_id: version_id
+              - version_id: evv_012def
+                orchestrated: false
           response:
             body:
-              id: id
+              id: ev_567yza
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: completed
               dataset:
-                path: path
-                id: id
-                name: name
-                version_id: version_id
+                id: ds_345mno
+                path: test-questions
+                name: test-questions
+                version_id: dsv_678pqr
                 type: dataset
-                environments:
-                  - id: id
-                    created_at: '2024-01-15T09:30:00Z'
-                    name: name
-                    tag: default
-                created_at: '2024-01-15T09:30:00Z'
-                updated_at: '2024-01-15T09:30:00Z'
+                created_at: '2024-05-01T12:00:00Z'
+                updated_at: '2024-05-01T12:00:00Z'
                 created_by:
-                  id: id
-                  email_address: email_address
-                  full_name: full_name
-                status: uncommitted
-                last_used_at: '2024-01-15T09:30:00Z'
-                commit_message: commit_message
-                datapoints_count: 1
-                datapoints:
-                  - id: id
+                  id: usr_v23rSVAgas2a
+                  full_name: Jordan Burges
+                  email_address: jordan@humanloop.com
+                status: committed
+                commit_message: initial commit
+                last_used_at: '2024-05-01T12:00:00Z'
+                datapoints_count: 2
               evaluatees:
                 - version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
-                    version_logs_count: 1
-                    total_logs_count: 1
+                    path: Personal Projects/Coding Assistant
+                    id: pr_30gco7dx6JDq4200GVOHa
+                    name: Coding Assistant
+                    version_id: prv_7ZlQREDScH0xkhUwtXruN
+                    type: prompt
+                    environments:
+                      - id: env_ffSVxEBzJcBZ1H5jcNMVj
+                        created_at: '2023-06-27T23:16:07.992339'
+                        name: development
+                        tag: default
+                    created_at: '2024-07-08T22:40:35.656915'
+                    updated_at: '2024-07-08T22:40:35.656915'
+                    created_by:
+                      id: usr_01RJO1k2spBVqNUt1ASef
+                      email_address: raza@humanloop.com
+                      full_name: Raza Habib
+                    status: committed
+                    last_used_at: '2024-07-08T22:40:35.656915'
+                    model: gpt-4o
+                    endpoint: chat
+                    template:
+                      - content: >-
+                          You are a helpful coding assistant specialising in
+                          {{language}}
+                        role: system
+                    provider: openai
+                    max_tokens: -1
+                    temperature: 0.7
+                    top_p: 1
+                    presence_penalty: 0
+                    frequency_penalty: 0
+                    other: {}
+                    tools: []
+                    linked_tools: []
+                    commit_message: Initial commit
+                    version_logs_count: 0
+                    total_logs_count: 0
                     inputs:
-                      - name: name
-                  batch_id: batch_id
-                  orchestrated: true
+                      - name: messages
+                  orchestrated: false
               evaluators:
                 - version:
-                    path: path
-                    id: id
-                    name: name
-                    version_id: version_id
-                    created_at: '2024-01-15T09:30:00Z'
-                    updated_at: '2024-01-15T09:30:00Z'
-                    status: uncommitted
-                    last_used_at: '2024-01-15T09:30:00Z'
+                    id: ev_890bcd
+                    name: Accuracy Evaluator
+                    path: Shared Evaluators/Accuracy Evaluator
+                    version_id: evv_012def
+                    type: evaluator
+                    created_at: '2024-05-01T12:00:00Z'
+                    updated_at: '2024-05-01T12:00:00Z'
+                    status: committed
+                    last_used_at: '2024-05-01T12:00:00Z'
                     spec:
-                      arguments_type: target_free
-                      return_type: boolean
+                      arguments_type: target_required
+                      return_type: number
+                      evaluator_type: python
+                      code: def evaluate(answer, target):\n    return 0.5
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
-                      - name: name
-                  orchestrated: true
-              status: pending
-              created_at: '2024-01-15T09:30:00Z'
-              created_by:
-                id: id
-                email_address: email_address
-                full_name: full_name
-              updated_at: '2024-01-15T09:30:00Z'
+                      - name: answer
+                  orchestrated: false
     updateStatus:
       path: /evaluations/{id}/status
       method: PATCH
@@ -420,9 +522,9 @@ service:
 
 
         Can be used to cancel a running Evaluation, or mark an Evaluation that
-        uses external or human evaluators
+        uses
 
-        as completed.
+        external or human evaluators as completed.
       path-parameters:
         id:
           type: string
@@ -521,16 +623,15 @@ service:
 
         Retrieve aggregate stats for the specified Evaluation.
 
-        This includes the number of generated Logs for every evaluatee and
-        Evaluator metrics
+        This includes the number of generated Logs for each evaluated version
+        and the
 
-        (such as the mean and percentiles for numeric Evaluators for every
-        evaluatee).
+        corresponding Evaluator statistics (such as the mean and percentiles).
       path-parameters:
         id:
           type: string
           docs: Unique identifier for Evaluation.
-      display-name: Get Evaluation Stats
+      display-name: Get Stats
       response:
         docs: Successful Response
         type: root.EvaluationStats
@@ -567,13 +668,14 @@ service:
       method: GET
       auth: true
       docs: >-
-        Get Logs by Evaluation ID.
+        Get the Logs associated to a specific Evaluation.
 
 
-        Each Evaluation Log corresponds to a (Datapoint, Evaluated Version)
-        pair.
+        Each Datapoint in your Dataset will have a corresponding Log for each
+        File version evaluated.
 
-        It has an optional generated Log and a list of Evaluator Logs.
+        e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will
+        be 100 Logs associated with the Evaluation.
       path-parameters:
         id:
           type: string
