@@ -21,7 +21,6 @@ from humanloop.apis.tags.datapoints_api import DatapointsApi
 from humanloop.apis.tags.datasets_api import DatasetsApi
 from humanloop.apis.tags.evaluations_api import EvaluationsApi
 from humanloop.apis.tags.evaluators_api import EvaluatorsApi
-from humanloop.apis.tags.experiments_api import ExperimentsApi
 from humanloop.apis.tags.feedback_api import FeedbackApi
 from humanloop.apis.tags.logs_api import LogsApi
 from humanloop.apis.tags.model_configs_api import ModelConfigsApi
@@ -102,7 +101,6 @@ class Humanloop(ClientCustom):
         self.datasets: DatasetsApi = DatasetsApi(api_client)
         self.evaluations: EvaluationsApi = EvaluationsApi(api_client)
         self.evaluators: EvaluatorsApi = EvaluatorsApi(api_client)
-        self.experiments: ExperimentsApi = ExperimentsApi(api_client)
         self.feedback_api: FeedbackApi = FeedbackApi(api_client)
         self.logs: LogsApi = LogsApi(api_client)
         self.model_configs: ModelConfigsApi = ModelConfigsApi(api_client)

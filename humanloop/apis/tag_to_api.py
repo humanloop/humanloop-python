@@ -6,7 +6,6 @@ from humanloop.apis.tags.evaluations_api import EvaluationsApi
 from humanloop.apis.tags.datasets_api import DatasetsApi
 from humanloop.apis.tags.logs_api import LogsApi
 from humanloop.apis.tags.evaluators_api import EvaluatorsApi
-from humanloop.apis.tags.experiments_api import ExperimentsApi
 from humanloop.apis.tags.model_configs_api import ModelConfigsApi
 from humanloop.apis.tags.chats_api import ChatsApi
 from humanloop.apis.tags.completions_api import CompletionsApi
@@ -23,7 +22,6 @@ TagToApi = typing_extensions.TypedDict(
         TagValues.DATASETS: DatasetsApi,
         TagValues.LOGS: LogsApi,
         TagValues.EVALUATORS: EvaluatorsApi,
-        TagValues.EXPERIMENTS: ExperimentsApi,
         TagValues.MODEL_CONFIGS: ModelConfigsApi,
         TagValues.CHATS: ChatsApi,
         TagValues.COMPLETIONS: CompletionsApi,
@@ -41,7 +39,6 @@ tag_to_api = TagToApi(
         TagValues.DATASETS: DatasetsApi,
         TagValues.LOGS: LogsApi,
         TagValues.EVALUATORS: EvaluatorsApi,
-        TagValues.EXPERIMENTS: ExperimentsApi,
         TagValues.MODEL_CONFIGS: ModelConfigsApi,
         TagValues.CHATS: ChatsApi,
         TagValues.COMPLETIONS: CompletionsApi,

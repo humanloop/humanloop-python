@@ -11,7 +11,6 @@ class TagValues(str, enum.Enum):
     DATASETS = "Datasets"
     LOGS = "Logs"
     EVALUATORS = "Evaluators"
-    EXPERIMENTS = "Experiments"
     MODEL_CONFIGS = "Model Configs"
     CHATS = "Chats"
     COMPLETIONS = "Completions"

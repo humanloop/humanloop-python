@@ -25,9 +25,6 @@ from humanloop.apis.paths.evaluations_id_evaluators import EvaluationsIdEvaluato
 from humanloop.apis.paths.evaluations import Evaluations
 from humanloop.apis.paths.evaluators import Evaluators
 from humanloop.apis.paths.evaluators_id import EvaluatorsId
-from humanloop.apis.paths.projects_project_id_experiments import ProjectsProjectIdExperiments
-from humanloop.apis.paths.experiments_experiment_id import ExperimentsExperimentId
-from humanloop.apis.paths.experiments_experiment_id_model_config import ExperimentsExperimentIdModelConfig
 from humanloop.apis.paths.feedback import Feedback
 from humanloop.apis.paths.logs import Logs
 from humanloop.apis.paths.logs_id import LogsId
@@ -76,9 +73,6 @@ PathToApi = typing_extensions.TypedDict(
         PathValues.EVALUATIONS: Evaluations,
         PathValues.EVALUATORS: Evaluators,
         PathValues.EVALUATORS_ID: EvaluatorsId,
-        PathValues.PROJECTS_PROJECT_ID_EXPERIMENTS: ProjectsProjectIdExperiments,
-        PathValues.EXPERIMENTS_EXPERIMENT_ID: ExperimentsExperimentId,
-        PathValues.EXPERIMENTS_EXPERIMENT_ID_MODELCONFIG: ExperimentsExperimentIdModelConfig,
         PathValues.FEEDBACK: Feedback,
         PathValues.LOGS: Logs,
         PathValues.LOGS_ID: LogsId,
@@ -128,9 +122,6 @@ path_to_api = PathToApi(
         PathValues.EVALUATIONS: Evaluations,
         PathValues.EVALUATORS: Evaluators,
         PathValues.EVALUATORS_ID: EvaluatorsId,
-        PathValues.PROJECTS_PROJECT_ID_EXPERIMENTS: ProjectsProjectIdExperiments,
-        PathValues.EXPERIMENTS_EXPERIMENT_ID: ExperimentsExperimentId,
-        PathValues.EXPERIMENTS_EXPERIMENT_ID_MODELCONFIG: ExperimentsExperimentIdModelConfig,
         PathValues.FEEDBACK: Feedback,
         PathValues.LOGS: Logs,
         PathValues.LOGS_ID: LogsId,
