@@ -495,8 +495,129 @@ service:
                   total_logs_count: 1
                   inputs:
                     - name: answer
+    log:
+      path: /evaluators/log
+      method: POST
+      auth: true
+      docs: >-
+        Submit evalutor judgment for an existing Log. Creates a new Log and
+        makes evaluated one its parent.
+      display-name: Log
+      request:
+        name: CreateEvaluatorLogRequest
+        query-parameters:
+          version_id:
+            type: optional<string>
+            docs: ID of the Evaluator version to log against.
+          environment:
+            type: optional<string>
+            docs: Name of the Environment identifying a deployed version to log to.
+        body:
+          properties:
+            path:
+              type: optional<string>
+              docs: >-
+                Path of the Evaluator, including the name, which is used as a
+                unique identifier.
+            id:
+              type: optional<string>
+              docs: ID for an existing Evaluator to update.
+            output:
+              type: optional<string>
+              docs: >-
+                Generated output from the LLM. Only populated for LLM Evaluator
+                Logs.
+            created_at:
+              type: optional<datetime>
+              docs: 'User defined timestamp for when the log was created. '
+            error:
+              type: optional<string>
+              docs: Error message if the log is an error.
+            provider_latency:
+              type: optional<double>
+              docs: Duration of the logged event in seconds.
+            provider_request:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Raw request sent to provider. Only populated for LLM Evaluator
+                Logs.
+            provider_response:
+              type: optional<map<string, unknown>>
+              docs: >-
+                Raw response received the provider. Only populated for LLM
+                Evaluator Logs.
+            session_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Session to associate the Log to.
+                Allows you to record multiple Logs to a Session (using an ID
+                kept by your internal systems) by passing the same `session_id`
+                in subsequent log requests.
+            parent_id:
+              type: string
+              docs: >-
+                Identifier of the evaluated Log. The newly created Log will have
+                this one set as parent.
+            inputs:
+              type: optional<map<string, unknown>>
+              docs: The inputs passed to the prompt template.
+            source:
+              type: optional<string>
+              docs: Identifies where the model was called from.
+            metadata:
+              type: optional<map<string, unknown>>
+              docs: Any additional metadata to record.
+            save:
+              type: optional<boolean>
+              docs: >-
+                Whether the request/response payloads will be stored on
+                Humanloop.
+              default: true
+            source_datapoint_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Datapoint that this Log is derived
+                from. This can be used by Humanloop to associate Logs to
+                Evaluations. If provided, Humanloop will automatically associate
+                this Log to Evaluations that require a Log for this
+                Datapoint-Version pair.
+            batches:
+              type: optional<list<string>>
+              docs: >-
+                Array of Batch Ids that this log is part of. Batches are used to
+                group Logs together for offline Evaluations
+            user:
+              type: optional<string>
+              docs: End-user ID related to the Log.
+            environment:
+              type: optional<string>
+              docs: The name of the Environment the Log is associated to.
+              name: createEvaluatorLogRequestEnvironment
+            judgment: optional<unknown>
+            spec: optional<CreateEvaluatorLogRequestSpec>
+      response:
+        docs: Successful Response
+        type: root.CreateEvaluatorLogResponse
+      errors:
+        - root.UnprocessableEntityError
+      examples:
+        - request:
+            parent_id: parent_id
+          response:
+            body:
+              id: id
+              parent_id: parent_id
+              session_id: session_id
+              version_id: version_id
 types:
   SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec:
+    discriminated: false
+    union:
+      - root.LlmEvaluatorRequest
+      - root.CodeEvaluatorRequest
+      - root.HumanEvaluatorRequest
+      - root.ExternalEvaluatorRequest
+  CreateEvaluatorLogRequestSpec:
     discriminated: false
     union:
       - root.LlmEvaluatorRequest

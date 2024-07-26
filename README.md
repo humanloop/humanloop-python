@@ -16,8 +16,9 @@ pip install humanloop
 Instantiate and use the client with the following:
 
 ```python
-from humanloop import ChatMessage, PromptKernelRequest
-from humanloop.client import Humanloop
+import datetime
+
+from humanloop import ChatMessage, Humanloop, PromptKernelRequest
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
@@ -40,6 +41,19 @@ client.prompts.log(
         )
     ],
     inputs={"person": "Trump"},
+    created_at=datetime.datetime.fromisoformat(
+        "2024-07-19 04:29:35.178000+00:00",
+    ),
+    provider_latency=6.5931549072265625,
+    output_message=ChatMessage(
+        content="Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+        role="assistant",
+    ),
+    prompt_tokens=100,
+    output_tokens=220,
+    prompt_cost=1e-05,
+    output_cost=0.0002,
+    finish_reason="stop",
 )
 ```
 
@@ -48,105 +62,67 @@ client.prompts.log(
 The SDK also exports an `async` client so that you can make non-blocking calls to our API.
 
 ```python
-from humanloop import ChatMessage, PromptKernelRequest
-from humanloop.client import AsyncHumanloop
+import asyncio
+import datetime
+
+from humanloop import AsyncHumanloop, ChatMessage, PromptKernelRequest
 
 client = AsyncHumanloop(
     api_key="YOUR_API_KEY",
 )
-await client.prompts.log(
-    path="persona",
-    prompt=PromptKernelRequest(
-        model="gpt-4",
-        template=[
+
+
+async def main() -> None:
+    await client.prompts.log(
+        path="persona",
+        prompt=PromptKernelRequest(
+            model="gpt-4",
+            template=[
+                ChatMessage(
+                    role="system",
+                    content="You are {{person}}. Answer questions as this person. Do not break character.",
+                )
+            ],
+        ),
+        messages=[
             ChatMessage(
-                role="system",
-                content="You are {{person}}. Answer questions as this person. Do not break character.",
+                role="user",
+                content="What really happened at Roswell?",
             )
         ],
-    ),
-    messages=[
-        ChatMessage(
-            role="user",
-            content="What really happened at Roswell?",
-        )
-    ],
-    inputs={"person": "Trump"},
-)
+        inputs={"person": "Trump"},
+        created_at=datetime.datetime.fromisoformat(
+            "2024-07-19 04:29:35.178000+00:00",
+        ),
+        provider_latency=6.5931549072265625,
+        output_message=ChatMessage(
+            content="Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+            role="assistant",
+        ),
+        prompt_tokens=100,
+        output_tokens=220,
+        prompt_cost=1e-05,
+        output_cost=0.0002,
+        finish_reason="stop",
+    )
+
+
+asyncio.run(main())
 ```
 
 ## Exception Handling
 
-All errors thrown by the SDK will be subclasses of [`ApiError`](./src/schematic/core/api_error.py).
+When the API returns a non-success status code (4xx or 5xx response), a subclass of the following error
+will be thrown.
 
 ```python
-import humanloop
+from .api_error import ApiError
 
 try:
-    client.prompts.call(...)
-except humanloop.core.ApiError as e: # Handle all errors
-  print(e.status_code)
-  print(e.body)
-```
-
-## Advanced
-
-### Timeouts
-
-By default, requests time out after 60 seconds. You can configure this with a
-timeout option at the client or request level.
-
-```python
-from humanloop.client import Humanloop
-
-client = Humanloop(
-    ...,
-    # All timeouts are 20 seconds
-    timeout=20.0,
-)
-
-# Override timeout for a specific method
-client.prompts.call(..., {
-    timeout_in_seconds=20.0
-})
-```
-
-### Retries
-
-The SDK is instrumented with automatic retries with exponential backoff. A request will be
-retried as long as the request is deemed retriable and the number of retry attempts has not grown larger
-than the configured retry limit (default: 2).
-
-A request is deemed retriable when any of the following HTTP status codes is returned:
-
-- [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
-- [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
-- [5XX](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) (Internal Server Errors)
-
-Use the `max_retries` request option to configure this behavior.
-
-```python
-client.prompts.call(..., {
-     max_retries=1
-})
-```
-
-### Custom HTTP client
-
-You can override the httpx client to customize it for your use-case. Some common use-cases
-include support for proxies and transports.
-
-```python
-import httpx
-
-from humanloop.client import Humanloop
-
-client = Humanloop(...,
-    http_client=httpx.Client(
-        proxies="http://my.test.proxy.example.com",
-        transport=httpx.HTTPTransport(local_address="0.0.0.0"),
-    ),
-)
+    client.prompts.log(...)
+except ApiError as e:
+    print(e.status_code)
+    print(e.body)
 ```
 
 ## Pagination
@@ -154,7 +130,7 @@ client = Humanloop(...,
 Paginated requests will return a `SyncPager` or `AsyncPager`, which can be used as generators for the underlying object.
 
 ```python
-from humanloop.client import Humanloop
+from humanloop import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
@@ -167,6 +143,62 @@ for item in response:
 # alternatively, you can paginate page-by-page
 for page in response.iter_pages():
     yield page
+```
+
+## Advanced
+
+### Retries
+
+The SDK is instrumented with automatic retries with exponential backoff. A request will be retried as long
+as the request is deemed retriable and the number of retry attempts has not grown larger than the configured
+retry limit (default: 2).
+
+A request is deemed retriable when any of the following HTTP status codes is returned:
+
+- [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
+- [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
+- [5XX](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500) (Internal Server Errors)
+
+Use the `max_retries` request option to configure this behavior.
+
+```python
+client.prompts.log(...,{
+    max_retries=1
+})
+```
+
+### Timeouts
+
+The SDK defaults to a 60 second timeout. You can configure this with a timeout option at the client or request level.
+
+```python
+
+from humanloop import Humanloop
+
+client = Humanloop(..., { timeout=20.0 }, )
+
+
+# Override timeout for a specific method
+client.prompts.log(...,{
+    timeout_in_seconds=1
+})
+```
+
+### Custom Client
+
+You can override the `httpx` client to customize it for your use-case. Some common use-cases include support for proxies
+and transports.
+```python
+import httpx
+from humanloop import Humanloop
+
+client = Humanloop(
+    ...,
+    http_client=httpx.Client(
+        proxies="http://my.test.proxy.example.com",
+        transport=httpx.HTTPTransport(local_address="0.0.0.0"),
+    ),
+)
 ```
 
 ## Contributing

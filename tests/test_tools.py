@@ -2,8 +2,7 @@
 
 import typing
 
-from humanloop import MonitoringEvaluatorVersionRequest, ToolFunction, ToolKernelRequest
-from humanloop.client import AsyncHumanloop, Humanloop
+from humanloop import AsyncHumanloop, Humanloop, MonitoringEvaluatorVersionRequest, ToolFunction, ToolKernelRequest
 
 from .utilities import validate_response
 
@@ -385,7 +384,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
             },
         }
     ]
-    expected_types: typing.Any = (
+    expected_types: typing.Tuple[typing.Any, typing.Any] = (
         "list",
         {
             0: {

@@ -2,8 +2,7 @@
 
 import typing
 
-from humanloop import CreateDatapointRequest
-from humanloop.client import AsyncHumanloop, Humanloop
+from humanloop import AsyncHumanloop, CreateDatapointRequest, Humanloop
 
 from .utilities import validate_response
 
@@ -132,7 +131,7 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "commit_message": "commit_message",
         "datapoints_count": 1,
         "datapoints": [
-            {"inputs": {"inputs": "inputs"}, "messages": [{"role": "user"}], "target": {"target": "target"}, "id": "id"}
+            {"inputs": {"key": "value"}, "messages": [{"role": "user"}], "target": {"key": "value"}, "id": "id"}
         ],
     }
     expected_types: typing.Any = {
@@ -335,6 +334,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                 "stop": "stop",
                 "presence_penalty": 1.1,
                 "frequency_penalty": 1.1,
+                "other": {"key": "value"},
                 "seed": 1,
                 "response_format": {"type": "json_object"},
                 "tools": [{"name": "name", "description": "description"}],
@@ -357,7 +357,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
             },
         }
     ]
-    expected_types: typing.Any = (
+    expected_types: typing.Tuple[typing.Any, typing.Any] = (
         "list",
         {
             0: {
@@ -387,6 +387,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                     "stop": None,
                     "presence_penalty": None,
                     "frequency_penalty": None,
+                    "other": ("dict", {0: (None, None)}),
                     "seed": "integer",
                     "response_format": {"type": None},
                     "tools": ("list", {0: {"name": None, "description": None}}),

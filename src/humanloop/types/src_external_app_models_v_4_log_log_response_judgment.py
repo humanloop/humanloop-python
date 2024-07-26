@@ -2,4 +2,4 @@
 
 import typing
 
-LogResponseJudgment = typing.Union[bool, float]
+SrcExternalAppModelsV4LogLogResponseJudgment = typing.Union[bool, float]

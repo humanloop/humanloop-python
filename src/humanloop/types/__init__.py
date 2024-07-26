@@ -20,6 +20,7 @@ from .config_tool_response import ConfigToolResponse
 from .create_datapoint_request import CreateDatapointRequest
 from .create_datapoint_request_target_value import CreateDatapointRequestTargetValue
 from .create_evaluation_request import CreateEvaluationRequest
+from .create_evaluator_log_response import CreateEvaluatorLogResponse
 from .create_prompt_log_response import CreatePromptLogResponse
 from .create_tool_log_response import CreateToolLogResponse
 from .dashboard_configuration import DashboardConfiguration
@@ -48,6 +49,7 @@ from .evaluator_activation_deactivation_request_deactivate_item import (
 from .evaluator_aggregate import EvaluatorAggregate
 from .evaluator_arguments_type import EvaluatorArgumentsType
 from .evaluator_config_response import EvaluatorConfigResponse
+from .evaluator_log_response import EvaluatorLogResponse
 from .evaluator_response import EvaluatorResponse
 from .evaluator_response_spec import EvaluatorResponseSpec
 from .evaluator_return_type_enum import EvaluatorReturnTypeEnum
@@ -84,9 +86,6 @@ from .list_evaluators import ListEvaluators
 from .list_prompts import ListPrompts
 from .list_tools import ListTools
 from .llm_evaluator_request import LlmEvaluatorRequest
-from .log_response import LogResponse
-from .log_response_judgment import LogResponseJudgment
-from .log_response_tool_choice import LogResponseToolChoice
 from .metric_value_response import MetricValueResponse
 from .model_config_request import ModelConfigRequest
 from .model_config_request_stop import ModelConfigRequestStop
@@ -105,6 +104,7 @@ from .observability_status import ObservabilityStatus
 from .overall_stats import OverallStats
 from .paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
 from .paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
+from .paginated_data_log_response import PaginatedDataLogResponse
 from .paginated_data_prompt_response import PaginatedDataPromptResponse
 from .paginated_data_tool_response import PaginatedDataToolResponse
 from .paginated_datapoint_response import PaginatedDatapointResponse
@@ -131,6 +131,10 @@ from .provider_api_keys import ProviderApiKeys
 from .response_format import ResponseFormat
 from .session_response import SessionResponse
 from .sort_order import SortOrder
+from .src_external_app_models_v_4_log_log_response import SrcExternalAppModelsV4LogLogResponse
+from .src_external_app_models_v_4_log_log_response_judgment import SrcExternalAppModelsV4LogLogResponseJudgment
+from .src_external_app_models_v_4_log_log_response_tool_choice import SrcExternalAppModelsV4LogLogResponseToolChoice
+from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponse
 from .text_chat_content import TextChatContent
 from .time_unit import TimeUnit
 from .tool_call import ToolCall
@@ -139,6 +143,7 @@ from .tool_config_request import ToolConfigRequest
 from .tool_config_response import ToolConfigResponse
 from .tool_function import ToolFunction
 from .tool_kernel_request import ToolKernelRequest
+from .tool_log_response import ToolLogResponse
 from .tool_response import ToolResponse
 from .tool_result_response import ToolResultResponse
 from .tool_source import ToolSource
@@ -177,6 +182,7 @@ __all__ = [
     "CreateDatapointRequest",
     "CreateDatapointRequestTargetValue",
     "CreateEvaluationRequest",
+    "CreateEvaluatorLogResponse",
     "CreatePromptLogResponse",
     "CreateToolLogResponse",
     "DashboardConfiguration",
@@ -203,6 +209,7 @@ __all__ = [
     "EvaluatorAggregate",
     "EvaluatorArgumentsType",
     "EvaluatorConfigResponse",
+    "EvaluatorLogResponse",
     "EvaluatorResponse",
     "EvaluatorResponseSpec",
     "EvaluatorReturnTypeEnum",
@@ -239,9 +246,6 @@ __all__ = [
     "ListPrompts",
     "ListTools",
     "LlmEvaluatorRequest",
-    "LogResponse",
-    "LogResponseJudgment",
-    "LogResponseToolChoice",
     "MetricValueResponse",
     "ModelConfigRequest",
     "ModelConfigRequestStop",
@@ -260,6 +264,7 @@ __all__ = [
     "OverallStats",
     "PaginatedDataEvaluationReportLogResponse",
     "PaginatedDataEvaluatorResponse",
+    "PaginatedDataLogResponse",
     "PaginatedDataPromptResponse",
     "PaginatedDataToolResponse",
     "PaginatedDatapointResponse",
@@ -286,6 +291,10 @@ __all__ = [
     "ResponseFormat",
     "SessionResponse",
     "SortOrder",
+    "SrcExternalAppModelsV4LogLogResponse",
+    "SrcExternalAppModelsV4LogLogResponseJudgment",
+    "SrcExternalAppModelsV4LogLogResponseToolChoice",
+    "SrcExternalAppModelsV5LogsLogResponse",
     "TextChatContent",
     "TimeUnit",
     "ToolCall",
@@ -294,6 +303,7 @@ __all__ = [
     "ToolConfigResponse",
     "ToolFunction",
     "ToolKernelRequest",
+    "ToolLogResponse",
     "ToolResponse",
     "ToolResultResponse",
     "ToolSource",

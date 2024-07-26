@@ -64,7 +64,6 @@ class PromptsClient:
         messages: typing.Optional[typing.Sequence[ChatMessage]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoice] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -86,11 +85,11 @@ class PromptsClient:
         Log to a Prompt.
 
         You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+        an existing version of the Prompt. Otherwise, the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -140,9 +139,6 @@ class PromptsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -199,8 +195,9 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import Humanloop
+        import datetime
+
+        from humanloop import ChatMessage, Humanloop, PromptKernelRequest
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -223,6 +220,19 @@ class PromptsClient:
                 )
             ],
             inputs={"person": "Trump"},
+            created_at=datetime.datetime.fromisoformat(
+                "2024-07-19 04:29:35.178000+00:00",
+            ),
+            provider_latency=6.5931549072265625,
+            output_message=ChatMessage(
+                content="Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+                role="assistant",
+            ),
+            prompt_tokens=100,
+            output_tokens=220,
+            prompt_cost=1e-05,
+            output_cost=0.0002,
+            finish_reason="stop",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -242,7 +252,6 @@ class PromptsClient:
                 "messages": messages,
                 "tool_choice": tool_choice,
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -305,7 +314,7 @@ class PromptsClient:
         """
         Call a Prompt.
 
-        Calling a Prompt subsequently calls the model provider before logging
+        Calling a Prompt calls the model provider before logging
         the request, responses and metadata to Humanloop.
 
         You can use query parameters `version_id`, or `environment`, to target
@@ -313,7 +322,7 @@ class PromptsClient:
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -401,8 +410,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import Humanloop
+        from humanloop import ChatMessage, Humanloop, PromptKernelRequest, ToolFunction
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -414,17 +422,33 @@ class PromptsClient:
                 template=[
                     ChatMessage(
                         role="system",
-                        content="You are {{person}}. Answer any questions as this person. Do not break character.",
+                        content="You are stockbot. Return latest prices.",
+                    )
+                ],
+                tools=[
+                    ToolFunction(
+                        name="get_stock_price",
+                        description="Get current stock price",
+                        parameters={
+                            "type": "object",
+                            "properties": {
+                                "ticker_symbol": {
+                                    "type": "string",
+                                    "name": "Ticker Symbol",
+                                    "description": "Ticker symbol of the stock",
+                                }
+                            },
+                            "required": [],
+                        },
                     )
                 ],
             ),
             messages=[
                 ChatMessage(
                     role="user",
-                    content="What really happened at Roswell?",
+                    content="latest apple",
                 )
             ],
-            inputs={"person": "Trump"},
             stream=False,
         )
         """
@@ -514,7 +538,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -528,7 +552,7 @@ class PromptsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "prompts",
             method="GET",
@@ -664,8 +688,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage
-        from humanloop.client import Humanloop
+        from humanloop import ChatMessage, Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -765,7 +788,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -810,7 +833,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -866,7 +889,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -927,7 +950,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -984,7 +1007,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1033,7 +1056,7 @@ class PromptsClient:
         id : str
 
         activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
         deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
             Evaluators to deactivate. These will not be run on new Logs.
@@ -1048,8 +1071,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop, MonitoringEvaluatorVersionRequest
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1112,7 +1134,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1167,7 +1189,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1215,7 +1237,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1261,7 +1283,6 @@ class AsyncPromptsClient:
         messages: typing.Optional[typing.Sequence[ChatMessage]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoice] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -1283,11 +1304,11 @@ class AsyncPromptsClient:
         Log to a Prompt.
 
         You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+        an existing version of the Prompt. Otherwise, the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -1337,9 +1358,6 @@ class AsyncPromptsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -1396,31 +1414,52 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+        import datetime
+
+        from humanloop import AsyncHumanloop, ChatMessage, PromptKernelRequest
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.log(
-            path="persona",
-            prompt=PromptKernelRequest(
-                model="gpt-4",
-                template=[
+
+
+        async def main() -> None:
+            await client.prompts.log(
+                path="persona",
+                prompt=PromptKernelRequest(
+                    model="gpt-4",
+                    template=[
+                        ChatMessage(
+                            role="system",
+                            content="You are {{person}}. Answer questions as this person. Do not break character.",
+                        )
+                    ],
+                ),
+                messages=[
                     ChatMessage(
-                        role="system",
-                        content="You are {{person}}. Answer questions as this person. Do not break character.",
+                        role="user",
+                        content="What really happened at Roswell?",
                     )
                 ],
-            ),
-            messages=[
-                ChatMessage(
-                    role="user",
-                    content="What really happened at Roswell?",
-                )
-            ],
-            inputs={"person": "Trump"},
-        )
+                inputs={"person": "Trump"},
+                created_at=datetime.datetime.fromisoformat(
+                    "2024-07-19 04:29:35.178000+00:00",
+                ),
+                provider_latency=6.5931549072265625,
+                output_message=ChatMessage(
+                    content="Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+                    role="assistant",
+                ),
+                prompt_tokens=100,
+                output_tokens=220,
+                prompt_cost=1e-05,
+                output_cost=0.0002,
+                finish_reason="stop",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts/log",
@@ -1439,7 +1478,6 @@ class AsyncPromptsClient:
                 "messages": messages,
                 "tool_choice": tool_choice,
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -1502,7 +1540,7 @@ class AsyncPromptsClient:
         """
         Call a Prompt.
 
-        Calling a Prompt subsequently calls the model provider before logging
+        Calling a Prompt calls the model provider before logging
         the request, responses and metadata to Humanloop.
 
         You can use query parameters `version_id`, or `environment`, to target
@@ -1510,7 +1548,7 @@ class AsyncPromptsClient:
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -1598,32 +1636,60 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import (
+            AsyncHumanloop,
+            ChatMessage,
+            PromptKernelRequest,
+            ToolFunction,
+        )
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.call(
-            path="persona",
-            prompt=PromptKernelRequest(
-                model="gpt-4",
-                template=[
+
+
+        async def main() -> None:
+            await client.prompts.call(
+                path="persona",
+                prompt=PromptKernelRequest(
+                    model="gpt-4",
+                    template=[
+                        ChatMessage(
+                            role="system",
+                            content="You are stockbot. Return latest prices.",
+                        )
+                    ],
+                    tools=[
+                        ToolFunction(
+                            name="get_stock_price",
+                            description="Get current stock price",
+                            parameters={
+                                "type": "object",
+                                "properties": {
+                                    "ticker_symbol": {
+                                        "type": "string",
+                                        "name": "Ticker Symbol",
+                                        "description": "Ticker symbol of the stock",
+                                    }
+                                },
+                                "required": [],
+                            },
+                        )
+                    ],
+                ),
+                messages=[
                     ChatMessage(
-                        role="system",
-                        content="You are {{person}}. Answer any questions as this person. Do not break character.",
+                        role="user",
+                        content="latest apple",
                     )
                 ],
-            ),
-            messages=[
-                ChatMessage(
-                    role="user",
-                    content="What really happened at Roswell?",
-                )
-            ],
-            inputs={"person": "Trump"},
-            stream=False,
-        )
+                stream=False,
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts/call",
@@ -1711,21 +1777,29 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.prompts.list(
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.prompts.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "prompts",
             method="GET",
@@ -1861,33 +1935,40 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop, ChatMessage
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.upsert(
-            path="Personal Projects/Coding Assistant",
-            model="gpt-4o",
-            endpoint="chat",
-            template=[
-                ChatMessage(
-                    content="You are a helpful coding assistant specialising in {{language}}",
-                    role="system",
-                )
-            ],
-            provider="openai",
-            max_tokens=-1,
-            temperature=0.7,
-            top_p=1.0,
-            presence_penalty=0.0,
-            frequency_penalty=0.0,
-            other={},
-            tools=[],
-            linked_tools=[],
-            commit_message="Initial commit",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.upsert(
+                path="Personal Projects/Coding Assistant",
+                model="gpt-4o",
+                endpoint="chat",
+                template=[
+                    ChatMessage(
+                        content="You are a helpful coding assistant specialising in {{language}}",
+                        role="system",
+                    )
+                ],
+                provider="openai",
+                max_tokens=-1,
+                temperature=0.7,
+                top_p=1.0,
+                presence_penalty=0.0,
+                frequency_penalty=0.0,
+                other={},
+                tools=[],
+                linked_tools=[],
+                commit_message="Initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts",
@@ -1962,14 +2043,22 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.get(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.get(
+                id="pr_30gco7dx6JDq4200GVOHa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}",
@@ -2007,14 +2096,22 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.delete(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.delete(
+                id="pr_30gco7dx6JDq4200GVOHa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -2063,15 +2160,23 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.move(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            path="new directory/new name",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.move(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                path="new directory/new name",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}",
@@ -2124,15 +2229,23 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list_versions(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            status="committed",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.list_versions(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                status="committed",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/versions",
@@ -2181,16 +2294,24 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.commit(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            version_id="prv_F34aba5f3asp0",
-            commit_message="Reiterated point about not discussing sentience",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.commit(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                version_id="prv_F34aba5f3asp0",
+                commit_message="Reiterated point about not discussing sentience",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
@@ -2230,7 +2351,7 @@ class AsyncPromptsClient:
         id : str
 
         activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
         deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
             Evaluators to deactivate. These will not be run on new Logs.
@@ -2245,20 +2366,27 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop, MonitoringEvaluatorVersionRequest
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.update_monitoring(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            activate=[
-                MonitoringEvaluatorVersionRequest(
-                    evaluator_version_id="evv_1abc4308abd",
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.prompts.update_monitoring(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                activate=[
+                    MonitoringEvaluatorVersionRequest(
+                        evaluator_version_id="evv_1abc4308abd",
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/evaluators",
@@ -2309,16 +2437,24 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.set_deployment(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.set_deployment(
+                id="id",
+                environment_id="environment_id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -2364,15 +2500,23 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.remove_deployment(
-            id="id",
-            environment_id="environment_id",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.remove_deployment(
+                id="id",
+                environment_id="environment_id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -2412,14 +2556,22 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list_environments(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.list_environments(
+                id="pr_30gco7dx6JDq4200GVOHa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options

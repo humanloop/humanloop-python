@@ -719,34 +719,36 @@ service:
                     id: id
                   log:
                     id: id
-                    config:
+                    prompt:
+                      path: path
                       id: id
-                      type: model
+                      name: name
+                      version_id: version_id
+                      created_at: '2024-01-15T09:30:00Z'
+                      updated_at: '2024-01-15T09:30:00Z'
+                      status: uncommitted
+                      last_used_at: '2024-01-15T09:30:00Z'
                       model: model
-                    evaluation_results:
-                      - id: id
-                        evaluator_id: evaluator_id
-                        evaluator_version_id: evaluator_version_id
-                        log_id: log_id
-                        updated_at: '2024-01-15T09:30:00Z'
-                        created_at: '2024-01-15T09:30:00Z'
-                    observability_status: pending
-                    updated_at: '2024-01-15T09:30:00Z'
+                      version_logs_count: 1
+                      total_logs_count: 1
+                      inputs:
+                        - name: name
                   evaluator_logs:
                     - id: id
-                      config:
+                      prompt:
+                        path: path
                         id: id
-                        type: model
+                        name: name
+                        version_id: version_id
+                        created_at: '2024-01-15T09:30:00Z'
+                        updated_at: '2024-01-15T09:30:00Z'
+                        status: uncommitted
+                        last_used_at: '2024-01-15T09:30:00Z'
                         model: model
-                      evaluation_results:
-                        - id: id
-                          evaluator_id: evaluator_id
-                          evaluator_version_id: evaluator_version_id
-                          log_id: log_id
-                          updated_at: '2024-01-15T09:30:00Z'
-                          created_at: '2024-01-15T09:30:00Z'
-                      observability_status: pending
-                      updated_at: '2024-01-15T09:30:00Z'
+                        version_logs_count: 1
+                        total_logs_count: 1
+                        inputs:
+                          - name: name
               page: 1
               size: 1
               total: 1

@@ -5,8 +5,9 @@ from __future__ import annotations
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2, update_forward_refs
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .evaluation_result_response_value import EvaluationResultResponseValue
 
@@ -17,34 +18,25 @@ class EvaluationResultResponse(UncheckedBaseModel):
     evaluator_version_id: str
     evaluation_id: typing.Optional[str] = None
     log_id: str
-    log: typing.Optional[LogResponse] = None
+    log: typing.Optional[SrcExternalAppModelsV4LogLogResponse] = None
     version_id: typing.Optional[str] = None
     version: typing.Optional[typing.Any] = None
     value: typing.Optional[EvaluationResultResponseValue] = None
     error: typing.Optional[str] = None
     updated_at: dt.datetime
     created_at: dt.datetime
-    llm_evaluator_log: typing.Optional[LogResponse] = None
+    llm_evaluator_log: typing.Optional[SrcExternalAppModelsV4LogLogResponse] = None
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow
 
 
-from .log_response import LogResponse  # noqa: E402
+from .src_external_app_models_v_4_log_log_response import SrcExternalAppModelsV4LogLogResponse  # noqa: E402
 
-EvaluationResultResponse.update_forward_refs()
+update_forward_refs(EvaluationResultResponse)

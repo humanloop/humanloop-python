@@ -3,7 +3,7 @@
 import os
 
 import pytest
-from humanloop.client import AsyncHumanloop, Humanloop
+from humanloop import AsyncHumanloop, Humanloop
 
 
 @pytest.fixture

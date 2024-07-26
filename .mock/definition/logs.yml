@@ -57,7 +57,7 @@ service:
               returned.
       response:
         docs: Successful Response
-        type: root.PaginatedPromptLogResponse
+        type: root.PaginatedDataLogResponse
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -115,7 +115,7 @@ service:
       display-name: Get Log
       response:
         docs: Successful Response
-        type: root.PromptLogResponse
+        type: root.SrcExternalAppModelsV5LogsLogResponse
       errors:
         - root.UnprocessableEntityError
       examples:
