@@ -62,7 +62,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -77,7 +77,7 @@ class EvaluationsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "evaluations",
             method="GET",
@@ -149,8 +149,8 @@ class EvaluationsClient:
             EvaluateeRequest,
             EvaluationsDatasetRequest,
             EvaluationsRequest,
+            Humanloop,
         )
-        from humanloop.client import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -211,7 +211,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -256,7 +256,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -323,8 +323,8 @@ class EvaluationsClient:
             EvaluateeRequest,
             EvaluationsDatasetRequest,
             EvaluationsRequest,
+            Humanloop,
         )
-        from humanloop.client import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -393,7 +393,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -445,7 +445,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -504,7 +504,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -570,22 +570,30 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.evaluations.list(
-            file_id="pr_30gco7dx6JDq4200GVOHa",
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.evaluations.list(
+                file_id="pr_30gco7dx6JDq4200GVOHa",
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "evaluations",
             method="GET",
@@ -653,33 +661,41 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
+        import asyncio
+
         from humanloop import (
+            AsyncHumanloop,
             EvaluateeRequest,
             EvaluationsDatasetRequest,
             EvaluationsRequest,
         )
-        from humanloop.client import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.create(
-            dataset=EvaluationsDatasetRequest(
-                version_id="dsv_6L78pqrdFi2xa",
-            ),
-            evaluatees=[
-                EvaluateeRequest(
-                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
-                    orchestrated=False,
-                )
-            ],
-            evaluators=[
-                EvaluationsRequest(
-                    version_id="evv_012def",
-                    orchestrated=False,
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.create(
+                dataset=EvaluationsDatasetRequest(
+                    version_id="dsv_6L78pqrdFi2xa",
+                ),
+                evaluatees=[
+                    EvaluateeRequest(
+                        version_id="prv_7ZlQREDScH0xkhUwtXruN",
+                        orchestrated=False,
+                    )
+                ],
+                evaluators=[
+                    EvaluationsRequest(
+                        version_id="evv_012def",
+                        orchestrated=False,
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "evaluations",
@@ -719,14 +735,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get(
-            id="ev_567yza",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.get(
+                id="ev_567yza",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}", method="GET", request_options=request_options
@@ -764,14 +788,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.delete(
-            id="ev_567yza",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.delete(
+                id="ev_567yza",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -827,34 +859,42 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
+        import asyncio
+
         from humanloop import (
+            AsyncHumanloop,
             EvaluateeRequest,
             EvaluationsDatasetRequest,
             EvaluationsRequest,
         )
-        from humanloop.client import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.update_setup(
-            id="ev_567yza",
-            dataset=EvaluationsDatasetRequest(
-                version_id="dsv_6L78pqrdFi2xa",
-            ),
-            evaluatees=[
-                EvaluateeRequest(
-                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
-                    orchestrated=False,
-                )
-            ],
-            evaluators=[
-                EvaluationsRequest(
-                    version_id="evv_012def",
-                    orchestrated=False,
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.update_setup(
+                id="ev_567yza",
+                dataset=EvaluationsDatasetRequest(
+                    version_id="dsv_6L78pqrdFi2xa",
+                ),
+                evaluatees=[
+                    EvaluateeRequest(
+                        version_id="prv_7ZlQREDScH0xkhUwtXruN",
+                        orchestrated=False,
+                    )
+                ],
+                evaluators=[
+                    EvaluationsRequest(
+                        version_id="evv_012def",
+                        orchestrated=False,
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}",
@@ -901,15 +941,23 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.update_status(
-            id="id",
-            status="pending",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.update_status(
+                id="id",
+                status="pending",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}/status",
@@ -953,14 +1001,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get_stats(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.get_stats(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}/stats", method="GET", request_options=request_options
@@ -1012,14 +1068,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get_logs(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.get_logs(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}/logs",

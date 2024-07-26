@@ -2,7 +2,7 @@
 
 import typing
 
-from humanloop.client import AsyncHumanloop, Humanloop
+from humanloop import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
 

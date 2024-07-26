@@ -46,7 +46,6 @@ class ToolsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -92,9 +91,6 @@ class ToolsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -154,8 +150,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction, ToolKernelRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop, ToolFunction, ToolKernelRequest
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -188,7 +183,6 @@ class ToolsClient:
                 "path": path,
                 "id": id,
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -265,7 +259,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -279,7 +273,7 @@ class ToolsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "tools",
             method="GET",
@@ -371,8 +365,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop, ToolFunction
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -453,7 +446,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -498,7 +491,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -554,7 +547,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -615,7 +608,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -672,7 +665,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -721,7 +714,7 @@ class ToolsClient:
         id : str
 
         activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
         deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
             Evaluators to deactivate. These will not be run on new Logs.
@@ -736,8 +729,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop, MonitoringEvaluatorVersionRequest
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -800,7 +792,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -855,7 +847,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -903,7 +895,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -940,7 +932,6 @@ class AsyncToolsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -986,9 +977,6 @@ class AsyncToolsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -1048,31 +1036,38 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction, ToolKernelRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop, ToolFunction, ToolKernelRequest
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.log(
-            path="math-tool",
-            tool=ToolKernelRequest(
-                function=ToolFunction(
-                    name="multiply",
-                    description="Multiply two numbers",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                            "a": {"type": "number"},
-                            "b": {"type": "number"},
+
+
+        async def main() -> None:
+            await client.tools.log(
+                path="math-tool",
+                tool=ToolKernelRequest(
+                    function=ToolFunction(
+                        name="multiply",
+                        description="Multiply two numbers",
+                        parameters={
+                            "type": "object",
+                            "properties": {
+                                "a": {"type": "number"},
+                                "b": {"type": "number"},
+                            },
+                            "required": ["a", "b"],
                         },
-                        "required": ["a", "b"],
-                    },
+                    ),
                 ),
-            ),
-            inputs={"a": 5, "b": 7},
-            output="35",
-        )
+                inputs={"a": 5, "b": 7},
+                output="35",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "tools/log",
@@ -1082,7 +1077,6 @@ class AsyncToolsClient:
                 "path": path,
                 "id": id,
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -1159,21 +1153,29 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.tools.list(
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.tools.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "tools",
             method="GET",
@@ -1265,25 +1267,35 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop, ToolFunction
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.upsert(
-            path="math-tool",
-            function=ToolFunction(
-                name="multiply",
-                description="Multiply two numbers",
-                parameters={
-                    "type": "object",
-                    "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
-                    "required": ["a", "b"],
-                },
-            ),
-            commit_message="Initial commit",
-        )
+
+
+        async def main() -> None:
+            await client.tools.upsert(
+                path="math-tool",
+                function=ToolFunction(
+                    name="multiply",
+                    description="Multiply two numbers",
+                    parameters={
+                        "type": "object",
+                        "properties": {
+                            "a": {"type": "number"},
+                            "b": {"type": "number"},
+                        },
+                        "required": ["a", "b"],
+                    },
+                ),
+                commit_message="Initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "tools",
@@ -1347,14 +1359,22 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.get(
-            id="tl_789ghi",
-        )
+
+
+        async def main() -> None:
+            await client.tools.get(
+                id="tl_789ghi",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}",
@@ -1392,14 +1412,22 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.delete(
-            id="tl_789ghi",
-        )
+
+
+        async def main() -> None:
+            await client.tools.delete(
+                id="tl_789ghi",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -1448,15 +1476,23 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.move(
-            id="tl_789ghi",
-            path="new directory/new name",
-        )
+
+
+        async def main() -> None:
+            await client.tools.move(
+                id="tl_789ghi",
+                path="new directory/new name",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}",
@@ -1509,15 +1545,23 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.list_versions(
-            id="tl_789ghi",
-            status="committed",
-        )
+
+
+        async def main() -> None:
+            await client.tools.list_versions(
+                id="tl_789ghi",
+                status="committed",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions",
@@ -1566,16 +1610,24 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.commit(
-            id="tl_789ghi",
-            version_id="tv_012jkl",
-            commit_message="Initial commit",
-        )
+
+
+        async def main() -> None:
+            await client.tools.commit(
+                id="tl_789ghi",
+                version_id="tv_012jkl",
+                commit_message="Initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
@@ -1615,7 +1667,7 @@ class AsyncToolsClient:
         id : str
 
         activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
         deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
             Evaluators to deactivate. These will not be run on new Logs.
@@ -1630,20 +1682,27 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop, MonitoringEvaluatorVersionRequest
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.update_monitoring(
-            id="tl_789ghi",
-            activate=[
-                MonitoringEvaluatorVersionRequest(
-                    evaluator_version_id="evv_1abc4308abd",
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.tools.update_monitoring(
+                id="tl_789ghi",
+                activate=[
+                    MonitoringEvaluatorVersionRequest(
+                        evaluator_version_id="evv_1abc4308abd",
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/evaluators",
@@ -1694,16 +1753,24 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.set_deployment(
-            id="tl_789ghi",
-            environment_id="staging",
-            version_id="tv_012jkl",
-        )
+
+
+        async def main() -> None:
+            await client.tools.set_deployment(
+                id="tl_789ghi",
+                environment_id="staging",
+                version_id="tv_012jkl",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -1749,15 +1816,23 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.remove_deployment(
-            id="tl_789ghi",
-            environment_id="staging",
-        )
+
+
+        async def main() -> None:
+            await client.tools.remove_deployment(
+                id="tl_789ghi",
+                environment_id="staging",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -1797,14 +1872,22 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.list_environments(
-            id="tl_789ghi",
-        )
+
+
+        async def main() -> None:
+            await client.tools.list_environments(
+                id="tl_789ghi",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options

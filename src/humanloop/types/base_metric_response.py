@@ -3,38 +3,39 @@
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 
 
 class BaseMetricResponse(UncheckedBaseModel):
-    id: str = pydantic_v1.Field()
+    id: str = pydantic.Field()
     """
     ID of the metric. Starts with 'metric\_'.
     """
 
-    name: str = pydantic_v1.Field()
+    name: str = pydantic.Field()
     """
     The name of the metric.
     """
 
-    description: str = pydantic_v1.Field()
+    description: str = pydantic.Field()
     """
     A description of what the metric measures.
     """
 
-    code: str = pydantic_v1.Field()
+    code: str = pydantic.Field()
     """
     Python code used to calculate a metric value on each logged datapoint.
     """
 
-    default: bool = pydantic_v1.Field()
+    default: bool = pydantic.Field()
     """
     Whether the metric is a global default metric. Metrics with this flag enabled cannot be deleted or modified.
     """
 
-    active: bool = pydantic_v1.Field()
+    active: bool = pydantic.Field()
     """
     If enabled, the metric is calculated for every logged datapoint.
     """
@@ -42,20 +43,11 @@ class BaseMetricResponse(UncheckedBaseModel):
     created_at: dt.datetime
     updated_at: dt.datetime
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow

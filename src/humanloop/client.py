@@ -47,7 +47,7 @@ class Humanloop:
 
     Examples
     --------
-    from humanloop.client import Humanloop
+    from humanloop import Humanloop
 
     client = Humanloop(
         api_key="YOUR_API_KEY",
@@ -118,7 +118,7 @@ class AsyncHumanloop:
 
     Examples
     --------
-    from humanloop.client import AsyncHumanloop
+    from humanloop import AsyncHumanloop
 
     client = AsyncHumanloop(
         api_key="YOUR_API_KEY",

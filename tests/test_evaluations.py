@@ -2,8 +2,7 @@
 
 import typing
 
-from humanloop import EvaluateeRequest, EvaluationsDatasetRequest, EvaluationsRequest
-from humanloop.client import AsyncHumanloop, Humanloop
+from humanloop import AsyncHumanloop, EvaluateeRequest, EvaluationsDatasetRequest, EvaluationsRequest, Humanloop
 
 from .utilities import validate_response
 
@@ -818,36 +817,38 @@ async def test_get_logs(client: Humanloop, async_client: AsyncHumanloop) -> None
                 "datapoint": {"id": "id"},
                 "log": {
                     "id": "id",
-                    "config": {"id": "id", "type": "model", "model": "model"},
-                    "evaluation_results": [
-                        {
-                            "id": "id",
-                            "evaluator_id": "evaluator_id",
-                            "evaluator_version_id": "evaluator_version_id",
-                            "log_id": "log_id",
-                            "updated_at": "2024-01-15T09:30:00Z",
-                            "created_at": "2024-01-15T09:30:00Z",
-                        }
-                    ],
-                    "observability_status": "pending",
-                    "updated_at": "2024-01-15T09:30:00Z",
+                    "prompt": {
+                        "path": "path",
+                        "id": "id",
+                        "name": "name",
+                        "version_id": "version_id",
+                        "created_at": "2024-01-15T09:30:00Z",
+                        "updated_at": "2024-01-15T09:30:00Z",
+                        "status": "uncommitted",
+                        "last_used_at": "2024-01-15T09:30:00Z",
+                        "model": "model",
+                        "version_logs_count": 1,
+                        "total_logs_count": 1,
+                        "inputs": [{"name": "name"}],
+                    },
                 },
                 "evaluator_logs": [
                     {
                         "id": "id",
-                        "config": {"id": "id", "type": "model", "model": "model"},
-                        "evaluation_results": [
-                            {
-                                "id": "id",
-                                "evaluator_id": "evaluator_id",
-                                "evaluator_version_id": "evaluator_version_id",
-                                "log_id": "log_id",
-                                "updated_at": "2024-01-15T09:30:00Z",
-                                "created_at": "2024-01-15T09:30:00Z",
-                            }
-                        ],
-                        "observability_status": "pending",
-                        "updated_at": "2024-01-15T09:30:00Z",
+                        "prompt": {
+                            "path": "path",
+                            "id": "id",
+                            "name": "name",
+                            "version_id": "version_id",
+                            "created_at": "2024-01-15T09:30:00Z",
+                            "updated_at": "2024-01-15T09:30:00Z",
+                            "status": "uncommitted",
+                            "last_used_at": "2024-01-15T09:30:00Z",
+                            "model": "model",
+                            "version_logs_count": 1,
+                            "total_logs_count": 1,
+                            "inputs": [{"name": "name"}],
+                        },
                     }
                 ],
             }
@@ -878,44 +879,40 @@ async def test_get_logs(client: Humanloop, async_client: AsyncHumanloop) -> None
                     "datapoint": {"id": None},
                     "log": {
                         "id": None,
-                        "config": {"id": None, "type": None, "model": None},
-                        "evaluation_results": (
-                            "list",
-                            {
-                                0: {
-                                    "id": None,
-                                    "evaluator_id": None,
-                                    "evaluator_version_id": None,
-                                    "log_id": None,
-                                    "updated_at": "datetime",
-                                    "created_at": "datetime",
-                                }
-                            },
-                        ),
-                        "observability_status": None,
-                        "updated_at": "datetime",
+                        "prompt": {
+                            "path": None,
+                            "id": None,
+                            "name": None,
+                            "version_id": None,
+                            "created_at": "datetime",
+                            "updated_at": "datetime",
+                            "status": None,
+                            "last_used_at": "datetime",
+                            "model": None,
+                            "version_logs_count": "integer",
+                            "total_logs_count": "integer",
+                            "inputs": ("list", {0: {"name": None}}),
+                        },
                     },
                     "evaluator_logs": (
                         "list",
                         {
                             0: {
                                 "id": None,
-                                "config": {"id": None, "type": None, "model": None},
-                                "evaluation_results": (
-                                    "list",
-                                    {
-                                        0: {
-                                            "id": None,
-                                            "evaluator_id": None,
-                                            "evaluator_version_id": None,
-                                            "log_id": None,
-                                            "updated_at": "datetime",
-                                            "created_at": "datetime",
-                                        }
-                                    },
-                                ),
-                                "observability_status": None,
-                                "updated_at": "datetime",
+                                "prompt": {
+                                    "path": None,
+                                    "id": None,
+                                    "name": None,
+                                    "version_id": None,
+                                    "created_at": "datetime",
+                                    "updated_at": "datetime",
+                                    "status": None,
+                                    "last_used_at": "datetime",
+                                    "model": None,
+                                    "version_logs_count": "integer",
+                                    "total_logs_count": "integer",
+                                    "inputs": ("list", {0: {"name": None}}),
+                                },
                             }
                         },
                     ),
