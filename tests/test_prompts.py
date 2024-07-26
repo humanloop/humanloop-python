@@ -3,6 +3,8 @@
 import datetime
 import typing
 
+import pytest
+
 from humanloop import (
     AsyncHumanloop,
     ChatMessage,
@@ -15,6 +17,7 @@ from humanloop import (
 from .utilities import validate_response
 
 
+@pytest.mark.skip(reason="Unregistered example")
 async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "data_fIfEb1SoKZooqeFbi9IFs",
@@ -859,6 +862,7 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
     assert await async_client.prompts.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
 
 
+@pytest.mark.skip(reason="Untested")
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {

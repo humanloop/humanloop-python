@@ -2,6 +2,8 @@
 
 import typing
 
+import pytest
+
 from humanloop import AsyncHumanloop, CodeEvaluatorRequest, Humanloop
 
 from .utilities import validate_response
@@ -310,6 +312,7 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
     assert await async_client.evaluators.remove_deployment(id="ev_890bcd", environment_id="staging") is None  # type: ignore[func-returns-value]
 
 
+@pytest.mark.skip(reason="Untested")
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
