@@ -5,8 +5,9 @@ from __future__ import annotations
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2, update_forward_refs
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .environment_response import EnvironmentResponse
 from .evaluator_aggregate import EvaluatorAggregate
@@ -27,169 +28,160 @@ class PromptResponse(UncheckedBaseModel):
     Request model for creating a new Prompt
     """
 
-    path: str = pydantic_v1.Field()
+    path: str = pydantic.Field()
     """
     Path of the Prompt, including the name, which is used as a unique identifier.
     """
 
-    id: str = pydantic_v1.Field()
+    id: str = pydantic.Field()
     """
     Unique identifier for the Prompt.
     """
 
-    name: str = pydantic_v1.Field()
+    name: str = pydantic.Field()
     """
     Name of the Prompt.
     """
 
-    version_id: str = pydantic_v1.Field()
+    version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
     """
 
     type: typing.Optional[typing.Literal["prompt"]] = None
-    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic_v1.Field(default=None)
+    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(default=None)
     """
     The list of environments the Prompt Version is deployed to.
     """
 
     created_at: dt.datetime
     updated_at: dt.datetime
-    created_by: typing.Optional[UserResponse] = pydantic_v1.Field(default=None)
+    created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
     """
     The user who created the Prompt.
     """
 
-    status: VersionStatus = pydantic_v1.Field()
+    status: VersionStatus = pydantic.Field()
     """
     The status of the Prompt Version.
     """
 
     last_used_at: dt.datetime
-    model: str = pydantic_v1.Field()
+    model: str = pydantic.Field()
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
     """
 
-    endpoint: typing.Optional[ModelEndpoints] = pydantic_v1.Field(default=None)
+    endpoint: typing.Optional[ModelEndpoints] = pydantic.Field(default=None)
     """
     The provider model endpoint used.
     """
 
-    template: typing.Optional[PromptResponseTemplate] = pydantic_v1.Field(default=None)
+    template: typing.Optional[PromptResponseTemplate] = pydantic.Field(default=None)
     """
     For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
     """
 
-    provider: typing.Optional[ModelProviders] = pydantic_v1.Field(default=None)
+    provider: typing.Optional[ModelProviders] = pydantic.Field(default=None)
     """
     The company providing the underlying model service.
     """
 
-    max_tokens: typing.Optional[int] = pydantic_v1.Field(default=None)
+    max_tokens: typing.Optional[int] = pydantic.Field(default=None)
     """
     The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
     """
 
-    temperature: typing.Optional[float] = pydantic_v1.Field(default=None)
+    temperature: typing.Optional[float] = pydantic.Field(default=None)
     """
     What sampling temperature to use when making a generation. Higher values means the model will be more creative.
     """
 
-    top_p: typing.Optional[float] = pydantic_v1.Field(default=None)
+    top_p: typing.Optional[float] = pydantic.Field(default=None)
     """
     An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
     """
 
-    stop: typing.Optional[PromptResponseStop] = pydantic_v1.Field(default=None)
+    stop: typing.Optional[PromptResponseStop] = pydantic.Field(default=None)
     """
     The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
     """
 
-    presence_penalty: typing.Optional[float] = pydantic_v1.Field(default=None)
+    presence_penalty: typing.Optional[float] = pydantic.Field(default=None)
     """
     Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
     """
 
-    frequency_penalty: typing.Optional[float] = pydantic_v1.Field(default=None)
+    frequency_penalty: typing.Optional[float] = pydantic.Field(default=None)
     """
     Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
     """
 
-    other: typing.Optional[typing.Dict[str, typing.Any]] = pydantic_v1.Field(default=None)
+    other: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     Other parameter values to be passed to the provider call.
     """
 
-    seed: typing.Optional[int] = pydantic_v1.Field(default=None)
+    seed: typing.Optional[int] = pydantic.Field(default=None)
     """
     If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
     """
 
-    response_format: typing.Optional[ResponseFormat] = pydantic_v1.Field(default=None)
+    response_format: typing.Optional[ResponseFormat] = pydantic.Field(default=None)
     """
     The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
     """
 
-    tools: typing.Optional[typing.List[ToolFunction]] = pydantic_v1.Field(default=None)
+    tools: typing.Optional[typing.List[ToolFunction]] = pydantic.Field(default=None)
     """
     The tool specification that the model can choose to call if Tool calling is supported.
     """
 
-    linked_tools: typing.Optional[typing.List[LinkedToolResponse]] = pydantic_v1.Field(default=None)
+    linked_tools: typing.Optional[typing.List[LinkedToolResponse]] = pydantic.Field(default=None)
     """
     The tools linked to your prompt that the model can call.
     """
 
-    commit_message: typing.Optional[str] = pydantic_v1.Field(default=None)
+    commit_message: typing.Optional[str] = pydantic.Field(default=None)
     """
     Message describing the changes made.
     """
 
-    version_logs_count: int = pydantic_v1.Field()
+    version_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated for this Prompt Version
     """
 
-    total_logs_count: int = pydantic_v1.Field()
+    total_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated across all Prompt Versions
     """
 
-    inputs: typing.List[InputResponse] = pydantic_v1.Field()
+    inputs: typing.List[InputResponse] = pydantic.Field()
     """
     Inputs associated to the Prompt. Inputs correspond to any of the variables used within the Prompt template.
     """
 
-    evaluators: typing.Optional[typing.List[MonitoringEvaluatorResponse]] = pydantic_v1.Field(default=None)
+    evaluators: typing.Optional[typing.List[MonitoringEvaluatorResponse]] = pydantic.Field(default=None)
     """
     Evaluators that have been attached to this Prompt that are used for monitoring logs.
     """
 
-    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic_v1.Field(default=None)
+    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic.Field(default=None)
     """
     Aggregation of Evaluator results for the Prompt Version.
     """
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow
 
 
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
 
-PromptResponse.update_forward_refs()
+update_forward_refs(PromptResponse)

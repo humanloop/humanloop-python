@@ -9,15 +9,18 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pagination import AsyncPager, SyncPager
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..requests.evaluator_activation_deactivation_request_activate_item import (
+    EvaluatorActivationDeactivationRequestActivateItemParams,
+)
+from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
+    EvaluatorActivationDeactivationRequestDeactivateItemParams,
+)
+from ..requests.tool_function import ToolFunctionParams
+from ..requests.tool_kernel_request import ToolKernelRequestParams
 from ..types.create_tool_log_response import CreateToolLogResponse
-from ..types.evaluator_activation_deactivation_request_activate_item import (
-    EvaluatorActivationDeactivationRequestActivateItem,
-)
-from ..types.evaluator_activation_deactivation_request_deactivate_item import (
-    EvaluatorActivationDeactivationRequestDeactivateItem,
-)
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.files_tool_type import FilesToolType
 from ..types.http_validation_error import HttpValidationError
@@ -25,8 +28,6 @@ from ..types.list_tools import ListTools
 from ..types.paginated_data_tool_response import PaginatedDataToolResponse
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
-from ..types.tool_function import ToolFunction
-from ..types.tool_kernel_request import ToolKernelRequest
 from ..types.tool_response import ToolResponse
 from ..types.version_status import VersionStatus
 
@@ -46,7 +47,6 @@ class ToolsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -62,7 +62,7 @@ class ToolsClient:
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequest] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
         """
@@ -92,9 +92,6 @@ class ToolsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -141,7 +138,7 @@ class ToolsClient:
         tool_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
 
-        tool : typing.Optional[ToolKernelRequest]
+        tool : typing.Optional[ToolKernelRequestParams]
             Details of your Tool. A new Tool version will be created if the provided details are new.
 
         request_options : typing.Optional[RequestOptions]
@@ -154,19 +151,18 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction, ToolKernelRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.tools.log(
             path="math-tool",
-            tool=ToolKernelRequest(
-                function=ToolFunction(
-                    name="multiply",
-                    description="Multiply two numbers",
-                    parameters={
+            tool={
+                "function": {
+                    "name": "multiply",
+                    "description": "Multiply two numbers",
+                    "parameters": {
                         "type": "object",
                         "properties": {
                             "a": {"type": "number"},
@@ -174,8 +170,8 @@ class ToolsClient:
                         },
                         "required": ["a", "b"],
                     },
-                ),
-            ),
+                }
+            },
             inputs={"a": 5, "b": 7},
             output="35",
         )
@@ -188,7 +184,6 @@ class ToolsClient:
                 "path": path,
                 "id": id,
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -204,7 +199,7 @@ class ToolsClient:
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
-                "tool": tool,
+                "tool": convert_and_respect_annotation_metadata(object_=tool, annotation=ToolKernelRequestParams),
             },
             request_options=request_options,
             omit=OMIT,
@@ -265,7 +260,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -279,7 +274,7 @@ class ToolsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "tools",
             method="GET",
@@ -322,7 +317,7 @@ class ToolsClient:
         *,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        function: typing.Optional[ToolFunction] = OMIT,
+        function: typing.Optional[ToolFunctionParams] = OMIT,
         source_code: typing.Optional[str] = OMIT,
         setup_values: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         tool_type: typing.Optional[FilesToolType] = OMIT,
@@ -346,7 +341,7 @@ class ToolsClient:
         id : typing.Optional[str]
             ID for an existing Tool to update.
 
-        function : typing.Optional[ToolFunction]
+        function : typing.Optional[ToolFunctionParams]
             Callable function specification of the Tool shown to the model for tool calling.
 
         source_code : typing.Optional[str]
@@ -371,23 +366,22 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.tools.upsert(
             path="math-tool",
-            function=ToolFunction(
-                name="multiply",
-                description="Multiply two numbers",
-                parameters={
+            function={
+                "name": "multiply",
+                "description": "Multiply two numbers",
+                "parameters": {
                     "type": "object",
                     "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
                     "required": ["a", "b"],
                 },
-            ),
+            },
             commit_message="Initial commit",
         )
         """
@@ -397,7 +391,7 @@ class ToolsClient:
             json={
                 "path": path,
                 "id": id,
-                "function": function,
+                "function": convert_and_respect_annotation_metadata(object_=function, annotation=ToolFunctionParams),
                 "source_code": source_code,
                 "setup_values": setup_values,
                 "tool_type": tool_type,
@@ -453,7 +447,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -498,7 +492,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -554,7 +548,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -615,7 +609,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -672,7 +666,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -706,8 +700,8 @@ class ToolsClient:
         self,
         id: str,
         *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]] = OMIT,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ToolResponse:
         """
@@ -720,10 +714,10 @@ class ToolsClient:
         ----------
         id : str
 
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
             Evaluators to deactivate. These will not be run on new Logs.
 
         request_options : typing.Optional[RequestOptions]
@@ -736,25 +730,29 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.tools.update_monitoring(
             id="tl_789ghi",
-            activate=[
-                MonitoringEvaluatorVersionRequest(
-                    evaluator_version_id="evv_1abc4308abd",
-                )
-            ],
+            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/evaluators",
             method="POST",
-            json={"activate": activate, "deactivate": deactivate},
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -800,7 +798,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -855,7 +853,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -903,7 +901,7 @@ class ToolsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -940,7 +938,6 @@ class AsyncToolsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -956,7 +953,7 @@ class AsyncToolsClient:
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequest] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
         """
@@ -986,9 +983,6 @@ class AsyncToolsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -1035,7 +1029,7 @@ class AsyncToolsClient:
         tool_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
 
-        tool : typing.Optional[ToolKernelRequest]
+        tool : typing.Optional[ToolKernelRequestParams]
             Details of your Tool. A new Tool version will be created if the provided details are new.
 
         request_options : typing.Optional[RequestOptions]
@@ -1048,31 +1042,38 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction, ToolKernelRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.log(
-            path="math-tool",
-            tool=ToolKernelRequest(
-                function=ToolFunction(
-                    name="multiply",
-                    description="Multiply two numbers",
-                    parameters={
-                        "type": "object",
-                        "properties": {
-                            "a": {"type": "number"},
-                            "b": {"type": "number"},
+
+
+        async def main() -> None:
+            await client.tools.log(
+                path="math-tool",
+                tool={
+                    "function": {
+                        "name": "multiply",
+                        "description": "Multiply two numbers",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "a": {"type": "number"},
+                                "b": {"type": "number"},
+                            },
+                            "required": ["a", "b"],
                         },
-                        "required": ["a", "b"],
-                    },
-                ),
-            ),
-            inputs={"a": 5, "b": 7},
-            output="35",
-        )
+                    }
+                },
+                inputs={"a": 5, "b": 7},
+                output="35",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "tools/log",
@@ -1082,7 +1083,6 @@ class AsyncToolsClient:
                 "path": path,
                 "id": id,
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -1098,7 +1098,7 @@ class AsyncToolsClient:
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
-                "tool": tool,
+                "tool": convert_and_respect_annotation_metadata(object_=tool, annotation=ToolKernelRequestParams),
             },
             request_options=request_options,
             omit=OMIT,
@@ -1159,21 +1159,29 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.tools.list(
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.tools.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "tools",
             method="GET",
@@ -1216,7 +1224,7 @@ class AsyncToolsClient:
         *,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        function: typing.Optional[ToolFunction] = OMIT,
+        function: typing.Optional[ToolFunctionParams] = OMIT,
         source_code: typing.Optional[str] = OMIT,
         setup_values: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         tool_type: typing.Optional[FilesToolType] = OMIT,
@@ -1240,7 +1248,7 @@ class AsyncToolsClient:
         id : typing.Optional[str]
             ID for an existing Tool to update.
 
-        function : typing.Optional[ToolFunction]
+        function : typing.Optional[ToolFunctionParams]
             Callable function specification of the Tool shown to the model for tool calling.
 
         source_code : typing.Optional[str]
@@ -1265,25 +1273,35 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop import ToolFunction
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.upsert(
-            path="math-tool",
-            function=ToolFunction(
-                name="multiply",
-                description="Multiply two numbers",
-                parameters={
-                    "type": "object",
-                    "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
-                    "required": ["a", "b"],
+
+
+        async def main() -> None:
+            await client.tools.upsert(
+                path="math-tool",
+                function={
+                    "name": "multiply",
+                    "description": "Multiply two numbers",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "a": {"type": "number"},
+                            "b": {"type": "number"},
+                        },
+                        "required": ["a", "b"],
+                    },
                 },
-            ),
-            commit_message="Initial commit",
-        )
+                commit_message="Initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "tools",
@@ -1291,7 +1309,7 @@ class AsyncToolsClient:
             json={
                 "path": path,
                 "id": id,
-                "function": function,
+                "function": convert_and_respect_annotation_metadata(object_=function, annotation=ToolFunctionParams),
                 "source_code": source_code,
                 "setup_values": setup_values,
                 "tool_type": tool_type,
@@ -1347,14 +1365,22 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.get(
-            id="tl_789ghi",
-        )
+
+
+        async def main() -> None:
+            await client.tools.get(
+                id="tl_789ghi",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}",
@@ -1392,14 +1418,22 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.delete(
-            id="tl_789ghi",
-        )
+
+
+        async def main() -> None:
+            await client.tools.delete(
+                id="tl_789ghi",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -1448,15 +1482,23 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.move(
-            id="tl_789ghi",
-            path="new directory/new name",
-        )
+
+
+        async def main() -> None:
+            await client.tools.move(
+                id="tl_789ghi",
+                path="new directory/new name",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}",
@@ -1509,15 +1551,23 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.list_versions(
-            id="tl_789ghi",
-            status="committed",
-        )
+
+
+        async def main() -> None:
+            await client.tools.list_versions(
+                id="tl_789ghi",
+                status="committed",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions",
@@ -1566,16 +1616,24 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.commit(
-            id="tl_789ghi",
-            version_id="tv_012jkl",
-            commit_message="Initial commit",
-        )
+
+
+        async def main() -> None:
+            await client.tools.commit(
+                id="tl_789ghi",
+                version_id="tv_012jkl",
+                commit_message="Initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
@@ -1600,8 +1658,8 @@ class AsyncToolsClient:
         self,
         id: str,
         *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]] = OMIT,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ToolResponse:
         """
@@ -1614,10 +1672,10 @@ class AsyncToolsClient:
         ----------
         id : str
 
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
             Evaluators to deactivate. These will not be run on new Logs.
 
         request_options : typing.Optional[RequestOptions]
@@ -1630,25 +1688,37 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.update_monitoring(
-            id="tl_789ghi",
-            activate=[
-                MonitoringEvaluatorVersionRequest(
-                    evaluator_version_id="evv_1abc4308abd",
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.tools.update_monitoring(
+                id="tl_789ghi",
+                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/evaluators",
             method="POST",
-            json={"activate": activate, "deactivate": deactivate},
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1694,16 +1764,24 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.set_deployment(
-            id="tl_789ghi",
-            environment_id="staging",
-            version_id="tv_012jkl",
-        )
+
+
+        async def main() -> None:
+            await client.tools.set_deployment(
+                id="tl_789ghi",
+                environment_id="staging",
+                version_id="tv_012jkl",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -1749,15 +1827,23 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.remove_deployment(
-            id="tl_789ghi",
-            environment_id="staging",
-        )
+
+
+        async def main() -> None:
+            await client.tools.remove_deployment(
+                id="tl_789ghi",
+                environment_id="staging",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -1797,14 +1883,22 @@ class AsyncToolsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.tools.list_environments(
-            id="tl_789ghi",
-        )
+
+
+        async def main() -> None:
+            await client.tools.list_environments(
+                id="tl_789ghi",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"tools/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options

@@ -3,8 +3,9 @@
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .dataset_response import DatasetResponse
 from .evaluatee_response import EvaluateeResponse
@@ -14,27 +15,27 @@ from .user_response import UserResponse
 
 
 class EvaluationResponse(UncheckedBaseModel):
-    id: str = pydantic_v1.Field()
+    id: str = pydantic.Field()
     """
     Unique identifier for the Evaluation. Starts with `evr`.
     """
 
-    dataset: DatasetResponse = pydantic_v1.Field()
+    dataset: DatasetResponse = pydantic.Field()
     """
     The Dataset used in the Evaluation.
     """
 
-    evaluatees: typing.List[EvaluateeResponse] = pydantic_v1.Field()
+    evaluatees: typing.List[EvaluateeResponse] = pydantic.Field()
     """
     The Prompt/Tool Versions included in the Evaluation.
     """
 
-    evaluators: typing.List[EvaluationEvaluatorResponse] = pydantic_v1.Field()
+    evaluators: typing.List[EvaluationEvaluatorResponse] = pydantic.Field()
     """
     The Evaluator Versions used to evaluate.
     """
 
-    status: EvaluationStatus = pydantic_v1.Field()
+    status: EvaluationStatus = pydantic.Field()
     """
     The current status of the Evaluation.
     
@@ -48,20 +49,11 @@ class EvaluationResponse(UncheckedBaseModel):
     created_by: typing.Optional[UserResponse] = None
     updated_at: dt.datetime
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow

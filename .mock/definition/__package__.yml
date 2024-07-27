@@ -160,6 +160,7 @@ types:
         docs: >-
           NB: Deprecated in favour of tool_calls. A tool call requested by the
           assistant.
+        availability: deprecated
   ChatRole:
     enum:
       - user
@@ -241,6 +242,23 @@ types:
       evaluators:
         docs: The Evaluators used to evaluate.
         type: list<EvaluationsRequest>
+  CreateEvaluatorLogResponse:
+    properties:
+      id:
+        type: string
+        docs: String identifier of the new Log.
+      parent_id:
+        type: string
+        docs: Identifier of the evaluated parent Log.
+      session_id:
+        type: optional<string>
+        docs: >-
+          Identifier of the Session containing both the parent and the new child
+          Log. If the parent Log does not belong to a Session, a new Session is
+          created with this ID.
+      version_id:
+        type: string
+        docs: Identifier of Evaluator Version for which the Log was registered.
   CreatePromptLogResponse:
     properties:
       id:
@@ -399,7 +417,7 @@ types:
         type: optional<string>
         docs: >-
           Unique identifier for the batch of Logs to include in the Evaluation
-          Report. 
+          Report.
       orchestrated:
         type: boolean
         docs: >-
@@ -422,13 +440,13 @@ types:
         docs: The version of the Prompt, Tool or Evaluator that the Log belongs to.
       datapoint:
         type: DatapointResponse
-        docs: The Datapoint used to generate the log
+        docs: The Datapoint used to generate the Log
       log:
-        type: optional<LogResponse>
+        type: optional<SrcExternalAppModelsV5LogsLogResponse>
         docs: The Log that was evaluated by the Evaluator.
       evaluator_logs:
-        docs: The Evaluator logs containing the judgments for the Log.
-        type: list<LogResponse>
+        docs: The Evaluator Logs containing the judgments for the Log.
+        type: list<SrcExternalAppModelsV5LogsLogResponse>
   EvaluationResponse:
     properties:
       id:
@@ -474,14 +492,14 @@ types:
       evaluator_version_id: string
       evaluation_id: optional<string>
       log_id: string
-      log: optional<LogResponse>
+      log: optional<SrcExternalAppModelsV4LogLogResponse>
       version_id: optional<string>
       version: optional<unknown>
       value: optional<EvaluationResultResponseValue>
       error: optional<string>
       updated_at: datetime
       created_at: datetime
-      llm_evaluator_log: optional<LogResponse>
+      llm_evaluator_log: optional<SrcExternalAppModelsV4LogLogResponse>
   EvaluationStats:
     properties:
       overall_stats:
@@ -513,7 +531,7 @@ types:
       activate:
         type: optional<list<EvaluatorActivationDeactivationRequestActivateItem>>
         docs: >-
-          Evaluators to activate on Monitoring. These will be automatically run
+          Evaluators to activate for Monitoring. These will be automatically run
           on new Logs.
       deactivate:
         type: optional<list<EvaluatorActivationDeactivationRequestDeactivateItem>>
@@ -574,6 +592,81 @@ types:
       return_type:
         type: optional<EvaluatorReturnTypeEnum>
         docs: The type of the return value of the evaluator.
+  EvaluatorLogResponse:
+    docs: Submit Evaluator judgment for another File's Log.
+    properties:
+      id:
+        type: string
+        docs: Unique identifier for the Log.
+      output:
+        type: optional<string>
+        docs: >-
+          Generated output from your model for the provided inputs. Can be
+          `None` if logging an error, or if creating a parent Log with the
+          intention to populate it later.
+      created_at:
+        type: optional<datetime>
+        docs: 'User defined timestamp for when the log was created. '
+      error:
+        type: optional<string>
+        docs: Error message if the log is an error.
+      provider_latency:
+        type: optional<double>
+        docs: Duration of the logged event in seconds.
+      provider_request:
+        type: optional<map<string, unknown>>
+        docs: Raw request sent to provider.
+      provider_response:
+        type: optional<map<string, unknown>>
+        docs: Raw response received the provider.
+      session_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the Session to associate the Log to. Allows you
+          to record multiple Logs to a Session (using an ID kept by your
+          internal systems) by passing the same `session_id` in subsequent log
+          requests.
+      parent_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the parent Log in a Session. Should only be
+          provided if `session_id` is provided. If provided, the Log will be
+          nested under the parent Log within the Session.
+      inputs:
+        type: optional<map<string, unknown>>
+        docs: The inputs passed to the prompt template.
+      source:
+        type: optional<string>
+        docs: Identifies where the model was called from.
+      metadata:
+        type: optional<map<string, unknown>>
+        docs: Any additional metadata to record.
+      save:
+        type: optional<boolean>
+        docs: Whether the request/response payloads will be stored on Humanloop.
+        default: true
+      source_datapoint_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the Datapoint that this Log is derived from.
+          This can be used by Humanloop to associate Logs to Evaluations. If
+          provided, Humanloop will automatically associate this Log to
+          Evaluations that require a Log for this Datapoint-Version pair.
+      batches:
+        type: optional<list<string>>
+        docs: >-
+          Array of Batch Ids that this log is part of. Batches are used to group
+          Logs together for offline Evaluations
+      user:
+        type: optional<string>
+        docs: End-user ID related to the Log.
+      environment:
+        type: optional<string>
+        docs: The name of the Environment the Log is associated to.
+      judgment: optional<unknown>
+      evaluator:
+        type: EvaluatorResponse
+        docs: The Evaluator used to generate the judgment.
   EvaluatorResponseSpec:
     discriminated: false
     union:
@@ -967,164 +1060,6 @@ types:
       records:
         docs: The list of Tools.
         type: list<ToolResponse>
-  LogResponseJudgment:
-    discriminated: false
-    union:
-      - boolean
-      - double
-  LogResponseToolChoice:
-    discriminated: false
-    docs: >-
-      Controls how the model uses tools. The following options are supported:
-      'none' forces the model to not call a tool; the default when no tools are
-      provided as part of the model config. 'auto' the model can decide to call
-      one of the provided tools; the default when tools are provided as part of
-      the model config. Providing {'type': 'function', 'function': {name':
-      <TOOL_NAME>}} forces the model to use the named function.
-    union:
-      - literal<"none">
-      - literal<"auto">
-      - literal<"required">
-      - ToolChoice
-  LogResponse:
-    docs: Request model for logging a datapoint.
-    properties:
-      project:
-        type: optional<string>
-        docs: The name of the project associated with this log
-      project_id:
-        type: optional<string>
-        docs: The unique ID of the project associated with this log.
-      session_id:
-        type: optional<string>
-        docs: ID of the session to associate the datapoint.
-      session_reference_id:
-        type: optional<string>
-        docs: >-
-          A unique string identifying the session to associate the datapoint to.
-          Allows you to log multiple datapoints to a session (using an ID kept
-          by your internal systems) by passing the same `session_reference_id`
-          in subsequent log requests. Specify at most one of this or
-          `session_id`.
-      parent_id:
-        type: optional<string>
-        docs: ID associated to the parent datapoint in a session.
-      parent_reference_id:
-        type: optional<string>
-        docs: >-
-          A unique string identifying the previously-logged parent datapoint in
-          a session. Allows you to log nested datapoints with your internal
-          system IDs by passing the same reference ID as `parent_id` in a prior
-          log request. Specify at most one of this or `parent_id`. Note that
-          this cannot refer to a datapoint being logged in the same request.
-      inputs:
-        type: optional<map<string, unknown>>
-        docs: The inputs passed to the prompt template.
-      source:
-        type: optional<string>
-        docs: Identifies where the model was called from.
-      metadata:
-        type: optional<map<string, unknown>>
-        docs: Any additional metadata to record.
-      save:
-        type: optional<boolean>
-        docs: Whether the request/response payloads will be stored on Humanloop.
-        default: true
-      source_datapoint_id:
-        type: optional<string>
-        docs: >-
-          ID of the source datapoint if this is a log derived from a datapoint
-          in a dataset.
-      id:
-        type: string
-        docs: String ID of logged datapoint. Starts with `data_`.
-      reference_id:
-        type: optional<string>
-        docs: Unique user-provided string identifying the datapoint.
-      trial_id:
-        type: optional<string>
-        docs: Unique ID of an experiment trial to associate to the log.
-      messages:
-        type: optional<list<ChatMessageWithToolCall>>
-        docs: The messages passed to the to provider chat endpoint.
-      output:
-        type: optional<string>
-        docs: >-
-          Generated output from your model for the provided inputs. Can be
-          `None` if logging an error, or if logging a parent datapoint with the
-          intention to populate it later
-      judgment: optional<LogResponseJudgment>
-      config_id:
-        type: optional<string>
-        docs: Unique ID of a config to associate to the log.
-      config: ConfigResponse
-      environment:
-        type: optional<string>
-        docs: The environment name used to create the log.
-      feedback: optional<list<FeedbackResponse>>
-      created_at:
-        type: optional<datetime>
-        docs: 'User defined timestamp for when the log was created. '
-      error:
-        type: optional<string>
-        docs: Error message if the log is an error.
-      duration:
-        type: optional<double>
-        docs: Duration of the logged event in seconds.
-      output_message:
-        type: optional<ChatMessageWithToolCall>
-        docs: The message returned by the provider.
-      prompt_tokens:
-        type: optional<integer>
-        docs: Number of tokens in the prompt used to generate the output.
-      output_tokens:
-        type: optional<integer>
-        docs: Number of tokens in the output generated by the model.
-      prompt_cost:
-        type: optional<double>
-        docs: Cost in dollars associated to the tokens in the prompt.
-      output_cost:
-        type: optional<double>
-        docs: Cost in dollars associated to the tokens in the output.
-      provider_request:
-        type: optional<map<string, unknown>>
-        docs: Raw request sent to provider.
-      provider_response:
-        type: optional<map<string, unknown>>
-        docs: Raw response received the provider.
-      user:
-        type: optional<string>
-        docs: User email address provided when creating the datapoint.
-      provider_latency:
-        type: optional<double>
-        docs: Latency of provider response.
-      tokens:
-        type: optional<integer>
-        docs: Total number of tokens in the prompt and output.
-      raw_output:
-        type: optional<string>
-        docs: Raw output from the provider.
-      finish_reason:
-        type: optional<string>
-        docs: Reason the generation finished.
-      metric_values: optional<list<MetricValueResponse>>
-      tools: optional<list<ToolResultResponse>>
-      tool_choice:
-        type: optional<LogResponseToolChoice>
-        docs: >-
-          Controls how the model uses tools. The following options are
-          supported: 'none' forces the model to not call a tool; the default
-          when no tools are provided as part of the model config. 'auto' the
-          model can decide to call one of the provided tools; the default when
-          tools are provided as part of the model config. Providing {'type':
-          'function', 'function': {name': <TOOL_NAME>}} forces the model to use
-          the named function.
-      evaluation_results: list<EvaluationResultResponse>
-      observability_status: ObservabilityStatus
-      updated_at: datetime
-      batch_ids:
-        type: optional<list<string>>
-        docs: List of batch IDs the log belongs to.
   MetricValueResponse:
     properties:
       metric_id: string
@@ -1332,6 +1267,7 @@ types:
         docs: >-
           NB: Deprecated with tools field. Definition of tools shown to the
           model.
+        availability: deprecated
       tools:
         type: optional<list<ConfigToolResponse>>
         docs: Tools shown to the model.
@@ -1506,9 +1442,9 @@ types:
       page: integer
       size: integer
       total: integer
-  PaginatedPromptLogResponse:
+  PaginatedDataLogResponse:
     properties:
-      records: list<PromptLogResponse>
+      records: list<SrcExternalAppModelsV5LogsLogResponse>
       page: integer
       size: integer
       total: integer
@@ -1555,9 +1491,6 @@ types:
           Generated output from your model for the provided inputs. Can be
           `None` if logging an error, or if creating a parent Log with the
           intention to populate it later.
-      raw_output:
-        type: optional<string>
-        docs: Raw output from the provider.
       created_at:
         type: optional<datetime>
         docs: 'User defined timestamp for when the log was created. '
@@ -1644,7 +1577,7 @@ types:
           Unique identifier for the Session to associate the Log to. Allows you
           to record multiple Logs to a Session (using an ID kept by your
           internal systems) by passing the same `session_id` in subsequent log
-          requests. 
+          requests.
       parent_id:
         type: optional<string>
         docs: >-
@@ -1697,9 +1630,6 @@ types:
           Generated output from your model for the provided inputs. Can be
           `None` if logging an error, or if creating a parent Log with the
           intention to populate it later.
-      raw_output:
-        type: optional<string>
-        docs: Raw output from the provider.
       created_at:
         type: optional<datetime>
         docs: 'User defined timestamp for when the log was created. '
@@ -1884,7 +1814,7 @@ types:
         docs: Reason the generation finished.
       prompt:
         type: PromptResponse
-        docs: Prompt details used to generate the log.
+        docs: Prompt details used to generate the Log.
       messages:
         type: optional<list<ChatMessage>>
         docs: The messages passed to the to provider chat endpoint.
@@ -1913,9 +1843,6 @@ types:
           Generated output from your model for the provided inputs. Can be
           `None` if logging an error, or if creating a parent Log with the
           intention to populate it later.
-      raw_output:
-        type: optional<string>
-        docs: Raw output from the provider.
       created_at:
         type: optional<datetime>
         docs: 'User defined timestamp for when the log was created. '
@@ -1937,7 +1864,7 @@ types:
           Unique identifier for the Session to associate the Log to. Allows you
           to record multiple Logs to a Session (using an ID kept by your
           internal systems) by passing the same `session_id` in subsequent log
-          requests. 
+          requests.
       parent_id:
         type: optional<string>
         docs: >-
@@ -2143,7 +2070,7 @@ types:
       updated_at: datetime
       logs:
         docs: List of Logs associated with this Session.
-        type: list<PromptLogResponse>
+        type: list<SrcExternalAppModelsV5LogsLogResponse>
   SortOrder:
     enum:
       - asc
@@ -2285,6 +2212,80 @@ types:
         docs: >-
           Values needed to setup the Tool, defined in JSON Schema format:
           https://json-schema.org/
+  ToolLogResponse:
+    docs: Request for creating a Tool log.
+    properties:
+      id:
+        type: string
+        docs: Unique identifier for the Log.
+      output:
+        type: optional<string>
+        docs: >-
+          Generated output from your model for the provided inputs. Can be
+          `None` if logging an error, or if creating a parent Log with the
+          intention to populate it later.
+      created_at:
+        type: optional<datetime>
+        docs: 'User defined timestamp for when the log was created. '
+      error:
+        type: optional<string>
+        docs: Error message if the log is an error.
+      provider_latency:
+        type: optional<double>
+        docs: Duration of the logged event in seconds.
+      provider_request:
+        type: optional<map<string, unknown>>
+        docs: Raw request sent to provider.
+      provider_response:
+        type: optional<map<string, unknown>>
+        docs: Raw response received the provider.
+      session_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the Session to associate the Log to. Allows you
+          to record multiple Logs to a Session (using an ID kept by your
+          internal systems) by passing the same `session_id` in subsequent log
+          requests.
+      parent_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the parent Log in a Session. Should only be
+          provided if `session_id` is provided. If provided, the Log will be
+          nested under the parent Log within the Session.
+      inputs:
+        type: optional<map<string, unknown>>
+        docs: The inputs passed to the prompt template.
+      source:
+        type: optional<string>
+        docs: Identifies where the model was called from.
+      metadata:
+        type: optional<map<string, unknown>>
+        docs: Any additional metadata to record.
+      save:
+        type: optional<boolean>
+        docs: Whether the request/response payloads will be stored on Humanloop.
+        default: true
+      source_datapoint_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the Datapoint that this Log is derived from.
+          This can be used by Humanloop to associate Logs to Evaluations. If
+          provided, Humanloop will automatically associate this Log to
+          Evaluations that require a Log for this Datapoint-Version pair.
+      batches:
+        type: optional<list<string>>
+        docs: >-
+          Array of Batch Ids that this log is part of. Batches are used to group
+          Logs together for offline Evaluations
+      user:
+        type: optional<string>
+        docs: End-user ID related to the Log.
+      environment:
+        type: optional<string>
+        docs: The name of the Environment the Log is associated to.
+      tool:
+        type: ToolResponse
+        docs: Tool details used to generate the Log.
   ToolResultResponse:
     docs: A result from a tool used to populate the prompt template
     properties:
@@ -2425,6 +2426,164 @@ types:
       - correction
       - comment
     docs: An enumeration.
+  SrcExternalAppModelsV4LogLogResponseJudgment:
+    discriminated: false
+    union:
+      - boolean
+      - double
+  SrcExternalAppModelsV4LogLogResponseToolChoice:
+    discriminated: false
+    docs: >-
+      Controls how the model uses tools. The following options are supported:
+      'none' forces the model to not call a tool; the default when no tools are
+      provided as part of the model config. 'auto' the model can decide to call
+      one of the provided tools; the default when tools are provided as part of
+      the model config. Providing {'type': 'function', 'function': {name':
+      <TOOL_NAME>}} forces the model to use the named function.
+    union:
+      - literal<"none">
+      - literal<"auto">
+      - literal<"required">
+      - ToolChoice
+  SrcExternalAppModelsV4LogLogResponse:
+    docs: Request model for logging a datapoint.
+    properties:
+      project:
+        type: optional<string>
+        docs: The name of the project associated with this log
+      project_id:
+        type: optional<string>
+        docs: The unique ID of the project associated with this log.
+      session_id:
+        type: optional<string>
+        docs: ID of the session to associate the datapoint.
+      session_reference_id:
+        type: optional<string>
+        docs: >-
+          A unique string identifying the session to associate the datapoint to.
+          Allows you to log multiple datapoints to a session (using an ID kept
+          by your internal systems) by passing the same `session_reference_id`
+          in subsequent log requests. Specify at most one of this or
+          `session_id`.
+      parent_id:
+        type: optional<string>
+        docs: ID associated to the parent datapoint in a session.
+      parent_reference_id:
+        type: optional<string>
+        docs: >-
+          A unique string identifying the previously-logged parent datapoint in
+          a session. Allows you to log nested datapoints with your internal
+          system IDs by passing the same reference ID as `parent_id` in a prior
+          log request. Specify at most one of this or `parent_id`. Note that
+          this cannot refer to a datapoint being logged in the same request.
+      inputs:
+        type: optional<map<string, unknown>>
+        docs: The inputs passed to the prompt template.
+      source:
+        type: optional<string>
+        docs: Identifies where the model was called from.
+      metadata:
+        type: optional<map<string, unknown>>
+        docs: Any additional metadata to record.
+      save:
+        type: optional<boolean>
+        docs: Whether the request/response payloads will be stored on Humanloop.
+        default: true
+      source_datapoint_id:
+        type: optional<string>
+        docs: >-
+          ID of the source datapoint if this is a log derived from a datapoint
+          in a dataset.
+      id:
+        type: string
+        docs: String ID of logged datapoint. Starts with `data_`.
+      reference_id:
+        type: optional<string>
+        docs: Unique user-provided string identifying the datapoint.
+      trial_id:
+        type: optional<string>
+        docs: Unique ID of an experiment trial to associate to the log.
+      messages:
+        type: optional<list<ChatMessageWithToolCall>>
+        docs: The messages passed to the to provider chat endpoint.
+      output:
+        type: optional<string>
+        docs: >-
+          Generated output from your model for the provided inputs. Can be
+          `None` if logging an error, or if logging a parent datapoint with the
+          intention to populate it later
+      judgment: optional<SrcExternalAppModelsV4LogLogResponseJudgment>
+      config_id:
+        type: optional<string>
+        docs: Unique ID of a config to associate to the log.
+      config: ConfigResponse
+      environment:
+        type: optional<string>
+        docs: The environment name used to create the log.
+      feedback: optional<list<FeedbackResponse>>
+      created_at:
+        type: optional<datetime>
+        docs: 'User defined timestamp for when the log was created. '
+      error:
+        type: optional<string>
+        docs: Error message if the log is an error.
+      duration:
+        type: optional<double>
+        docs: Duration of the logged event in seconds.
+      output_message:
+        type: optional<ChatMessageWithToolCall>
+        docs: The message returned by the provider.
+      prompt_tokens:
+        type: optional<integer>
+        docs: Number of tokens in the prompt used to generate the output.
+      output_tokens:
+        type: optional<integer>
+        docs: Number of tokens in the output generated by the model.
+      prompt_cost:
+        type: optional<double>
+        docs: Cost in dollars associated to the tokens in the prompt.
+      output_cost:
+        type: optional<double>
+        docs: Cost in dollars associated to the tokens in the output.
+      provider_request:
+        type: optional<map<string, unknown>>
+        docs: Raw request sent to provider.
+      provider_response:
+        type: optional<map<string, unknown>>
+        docs: Raw response received the provider.
+      user:
+        type: optional<string>
+        docs: User email address provided when creating the datapoint.
+      provider_latency:
+        type: optional<double>
+        docs: Latency of provider response.
+      tokens:
+        type: optional<integer>
+        docs: Total number of tokens in the prompt and output.
+      raw_output:
+        type: optional<string>
+        docs: Raw output from the provider.
+      finish_reason:
+        type: optional<string>
+        docs: Reason the generation finished.
+      metric_values: optional<list<MetricValueResponse>>
+      tools: optional<list<ToolResultResponse>>
+      tool_choice:
+        type: optional<SrcExternalAppModelsV4LogLogResponseToolChoice>
+        docs: >-
+          Controls how the model uses tools. The following options are
+          supported: 'none' forces the model to not call a tool; the default
+          when no tools are provided as part of the model config. 'auto' the
+          model can decide to call one of the provided tools; the default when
+          tools are provided as part of the model config. Providing {'type':
+          'function', 'function': {name': <TOOL_NAME>}} forces the model to use
+          the named function.
+      evaluation_results: list<EvaluationResultResponse>
+      observability_status: ObservabilityStatus
+      updated_at: datetime
+      batch_ids:
+        type: optional<list<string>>
+        docs: List of batch IDs the log belongs to.
   BaseModelsUserResponse:
     properties:
       id:
@@ -2460,6 +2619,12 @@ types:
           If `False`, a log for the Evaluator should be submitted by the user
           via the API.
         default: true
+  SrcExternalAppModelsV5LogsLogResponse:
+    discriminated: false
+    union:
+      - PromptLogResponse
+      - ToolLogResponse
+      - EvaluatorLogResponse
   ToolResponse:
     docs: Request to create a new Tool.
     properties:
@@ -2545,3 +2710,4 @@ types:
         type: optional<string>
         docs: The User's full name.
   UpdateEvaluationStatusRequest: unknown
+  PaginatedPromptLogResponse: unknown

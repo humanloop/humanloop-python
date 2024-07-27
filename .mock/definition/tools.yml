@@ -54,9 +54,6 @@ service:
                 Generated output from your model for the provided inputs. Can be
                 `None` if logging an error, or if creating a parent Log with the
                 intention to populate it later.
-            raw_output:
-              type: optional<string>
-              docs: Raw output from the provider.
             created_at:
               type: optional<datetime>
               docs: 'User defined timestamp for when the log was created. '
@@ -78,7 +75,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests. 
+                in subsequent log requests.
             parent_id:
               type: optional<string>
               docs: >-

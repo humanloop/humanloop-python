@@ -8,14 +8,15 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pagination import AsyncPager, SyncPager
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.evaluatee_request import EvaluateeRequest
+from ..requests.evaluatee_request import EvaluateeRequestParams
+from ..requests.evaluations_dataset_request import EvaluationsDatasetRequestParams
+from ..requests.evaluations_request import EvaluationsRequestParams
 from ..types.evaluation_response import EvaluationResponse
 from ..types.evaluation_stats import EvaluationStats
 from ..types.evaluation_status import EvaluationStatus
-from ..types.evaluations_dataset_request import EvaluationsDatasetRequest
-from ..types.evaluations_request import EvaluationsRequest
 from ..types.http_validation_error import HttpValidationError
 from ..types.paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
 from ..types.paginated_evaluation_response import PaginatedEvaluationResponse
@@ -62,7 +63,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -77,7 +78,7 @@ class EvaluationsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "evaluations",
             method="GET",
@@ -105,9 +106,9 @@ class EvaluationsClient:
     def create(
         self,
         *,
-        dataset: EvaluationsDatasetRequest,
-        evaluatees: typing.Sequence[EvaluateeRequest],
-        evaluators: typing.Sequence[EvaluationsRequest],
+        dataset: EvaluationsDatasetRequestParams,
+        evaluatees: typing.Sequence[EvaluateeRequestParams],
+        evaluators: typing.Sequence[EvaluationsRequestParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -126,13 +127,13 @@ class EvaluationsClient:
 
         Parameters
         ----------
-        dataset : EvaluationsDatasetRequest
+        dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequest]
+        evaluatees : typing.Sequence[EvaluateeRequestParams]
             Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
 
-        evaluators : typing.Sequence[EvaluationsRequest]
+        evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
 
         request_options : typing.Optional[RequestOptions]
@@ -145,38 +146,33 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop import (
-            EvaluateeRequest,
-            EvaluationsDatasetRequest,
-            EvaluationsRequest,
-        )
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.evaluations.create(
-            dataset=EvaluationsDatasetRequest(
-                version_id="dsv_6L78pqrdFi2xa",
-            ),
+            dataset={"version_id": "dsv_6L78pqrdFi2xa"},
             evaluatees=[
-                EvaluateeRequest(
-                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
-                    orchestrated=False,
-                )
+                {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
             ],
-            evaluators=[
-                EvaluationsRequest(
-                    version_id="evv_012def",
-                    orchestrated=False,
-                )
-            ],
+            evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             "evaluations",
             method="POST",
-            json={"dataset": dataset, "evaluatees": evaluatees, "evaluators": evaluators},
+            json={
+                "dataset": convert_and_respect_annotation_metadata(
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                ),
+                "evaluatees": convert_and_respect_annotation_metadata(
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                ),
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -211,7 +207,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -256,7 +252,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -284,9 +280,9 @@ class EvaluationsClient:
         self,
         id: str,
         *,
-        dataset: EvaluationsDatasetRequest,
-        evaluatees: typing.Sequence[EvaluateeRequest],
-        evaluators: typing.Sequence[EvaluationsRequest],
+        dataset: EvaluationsDatasetRequestParams,
+        evaluatees: typing.Sequence[EvaluateeRequestParams],
+        evaluators: typing.Sequence[EvaluationsRequestParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -300,13 +296,13 @@ class EvaluationsClient:
         id : str
             Unique identifier for Evaluation.
 
-        dataset : EvaluationsDatasetRequest
+        dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequest]
+        evaluatees : typing.Sequence[EvaluateeRequestParams]
             Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
 
-        evaluators : typing.Sequence[EvaluationsRequest]
+        evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
 
         request_options : typing.Optional[RequestOptions]
@@ -319,39 +315,34 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop import (
-            EvaluateeRequest,
-            EvaluationsDatasetRequest,
-            EvaluationsRequest,
-        )
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.evaluations.update_setup(
             id="ev_567yza",
-            dataset=EvaluationsDatasetRequest(
-                version_id="dsv_6L78pqrdFi2xa",
-            ),
+            dataset={"version_id": "dsv_6L78pqrdFi2xa"},
             evaluatees=[
-                EvaluateeRequest(
-                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
-                    orchestrated=False,
-                )
+                {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
             ],
-            evaluators=[
-                EvaluationsRequest(
-                    version_id="evv_012def",
-                    orchestrated=False,
-                )
-            ],
+            evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}",
             method="PATCH",
-            json={"dataset": dataset, "evaluatees": evaluatees, "evaluators": evaluators},
+            json={
+                "dataset": convert_and_respect_annotation_metadata(
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                ),
+                "evaluatees": convert_and_respect_annotation_metadata(
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                ),
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -393,7 +384,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -445,7 +436,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -504,7 +495,7 @@ class EvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -570,22 +561,30 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.evaluations.list(
-            file_id="pr_30gco7dx6JDq4200GVOHa",
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.evaluations.list(
+                file_id="pr_30gco7dx6JDq4200GVOHa",
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "evaluations",
             method="GET",
@@ -613,9 +612,9 @@ class AsyncEvaluationsClient:
     async def create(
         self,
         *,
-        dataset: EvaluationsDatasetRequest,
-        evaluatees: typing.Sequence[EvaluateeRequest],
-        evaluators: typing.Sequence[EvaluationsRequest],
+        dataset: EvaluationsDatasetRequestParams,
+        evaluatees: typing.Sequence[EvaluateeRequestParams],
+        evaluators: typing.Sequence[EvaluationsRequestParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -634,13 +633,13 @@ class AsyncEvaluationsClient:
 
         Parameters
         ----------
-        dataset : EvaluationsDatasetRequest
+        dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequest]
+        evaluatees : typing.Sequence[EvaluateeRequestParams]
             Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
 
-        evaluators : typing.Sequence[EvaluationsRequest]
+        evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
 
         request_options : typing.Optional[RequestOptions]
@@ -653,38 +652,41 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop import (
-            EvaluateeRequest,
-            EvaluationsDatasetRequest,
-            EvaluationsRequest,
-        )
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.create(
-            dataset=EvaluationsDatasetRequest(
-                version_id="dsv_6L78pqrdFi2xa",
-            ),
-            evaluatees=[
-                EvaluateeRequest(
-                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
-                    orchestrated=False,
-                )
-            ],
-            evaluators=[
-                EvaluationsRequest(
-                    version_id="evv_012def",
-                    orchestrated=False,
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.create(
+                dataset={"version_id": "dsv_6L78pqrdFi2xa"},
+                evaluatees=[
+                    {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
+                ],
+                evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "evaluations",
             method="POST",
-            json={"dataset": dataset, "evaluatees": evaluatees, "evaluators": evaluators},
+            json={
+                "dataset": convert_and_respect_annotation_metadata(
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                ),
+                "evaluatees": convert_and_respect_annotation_metadata(
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                ),
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -719,14 +721,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get(
-            id="ev_567yza",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.get(
+                id="ev_567yza",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}", method="GET", request_options=request_options
@@ -764,14 +774,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.delete(
-            id="ev_567yza",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.delete(
+                id="ev_567yza",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -792,9 +810,9 @@ class AsyncEvaluationsClient:
         self,
         id: str,
         *,
-        dataset: EvaluationsDatasetRequest,
-        evaluatees: typing.Sequence[EvaluateeRequest],
-        evaluators: typing.Sequence[EvaluationsRequest],
+        dataset: EvaluationsDatasetRequestParams,
+        evaluatees: typing.Sequence[EvaluateeRequestParams],
+        evaluators: typing.Sequence[EvaluationsRequestParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -808,13 +826,13 @@ class AsyncEvaluationsClient:
         id : str
             Unique identifier for Evaluation.
 
-        dataset : EvaluationsDatasetRequest
+        dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequest]
+        evaluatees : typing.Sequence[EvaluateeRequestParams]
             Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
 
-        evaluators : typing.Sequence[EvaluationsRequest]
+        evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
 
         request_options : typing.Optional[RequestOptions]
@@ -827,39 +845,42 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop import (
-            EvaluateeRequest,
-            EvaluationsDatasetRequest,
-            EvaluationsRequest,
-        )
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.update_setup(
-            id="ev_567yza",
-            dataset=EvaluationsDatasetRequest(
-                version_id="dsv_6L78pqrdFi2xa",
-            ),
-            evaluatees=[
-                EvaluateeRequest(
-                    version_id="prv_7ZlQREDScH0xkhUwtXruN",
-                    orchestrated=False,
-                )
-            ],
-            evaluators=[
-                EvaluationsRequest(
-                    version_id="evv_012def",
-                    orchestrated=False,
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.update_setup(
+                id="ev_567yza",
+                dataset={"version_id": "dsv_6L78pqrdFi2xa"},
+                evaluatees=[
+                    {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
+                ],
+                evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}",
             method="PATCH",
-            json={"dataset": dataset, "evaluatees": evaluatees, "evaluators": evaluators},
+            json={
+                "dataset": convert_and_respect_annotation_metadata(
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                ),
+                "evaluatees": convert_and_respect_annotation_metadata(
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                ),
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -901,15 +922,23 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.update_status(
-            id="id",
-            status="pending",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.update_status(
+                id="id",
+                status="pending",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}/status",
@@ -953,14 +982,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get_stats(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.get_stats(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}/stats", method="GET", request_options=request_options
@@ -1012,14 +1049,22 @@ class AsyncEvaluationsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.evaluations.get_logs(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.evaluations.get_logs(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"evaluations/{jsonable_encoder(id)}/logs",

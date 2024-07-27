@@ -9,9 +9,10 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pagination import AsyncPager, SyncPager
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.create_datapoint_request import CreateDatapointRequest
+from ..requests.create_datapoint_request import CreateDatapointRequestParams
 from ..types.datapoint_response import DatapointResponse
 from ..types.dataset_response import DatasetResponse
 from ..types.file_environment_response import FileEnvironmentResponse
@@ -44,7 +45,7 @@ class DatasetsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[DatasetResponse]:
         """
-        List a list of all Datasets.
+        List all Datasets.
 
         Parameters
         ----------
@@ -76,7 +77,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -90,7 +91,7 @@ class DatasetsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "datasets",
             method="GET",
@@ -131,7 +132,7 @@ class DatasetsClient:
     def upsert(
         self,
         *,
-        datapoints: typing.Sequence[CreateDatapointRequest],
+        datapoints: typing.Sequence[CreateDatapointRequestParams],
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
@@ -161,7 +162,7 @@ class DatasetsClient:
 
         Parameters
         ----------
-        datapoints : typing.Sequence[CreateDatapointRequest]
+        datapoints : typing.Sequence[CreateDatapointRequestParams]
             The Datapoints to create this Dataset version with. Modify the `action` field to determine how these Datapoints are used.
 
         version_id : typing.Optional[str]
@@ -198,8 +199,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop import CreateDatapointRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -207,14 +207,14 @@ class DatasetsClient:
         client.datasets.upsert(
             path="test-questions",
             datapoints=[
-                CreateDatapointRequest(
-                    inputs={"question": "What is the capital of France?"},
-                    target={"answer": "Paris"},
-                ),
-                CreateDatapointRequest(
-                    inputs={"question": "Who wrote Hamlet?"},
-                    target={"answer": "William Shakespeare"},
-                ),
+                {
+                    "inputs": {"question": "What is the capital of France?"},
+                    "target": {"answer": "Paris"},
+                },
+                {
+                    "inputs": {"question": "Who wrote Hamlet?"},
+                    "target": {"answer": "William Shakespeare"},
+                },
             ],
             action="add",
             commit_message="Add two new questions and answers",
@@ -224,7 +224,15 @@ class DatasetsClient:
             "datasets",
             method="POST",
             params={"version_id": version_id, "environment": environment},
-            json={"path": path, "id": id, "datapoints": datapoints, "action": action, "commit_message": commit_message},
+            json={
+                "path": path,
+                "id": id,
+                "datapoints": convert_and_respect_annotation_metadata(
+                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
+                ),
+                "action": action,
+                "commit_message": commit_message,
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -284,7 +292,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -331,7 +339,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -387,7 +395,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -455,7 +463,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -470,7 +478,7 @@ class DatasetsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/datapoints",
             method="GET",
@@ -528,7 +536,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -585,7 +593,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -662,7 +670,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -722,7 +730,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -776,7 +784,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -824,7 +832,7 @@ class DatasetsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -865,7 +873,7 @@ class AsyncDatasetsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[DatasetResponse]:
         """
-        List a list of all Datasets.
+        List all Datasets.
 
         Parameters
         ----------
@@ -897,21 +905,29 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.datasets.list(
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.datasets.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "datasets",
             method="GET",
@@ -952,7 +968,7 @@ class AsyncDatasetsClient:
     async def upsert(
         self,
         *,
-        datapoints: typing.Sequence[CreateDatapointRequest],
+        datapoints: typing.Sequence[CreateDatapointRequestParams],
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
@@ -982,7 +998,7 @@ class AsyncDatasetsClient:
 
         Parameters
         ----------
-        datapoints : typing.Sequence[CreateDatapointRequest]
+        datapoints : typing.Sequence[CreateDatapointRequestParams]
             The Datapoints to create this Dataset version with. Modify the `action` field to determine how these Datapoints are used.
 
         version_id : typing.Optional[str]
@@ -1019,33 +1035,48 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop import CreateDatapointRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.upsert(
-            path="test-questions",
-            datapoints=[
-                CreateDatapointRequest(
-                    inputs={"question": "What is the capital of France?"},
-                    target={"answer": "Paris"},
-                ),
-                CreateDatapointRequest(
-                    inputs={"question": "Who wrote Hamlet?"},
-                    target={"answer": "William Shakespeare"},
-                ),
-            ],
-            action="add",
-            commit_message="Add two new questions and answers",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.upsert(
+                path="test-questions",
+                datapoints=[
+                    {
+                        "inputs": {"question": "What is the capital of France?"},
+                        "target": {"answer": "Paris"},
+                    },
+                    {
+                        "inputs": {"question": "Who wrote Hamlet?"},
+                        "target": {"answer": "William Shakespeare"},
+                    },
+                ],
+                action="add",
+                commit_message="Add two new questions and answers",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "datasets",
             method="POST",
             params={"version_id": version_id, "environment": environment},
-            json={"path": path, "id": id, "datapoints": datapoints, "action": action, "commit_message": commit_message},
+            json={
+                "path": path,
+                "id": id,
+                "datapoints": convert_and_respect_annotation_metadata(
+                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
+                ),
+                "action": action,
+                "commit_message": commit_message,
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1105,16 +1136,24 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.get(
-            id="ds_b0baF1ca7652",
-            version_id="dsv_6L78pqrdFi2xa",
-            include_datapoints=True,
-        )
+
+
+        async def main() -> None:
+            await client.datasets.get(
+                id="ds_b0baF1ca7652",
+                version_id="dsv_6L78pqrdFi2xa",
+                include_datapoints=True,
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}",
@@ -1152,14 +1191,22 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.delete(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.delete(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -1208,14 +1255,22 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.move(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.move(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}",
@@ -1276,22 +1331,30 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.datasets.list_datapoints(
-            id="ds_b0baF1ca7652",
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.datasets.list_datapoints(
+                id="ds_b0baF1ca7652",
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/datapoints",
             method="GET",
@@ -1349,15 +1412,23 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.list_versions(
-            id="ds_b0baF1ca7652",
-            status="committed",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.list_versions(
+                id="ds_b0baF1ca7652",
+                status="committed",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/versions",
@@ -1406,16 +1477,24 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.commit(
-            id="ds_b0baF1ca7652",
-            version_id="dsv_6L78pqrdFi2xa",
-            commit_message="initial commit",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.commit(
+                id="ds_b0baF1ca7652",
+                version_id="dsv_6L78pqrdFi2xa",
+                commit_message="initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
@@ -1483,15 +1562,23 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.upload_csv(
-            id="id",
-            commit_message="commit_message",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.upload_csv(
+                id="id",
+                commit_message="commit_message",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/datapoints/csv",
@@ -1543,16 +1630,24 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.set_deployment(
-            id="ds_b0baF1ca7652",
-            environment_id="staging",
-            version_id="dsv_6L78pqrdFi2xa",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.set_deployment(
+                id="ds_b0baF1ca7652",
+                environment_id="staging",
+                version_id="dsv_6L78pqrdFi2xa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -1597,15 +1692,23 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.remove_deployment(
-            id="ds_b0baF1ca7652",
-            environment_id="staging",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.remove_deployment(
+                id="ds_b0baF1ca7652",
+                environment_id="staging",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -1645,14 +1748,22 @@ class AsyncDatasetsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.datasets.list_environments(
-            id="id",
-        )
+
+
+        async def main() -> None:
+            await client.datasets.list_environments(
+                id="id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options

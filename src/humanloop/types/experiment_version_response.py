@@ -3,43 +3,44 @@
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 
 
 class ExperimentVersionResponse(UncheckedBaseModel):
-    mean: typing.Optional[float] = pydantic_v1.Field(default=None)
+    mean: typing.Optional[float] = pydantic.Field(default=None)
     """
     The mean performance of the Version.
     """
 
-    spread: typing.Optional[float] = pydantic_v1.Field(default=None)
+    spread: typing.Optional[float] = pydantic.Field(default=None)
     """
     The spread of performance of the Version.
     """
 
-    trials_count: int = pydantic_v1.Field()
+    trials_count: int = pydantic.Field()
     """
     Number of datapoints with feedback associated to the experiment.
     """
 
-    active: bool = pydantic_v1.Field()
+    active: bool = pydantic.Field()
     """
     Whether the Version is active in the experiment. Only active model configs can be sampled from the experiment.
     """
 
-    id: str = pydantic_v1.Field()
+    id: str = pydantic.Field()
     """
     String ID of Version.
     """
 
-    commit_message: typing.Optional[str] = pydantic_v1.Field(default=None)
+    commit_message: typing.Optional[str] = pydantic.Field(default=None)
     """
     Commit message of Version.
     """
 
-    version_id: str = pydantic_v1.Field()
+    version_id: str = pydantic.Field()
     """
     Version of the Prompt or Tool.
     """
@@ -47,20 +48,11 @@ class ExperimentVersionResponse(UncheckedBaseModel):
     created_at: dt.datetime
     updated_at: dt.datetime
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow

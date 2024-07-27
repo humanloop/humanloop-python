@@ -9,16 +9,21 @@ from ..core.client_wrapper import AsyncClientWrapper, SyncClientWrapper
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pagination import AsyncPager, SyncPager
 from ..core.request_options import RequestOptions
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.chat_message import ChatMessage
+from ..requests.chat_message import ChatMessageParams
+from ..requests.evaluator_activation_deactivation_request_activate_item import (
+    EvaluatorActivationDeactivationRequestActivateItemParams,
+)
+from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
+    EvaluatorActivationDeactivationRequestDeactivateItemParams,
+)
+from ..requests.prompt_kernel_request import PromptKernelRequestParams
+from ..requests.provider_api_keys import ProviderApiKeysParams
+from ..requests.response_format import ResponseFormatParams
+from ..requests.tool_function import ToolFunctionParams
 from ..types.create_prompt_log_response import CreatePromptLogResponse
-from ..types.evaluator_activation_deactivation_request_activate_item import (
-    EvaluatorActivationDeactivationRequestActivateItem,
-)
-from ..types.evaluator_activation_deactivation_request_deactivate_item import (
-    EvaluatorActivationDeactivationRequestDeactivateItem,
-)
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_prompts import ListPrompts
@@ -26,18 +31,14 @@ from ..types.model_endpoints import ModelEndpoints
 from ..types.model_providers import ModelProviders
 from ..types.paginated_data_prompt_response import PaginatedDataPromptResponse
 from ..types.project_sort_by import ProjectSortBy
-from ..types.prompt_kernel_request import PromptKernelRequest
 from ..types.prompt_response import PromptResponse
-from ..types.provider_api_keys import ProviderApiKeys
-from ..types.response_format import ResponseFormat
 from ..types.sort_order import SortOrder
-from ..types.tool_function import ToolFunction
 from ..types.version_status import VersionStatus
+from .requests.prompt_call_request_tool_choice import PromptCallRequestToolChoiceParams
+from .requests.prompt_log_request_tool_choice import PromptLogRequestToolChoiceParams
+from .requests.prompt_request_stop import PromptRequestStopParams
+from .requests.prompt_request_template import PromptRequestTemplateParams
 from .types.call_prompts_call_post_response import CallPromptsCallPostResponse
-from .types.prompt_call_request_tool_choice import PromptCallRequestToolChoice
-from .types.prompt_log_request_tool_choice import PromptLogRequestToolChoice
-from .types.prompt_request_stop import PromptRequestStop
-from .types.prompt_request_template import PromptRequestTemplate
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -54,17 +55,16 @@ class PromptsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        output_message: typing.Optional[ChatMessage] = OMIT,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
         prompt_tokens: typing.Optional[int] = OMIT,
         output_tokens: typing.Optional[int] = OMIT,
         prompt_cost: typing.Optional[float] = OMIT,
         output_cost: typing.Optional[float] = OMIT,
         finish_reason: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequest] = OMIT,
-        messages: typing.Optional[typing.Sequence[ChatMessage]] = OMIT,
-        tool_choice: typing.Optional[PromptLogRequestToolChoice] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -86,11 +86,11 @@ class PromptsClient:
         Log to a Prompt.
 
         You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+        an existing version of the Prompt. Otherwise, the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -107,7 +107,7 @@ class PromptsClient:
         id : typing.Optional[str]
             ID for an existing Prompt to update.
 
-        output_message : typing.Optional[ChatMessage]
+        output_message : typing.Optional[ChatMessageParams]
             The message returned by the provider.
 
         prompt_tokens : typing.Optional[int]
@@ -125,13 +125,13 @@ class PromptsClient:
         finish_reason : typing.Optional[str]
             Reason the generation finished.
 
-        prompt : typing.Optional[PromptKernelRequest]
+        prompt : typing.Optional[PromptKernelRequestParams]
             Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
-        messages : typing.Optional[typing.Sequence[ChatMessage]]
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptLogRequestToolChoice]
+        tool_choice : typing.Optional[PromptLogRequestToolChoiceParams]
             Controls how the model uses tools. The following options are supported:
             - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
@@ -140,9 +140,6 @@ class PromptsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -199,30 +196,39 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import Humanloop
+        import datetime
+
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.prompts.log(
             path="persona",
-            prompt=PromptKernelRequest(
-                model="gpt-4",
-                template=[
-                    ChatMessage(
-                        role="system",
-                        content="You are {{person}}. Answer questions as this person. Do not break character.",
-                    )
+            prompt={
+                "model": "gpt-4",
+                "template": [
+                    {
+                        "role": "system",
+                        "content": "You are {{person}}. Answer questions as this person. Do not break character.",
+                    }
                 ],
-            ),
-            messages=[
-                ChatMessage(
-                    role="user",
-                    content="What really happened at Roswell?",
-                )
-            ],
+            },
+            messages=[{"role": "user", "content": "What really happened at Roswell?"}],
             inputs={"person": "Trump"},
+            created_at=datetime.datetime.fromisoformat(
+                "2024-07-19 04:29:35.178000+00:00",
+            ),
+            provider_latency=6.5931549072265625,
+            output_message={
+                "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+                "role": "assistant",
+            },
+            prompt_tokens=100,
+            output_tokens=220,
+            prompt_cost=1e-05,
+            output_cost=0.0002,
+            finish_reason="stop",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -232,17 +238,22 @@ class PromptsClient:
             json={
                 "path": path,
                 "id": id,
-                "output_message": output_message,
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams
+                ),
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
                 "prompt_cost": prompt_cost,
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
-                "prompt": prompt,
-                "messages": messages,
-                "tool_choice": tool_choice,
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams
+                ),
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -281,9 +292,9 @@ class PromptsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequest] = OMIT,
-        messages: typing.Optional[typing.Sequence[ChatMessage]] = OMIT,
-        tool_choice: typing.Optional[PromptCallRequestToolChoice] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptCallRequestToolChoiceParams] = OMIT,
         session_id: typing.Optional[str] = OMIT,
         parent_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
@@ -294,7 +305,7 @@ class PromptsClient:
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompt_call_request_environment: typing.Optional[str] = OMIT,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = OMIT,
+        provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
         stream: typing.Optional[bool] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
@@ -305,7 +316,7 @@ class PromptsClient:
         """
         Call a Prompt.
 
-        Calling a Prompt subsequently calls the model provider before logging
+        Calling a Prompt calls the model provider before logging
         the request, responses and metadata to Humanloop.
 
         You can use query parameters `version_id`, or `environment`, to target
@@ -313,7 +324,7 @@ class PromptsClient:
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -330,13 +341,13 @@ class PromptsClient:
         id : typing.Optional[str]
             ID for an existing Prompt to update.
 
-        prompt : typing.Optional[PromptKernelRequest]
+        prompt : typing.Optional[PromptKernelRequestParams]
             Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
-        messages : typing.Optional[typing.Sequence[ChatMessage]]
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptCallRequestToolChoice]
+        tool_choice : typing.Optional[PromptCallRequestToolChoiceParams]
             Controls how the model uses tools. The following options are supported:
             - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
@@ -373,7 +384,7 @@ class PromptsClient:
         prompt_call_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
 
-        provider_api_keys : typing.Optional[ProviderApiKeys]
+        provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
         num_samples : typing.Optional[int]
@@ -401,30 +412,40 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.prompts.call(
             path="persona",
-            prompt=PromptKernelRequest(
-                model="gpt-4",
-                template=[
-                    ChatMessage(
-                        role="system",
-                        content="You are {{person}}. Answer any questions as this person. Do not break character.",
-                    )
+            prompt={
+                "model": "gpt-4",
+                "template": [
+                    {
+                        "role": "system",
+                        "content": "You are stockbot. Return latest prices.",
+                    }
                 ],
-            ),
-            messages=[
-                ChatMessage(
-                    role="user",
-                    content="What really happened at Roswell?",
-                )
-            ],
-            inputs={"person": "Trump"},
+                "tools": [
+                    {
+                        "name": "get_stock_price",
+                        "description": "Get current stock price",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "ticker_symbol": {
+                                    "type": "string",
+                                    "name": "Ticker Symbol",
+                                    "description": "Ticker symbol of the stock",
+                                }
+                            },
+                            "required": [],
+                        },
+                    }
+                ],
+            },
+            messages=[{"role": "user", "content": "latest apple"}],
             stream=False,
         )
         """
@@ -435,9 +456,13 @@ class PromptsClient:
             json={
                 "path": path,
                 "id": id,
-                "prompt": prompt,
-                "messages": messages,
-                "tool_choice": tool_choice,
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptCallRequestToolChoiceParams
+                ),
                 "session_id": session_id,
                 "parent_id": parent_id,
                 "inputs": inputs,
@@ -448,7 +473,9 @@ class PromptsClient:
                 "batches": batches,
                 "user": user,
                 "environment": prompt_call_request_environment,
-                "provider_api_keys": provider_api_keys,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                ),
                 "num_samples": num_samples,
                 "stream": stream,
                 "return_inputs": return_inputs,
@@ -514,7 +541,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -528,7 +555,7 @@ class PromptsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "prompts",
             method="GET",
@@ -573,18 +600,18 @@ class PromptsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         endpoint: typing.Optional[ModelEndpoints] = OMIT,
-        template: typing.Optional[PromptRequestTemplate] = OMIT,
+        template: typing.Optional[PromptRequestTemplateParams] = OMIT,
         provider: typing.Optional[ModelProviders] = OMIT,
         max_tokens: typing.Optional[int] = OMIT,
         temperature: typing.Optional[float] = OMIT,
         top_p: typing.Optional[float] = OMIT,
-        stop: typing.Optional[PromptRequestStop] = OMIT,
+        stop: typing.Optional[PromptRequestStopParams] = OMIT,
         presence_penalty: typing.Optional[float] = OMIT,
         frequency_penalty: typing.Optional[float] = OMIT,
         other: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         seed: typing.Optional[int] = OMIT,
-        response_format: typing.Optional[ResponseFormat] = OMIT,
-        tools: typing.Optional[typing.Sequence[ToolFunction]] = OMIT,
+        response_format: typing.Optional[ResponseFormatParams] = OMIT,
+        tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -612,7 +639,7 @@ class PromptsClient:
         endpoint : typing.Optional[ModelEndpoints]
             The provider model endpoint used.
 
-        template : typing.Optional[PromptRequestTemplate]
+        template : typing.Optional[PromptRequestTemplateParams]
             For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
 
         provider : typing.Optional[ModelProviders]
@@ -627,7 +654,7 @@ class PromptsClient:
         top_p : typing.Optional[float]
             An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
 
-        stop : typing.Optional[PromptRequestStop]
+        stop : typing.Optional[PromptRequestStopParams]
             The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
 
         presence_penalty : typing.Optional[float]
@@ -642,10 +669,10 @@ class PromptsClient:
         seed : typing.Optional[int]
             If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-        response_format : typing.Optional[ResponseFormat]
+        response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        tools : typing.Optional[typing.Sequence[ToolFunction]]
+        tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
 
         linked_tools : typing.Optional[typing.Sequence[str]]
@@ -664,8 +691,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -675,10 +701,10 @@ class PromptsClient:
             model="gpt-4o",
             endpoint="chat",
             template=[
-                ChatMessage(
-                    content="You are a helpful coding assistant specialising in {{language}}",
-                    role="system",
-                )
+                {
+                    "content": "You are a helpful coding assistant specialising in {{language}}",
+                    "role": "system",
+                }
             ],
             provider="openai",
             max_tokens=-1,
@@ -700,18 +726,24 @@ class PromptsClient:
                 "id": id,
                 "model": model,
                 "endpoint": endpoint,
-                "template": template,
+                "template": convert_and_respect_annotation_metadata(
+                    object_=template, annotation=PromptRequestTemplateParams
+                ),
                 "provider": provider,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
                 "top_p": top_p,
-                "stop": stop,
+                "stop": convert_and_respect_annotation_metadata(object_=stop, annotation=PromptRequestStopParams),
                 "presence_penalty": presence_penalty,
                 "frequency_penalty": frequency_penalty,
                 "other": other,
                 "seed": seed,
-                "response_format": response_format,
-                "tools": tools,
+                "response_format": convert_and_respect_annotation_metadata(
+                    object_=response_format, annotation=ResponseFormatParams
+                ),
+                "tools": convert_and_respect_annotation_metadata(
+                    object_=tools, annotation=typing.Sequence[ToolFunctionParams]
+                ),
                 "linked_tools": linked_tools,
                 "commit_message": commit_message,
             },
@@ -765,7 +797,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -810,7 +842,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -866,7 +898,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -927,7 +959,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -984,7 +1016,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1018,8 +1050,8 @@ class PromptsClient:
         self,
         id: str,
         *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]] = OMIT,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
         """
@@ -1032,10 +1064,10 @@ class PromptsClient:
         ----------
         id : str
 
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
             Evaluators to deactivate. These will not be run on new Logs.
 
         request_options : typing.Optional[RequestOptions]
@@ -1048,25 +1080,29 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
         client.prompts.update_monitoring(
             id="pr_30gco7dx6JDq4200GVOHa",
-            activate=[
-                MonitoringEvaluatorVersionRequest(
-                    evaluator_version_id="evv_1abc4308abd",
-                )
-            ],
+            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/evaluators",
             method="POST",
-            json={"activate": activate, "deactivate": deactivate},
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1112,7 +1148,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1167,7 +1203,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1215,7 +1251,7 @@ class PromptsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -1251,17 +1287,16 @@ class AsyncPromptsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        output_message: typing.Optional[ChatMessage] = OMIT,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
         prompt_tokens: typing.Optional[int] = OMIT,
         output_tokens: typing.Optional[int] = OMIT,
         prompt_cost: typing.Optional[float] = OMIT,
         output_cost: typing.Optional[float] = OMIT,
         finish_reason: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequest] = OMIT,
-        messages: typing.Optional[typing.Sequence[ChatMessage]] = OMIT,
-        tool_choice: typing.Optional[PromptLogRequestToolChoice] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
         output: typing.Optional[str] = OMIT,
-        raw_output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
@@ -1283,11 +1318,11 @@ class AsyncPromptsClient:
         Log to a Prompt.
 
         You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+        an existing version of the Prompt. Otherwise, the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -1304,7 +1339,7 @@ class AsyncPromptsClient:
         id : typing.Optional[str]
             ID for an existing Prompt to update.
 
-        output_message : typing.Optional[ChatMessage]
+        output_message : typing.Optional[ChatMessageParams]
             The message returned by the provider.
 
         prompt_tokens : typing.Optional[int]
@@ -1322,13 +1357,13 @@ class AsyncPromptsClient:
         finish_reason : typing.Optional[str]
             Reason the generation finished.
 
-        prompt : typing.Optional[PromptKernelRequest]
+        prompt : typing.Optional[PromptKernelRequestParams]
             Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
-        messages : typing.Optional[typing.Sequence[ChatMessage]]
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptLogRequestToolChoice]
+        tool_choice : typing.Optional[PromptLogRequestToolChoiceParams]
             Controls how the model uses tools. The following options are supported:
             - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
@@ -1337,9 +1372,6 @@ class AsyncPromptsClient:
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
-
-        raw_output : typing.Optional[str]
-            Raw output from the provider.
 
         created_at : typing.Optional[dt.datetime]
             User defined timestamp for when the log was created.
@@ -1396,31 +1428,49 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+        import datetime
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.log(
-            path="persona",
-            prompt=PromptKernelRequest(
-                model="gpt-4",
-                template=[
-                    ChatMessage(
-                        role="system",
-                        content="You are {{person}}. Answer questions as this person. Do not break character.",
-                    )
+
+
+        async def main() -> None:
+            await client.prompts.log(
+                path="persona",
+                prompt={
+                    "model": "gpt-4",
+                    "template": [
+                        {
+                            "role": "system",
+                            "content": "You are {{person}}. Answer questions as this person. Do not break character.",
+                        }
+                    ],
+                },
+                messages=[
+                    {"role": "user", "content": "What really happened at Roswell?"}
                 ],
-            ),
-            messages=[
-                ChatMessage(
-                    role="user",
-                    content="What really happened at Roswell?",
-                )
-            ],
-            inputs={"person": "Trump"},
-        )
+                inputs={"person": "Trump"},
+                created_at=datetime.datetime.fromisoformat(
+                    "2024-07-19 04:29:35.178000+00:00",
+                ),
+                provider_latency=6.5931549072265625,
+                output_message={
+                    "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+                    "role": "assistant",
+                },
+                prompt_tokens=100,
+                output_tokens=220,
+                prompt_cost=1e-05,
+                output_cost=0.0002,
+                finish_reason="stop",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts/log",
@@ -1429,17 +1479,22 @@ class AsyncPromptsClient:
             json={
                 "path": path,
                 "id": id,
-                "output_message": output_message,
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams
+                ),
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
                 "prompt_cost": prompt_cost,
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
-                "prompt": prompt,
-                "messages": messages,
-                "tool_choice": tool_choice,
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams
+                ),
                 "output": output,
-                "raw_output": raw_output,
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
@@ -1478,9 +1533,9 @@ class AsyncPromptsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequest] = OMIT,
-        messages: typing.Optional[typing.Sequence[ChatMessage]] = OMIT,
-        tool_choice: typing.Optional[PromptCallRequestToolChoice] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptCallRequestToolChoiceParams] = OMIT,
         session_id: typing.Optional[str] = OMIT,
         parent_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
@@ -1491,7 +1546,7 @@ class AsyncPromptsClient:
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompt_call_request_environment: typing.Optional[str] = OMIT,
-        provider_api_keys: typing.Optional[ProviderApiKeys] = OMIT,
+        provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
         stream: typing.Optional[bool] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
@@ -1502,7 +1557,7 @@ class AsyncPromptsClient:
         """
         Call a Prompt.
 
-        Calling a Prompt subsequently calls the model provider before logging
+        Calling a Prompt calls the model provider before logging
         the request, responses and metadata to Humanloop.
 
         You can use query parameters `version_id`, or `environment`, to target
@@ -1510,7 +1565,7 @@ class AsyncPromptsClient:
 
         Instead of targeting an existing version explicitly, you can instead pass in
         Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt, if not we will create a new version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
         in the case where you are storing or deriving your Prompt details in code.
 
         Parameters
@@ -1527,13 +1582,13 @@ class AsyncPromptsClient:
         id : typing.Optional[str]
             ID for an existing Prompt to update.
 
-        prompt : typing.Optional[PromptKernelRequest]
+        prompt : typing.Optional[PromptKernelRequestParams]
             Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
-        messages : typing.Optional[typing.Sequence[ChatMessage]]
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptCallRequestToolChoice]
+        tool_choice : typing.Optional[PromptCallRequestToolChoiceParams]
             Controls how the model uses tools. The following options are supported:
             - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
@@ -1570,7 +1625,7 @@ class AsyncPromptsClient:
         prompt_call_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
 
-        provider_api_keys : typing.Optional[ProviderApiKeys]
+        provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
         num_samples : typing.Optional[int]
@@ -1598,32 +1653,50 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage, PromptKernelRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.call(
-            path="persona",
-            prompt=PromptKernelRequest(
-                model="gpt-4",
-                template=[
-                    ChatMessage(
-                        role="system",
-                        content="You are {{person}}. Answer any questions as this person. Do not break character.",
-                    )
-                ],
-            ),
-            messages=[
-                ChatMessage(
-                    role="user",
-                    content="What really happened at Roswell?",
-                )
-            ],
-            inputs={"person": "Trump"},
-            stream=False,
-        )
+
+
+        async def main() -> None:
+            await client.prompts.call(
+                path="persona",
+                prompt={
+                    "model": "gpt-4",
+                    "template": [
+                        {
+                            "role": "system",
+                            "content": "You are stockbot. Return latest prices.",
+                        }
+                    ],
+                    "tools": [
+                        {
+                            "name": "get_stock_price",
+                            "description": "Get current stock price",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "ticker_symbol": {
+                                        "type": "string",
+                                        "name": "Ticker Symbol",
+                                        "description": "Ticker symbol of the stock",
+                                    }
+                                },
+                                "required": [],
+                            },
+                        }
+                    ],
+                },
+                messages=[{"role": "user", "content": "latest apple"}],
+                stream=False,
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts/call",
@@ -1632,9 +1705,13 @@ class AsyncPromptsClient:
             json={
                 "path": path,
                 "id": id,
-                "prompt": prompt,
-                "messages": messages,
-                "tool_choice": tool_choice,
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptCallRequestToolChoiceParams
+                ),
                 "session_id": session_id,
                 "parent_id": parent_id,
                 "inputs": inputs,
@@ -1645,7 +1722,9 @@ class AsyncPromptsClient:
                 "batches": batches,
                 "user": user,
                 "environment": prompt_call_request_environment,
-                "provider_api_keys": provider_api_keys,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                ),
                 "num_samples": num_samples,
                 "stream": stream,
                 "return_inputs": return_inputs,
@@ -1711,21 +1790,29 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.prompts.list(
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.prompts.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "prompts",
             method="GET",
@@ -1770,18 +1857,18 @@ class AsyncPromptsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         endpoint: typing.Optional[ModelEndpoints] = OMIT,
-        template: typing.Optional[PromptRequestTemplate] = OMIT,
+        template: typing.Optional[PromptRequestTemplateParams] = OMIT,
         provider: typing.Optional[ModelProviders] = OMIT,
         max_tokens: typing.Optional[int] = OMIT,
         temperature: typing.Optional[float] = OMIT,
         top_p: typing.Optional[float] = OMIT,
-        stop: typing.Optional[PromptRequestStop] = OMIT,
+        stop: typing.Optional[PromptRequestStopParams] = OMIT,
         presence_penalty: typing.Optional[float] = OMIT,
         frequency_penalty: typing.Optional[float] = OMIT,
         other: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         seed: typing.Optional[int] = OMIT,
-        response_format: typing.Optional[ResponseFormat] = OMIT,
-        tools: typing.Optional[typing.Sequence[ToolFunction]] = OMIT,
+        response_format: typing.Optional[ResponseFormatParams] = OMIT,
+        tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1809,7 +1896,7 @@ class AsyncPromptsClient:
         endpoint : typing.Optional[ModelEndpoints]
             The provider model endpoint used.
 
-        template : typing.Optional[PromptRequestTemplate]
+        template : typing.Optional[PromptRequestTemplateParams]
             For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
 
         provider : typing.Optional[ModelProviders]
@@ -1824,7 +1911,7 @@ class AsyncPromptsClient:
         top_p : typing.Optional[float]
             An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
 
-        stop : typing.Optional[PromptRequestStop]
+        stop : typing.Optional[PromptRequestStopParams]
             The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
 
         presence_penalty : typing.Optional[float]
@@ -1839,10 +1926,10 @@ class AsyncPromptsClient:
         seed : typing.Optional[int]
             If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-        response_format : typing.Optional[ResponseFormat]
+        response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        tools : typing.Optional[typing.Sequence[ToolFunction]]
+        tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
 
         linked_tools : typing.Optional[typing.Sequence[str]]
@@ -1861,33 +1948,40 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import ChatMessage
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.upsert(
-            path="Personal Projects/Coding Assistant",
-            model="gpt-4o",
-            endpoint="chat",
-            template=[
-                ChatMessage(
-                    content="You are a helpful coding assistant specialising in {{language}}",
-                    role="system",
-                )
-            ],
-            provider="openai",
-            max_tokens=-1,
-            temperature=0.7,
-            top_p=1.0,
-            presence_penalty=0.0,
-            frequency_penalty=0.0,
-            other={},
-            tools=[],
-            linked_tools=[],
-            commit_message="Initial commit",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.upsert(
+                path="Personal Projects/Coding Assistant",
+                model="gpt-4o",
+                endpoint="chat",
+                template=[
+                    {
+                        "content": "You are a helpful coding assistant specialising in {{language}}",
+                        "role": "system",
+                    }
+                ],
+                provider="openai",
+                max_tokens=-1,
+                temperature=0.7,
+                top_p=1.0,
+                presence_penalty=0.0,
+                frequency_penalty=0.0,
+                other={},
+                tools=[],
+                linked_tools=[],
+                commit_message="Initial commit",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts",
@@ -1897,18 +1991,24 @@ class AsyncPromptsClient:
                 "id": id,
                 "model": model,
                 "endpoint": endpoint,
-                "template": template,
+                "template": convert_and_respect_annotation_metadata(
+                    object_=template, annotation=PromptRequestTemplateParams
+                ),
                 "provider": provider,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
                 "top_p": top_p,
-                "stop": stop,
+                "stop": convert_and_respect_annotation_metadata(object_=stop, annotation=PromptRequestStopParams),
                 "presence_penalty": presence_penalty,
                 "frequency_penalty": frequency_penalty,
                 "other": other,
                 "seed": seed,
-                "response_format": response_format,
-                "tools": tools,
+                "response_format": convert_and_respect_annotation_metadata(
+                    object_=response_format, annotation=ResponseFormatParams
+                ),
+                "tools": convert_and_respect_annotation_metadata(
+                    object_=tools, annotation=typing.Sequence[ToolFunctionParams]
+                ),
                 "linked_tools": linked_tools,
                 "commit_message": commit_message,
             },
@@ -1962,14 +2062,22 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.get(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.get(
+                id="pr_30gco7dx6JDq4200GVOHa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}",
@@ -2007,14 +2115,22 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.delete(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.delete(
+                id="pr_30gco7dx6JDq4200GVOHa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -2063,15 +2179,23 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.move(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            path="new directory/new name",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.move(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                path="new directory/new name",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}",
@@ -2124,15 +2248,23 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list_versions(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            status="committed",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.list_versions(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                status="committed",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/versions",
@@ -2181,16 +2313,24 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.commit(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            version_id="prv_F34aba5f3asp0",
-            commit_message="Reiterated point about not discussing sentience",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.commit(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                version_id="prv_F34aba5f3asp0",
+                commit_message="Reiterated point about not discussing sentience",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
@@ -2215,8 +2355,8 @@ class AsyncPromptsClient:
         self,
         id: str,
         *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]] = OMIT,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
         """
@@ -2229,10 +2369,10 @@ class AsyncPromptsClient:
         ----------
         id : str
 
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItem]]
-            Evaluators to activate on Monitoring. These will be automatically run on new Logs.
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
 
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItem]]
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
             Evaluators to deactivate. These will not be run on new Logs.
 
         request_options : typing.Optional[RequestOptions]
@@ -2245,25 +2385,37 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop import MonitoringEvaluatorVersionRequest
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.update_monitoring(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            activate=[
-                MonitoringEvaluatorVersionRequest(
-                    evaluator_version_id="evv_1abc4308abd",
-                )
-            ],
-        )
+
+
+        async def main() -> None:
+            await client.prompts.update_monitoring(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/evaluators",
             method="POST",
-            json={"activate": activate, "deactivate": deactivate},
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -2309,16 +2461,24 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.set_deployment(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.set_deployment(
+                id="id",
+                environment_id="environment_id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -2364,15 +2524,23 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.remove_deployment(
-            id="id",
-            environment_id="environment_id",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.remove_deployment(
+                id="id",
+                environment_id="environment_id",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
@@ -2412,14 +2580,22 @@ class AsyncPromptsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.prompts.list_environments(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+
+
+        async def main() -> None:
+            await client.prompts.list_environments(
+                id="pr_30gco7dx6JDq4200GVOHa",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/environments", method="GET", request_options=request_options

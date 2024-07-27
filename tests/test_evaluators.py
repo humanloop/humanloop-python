@@ -2,8 +2,7 @@
 
 import typing
 
-from humanloop import CodeEvaluatorRequest
-from humanloop.client import AsyncHumanloop, Humanloop
+from humanloop import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
 
@@ -46,22 +45,22 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     }
     response = client.evaluators.upsert(
         path="Shared Evaluators/Accuracy Evaluator",
-        spec=CodeEvaluatorRequest(
-            arguments_type="target_required",
-            return_type="number",
-            code="def evaluate(answer, target):\\n    return 0.5",
-        ),
+        spec={
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
+        },
         commit_message="Initial commit",
     )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.evaluators.upsert(
         path="Shared Evaluators/Accuracy Evaluator",
-        spec=CodeEvaluatorRequest(
-            arguments_type="target_required",
-            return_type="number",
-            code="def evaluate(answer, target):\\n    return 0.5",
-        ),
+        spec={
+            "arguments_type": "target_required",
+            "return_type": "number",
+            "code": "def evaluate(answer, target):\\n    return 0.5",
+        },
         commit_message="Initial commit",
     )
     validate_response(async_response, expected_response, expected_types)
@@ -340,7 +339,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
             },
         }
     ]
-    expected_types: typing.Any = (
+    expected_types: typing.Tuple[typing.Any, typing.Any] = (
         "list",
         {
             0: {
@@ -370,4 +369,19 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.evaluators.list_environments(id="ev_890bcd")
+    validate_response(async_response, expected_response, expected_types)
+
+
+async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
+    expected_response: typing.Any = {
+        "id": "id",
+        "parent_id": "parent_id",
+        "session_id": "session_id",
+        "version_id": "version_id",
+    }
+    expected_types: typing.Any = {"id": None, "parent_id": None, "session_id": None, "version_id": None}
+    response = client.evaluators.log(parent_id="parent_id")
+    validate_response(response, expected_response, expected_types)
+
+    async_response = await async_client.evaluators.log(parent_id="parent_id")
     validate_response(async_response, expected_response, expected_types)

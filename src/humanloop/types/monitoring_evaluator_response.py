@@ -5,24 +5,25 @@ from __future__ import annotations
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2, update_forward_refs
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .monitoring_evaluator_state import MonitoringEvaluatorState
 
 
 class MonitoringEvaluatorResponse(UncheckedBaseModel):
-    version_reference: VersionReferenceResponse = pydantic_v1.Field()
+    version_reference: VersionReferenceResponse = pydantic.Field()
     """
     The Evaluator Version used for monitoring. This can be a specific Version by ID, or a Version deployed to an Environment.
     """
 
-    version: typing.Optional[EvaluatorResponse] = pydantic_v1.Field(default=None)
+    version: typing.Optional[EvaluatorResponse] = pydantic.Field(default=None)
     """
     The deployed Version.
     """
 
-    state: MonitoringEvaluatorState = pydantic_v1.Field()
+    state: MonitoringEvaluatorState = pydantic.Field()
     """
     The state of the Monitoring Evaluator. Either `active` or `inactive`
     """
@@ -30,26 +31,17 @@ class MonitoringEvaluatorResponse(UncheckedBaseModel):
     created_at: dt.datetime
     updated_at: dt.datetime
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow
 
 
 from .evaluator_response import EvaluatorResponse  # noqa: E402
 from .version_reference_response import VersionReferenceResponse  # noqa: E402
 
-MonitoringEvaluatorResponse.update_forward_refs()
+update_forward_refs(MonitoringEvaluatorResponse)
