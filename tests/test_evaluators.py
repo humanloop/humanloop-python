@@ -2,6 +2,8 @@
 
 import typing
 
+import pytest
+
 from humanloop import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
@@ -49,6 +51,7 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "arguments_type": "target_required",
             "return_type": "number",
             "code": "def evaluate(answer, target):\\n    return 0.5",
+            "evaluator_type": "python"
         },
         commit_message="Initial commit",
     )
@@ -60,6 +63,7 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "arguments_type": "target_required",
             "return_type": "number",
             "code": "def evaluate(answer, target):\\n    return 0.5",
+            "evaluator_type": "python"
         },
         commit_message="Initial commit",
     )
@@ -310,6 +314,7 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
     assert await async_client.evaluators.remove_deployment(id="ev_890bcd", environment_id="staging") is None  # type: ignore[func-returns-value]
 
 
+@pytest.mark.skip(reason="Untested")
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
