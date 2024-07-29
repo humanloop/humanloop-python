@@ -854,65 +854,6 @@ operation_parameter_map = {
             },
         ]
     },
-    '/projects/{project_id}/experiments-POST': {
-        'parameters': [
-            {
-                'name': 'name'
-            },
-            {
-                'name': 'positive_labels'
-            },
-            {
-                'name': 'project_id'
-            },
-            {
-                'name': 'config_ids'
-            },
-            {
-                'name': 'set_active'
-            },
-        ]
-    },
-    '/experiments/{experiment_id}-DELETE': {
-        'parameters': [
-            {
-                'name': 'experiment_id'
-            },
-        ]
-    },
-    '/projects/{project_id}/experiments-GET': {
-        'parameters': [
-            {
-                'name': 'project_id'
-            },
-        ]
-    },
-    '/experiments/{experiment_id}/model-config-GET': {
-        'parameters': [
-            {
-                'name': 'experiment_id'
-            },
-        ]
-    },
-    '/experiments/{experiment_id}-PATCH': {
-        'parameters': [
-            {
-                'name': 'experiment_id'
-            },
-            {
-                'name': 'name'
-            },
-            {
-                'name': 'positive_labels'
-            },
-            {
-                'name': 'config_ids_to_register'
-            },
-            {
-                'name': 'config_ids_to_deregister'
-            },
-        ]
-    },
     '/feedback-POST': {
         'parameters': [
             {

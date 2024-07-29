@@ -38,10 +38,8 @@ class ModelProviders(
         enum_value_to_name = {
             "openai": "OPENAI",
             "openai_azure": "OPENAI_AZURE",
-            "ai21": "AI21",
             "mock": "MOCK",
             "anthropic": "ANTHROPIC",
-            "langchain": "LANGCHAIN",
             "cohere": "COHERE",
             "replicate": "REPLICATE",
             "google": "GOOGLE",
@@ -57,20 +55,12 @@ class ModelProviders(
         return cls("openai_azure")
     
     @schemas.classproperty
-    def AI21(cls):
-        return cls("ai21")
-    
-    @schemas.classproperty
     def MOCK(cls):
         return cls("mock")
     
     @schemas.classproperty
     def ANTHROPIC(cls):
         return cls("anthropic")
-    
-    @schemas.classproperty
-    def LANGCHAIN(cls):
-        return cls("langchain")
     
     @schemas.classproperty
     def COHERE(cls):

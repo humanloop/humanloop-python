@@ -15,4 +15,4 @@ from enum import Enum
 from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
-ModelProviders = Literal["openai", "openai_azure", "ai21", "mock", "anthropic", "langchain", "cohere", "replicate", "google", "groq"]
+ModelProviders = Literal["openai", "openai_azure", "mock", "anthropic", "cohere", "replicate", "google", "groq"]
