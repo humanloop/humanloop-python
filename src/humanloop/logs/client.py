@@ -13,8 +13,8 @@ from ..core.request_options import RequestOptions
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
-from ..types.paginated_prompt_log_response import PaginatedPromptLogResponse
-from ..types.prompt_log_response import PromptLogResponse
+from ..types.paginated_data_log_response import PaginatedDataLogResponse
+from ..types.src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponse
 from ..types.version_status import VersionStatus
 
 
@@ -35,7 +35,7 @@ class LogsClient:
         start_date: typing.Optional[dt.datetime] = None,
         end_date: typing.Optional[dt.datetime] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SyncPager[PromptLogResponse]:
+    ) -> SyncPager[SrcExternalAppModelsV5LogsLogResponse]:
         """
         List all Logs for the given filter criteria.
 
@@ -73,12 +73,12 @@ class LogsClient:
 
         Returns
         -------
-        SyncPager[PromptLogResponse]
+        SyncPager[SrcExternalAppModelsV5LogsLogResponse]
             Successful Response
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -93,7 +93,7 @@ class LogsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "logs",
             method="GET",
@@ -112,7 +112,7 @@ class LogsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
+                _parsed_response = typing.cast(PaginatedDataLogResponse, construct_type(type_=PaginatedDataLogResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
                 _get_next = lambda: self.list(
                     file_id=file_id,
@@ -160,7 +160,7 @@ class LogsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -184,7 +184,9 @@ class LogsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> PromptLogResponse:
+    def get(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> SrcExternalAppModelsV5LogsLogResponse:
         """
         Retrieve the Log with the given ID.
 
@@ -198,12 +200,12 @@ class LogsClient:
 
         Returns
         -------
-        PromptLogResponse
+        SrcExternalAppModelsV5LogsLogResponse
             Successful Response
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -217,7 +219,7 @@ class LogsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(PromptLogResponse, construct_type(type_=PromptLogResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(SrcExternalAppModelsV5LogsLogResponse, construct_type(type_=SrcExternalAppModelsV5LogsLogResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -245,7 +247,7 @@ class AsyncLogsClient:
         start_date: typing.Optional[dt.datetime] = None,
         end_date: typing.Optional[dt.datetime] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncPager[PromptLogResponse]:
+    ) -> AsyncPager[SrcExternalAppModelsV5LogsLogResponse]:
         """
         List all Logs for the given filter criteria.
 
@@ -283,27 +285,35 @@ class AsyncLogsClient:
 
         Returns
         -------
-        AsyncPager[PromptLogResponse]
+        AsyncPager[SrcExternalAppModelsV5LogsLogResponse]
             Successful Response
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.logs.list(
-            file_id="file_123abc",
-            size=1,
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.logs.list(
+                file_id="file_123abc",
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "logs",
             method="GET",
@@ -322,7 +332,7 @@ class AsyncLogsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(PaginatedPromptLogResponse, construct_type(type_=PaginatedPromptLogResponse, object_=_response.json()))  # type: ignore
+                _parsed_response = typing.cast(PaginatedDataLogResponse, construct_type(type_=PaginatedDataLogResponse, object_=_response.json()))  # type: ignore
                 _has_next = True
                 _get_next = lambda: self.list(
                     file_id=file_id,
@@ -370,14 +380,22 @@ class AsyncLogsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.logs.delete(
-            id="string",
-        )
+
+
+        async def main() -> None:
+            await client.logs.delete(
+                id="string",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "logs", method="DELETE", params={"id": id}, request_options=request_options
@@ -394,7 +412,9 @@ class AsyncLogsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> PromptLogResponse:
+    async def get(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> SrcExternalAppModelsV5LogsLogResponse:
         """
         Retrieve the Log with the given ID.
 
@@ -408,26 +428,34 @@ class AsyncLogsClient:
 
         Returns
         -------
-        PromptLogResponse
+        SrcExternalAppModelsV5LogsLogResponse
             Successful Response
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.logs.get(
-            id="prv_Wu6zx1lAWJRqOyL8nWuZk",
-        )
+
+
+        async def main() -> None:
+            await client.logs.get(
+                id="prv_Wu6zx1lAWJRqOyL8nWuZk",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"logs/{jsonable_encoder(id)}", method="GET", request_options=request_options
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(PromptLogResponse, construct_type(type_=PromptLogResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(SrcExternalAppModelsV5LogsLogResponse, construct_type(type_=SrcExternalAppModelsV5LogsLogResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

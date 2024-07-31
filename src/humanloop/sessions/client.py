@@ -38,7 +38,7 @@ class SessionsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -80,7 +80,7 @@ class SessionsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -140,7 +140,7 @@ class SessionsClient:
 
         Examples
         --------
-        from humanloop.client import Humanloop
+        from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
@@ -155,7 +155,7 @@ class SessionsClient:
         for page in response.iter_pages():
             yield page
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = self._client_wrapper.httpx_client.request(
             "sessions",
             method="GET",
@@ -204,14 +204,22 @@ class AsyncSessionsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.sessions.get(
-            id="sesh_123abc",
-        )
+
+
+        async def main() -> None:
+            await client.sessions.get(
+                id="sesh_123abc",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"sessions/{jsonable_encoder(id)}", method="GET", request_options=request_options
@@ -246,14 +254,22 @@ class AsyncSessionsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        await client.sessions.delete(
-            id="sesh_123abc",
-        )
+
+
+        async def main() -> None:
+            await client.sessions.delete(
+                id="sesh_123abc",
+            )
+
+
+        asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"sessions/{jsonable_encoder(id)}", method="DELETE", request_options=request_options
@@ -306,22 +322,30 @@ class AsyncSessionsClient:
 
         Examples
         --------
-        from humanloop.client import AsyncHumanloop
+        import asyncio
+
+        from humanloop import AsyncHumanloop
 
         client = AsyncHumanloop(
             api_key="YOUR_API_KEY",
         )
-        response = await client.sessions.list(
-            size=1,
-            file_id="pr_123abc",
-        )
-        async for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        async for page in response.iter_pages():
-            yield page
+
+
+        async def main() -> None:
+            response = await client.sessions.list(
+                size=1,
+                file_id="pr_123abc",
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
         """
-        page = page or 1
+        page = page if page is not None else 1
         _response = await self._client_wrapper.httpx_client.request(
             "sessions",
             method="GET",

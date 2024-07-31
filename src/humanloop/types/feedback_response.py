@@ -3,58 +3,50 @@
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .feedback_response_type import FeedbackResponseType
 from .feedback_response_value import FeedbackResponseValue
 
 
 class FeedbackResponse(UncheckedBaseModel):
-    type: FeedbackResponseType = pydantic_v1.Field()
+    type: FeedbackResponseType = pydantic.Field()
     """
     The type of feedback. The default feedback types available are 'rating', 'action', 'issue', 'correction', and 'comment'.
     """
 
-    value: FeedbackResponseValue = pydantic_v1.Field()
+    value: FeedbackResponseValue = pydantic.Field()
     """
     The feedback value to set. This would be the appropriate text for 'correction' or 'comment', or a label to apply for 'rating', 'action', or 'issue'.
     """
 
-    data_id: typing.Optional[str] = pydantic_v1.Field(default=None)
+    data_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     ID to associate the feedback to a previously logged datapoint.
     """
 
-    user: typing.Optional[str] = pydantic_v1.Field(default=None)
+    user: typing.Optional[str] = pydantic.Field(default=None)
     """
     A unique identifier to who provided the feedback.
     """
 
-    created_at: typing.Optional[dt.datetime] = pydantic_v1.Field(default=None)
+    created_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
     User defined timestamp for when the feedback was created.
     """
 
-    id: str = pydantic_v1.Field()
+    id: str = pydantic.Field()
     """
     String ID of user feedback. Starts with `ann_`, short for annotation.
     """
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow

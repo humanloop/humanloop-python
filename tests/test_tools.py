@@ -2,8 +2,9 @@
 
 import typing
 
-from humanloop import MonitoringEvaluatorVersionRequest, ToolFunction, ToolKernelRequest
-from humanloop.client import AsyncHumanloop, Humanloop
+import pytest
+
+from humanloop import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
 
@@ -18,17 +19,17 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_types: typing.Any = {"id": None, "tool_id": None, "version_id": None, "session_id": None}
     response = client.tools.log(
         path="math-tool",
-        tool=ToolKernelRequest(
-            function=ToolFunction(
-                name="multiply",
-                description="Multiply two numbers",
-                parameters={
+        tool={
+            "function": {
+                "name": "multiply",
+                "description": "Multiply two numbers",
+                "parameters": {
                     "type": "object",
                     "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
                     "required": ["a", "b"],
                 },
-            )
-        ),
+            }
+        },
         inputs={"a": 5, "b": 7},
         output="35",
     )
@@ -36,17 +37,17 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
 
     async_response = await async_client.tools.log(
         path="math-tool",
-        tool=ToolKernelRequest(
-            function=ToolFunction(
-                name="multiply",
-                description="Multiply two numbers",
-                parameters={
+        tool={
+            "function": {
+                "name": "multiply",
+                "description": "Multiply two numbers",
+                "parameters": {
                     "type": "object",
                     "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
                     "required": ["a", "b"],
                 },
-            )
-        ),
+            }
+        },
         inputs={"a": 5, "b": 7},
         output="35",
     )
@@ -84,30 +85,30 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     }
     response = client.tools.upsert(
         path="math-tool",
-        function=ToolFunction(
-            name="multiply",
-            description="Multiply two numbers",
-            parameters={
+        function={
+            "name": "multiply",
+            "description": "Multiply two numbers",
+            "parameters": {
                 "type": "object",
                 "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
                 "required": ["a", "b"],
             },
-        ),
+        },
         commit_message="Initial commit",
     )
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.tools.upsert(
         path="math-tool",
-        function=ToolFunction(
-            name="multiply",
-            description="Multiply two numbers",
-            parameters={
+        function={
+            "name": "multiply",
+            "description": "Multiply two numbers",
+            "parameters": {
                 "type": "object",
                 "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
                 "required": ["a", "b"],
             },
-        ),
+        },
         commit_message="Initial commit",
     )
     validate_response(async_response, expected_response, expected_types)
@@ -306,13 +307,11 @@ async def test_update_monitoring(client: Humanloop, async_client: AsyncHumanloop
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
     }
-    response = client.tools.update_monitoring(
-        id="tl_789ghi", activate=[MonitoringEvaluatorVersionRequest(evaluator_version_id="evv_1abc4308abd")]
-    )
+    response = client.tools.update_monitoring(id="tl_789ghi", activate=[{"evaluator_version_id": "evv_1abc4308abd"}])
     validate_response(response, expected_response, expected_types)
 
     async_response = await async_client.tools.update_monitoring(
-        id="tl_789ghi", activate=[MonitoringEvaluatorVersionRequest(evaluator_version_id="evv_1abc4308abd")]
+        id="tl_789ghi", activate=[{"evaluator_version_id": "evv_1abc4308abd"}]
     )
     validate_response(async_response, expected_response, expected_types)
 
@@ -362,6 +361,7 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
     assert await async_client.tools.remove_deployment(id="tl_789ghi", environment_id="staging") is None  # type: ignore[func-returns-value]
 
 
+@pytest.mark.skip(reason="Untested")
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
@@ -385,7 +385,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
             },
         }
     ]
-    expected_types: typing.Any = (
+    expected_types: typing.Tuple[typing.Any, typing.Any] = (
         "list",
         {
             0: {

@@ -81,7 +81,7 @@ service:
 
         You can use query parameters `version_id`, or `environment`, to target
 
-        an existing version of the Prompt. Otherwise the default deployed
+        an existing version of the Prompt. Otherwise, the default deployed
         version will be chosen.
 
 
@@ -91,8 +91,8 @@ service:
         Prompt details in the request body. In this case, we will check if the
         details correspond
 
-        to an existing version of the Prompt, if not we will create a new
-        version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a
+        new version. This is helpful
 
         in the case where you are storing or deriving your Prompt details in
         code.
@@ -167,9 +167,6 @@ service:
                 Generated output from your model for the provided inputs. Can be
                 `None` if logging an error, or if creating a parent Log with the
                 intention to populate it later.
-            raw_output:
-              type: optional<string>
-              docs: Raw output from the provider.
             created_at:
               type: optional<datetime>
               docs: 'User defined timestamp for when the log was created. '
@@ -191,7 +188,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests. 
+                in subsequent log requests.
             parent_id:
               type: optional<string>
               docs: >-
@@ -254,6 +251,28 @@ service:
                 content: What really happened at Roswell?
             inputs:
               person: Trump
+            created_at: '2024-07-19T00:29:35.178992'
+            provider_latency: 6.5931549072265625
+            output_message:
+              content: >-
+                Well, you know, there is so much secrecy involved in government,
+                folks, it's unbelievable. They don't want to tell you
+                everything. They don't tell me everything! But about Roswell,
+                it’s a very popular question. I know, I just know, that
+                something very, very peculiar happened there. Was it a weather
+                balloon? Maybe. Was it something extraterrestrial? Could be. I'd
+                love to go down and open up all the classified documents,
+                believe me, I would. But they don't let that happen. The Deep
+                State, folks, the Deep State. They’re unbelievable. They want to
+                keep everything a secret. But whatever the truth is, I can tell
+                you this: it’s something big, very very big. Tremendous, in
+                fact.
+              role: assistant
+            prompt_tokens: 100
+            output_tokens: 220
+            prompt_cost: 0.00001
+            output_cost: 0.0002
+            finish_reason: stop
           response:
             body:
               id: data_fIfEb1SoKZooqeFbi9IFs
@@ -267,7 +286,7 @@ service:
         Call a Prompt.
 
 
-        Calling a Prompt subsequently calls the model provider before logging
+        Calling a Prompt calls the model provider before logging
 
         the request, responses and metadata to Humanloop.
 
@@ -284,8 +303,8 @@ service:
         Prompt details in the request body. In this case, we will check if the
         details correspond
 
-        to an existing version of the Prompt, if not we will create a new
-        version. This is helpful
+        to an existing version of the Prompt. If they do not, we will create a
+        new version. This is helpful
 
         in the case where you are storing or deriving your Prompt details in
         code.
@@ -342,7 +361,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests. 
+                in subsequent log requests.
             parent_id:
               type: optional<string>
               docs: >-
@@ -424,7 +443,84 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - name: Simple
+        - name: Supplying Prompt with Tool
+          request:
+            path: persona
+            prompt:
+              model: gpt-4
+              template:
+                - role: system
+                  content: You are stockbot. Return latest prices.
+              tools:
+                - name: get_stock_price
+                  description: Get current stock price
+                  parameters:
+                    type: object
+                    properties:
+                      ticker_symbol:
+                        type: string
+                        name: Ticker Symbol
+                        description: Ticker symbol of the stock
+                    required: []
+            messages:
+              - role: user
+                content: latest apple
+            stream: false
+          response:
+            body:
+              prompt:
+                id: pr_3usCu3dAkgrXTlufrvPs7
+                path: persona
+                name: persona
+                version_id: prv_Wu6zx1lAWJRqOyL8nWuZk
+                type: prompt
+                created_at: '2024-05-01T12:00:00Z'
+                updated_at: '2024-05-01T12:00:00Z'
+                status: committed
+                last_used_at: '2024-05-01T12:00:00Z'
+                model: gpt-4
+                template:
+                  - role: system
+                    content: >-
+                      You are {{person}}. Answer any questions as this person.
+                      Do not break character.
+                provider: openai
+                version_logs_count: 1
+                total_logs_count: 1
+                inputs:
+                  - name: person
+              id: data_fIfEb1SoKZooqeFbi9IFs
+              logs:
+                - output: >-
+                    Well, let me tell you, there are a lot of stories about
+                    Roswell, and I hear them all the time. People love to talk
+                    about Roswell. So many theories, so many ideas. Some folks
+                    believe it was a weather balloon, others say it was
+                    something out of this world. Believe me, there's plenty that
+                    we don't know. Very interesting to look into, but the truth,
+                    well, it might still be out there. Could be a great story,
+                    who knows? But what I do know, folks, is that we have to
+                    keep our eyes open and always be on the lookout for the
+                    truth!
+                  created_at: '2024-05-01T12:00:00Z'
+                  finish_reason: stop
+                  output_message:
+                    content: >-
+                      Well, let me tell you, there are a lot of stories about
+                      Roswell, and I hear them all the time. People love to talk
+                      about Roswell. So many theories, so many ideas. Some folks
+                      believe it was a weather balloon, others say it was
+                      something out of this world. Believe me, there's plenty
+                      that we don't know. Very interesting to look into, but the
+                      truth, well, it might still be out there. Could be a great
+                      story, who knows? But what I do know, folks, is that we
+                      have to keep our eyes open and always be on the lookout
+                      for the truth!
+                    role: assistant
+                  prompt_tokens: 34
+                  output_tokens: 125
+                  index: 0
+        - name: Supplying Prompt
           request:
             path: persona
             prompt:
@@ -476,7 +572,60 @@ service:
                     who knows? But what I do know, folks, is that we have to
                     keep our eyes open and always be on the lookout for the
                     truth!
-                  raw_output: >-
+                  created_at: '2024-05-01T12:00:00Z'
+                  finish_reason: stop
+                  output_message:
+                    content: >-
+                      Well, let me tell you, there are a lot of stories about
+                      Roswell, and I hear them all the time. People love to talk
+                      about Roswell. So many theories, so many ideas. Some folks
+                      believe it was a weather balloon, others say it was
+                      something out of this world. Believe me, there's plenty
+                      that we don't know. Very interesting to look into, but the
+                      truth, well, it might still be out there. Could be a great
+                      story, who knows? But what I do know, folks, is that we
+                      have to keep our eyes open and always be on the lookout
+                      for the truth!
+                    role: assistant
+                  prompt_tokens: 34
+                  output_tokens: 125
+                  index: 0
+        - name: By ID
+          query-parameters:
+            version_id: prv_Wu6zx1lAWJRqOyL8nWuZk
+          request:
+            path: persona
+            messages:
+              - role: user
+                content: What really happened at Roswell?
+            inputs:
+              person: Trump
+          response:
+            body:
+              prompt:
+                id: pr_3usCu3dAkgrXTlufrvPs7
+                path: persona
+                name: persona
+                version_id: prv_Wu6zx1lAWJRqOyL8nWuZk
+                type: prompt
+                created_at: '2024-05-01T12:00:00Z'
+                updated_at: '2024-05-01T12:00:00Z'
+                status: committed
+                last_used_at: '2024-05-01T12:00:00Z'
+                model: gpt-4
+                template:
+                  - role: system
+                    content: >-
+                      You are {{person}}. Answer any questions as this person.
+                      Do not break character.
+                provider: openai
+                version_logs_count: 1
+                total_logs_count: 1
+                inputs:
+                  - name: person
+              id: data_fIfEb1SoKZooqeFbi9IFs
+              logs:
+                - output: >-
                     Well, let me tell you, there are a lot of stories about
                     Roswell, and I hear them all the time. People love to talk
                     about Roswell. So many theories, so many ideas. Some folks
@@ -1218,17 +1367,20 @@ service:
               presence_penalty: 1.1
               frequency_penalty: 1.1
               other:
-                other:
-                  key: value
+                key: value
               seed: 1
               response_format:
                 type: json_object
               tools:
                 - name: name
                   description: description
+                  parameters:
+                    key: value
               linked_tools:
                 - name: name
                   description: description
+                  parameters:
+                    key: value
                   id: id
                   version_id: version_id
               commit_message: commit_message

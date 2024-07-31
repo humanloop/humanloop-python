@@ -8,7 +8,7 @@ service:
       path: /datasets
       method: GET
       auth: true
-      docs: List a list of all Datasets.
+      docs: List all Datasets.
       pagination:
         offset: $request.page
         results: $response.records
@@ -163,7 +163,7 @@ service:
       errors:
         - root.UnprocessableEntityError
       examples:
-        - name: Create dataset
+        - name: AddToDataset
           request:
             path: test-questions
             datapoints:
@@ -175,6 +175,43 @@ service:
                   question: Who wrote Hamlet?
                 target:
                   answer: William Shakespeare
+            action: add
+            commit_message: Add two new questions and answers
+          response:
+            body:
+              id: ds_mno345
+              path: test-questions
+              name: test-questions
+              version_id: dsv_pqr678
+              type: dataset
+              created_at: '2024-05-01T12:00:00Z'
+              updated_at: '2024-05-01T12:00:00Z'
+              status: committed
+              last_used_at: '2024-05-01T12:00:00Z'
+              datapoints_count: 4
+        - name: CreateSupportDataset
+          request:
+            path: datasets/support-queries
+            datapoints:
+              - messages:
+                  - role: user
+                    content: >-
+                      Hi Humanloop support team, I'm having trouble
+                      understanding how to use the evaluations feature in your
+                      software. Can you provide a step-by-step guide or any
+                      resources to help me get started?
+                target:
+                  feature: evaluations
+                  issue: needs step-by-step guide
+              - messages:
+                  - role: user
+                    content: >-
+                      Hi there, I'm interested in fine-tuning a language model
+                      using your software. Can you explain the process and
+                      provide any best practices or guidelines?
+                target:
+                  feature: fine-tuning
+                  issue: process explanation and best practices
             action: add
             commit_message: Add two new questions and answers
           response:
@@ -337,11 +374,11 @@ service:
               datapoints_count: 1
               datapoints:
                 - inputs:
-                    inputs: inputs
+                    key: value
                   messages:
                     - role: user
                   target:
-                    target: target
+                    key: value
                   id: id
     listDatapoints:
       path: /datasets/{id}/datapoints
@@ -573,11 +610,11 @@ service:
               datapoints_count: 1
               datapoints:
                 - inputs:
-                    inputs: inputs
+                    key: value
                   messages:
                     - role: user
                   target:
-                    target: target
+                    key: value
                   id: id
     setDeployment:
       path: /datasets/{id}/environments/{environment_id}
@@ -705,6 +742,8 @@ service:
                   stop: stop
                   presence_penalty: 1.1
                   frequency_penalty: 1.1
+                  other:
+                    key: value
                   seed: 1
                   response_format:
                     type: json_object

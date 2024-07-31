@@ -5,8 +5,9 @@ from __future__ import annotations
 import datetime as dt
 import typing
 
-from ..core.datetime_utils import serialize_datetime
-from ..core.pydantic_utilities import deep_union_pydantic_dicts, pydantic_v1
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2, update_forward_refs
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .environment_response import EnvironmentResponse
 from .evaluator_aggregate import EvaluatorAggregate
@@ -22,119 +23,110 @@ class ToolResponse(UncheckedBaseModel):
     Request to create a new Tool.
     """
 
-    path: str = pydantic_v1.Field()
+    path: str = pydantic.Field()
     """
     Path of the Tool, including the name, which is used as a unique identifier.
     """
 
-    id: str = pydantic_v1.Field()
+    id: str = pydantic.Field()
     """
     Unique identifier for the Tool.
     """
 
-    name: str = pydantic_v1.Field()
+    name: str = pydantic.Field()
     """
     Name of the Tool, which is used as a unique identifier.
     """
 
-    version_id: str = pydantic_v1.Field()
+    version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Tool Version. If no query params provided, the default deployed Tool Version is returned.
     """
 
     type: typing.Optional[typing.Literal["tool"]] = None
-    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic_v1.Field(default=None)
+    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(default=None)
     """
     The list of environments the Tool Version is deployed to.
     """
 
     created_at: dt.datetime
     updated_at: dt.datetime
-    created_by: typing.Optional[UserResponse] = pydantic_v1.Field(default=None)
+    created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
     """
     The user who created the Tool.
     """
 
-    status: VersionStatus = pydantic_v1.Field()
+    status: VersionStatus = pydantic.Field()
     """
     The status of the Tool Version.
     """
 
     last_used_at: dt.datetime
-    function: typing.Optional[ToolFunction] = pydantic_v1.Field(default=None)
+    function: typing.Optional[ToolFunction] = pydantic.Field(default=None)
     """
     Callable function specification of the Tool shown to the model for tool calling.
     """
 
-    source_code: typing.Optional[str] = pydantic_v1.Field(default=None)
+    source_code: typing.Optional[str] = pydantic.Field(default=None)
     """
     Code source of the Tool.
     """
 
-    setup_values: typing.Optional[typing.Dict[str, typing.Any]] = pydantic_v1.Field(default=None)
+    setup_values: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
     Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
     """
 
-    tool_type: typing.Optional[FilesToolType] = pydantic_v1.Field(default=None)
+    tool_type: typing.Optional[FilesToolType] = pydantic.Field(default=None)
     """
     Type of Tool.
     """
 
-    commit_message: typing.Optional[str] = pydantic_v1.Field(default=None)
+    commit_message: typing.Optional[str] = pydantic.Field(default=None)
     """
     Message describing the changes made.
     """
 
-    version_logs_count: int = pydantic_v1.Field()
+    version_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated for this Tool Version
     """
 
-    total_logs_count: int = pydantic_v1.Field()
+    total_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated across all Tool Versions
     """
 
-    inputs: typing.List[InputResponse] = pydantic_v1.Field()
+    inputs: typing.List[InputResponse] = pydantic.Field()
     """
     Inputs associated to the Prompt. Inputs correspond to any of the variables used within the Tool template.
     """
 
-    evaluators: typing.Optional[typing.List[MonitoringEvaluatorResponse]] = pydantic_v1.Field(default=None)
+    evaluators: typing.Optional[typing.List[MonitoringEvaluatorResponse]] = pydantic.Field(default=None)
     """
     Evaluators that have been attached to this Tool that are used for monitoring logs.
     """
 
-    signature: typing.Optional[str] = pydantic_v1.Field(default=None)
+    signature: typing.Optional[str] = pydantic.Field(default=None)
     """
     Signature of the Tool.
     """
 
-    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic_v1.Field(default=None)
+    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic.Field(default=None)
     """
     Aggregation of Evaluator results for the Tool Version.
     """
 
-    def json(self, **kwargs: typing.Any) -> str:
-        kwargs_with_defaults: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        return super().json(**kwargs_with_defaults)
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
 
-    def dict(self, **kwargs: typing.Any) -> typing.Dict[str, typing.Any]:
-        kwargs_with_defaults_exclude_unset: typing.Any = {"by_alias": True, "exclude_unset": True, **kwargs}
-        kwargs_with_defaults_exclude_none: typing.Any = {"by_alias": True, "exclude_none": True, **kwargs}
-
-        return deep_union_pydantic_dicts(
-            super().dict(**kwargs_with_defaults_exclude_unset), super().dict(**kwargs_with_defaults_exclude_none)
-        )
-
-    class Config:
-        frozen = True
-        smart_union = True
-        extra = pydantic_v1.Extra.allow
-        json_encoders = {dt.datetime: serialize_datetime}
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow
 
 
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
 
-ToolResponse.update_forward_refs()
+update_forward_refs(ToolResponse)

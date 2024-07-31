@@ -2,4 +2,4 @@
 
 import typing
 
-LogResponseJudgment = typing.Union[bool, float]
+EvaluationResultResponseValueParams = typing.Union[bool, float]
