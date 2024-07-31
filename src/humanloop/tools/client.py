@@ -85,10 +85,10 @@ class ToolsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Tool, including the name, which is used as a unique identifier.
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Tool to update.
+            ID for an existing Tool.
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
@@ -336,10 +336,10 @@ class ToolsClient:
         Parameters
         ----------
         path : typing.Optional[str]
-            Path of the Tool, including the name, which is used as a unique identifier.
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Tool to update.
+            ID for an existing Tool.
 
         function : typing.Optional[ToolFunctionParams]
             Callable function specification of the Tool shown to the model for tool calling.
@@ -976,10 +976,10 @@ class AsyncToolsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Tool, including the name, which is used as a unique identifier.
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Tool to update.
+            ID for an existing Tool.
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
@@ -1243,10 +1243,10 @@ class AsyncToolsClient:
         Parameters
         ----------
         path : typing.Optional[str]
-            Path of the Tool, including the name, which is used as a unique identifier.
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Tool to update.
+            ID for an existing Tool.
 
         function : typing.Optional[ToolFunctionParams]
             Callable function specification of the Tool shown to the model for tool calling.

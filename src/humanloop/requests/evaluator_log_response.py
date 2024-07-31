@@ -10,12 +10,7 @@ from .evaluator_response import EvaluatorResponseParams
 
 class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     """
-    Submit Evaluator judgment for another File's Log.
-    """
-
-    id: str
-    """
-    Unique identifier for the Log.
+    General request for creating a Log
     """
 
     output: typing_extensions.NotRequired[str]
@@ -53,9 +48,9 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
     """
 
-    parent_id: typing_extensions.NotRequired[str]
+    parent_id: str
     """
-    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+    Identifier of the evaluated Log. The newly created Log will have this one set as parent.
     """
 
     inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Any]]
@@ -99,6 +94,11 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     """
 
     judgment: typing_extensions.NotRequired[typing.Any]
+    id: str
+    """
+    Unique identifier for the Log.
+    """
+
     evaluator: EvaluatorResponseParams
     """
     The Evaluator used to generate the judgment.

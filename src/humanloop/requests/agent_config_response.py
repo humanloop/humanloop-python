@@ -5,7 +5,6 @@ import typing
 import typing_extensions
 
 from .base_models_user_response import BaseModelsUserResponseParams
-from .model_config_request import ModelConfigRequestParams
 from .tool_config_request import ToolConfigRequestParams
 
 
@@ -49,9 +48,4 @@ class AgentConfigResponseParams(typing_extensions.TypedDict):
     tools: typing_extensions.NotRequired[typing.Sequence[ToolConfigRequestParams]]
     """
     Tools associated with the agent.
-    """
-
-    model_config: ModelConfigRequestParams
-    """
-    Model config associated with the agent.
     """

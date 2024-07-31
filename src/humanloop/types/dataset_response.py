@@ -31,6 +31,11 @@ class DatasetResponse(UncheckedBaseModel):
     Unique identifier for the Dataset. Starts with `ds_`.
     """
 
+    directory_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    ID of the directory that the file is in on Humanloop.
+    """
+
     name: str = pydantic.Field()
     """
     Name of the Dataset, which is used as a unique identifier.

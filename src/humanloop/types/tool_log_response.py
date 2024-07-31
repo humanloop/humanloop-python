@@ -12,12 +12,7 @@ from .tool_response import ToolResponse
 
 class ToolLogResponse(UncheckedBaseModel):
     """
-    Request for creating a Tool log.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the Log.
+    General request for creating a Log
     """
 
     output: typing.Optional[str] = pydantic.Field(default=None)
@@ -98,6 +93,11 @@ class ToolLogResponse(UncheckedBaseModel):
     environment: typing.Optional[str] = pydantic.Field(default=None)
     """
     The name of the Environment the Log is associated to.
+    """
+
+    id: str = pydantic.Field()
+    """
+    Unique identifier for the Log.
     """
 
     tool: ToolResponse = pydantic.Field()
