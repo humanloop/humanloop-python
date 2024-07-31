@@ -9,7 +9,6 @@ from ..core.unchecked_base_model import UncheckedBaseModel
 from .base_models_user_response import BaseModelsUserResponse
 from .evaluator_arguments_type import EvaluatorArgumentsType
 from .evaluator_return_type_enum import EvaluatorReturnTypeEnum
-from .model_config_response import ModelConfigResponse
 
 
 class EvaluatorConfigResponse(UncheckedBaseModel):
@@ -47,11 +46,6 @@ class EvaluatorConfigResponse(UncheckedBaseModel):
     evaluator_type: str = pydantic.Field()
     """
     Type of evaluator.
-    """
-
-    model_config_: typing.Optional[ModelConfigResponse] = pydantic.Field(default=None)
-    """
-    The model config defining the LLM evaluator.
     """
 
     code: typing.Optional[str] = pydantic.Field(default=None)

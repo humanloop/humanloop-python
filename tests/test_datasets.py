@@ -2,8 +2,6 @@
 
 import typing
 
-import pytest
-
 from humanloop import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
@@ -121,6 +119,7 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
+        "directory_id": "directory_id",
         "name": "name",
         "version_id": "version_id",
         "type": "dataset",
@@ -139,6 +138,7 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_types: typing.Any = {
         "path": None,
         "id": None,
+        "directory_id": None,
         "name": None,
         "version_id": None,
         "type": None,
@@ -307,7 +307,6 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
     assert await async_client.datasets.remove_deployment(id="ds_b0baF1ca7652", environment_id="staging") is None  # type: ignore[func-returns-value]
 
 
-@pytest.mark.skip(reason="Untested")
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {
@@ -318,15 +317,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
             "file": {
                 "path": "path",
                 "id": "id",
-                "name": "name",
-                "version_id": "version_id",
-                "type": "prompt",
-                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-                "created_at": "2024-01-15T09:30:00Z",
-                "updated_at": "2024-01-15T09:30:00Z",
-                "created_by": {"id": "id", "email_address": "email_address"},
-                "status": "uncommitted",
-                "last_used_at": "2024-01-15T09:30:00Z",
+                "directory_id": "directory_id",
                 "model": "model",
                 "endpoint": "complete",
                 "template": "template",
@@ -345,6 +336,15 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                     {"name": "name", "description": "description", "id": "id", "version_id": "version_id"}
                 ],
                 "commit_message": "commit_message",
+                "name": "name",
+                "version_id": "version_id",
+                "type": "prompt",
+                "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
+                "created_at": "2024-01-15T09:30:00Z",
+                "updated_at": "2024-01-15T09:30:00Z",
+                "created_by": {"id": "id", "email_address": "email_address"},
+                "status": "uncommitted",
+                "last_used_at": "2024-01-15T09:30:00Z",
                 "version_logs_count": 1,
                 "total_logs_count": 1,
                 "inputs": [{"name": "name"}],
@@ -371,15 +371,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                 "file": {
                     "path": None,
                     "id": None,
-                    "name": None,
-                    "version_id": None,
-                    "type": None,
-                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                    "created_by": {"id": None, "email_address": None},
-                    "status": None,
-                    "last_used_at": "datetime",
+                    "directory_id": None,
                     "model": None,
                     "endpoint": None,
                     "template": None,
@@ -396,6 +388,15 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
                     "tools": ("list", {0: {"name": None, "description": None}}),
                     "linked_tools": ("list", {0: {"name": None, "description": None, "id": None, "version_id": None}}),
                     "commit_message": None,
+                    "name": None,
+                    "version_id": None,
+                    "type": None,
+                    "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+                    "created_at": "datetime",
+                    "updated_at": "datetime",
+                    "created_by": {"id": None, "email_address": None},
+                    "status": None,
+                    "last_used_at": "datetime",
                     "version_logs_count": "integer",
                     "total_logs_count": "integer",
                     "inputs": ("list", {0: {"name": None}}),

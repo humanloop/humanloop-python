@@ -7,7 +7,6 @@ import typing_extensions
 from ..types.evaluator_arguments_type import EvaluatorArgumentsType
 from ..types.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 from .base_models_user_response import BaseModelsUserResponseParams
-from .model_config_response import ModelConfigResponseParams
 
 
 class EvaluatorConfigResponseParams(typing_extensions.TypedDict):
@@ -45,11 +44,6 @@ class EvaluatorConfigResponseParams(typing_extensions.TypedDict):
     evaluator_type: str
     """
     Type of evaluator.
-    """
-
-    model_config: typing_extensions.NotRequired[ModelConfigResponseParams]
-    """
-    The model config defining the LLM evaluator.
     """
 
     code: typing_extensions.NotRequired[str]

@@ -96,11 +96,12 @@ service:
             path:
               type: optional<string>
               docs: >-
-                Path of the Evaluator, including the name, which is used as a
-                unique identifier.
+                Path of the Evaluator, including the name. This locates the
+                Evaluator in the Humanloop filesystem and is used as as a unique
+                identifier. Example: `folder/name` or just `name`.
             id:
               type: optional<string>
-              docs: ID for an existing Evaluator to update.
+              docs: ID for an existing Evaluator.
             commit_message:
               type: optional<string>
               docs: Message describing the changes made.
@@ -517,11 +518,12 @@ service:
             path:
               type: optional<string>
               docs: >-
-                Path of the Evaluator, including the name, which is used as a
-                unique identifier.
+                Path of the Evaluator, including the name. This locates the
+                Evaluator in the Humanloop filesystem and is used as as a unique
+                identifier. Example: `folder/name` or just `name`.
             id:
               type: optional<string>
-              docs: ID for an existing Evaluator to update.
+              docs: ID for an existing Evaluator.
             output:
               type: optional<string>
               docs: >-

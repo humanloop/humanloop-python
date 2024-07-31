@@ -153,10 +153,10 @@ class EvaluatorsClient:
         spec : SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams
 
         path : typing.Optional[str]
-            Path of the Evaluator, including the name, which is used as a unique identifier.
+            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Evaluator to update.
+            ID for an existing Evaluator.
 
         commit_message : typing.Optional[str]
             Message describing the changes made.
@@ -694,10 +694,10 @@ class EvaluatorsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Evaluator, including the name, which is used as a unique identifier.
+            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Evaluator to update.
+            ID for an existing Evaluator.
 
         output : typing.Optional[str]
             Generated output from the LLM. Only populated for LLM Evaluator Logs.
@@ -942,10 +942,10 @@ class AsyncEvaluatorsClient:
         spec : SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams
 
         path : typing.Optional[str]
-            Path of the Evaluator, including the name, which is used as a unique identifier.
+            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Evaluator to update.
+            ID for an existing Evaluator.
 
         commit_message : typing.Optional[str]
             Message describing the changes made.
@@ -1555,10 +1555,10 @@ class AsyncEvaluatorsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Evaluator, including the name, which is used as a unique identifier.
+            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Evaluator to update.
+            ID for an existing Evaluator.
 
         output : typing.Optional[str]
             Generated output from the LLM. Only populated for LLM Evaluator Logs.

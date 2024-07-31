@@ -29,6 +29,11 @@ class DatasetResponseParams(typing_extensions.TypedDict):
     Unique identifier for the Dataset. Starts with `ds_`.
     """
 
+    directory_id: typing_extensions.NotRequired[str]
+    """
+    ID of the directory that the file is in on Humanloop.
+    """
+
     name: str
     """
     Name of the Dataset, which is used as a unique identifier.

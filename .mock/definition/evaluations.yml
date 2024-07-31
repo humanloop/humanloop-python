@@ -551,6 +551,7 @@ service:
               dataset:
                 path: path
                 id: id
+                directory_id: directory_id
                 name: name
                 version_id: version_id
                 type: dataset
@@ -575,13 +576,13 @@ service:
                 - version:
                     path: path
                     id: id
+                    model: model
                     name: name
                     version_id: version_id
                     created_at: '2024-01-15T09:30:00Z'
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
@@ -592,15 +593,15 @@ service:
                 - version:
                     path: path
                     id: id
+                    spec:
+                      arguments_type: target_free
+                      return_type: boolean
                     name: name
                     version_id: version_id
                     created_at: '2024-01-15T09:30:00Z'
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
-                    spec:
-                      arguments_type: target_free
-                      return_type: boolean
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
@@ -704,13 +705,13 @@ service:
                 - evaluated_version:
                     path: path
                     id: id
+                    model: model
                     name: name
                     version_id: version_id
                     created_at: '2024-01-15T09:30:00Z'
                     updated_at: '2024-01-15T09:30:00Z'
                     status: uncommitted
                     last_used_at: '2024-01-15T09:30:00Z'
-                    model: model
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
@@ -718,37 +719,37 @@ service:
                   datapoint:
                     id: id
                   log:
-                    id: id
                     prompt:
                       path: path
                       id: id
+                      model: model
                       name: name
                       version_id: version_id
                       created_at: '2024-01-15T09:30:00Z'
                       updated_at: '2024-01-15T09:30:00Z'
                       status: uncommitted
                       last_used_at: '2024-01-15T09:30:00Z'
-                      model: model
                       version_logs_count: 1
                       total_logs_count: 1
                       inputs:
                         - name: name
+                    id: id
                   evaluator_logs:
-                    - id: id
-                      prompt:
+                    - prompt:
                         path: path
                         id: id
+                        model: model
                         name: name
                         version_id: version_id
                         created_at: '2024-01-15T09:30:00Z'
                         updated_at: '2024-01-15T09:30:00Z'
                         status: uncommitted
                         last_used_at: '2024-01-15T09:30:00Z'
-                        model: model
                         version_logs_count: 1
                         total_logs_count: 1
                         inputs:
                           - name: name
+                      id: id
               page: 1
               size: 1
               total: 1

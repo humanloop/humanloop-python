@@ -10,12 +10,7 @@ from .tool_response import ToolResponseParams
 
 class ToolLogResponseParams(typing_extensions.TypedDict):
     """
-    Request for creating a Tool log.
-    """
-
-    id: str
-    """
-    Unique identifier for the Log.
+    General request for creating a Log
     """
 
     output: typing_extensions.NotRequired[str]
@@ -96,6 +91,11 @@ class ToolLogResponseParams(typing_extensions.TypedDict):
     environment: typing_extensions.NotRequired[str]
     """
     The name of the Environment the Log is associated to.
+    """
+
+    id: str
+    """
+    Unique identifier for the Log.
     """
 
     tool: ToolResponseParams

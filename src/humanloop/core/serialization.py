@@ -58,30 +58,33 @@ def convert_and_respect_annotation_metadata(
 
     if (
         # If you're iterating on a string, do not bother to coerce it to a sequence.
-        (not isinstance(object_, str)) and ((
+        (not isinstance(object_, str))
+        and (
             (
-                typing_extensions.get_origin(clean_type) == typing.List
-                or typing_extensions.get_origin(clean_type) == list
-                or clean_type == typing.List
+                (
+                    typing_extensions.get_origin(clean_type) == typing.List
+                    or typing_extensions.get_origin(clean_type) == list
+                    or clean_type == typing.List
+                )
+                and isinstance(object_, typing.List)
             )
-            and isinstance(object_, typing.List)
+            or (
+                (
+                    typing_extensions.get_origin(clean_type) == typing.Set
+                    or typing_extensions.get_origin(clean_type) == set
+                    or clean_type == typing.Set
+                )
+                and isinstance(object_, typing.Set)
+            )
+            or (
+                (
+                    typing_extensions.get_origin(clean_type) == typing.Sequence
+                    or typing_extensions.get_origin(clean_type) == collections.abc.Sequence
+                    or clean_type == typing.Sequence
+                )
+                and isinstance(object_, typing.Sequence)
+            )
         )
-        or (
-            (
-                typing_extensions.get_origin(clean_type) == typing.Set
-                or typing_extensions.get_origin(clean_type) == set
-                or clean_type == typing.Set
-            )
-            and isinstance(object_, typing.Set)
-        )
-        or (
-            (
-                typing_extensions.get_origin(clean_type) == typing.Sequence
-                or typing_extensions.get_origin(clean_type) == collections.abc.Sequence
-                or clean_type == typing.Sequence
-            )
-            and isinstance(object_, typing.Sequence)
-        ))
     ):
         inner_type = typing_extensions.get_args(clean_type)[0]
         return [

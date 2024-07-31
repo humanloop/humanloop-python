@@ -43,11 +43,12 @@ service:
             path:
               type: optional<string>
               docs: >-
-                Path of the Tool, including the name, which is used as a unique
-                identifier.
+                Path of the Tool, including the name. This locates the Tool in
+                the Humanloop filesystem and is used as as a unique identifier.
+                Example: `folder/name` or just `name`.
             id:
               type: optional<string>
-              docs: ID for an existing Tool to update.
+              docs: ID for an existing Tool.
             output:
               type: optional<string>
               docs: >-
@@ -241,11 +242,12 @@ service:
             path:
               type: optional<string>
               docs: >-
-                Path of the Tool, including the name, which is used as a unique
-                identifier.
+                Path of the Tool, including the name. This locates the Tool in
+                the Humanloop filesystem and is used as as a unique identifier.
+                Example: `folder/name` or just `name`.
             id:
               type: optional<string>
-              docs: ID for an existing Tool to update.
+              docs: ID for an existing Tool.
             function:
               type: optional<root.ToolFunction>
               docs: >-

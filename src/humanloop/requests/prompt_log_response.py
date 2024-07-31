@@ -12,12 +12,7 @@ from .prompt_response import PromptResponseParams
 
 class PromptLogResponseParams(typing_extensions.TypedDict):
     """
-    Request for creating a Prompt log.
-    """
-
-    id: str
-    """
-    Unique identifier for the Log.
+    General request for creating a Log
     """
 
     output_message: typing_extensions.NotRequired[ChatMessageParams]
@@ -148,4 +143,9 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     environment: typing_extensions.NotRequired[str]
     """
     The name of the Environment the Log is associated to.
+    """
+
+    id: str
+    """
+    Unique identifier for the Log.
     """

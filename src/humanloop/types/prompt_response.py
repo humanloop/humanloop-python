@@ -25,7 +25,10 @@ from .version_status import VersionStatus
 
 class PromptResponse(UncheckedBaseModel):
     """
-    Request model for creating a new Prompt
+    Base type that all File Responses should inherit from.
+
+    Attributes defined here are common to all File Responses and should be overridden
+    in the inheriting classes with documentation and appropriate Field definitions.
     """
 
     path: str = pydantic.Field()
@@ -38,35 +41,11 @@ class PromptResponse(UncheckedBaseModel):
     Unique identifier for the Prompt.
     """
 
-    name: str = pydantic.Field()
+    directory_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Name of the Prompt.
-    """
-
-    version_id: str = pydantic.Field()
-    """
-    Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
+    ID of the directory that the file is in on Humanloop.
     """
 
-    type: typing.Optional[typing.Literal["prompt"]] = None
-    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(default=None)
-    """
-    The list of environments the Prompt Version is deployed to.
-    """
-
-    created_at: dt.datetime
-    updated_at: dt.datetime
-    created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
-    """
-    The user who created the Prompt.
-    """
-
-    status: VersionStatus = pydantic.Field()
-    """
-    The status of the Prompt Version.
-    """
-
-    last_used_at: dt.datetime
     model: str = pydantic.Field()
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
@@ -147,6 +126,35 @@ class PromptResponse(UncheckedBaseModel):
     Message describing the changes made.
     """
 
+    name: str = pydantic.Field()
+    """
+    Name of the Prompt.
+    """
+
+    version_id: str = pydantic.Field()
+    """
+    Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
+    """
+
+    type: typing.Optional[typing.Literal["prompt"]] = None
+    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(default=None)
+    """
+    The list of environments the Prompt Version is deployed to.
+    """
+
+    created_at: dt.datetime
+    updated_at: dt.datetime
+    created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
+    """
+    The user who created the Prompt.
+    """
+
+    status: VersionStatus = pydantic.Field()
+    """
+    The status of the Prompt Version.
+    """
+
+    last_used_at: dt.datetime
     version_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated for this Prompt Version
