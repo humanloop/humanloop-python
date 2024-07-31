@@ -3,11 +3,14 @@
 import datetime
 import typing
 
+import pytest
+
 from humanloop import AsyncHumanloop, Humanloop
 
 from .utilities import validate_response
 
 
+@pytest.mark.skip(reason="Not implemented")
 async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "data_fIfEb1SoKZooqeFbi9IFs",

@@ -49,6 +49,7 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "arguments_type": "target_required",
             "return_type": "number",
             "code": "def evaluate(answer, target):\\n    return 0.5",
+            "evaluator_type": "python",
         },
         commit_message="Initial commit",
     )
@@ -60,6 +61,7 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "arguments_type": "target_required",
             "return_type": "number",
             "code": "def evaluate(answer, target):\\n    return 0.5",
+            "evaluator_type": "python",
         },
         commit_message="Initial commit",
     )
