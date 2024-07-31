@@ -102,10 +102,10 @@ class PromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name, which is used as a unique identifier.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Prompt to update.
+            ID for an existing Prompt.
 
         output_message : typing.Optional[ChatMessageParams]
             The message returned by the provider.
@@ -217,7 +217,7 @@ class PromptsClient:
             messages=[{"role": "user", "content": "What really happened at Roswell?"}],
             inputs={"person": "Trump"},
             created_at=datetime.datetime.fromisoformat(
-                "2024-07-19 04:29:35.178000+00:00",
+                "2024-07-19 00:29:35.178000+00:00",
             ),
             provider_latency=6.5931549072265625,
             output_message={
@@ -336,10 +336,10 @@ class PromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name, which is used as a unique identifier.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Prompt to update.
+            ID for an existing Prompt.
 
         prompt : typing.Optional[PromptKernelRequestParams]
             Details of your Prompt. A new Prompt version will be created if the provided details are new.
@@ -631,10 +631,10 @@ class PromptsClient:
             The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name, which is used as a unique identifier.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Prompt to update.
+            ID for an existing Prompt.
 
         endpoint : typing.Optional[ModelEndpoints]
             The provider model endpoint used.
@@ -1334,10 +1334,10 @@ class AsyncPromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name, which is used as a unique identifier.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Prompt to update.
+            ID for an existing Prompt.
 
         output_message : typing.Optional[ChatMessageParams]
             The message returned by the provider.
@@ -1455,7 +1455,7 @@ class AsyncPromptsClient:
                 ],
                 inputs={"person": "Trump"},
                 created_at=datetime.datetime.fromisoformat(
-                    "2024-07-19 04:29:35.178000+00:00",
+                    "2024-07-19 00:29:35.178000+00:00",
                 ),
                 provider_latency=6.5931549072265625,
                 output_message={
@@ -1577,10 +1577,10 @@ class AsyncPromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name, which is used as a unique identifier.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Prompt to update.
+            ID for an existing Prompt.
 
         prompt : typing.Optional[PromptKernelRequestParams]
             Details of your Prompt. A new Prompt version will be created if the provided details are new.
@@ -1888,10 +1888,10 @@ class AsyncPromptsClient:
             The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name, which is used as a unique identifier.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
-            ID for an existing Prompt to update.
+            ID for an existing Prompt.
 
         endpoint : typing.Optional[ModelEndpoints]
             The provider model endpoint used.

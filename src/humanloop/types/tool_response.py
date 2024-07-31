@@ -20,7 +20,10 @@ from .version_status import VersionStatus
 
 class ToolResponse(UncheckedBaseModel):
     """
-    Request to create a new Tool.
+    Base type that all File Responses should inherit from.
+
+    Attributes defined here are common to all File Responses and should be overridden
+    in the inheriting classes with documentation and appropriate Field definitions.
     """
 
     path: str = pydantic.Field()
@@ -31,6 +34,36 @@ class ToolResponse(UncheckedBaseModel):
     id: str = pydantic.Field()
     """
     Unique identifier for the Tool.
+    """
+
+    directory_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    ID of the directory that the file is in on Humanloop.
+    """
+
+    function: typing.Optional[ToolFunction] = pydantic.Field(default=None)
+    """
+    Callable function specification of the Tool shown to the model for tool calling.
+    """
+
+    source_code: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Code source of the Tool.
+    """
+
+    setup_values: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
+    """
+    Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+    """
+
+    tool_type: typing.Optional[FilesToolType] = pydantic.Field(default=None)
+    """
+    Type of Tool.
+    """
+
+    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Message describing the changes made.
     """
 
     name: str = pydantic.Field()
@@ -62,31 +95,6 @@ class ToolResponse(UncheckedBaseModel):
     """
 
     last_used_at: dt.datetime
-    function: typing.Optional[ToolFunction] = pydantic.Field(default=None)
-    """
-    Callable function specification of the Tool shown to the model for tool calling.
-    """
-
-    source_code: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Code source of the Tool.
-    """
-
-    setup_values: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
-    """
-    Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
-    """
-
-    tool_type: typing.Optional[FilesToolType] = pydantic.Field(default=None)
-    """
-    Type of Tool.
-    """
-
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Message describing the changes made.
-    """
-
     version_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated for this Tool Version

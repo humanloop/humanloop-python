@@ -21,7 +21,10 @@ if typing.TYPE_CHECKING:
 
 class ToolResponseParams(typing_extensions.TypedDict):
     """
-    Request to create a new Tool.
+    Base type that all File Responses should inherit from.
+
+    Attributes defined here are common to all File Responses and should be overridden
+    in the inheriting classes with documentation and appropriate Field definitions.
     """
 
     path: str
@@ -32,6 +35,36 @@ class ToolResponseParams(typing_extensions.TypedDict):
     id: str
     """
     Unique identifier for the Tool.
+    """
+
+    directory_id: typing_extensions.NotRequired[str]
+    """
+    ID of the directory that the file is in on Humanloop.
+    """
+
+    function: typing_extensions.NotRequired[ToolFunctionParams]
+    """
+    Callable function specification of the Tool shown to the model for tool calling.
+    """
+
+    source_code: typing_extensions.NotRequired[str]
+    """
+    Code source of the Tool.
+    """
+
+    setup_values: typing_extensions.NotRequired[typing.Dict[str, typing.Any]]
+    """
+    Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+    """
+
+    tool_type: typing_extensions.NotRequired[FilesToolType]
+    """
+    Type of Tool.
+    """
+
+    commit_message: typing_extensions.NotRequired[str]
+    """
+    Message describing the changes made.
     """
 
     name: str
@@ -63,31 +96,6 @@ class ToolResponseParams(typing_extensions.TypedDict):
     """
 
     last_used_at: dt.datetime
-    function: typing_extensions.NotRequired[ToolFunctionParams]
-    """
-    Callable function specification of the Tool shown to the model for tool calling.
-    """
-
-    source_code: typing_extensions.NotRequired[str]
-    """
-    Code source of the Tool.
-    """
-
-    setup_values: typing_extensions.NotRequired[typing.Dict[str, typing.Any]]
-    """
-    Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
-    """
-
-    tool_type: typing_extensions.NotRequired[FilesToolType]
-    """
-    Type of Tool.
-    """
-
-    commit_message: typing_extensions.NotRequired[str]
-    """
-    Message describing the changes made.
-    """
-
     version_logs_count: int
     """
     The number of logs that have been generated for this Tool Version

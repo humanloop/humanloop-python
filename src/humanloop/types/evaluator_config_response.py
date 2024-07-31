@@ -49,7 +49,7 @@ class EvaluatorConfigResponse(UncheckedBaseModel):
     Type of evaluator.
     """
 
-    model_config_: typing.Optional[ModelConfigResponse] = pydantic.Field(default=None)
+    model_config: typing.Optional[ModelConfigResponse] = pydantic.Field(default=None)
     """
     The model config defining the LLM evaluator.
     """

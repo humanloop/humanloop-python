@@ -4,4 +4,4 @@ import enum
 
 
 class HumanloopEnvironment(enum.Enum):
-    DEFAULT = "https://neostaging.humanloop.ml/v5"
+    DEFAULT = "https://api.humanloop.com/v5"

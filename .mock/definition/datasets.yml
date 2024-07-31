@@ -130,11 +130,12 @@ service:
             path:
               type: optional<string>
               docs: >-
-                Path of the Dataset, including the name, which is used as a
-                unique identifier.
+                Path of the Dataset, including the name. This locates the
+                Dataset in the Humanloop filesystem and is used as as a unique
+                identifier. Example: `folder/name` or just `name`.
             id:
               type: optional<string>
-              docs: ID for an existing Dataset to update.
+              docs: ID for an existing Dataset.
             datapoints:
               docs: >-
                 The Datapoints to create this Dataset version with. Modify the
@@ -354,6 +355,7 @@ service:
             body:
               path: path
               id: id
+              directory_id: directory_id
               name: name
               version_id: version_id
               type: dataset
@@ -590,6 +592,7 @@ service:
             body:
               path: path
               id: id
+              directory_id: directory_id
               name: name
               version_id: version_id
               type: dataset
@@ -717,21 +720,7 @@ service:
                 file:
                   path: path
                   id: id
-                  name: name
-                  version_id: version_id
-                  type: prompt
-                  environments:
-                    - id: id
-                      created_at: '2024-01-15T09:30:00Z'
-                      name: name
-                      tag: default
-                  created_at: '2024-01-15T09:30:00Z'
-                  updated_at: '2024-01-15T09:30:00Z'
-                  created_by:
-                    id: id
-                    email_address: email_address
-                  status: uncommitted
-                  last_used_at: '2024-01-15T09:30:00Z'
+                  directory_id: directory_id
                   model: model
                   endpoint: complete
                   template: template
@@ -756,6 +745,21 @@ service:
                       id: id
                       version_id: version_id
                   commit_message: commit_message
+                  name: name
+                  version_id: version_id
+                  type: prompt
+                  environments:
+                    - id: id
+                      created_at: '2024-01-15T09:30:00Z'
+                      name: name
+                      tag: default
+                  created_at: '2024-01-15T09:30:00Z'
+                  updated_at: '2024-01-15T09:30:00Z'
+                  created_by:
+                    id: id
+                    email_address: email_address
+                  status: uncommitted
+                  last_used_at: '2024-01-15T09:30:00Z'
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:

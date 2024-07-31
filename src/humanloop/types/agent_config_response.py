@@ -53,7 +53,7 @@ class AgentConfigResponse(UncheckedBaseModel):
     Tools associated with the agent.
     """
 
-    model_config_: ModelConfigRequest = pydantic.Field()
+    model_config: ModelConfigRequest = pydantic.Field()
     """
     Model config associated with the agent.
     """
