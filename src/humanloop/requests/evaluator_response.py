@@ -33,6 +33,17 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
     Unique identifier for the Evaluator.
     """
 
+    directory_id: typing_extensions.NotRequired[str]
+    """
+    ID of the directory that the file is in on Humanloop.
+    """
+
+    commit_message: typing_extensions.NotRequired[str]
+    """
+    Message describing the changes made.
+    """
+
+    spec: EvaluatorResponseSpecParams
     name: str
     """
     Name of the Evaluator, which is used as a unique identifier.
@@ -58,12 +69,6 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
 
     status: VersionStatus
     last_used_at: dt.datetime
-    commit_message: typing_extensions.NotRequired[str]
-    """
-    Message describing the changes made.
-    """
-
-    spec: EvaluatorResponseSpecParams
     version_logs_count: int
     """
     The number of logs that have been generated for this Prompt Version

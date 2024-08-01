@@ -3,7 +3,7 @@ error-discrimination:
   strategy: status-code
 display-name: Humanloop API
 environments:
-  Default: https://neostaging.humanloop.ml/v5
+  Default: https://api.humanloop.com/v5
 default-environment: Default
 auth-schemes:
   APIKeyHeader:

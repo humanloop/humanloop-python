@@ -7,7 +7,6 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .base_models_user_response import BaseModelsUserResponse
-from .model_config_request import ModelConfigRequest
 from .tool_config_request import ToolConfigRequest
 
 
@@ -51,11 +50,6 @@ class AgentConfigResponse(UncheckedBaseModel):
     tools: typing.Optional[typing.List[ToolConfigRequest]] = pydantic.Field(default=None)
     """
     Tools associated with the agent.
-    """
-
-    model_config_: ModelConfigRequest = pydantic.Field()
-    """
-    Model config associated with the agent.
     """
 
     if IS_PYDANTIC_V2:

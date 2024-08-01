@@ -32,6 +32,17 @@ class EvaluatorResponse(UncheckedBaseModel):
     Unique identifier for the Evaluator.
     """
 
+    directory_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    ID of the directory that the file is in on Humanloop.
+    """
+
+    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Message describing the changes made.
+    """
+
+    spec: EvaluatorResponseSpec
     name: str = pydantic.Field()
     """
     Name of the Evaluator, which is used as a unique identifier.
@@ -57,12 +68,6 @@ class EvaluatorResponse(UncheckedBaseModel):
 
     status: VersionStatus
     last_used_at: dt.datetime
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Message describing the changes made.
-    """
-
-    spec: EvaluatorResponseSpec
     version_logs_count: int = pydantic.Field()
     """
     The number of logs that have been generated for this Prompt Version

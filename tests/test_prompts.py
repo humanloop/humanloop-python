@@ -10,7 +10,7 @@ from humanloop import AsyncHumanloop, Humanloop
 from .utilities import validate_response
 
 
-@pytest.mark.skip(reason="Untested")
+@pytest.mark.skip(reason="Not implemented")
 async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "id": "data_fIfEb1SoKZooqeFbi9IFs",
@@ -31,7 +31,7 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
         },
         messages=[{"role": "user", "content": "What really happened at Roswell?"}],
         inputs={"person": "Trump"},
-        created_at=datetime.datetime.fromisoformat("2024-07-19 04:29:35.178000+00:00"),
+        created_at=datetime.datetime.fromisoformat("2024-07-19 00:29:35.178000+00:00"),
         provider_latency=6.5931549072265625,
         output_message={
             "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
@@ -58,7 +58,7 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
         },
         messages=[{"role": "user", "content": "What really happened at Roswell?"}],
         inputs={"person": "Trump"},
-        created_at=datetime.datetime.fromisoformat("2024-07-19 04:29:35.178000+00:00"),
+        created_at=datetime.datetime.fromisoformat("2024-07-19 00:29:35.178000+00:00"),
         provider_latency=6.5931549072265625,
         output_message={
             "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
@@ -73,7 +73,6 @@ async def test_log(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-@pytest.mark.skip(reason="Untested")
 async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "prompt": {
@@ -205,7 +204,6 @@ async def test_call(client: Humanloop, async_client: AsyncHumanloop) -> None:
     validate_response(async_response, expected_response, expected_types)
 
 
-@pytest.mark.skip(reason="Untested")
 async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = {
         "path": "Personal Projects/Coding Assistant",
@@ -734,15 +732,7 @@ async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -
     expected_response: typing.Any = {
         "path": "path",
         "id": "id",
-        "name": "name",
-        "version_id": "version_id",
-        "type": "prompt",
-        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
-        "created_at": "2024-01-15T09:30:00Z",
-        "updated_at": "2024-01-15T09:30:00Z",
-        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
-        "status": "uncommitted",
-        "last_used_at": "2024-01-15T09:30:00Z",
+        "directory_id": "directory_id",
         "model": "model",
         "endpoint": "complete",
         "template": "template",
@@ -767,6 +757,15 @@ async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -
             }
         ],
         "commit_message": "commit_message",
+        "name": "name",
+        "version_id": "version_id",
+        "type": "prompt",
+        "environments": [{"id": "id", "created_at": "2024-01-15T09:30:00Z", "name": "name", "tag": "default"}],
+        "created_at": "2024-01-15T09:30:00Z",
+        "updated_at": "2024-01-15T09:30:00Z",
+        "created_by": {"id": "id", "email_address": "email_address", "full_name": "full_name"},
+        "status": "uncommitted",
+        "last_used_at": "2024-01-15T09:30:00Z",
         "version_logs_count": 1,
         "total_logs_count": 1,
         "inputs": [{"name": "name"}],
@@ -783,15 +782,7 @@ async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -
     expected_types: typing.Any = {
         "path": None,
         "id": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "created_by": {"id": None, "email_address": None, "full_name": None},
-        "status": None,
-        "last_used_at": "datetime",
+        "directory_id": None,
         "model": None,
         "endpoint": None,
         "template": None,
@@ -819,6 +810,15 @@ async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -
             },
         ),
         "commit_message": None,
+        "name": None,
+        "version_id": None,
+        "type": None,
+        "environments": ("list", {0: {"id": None, "created_at": "datetime", "name": None, "tag": None}}),
+        "created_at": "datetime",
+        "updated_at": "datetime",
+        "created_by": {"id": None, "email_address": None, "full_name": None},
+        "status": None,
+        "last_used_at": "datetime",
         "version_logs_count": "integer",
         "total_logs_count": "integer",
         "inputs": ("list", {0: {"name": None}}),
@@ -851,7 +851,6 @@ async def test_remove_deployment(client: Humanloop, async_client: AsyncHumanloop
     assert await async_client.prompts.remove_deployment(id="id", environment_id="environment_id") is None  # type: ignore[func-returns-value]
 
 
-@pytest.mark.skip(reason="Untested")
 async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop) -> None:
     expected_response: typing.Any = [
         {

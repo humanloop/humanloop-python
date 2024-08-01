@@ -26,7 +26,10 @@ if typing.TYPE_CHECKING:
 
 class PromptResponseParams(typing_extensions.TypedDict):
     """
-    Request model for creating a new Prompt
+    Base type that all File Responses should inherit from.
+
+    Attributes defined here are common to all File Responses and should be overridden
+    in the inheriting classes with documentation and appropriate Field definitions.
     """
 
     path: str
@@ -39,35 +42,11 @@ class PromptResponseParams(typing_extensions.TypedDict):
     Unique identifier for the Prompt.
     """
 
-    name: str
+    directory_id: typing_extensions.NotRequired[str]
     """
-    Name of the Prompt.
-    """
-
-    version_id: str
-    """
-    Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
+    ID of the directory that the file is in on Humanloop.
     """
 
-    type: typing_extensions.NotRequired[typing.Literal["prompt"]]
-    environments: typing_extensions.NotRequired[typing.Sequence[EnvironmentResponseParams]]
-    """
-    The list of environments the Prompt Version is deployed to.
-    """
-
-    created_at: dt.datetime
-    updated_at: dt.datetime
-    created_by: typing_extensions.NotRequired[UserResponseParams]
-    """
-    The user who created the Prompt.
-    """
-
-    status: VersionStatus
-    """
-    The status of the Prompt Version.
-    """
-
-    last_used_at: dt.datetime
     model: str
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
@@ -148,6 +127,35 @@ class PromptResponseParams(typing_extensions.TypedDict):
     Message describing the changes made.
     """
 
+    name: str
+    """
+    Name of the Prompt.
+    """
+
+    version_id: str
+    """
+    Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
+    """
+
+    type: typing_extensions.NotRequired[typing.Literal["prompt"]]
+    environments: typing_extensions.NotRequired[typing.Sequence[EnvironmentResponseParams]]
+    """
+    The list of environments the Prompt Version is deployed to.
+    """
+
+    created_at: dt.datetime
+    updated_at: dt.datetime
+    created_by: typing_extensions.NotRequired[UserResponseParams]
+    """
+    The user who created the Prompt.
+    """
+
+    status: VersionStatus
+    """
+    The status of the Prompt Version.
+    """
+
+    last_used_at: dt.datetime
     version_logs_count: int
     """
     The number of logs that have been generated for this Prompt Version
