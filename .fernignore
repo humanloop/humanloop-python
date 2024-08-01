@@ -1,5 +1,1 @@
 # Specify files that shouldn't be modified by Fern
-
-tests/test_evaluators.py
-tests/test_prompts.py
-tests/utilities.py
