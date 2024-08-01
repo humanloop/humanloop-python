@@ -181,6 +181,7 @@ class EvaluatorsClient:
             spec={
                 "arguments_type": "target_required",
                 "return_type": "number",
+                "evaluator_type": "python",
                 "code": "def evaluate(answer, target):\\n    return 0.5",
             },
             commit_message="Initial commit",
@@ -975,6 +976,7 @@ class AsyncEvaluatorsClient:
                 spec={
                     "arguments_type": "target_required",
                     "return_type": "number",
+                    "evaluator_type": "python",
                     "code": "def evaluate(answer, target):\\n    return 0.5",
                 },
                 commit_message="Initial commit",
