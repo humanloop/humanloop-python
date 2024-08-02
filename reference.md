@@ -4990,6 +4990,7 @@ client.evaluators.upsert(
     spec={
         "arguments_type": "target_required",
         "return_type": "number",
+        "evaluator_type": "python",
         "code": "def evaluate(answer, target):\\n    return 0.5",
     },
     commit_message="Initial commit",
