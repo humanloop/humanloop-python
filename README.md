@@ -108,7 +108,7 @@ When the API returns a non-success status code (4xx or 5xx response), a subclass
 will be thrown.
 
 ```python
-from .api_error import ApiError
+from humanloop.core.api_error import ApiError
 
 try:
     client.prompts.log(...)
