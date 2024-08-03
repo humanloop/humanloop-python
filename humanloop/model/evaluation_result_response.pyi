@@ -97,7 +97,7 @@ class EvaluationResultResponse(
             error = schemas.StrSchema
         
             @staticmethod
-            def llm_evaluator_log() -> typing.Type['LogResponse']:
+            def evaluator_log() -> typing.Type['LogResponse']:
                 return LogResponse
             __annotations__ = {
                 "id": id,
@@ -112,7 +112,7 @@ class EvaluationResultResponse(
                 "version_id": version_id,
                 "value": value,
                 "error": error,
-                "llm_evaluator_log": llm_evaluator_log,
+                "evaluator_log": evaluator_log,
             }
     
     evaluator_version_id: MetaOapg.properties.evaluator_version_id
@@ -159,12 +159,12 @@ class EvaluationResultResponse(
     def __getitem__(self, name: typing_extensions.Literal["error"]) -> MetaOapg.properties.error: ...
     
     @typing.overload
-    def __getitem__(self, name: typing_extensions.Literal["llm_evaluator_log"]) -> 'LogResponse': ...
+    def __getitem__(self, name: typing_extensions.Literal["evaluator_log"]) -> 'LogResponse': ...
     
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "evaluator_version_id", "log_id", "updated_at", "created_at", "version", "evaluation_id", "log", "version_id", "value", "error", "llm_evaluator_log", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "evaluator_version_id", "log_id", "updated_at", "created_at", "version", "evaluation_id", "log", "version_id", "value", "error", "evaluator_log", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -206,12 +206,12 @@ class EvaluationResultResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["error"]) -> typing.Union[MetaOapg.properties.error, schemas.Unset]: ...
     
     @typing.overload
-    def get_item_oapg(self, name: typing_extensions.Literal["llm_evaluator_log"]) -> typing.Union['LogResponse', schemas.Unset]: ...
+    def get_item_oapg(self, name: typing_extensions.Literal["evaluator_log"]) -> typing.Union['LogResponse', schemas.Unset]: ...
     
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "evaluator_version_id", "log_id", "updated_at", "created_at", "version", "evaluation_id", "log", "version_id", "value", "error", "llm_evaluator_log", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "evaluator_id", "evaluator_version_id", "log_id", "updated_at", "created_at", "version", "evaluation_id", "log", "version_id", "value", "error", "evaluator_log", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -230,7 +230,7 @@ class EvaluationResultResponse(
         version_id: typing.Union[MetaOapg.properties.version_id, str, schemas.Unset] = schemas.unset,
         value: typing.Union[MetaOapg.properties.value, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, schemas.Unset] = schemas.unset,
         error: typing.Union[MetaOapg.properties.error, str, schemas.Unset] = schemas.unset,
-        llm_evaluator_log: typing.Union['LogResponse', schemas.Unset] = schemas.unset,
+        evaluator_log: typing.Union['LogResponse', schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'EvaluationResultResponse':
@@ -249,7 +249,7 @@ class EvaluationResultResponse(
             version_id=version_id,
             value=value,
             error=error,
-            llm_evaluator_log=llm_evaluator_log,
+            evaluator_log=evaluator_log,
             _configuration=_configuration,
             **kwargs,
         )

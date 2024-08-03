@@ -151,6 +151,7 @@ class BaseApi(api_client.Api):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -206,6 +207,8 @@ class BaseApi(api_client.Api):
             _body["created_at"] = created_at
         if error is not None:
             _body["error"] = error
+        if stdout is not None:
+            _body["stdout"] = stdout
         if duration is not None:
             _body["duration"] = duration
         if output_message is not None:
@@ -452,6 +455,7 @@ class LogRaw(BaseApi):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -490,6 +494,7 @@ class LogRaw(BaseApi):
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,
@@ -529,6 +534,7 @@ class LogRaw(BaseApi):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -565,6 +571,7 @@ class LogRaw(BaseApi):
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,
@@ -605,6 +612,7 @@ class Log(BaseApi):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -640,6 +648,7 @@ class Log(BaseApi):
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,
@@ -680,6 +689,7 @@ class Log(BaseApi):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -714,6 +724,7 @@ class Log(BaseApi):
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,
@@ -756,6 +767,7 @@ class ApiForpost(BaseApi):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -794,6 +806,7 @@ class ApiForpost(BaseApi):
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,
@@ -833,6 +846,7 @@ class ApiForpost(BaseApi):
         feedback: typing.Optional[typing.Union[Feedback, typing.List[Feedback]]] = None,
         created_at: typing.Optional[datetime] = None,
         error: typing.Optional[str] = None,
+        stdout: typing.Optional[str] = None,
         duration: typing.Optional[typing.Union[int, float]] = None,
         output_message: typing.Optional[ChatMessageWithToolCall] = None,
         prompt_tokens: typing.Optional[int] = None,
@@ -869,6 +883,7 @@ class ApiForpost(BaseApi):
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,

@@ -177,20 +177,6 @@ class TestSimple(unittest.TestCase):
             },
         )  # type: ignore
 
-    def test_experiment_create(self):
-        response = self.humanloop.experiments.create(
-            name='test',
-            positive_labels=[{"type": 'test', "value": 'test'}],
-            project_id="test"
-        )
-        self.assertIsNotNone(response.id)
-
-    def test_experiment_delete(self):
-        response = self.humanloop.experiments.delete(
-            experiment_id="test"
-        )
-        self.assertIsNone(response)
-
     def test_chat_model_config(self):
         response = self.humanloop.chat_model_config(
             model_config_id="test",

@@ -44,7 +44,7 @@ class OptionalEvaluationResultResponse(TypedDict, total=False):
 
     error: str
 
-    llm_evaluator_log: 'LogResponse'
+    evaluator_log: 'LogResponse'
 
 class EvaluationResultResponse(RequiredEvaluationResultResponse, OptionalEvaluationResultResponse):
     pass

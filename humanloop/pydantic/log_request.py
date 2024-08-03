@@ -86,6 +86,9 @@ class LogRequest(BaseModel):
     # Error message if the log is an error.
     error: typing.Optional[str] = Field(None, alias='error')
 
+    # Captured log and debug statements.
+    stdout: typing.Optional[str] = Field(None, alias='stdout')
+
     # Duration of the logged event in seconds.
     duration: typing.Optional[typing.Union[int, float]] = Field(None, alias='duration')
 

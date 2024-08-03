@@ -987,6 +987,9 @@ operation_parameter_map = {
                 'name': 'error'
             },
             {
+                'name': 'stdout'
+            },
+            {
                 'name': 'duration'
             },
             {

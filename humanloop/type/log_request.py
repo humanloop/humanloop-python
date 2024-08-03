@@ -88,6 +88,9 @@ class OptionalLogRequest(TypedDict, total=False):
     # Error message if the log is an error.
     error: str
 
+    # Captured log and debug statements.
+    stdout: str
+
     # Duration of the logged event in seconds.
     duration: typing.Union[int, float]
 

@@ -2847,6 +2847,7 @@ log_response = humanloop.log(
     },
     created_at="1970-01-01T00:00:00.00Z",
     error="string_example",
+    stdout="string_example",
     duration=3.14,
     output_message={
         "role": "user",
@@ -2950,6 +2951,10 @@ User defined timestamp for when the log was created.
 ##### error: `str`<a id="error-str"></a>
 
 Error message if the log is an error.
+
+##### stdout: `str`<a id="stdout-str"></a>
+
+Captured log and debug statements.
 
 ##### duration: `Union[int, float]`<a id="duration-unionint-float"></a>
 

@@ -43,7 +43,7 @@ class EvaluationResultResponse(BaseModel):
 
     error: typing.Optional[str] = Field(None, alias='error')
 
-    llm_evaluator_log: typing.Optional['LogResponse'] = Field(None, alias='llm_evaluator_log')
+    evaluator_log: typing.Optional['LogResponse'] = Field(None, alias='evaluator_log')
 
     model_config = ConfigDict(
         protected_namespaces=(),

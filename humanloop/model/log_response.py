@@ -188,6 +188,7 @@ class LogResponse(
                     return super().__getitem__(i)
             created_at = schemas.DateTimeSchema
             error = schemas.StrSchema
+            stdout = schemas.StrSchema
             duration = schemas.NumberSchema
         
             @staticmethod
@@ -374,6 +375,7 @@ class LogResponse(
                 "feedback": feedback,
                 "created_at": created_at,
                 "error": error,
+                "stdout": stdout,
                 "duration": duration,
                 "output_message": output_message,
                 "prompt_tokens": prompt_tokens,
@@ -478,6 +480,9 @@ class LogResponse(
     def __getitem__(self, name: typing_extensions.Literal["error"]) -> MetaOapg.properties.error: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["stdout"]) -> MetaOapg.properties.stdout: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["duration"]) -> MetaOapg.properties.duration: ...
     
     @typing.overload
@@ -531,7 +536,7 @@ class LogResponse(
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "judgment", "config_id", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", "batch_ids", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "judgment", "config_id", "environment", "feedback", "created_at", "error", "stdout", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", "batch_ids", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -615,6 +620,9 @@ class LogResponse(
     def get_item_oapg(self, name: typing_extensions.Literal["error"]) -> typing.Union[MetaOapg.properties.error, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["stdout"]) -> typing.Union[MetaOapg.properties.stdout, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["duration"]) -> typing.Union[MetaOapg.properties.duration, schemas.Unset]: ...
     
     @typing.overload
@@ -668,7 +676,7 @@ class LogResponse(
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "judgment", "config_id", "environment", "feedback", "created_at", "error", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", "batch_ids", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "config", "evaluation_results", "observability_status", "updated_at", "project", "project_id", "session_id", "session_reference_id", "parent_id", "parent_reference_id", "inputs", "source", "metadata", "save", "source_datapoint_id", "reference_id", "trial_id", "messages", "output", "judgment", "config_id", "environment", "feedback", "created_at", "error", "stdout", "duration", "output_message", "prompt_tokens", "output_tokens", "prompt_cost", "output_cost", "provider_request", "provider_response", "user", "provider_latency", "tokens", "raw_output", "finish_reason", "metric_values", "tools", "tool_choice", "batch_ids", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -701,6 +709,7 @@ class LogResponse(
         feedback: typing.Union[MetaOapg.properties.feedback, list, tuple, schemas.Unset] = schemas.unset,
         created_at: typing.Union[MetaOapg.properties.created_at, str, datetime, schemas.Unset] = schemas.unset,
         error: typing.Union[MetaOapg.properties.error, str, schemas.Unset] = schemas.unset,
+        stdout: typing.Union[MetaOapg.properties.stdout, str, schemas.Unset] = schemas.unset,
         duration: typing.Union[MetaOapg.properties.duration, decimal.Decimal, int, float, schemas.Unset] = schemas.unset,
         output_message: typing.Union['ChatMessageWithToolCall', schemas.Unset] = schemas.unset,
         prompt_tokens: typing.Union[MetaOapg.properties.prompt_tokens, decimal.Decimal, int, schemas.Unset] = schemas.unset,
@@ -750,6 +759,7 @@ class LogResponse(
             feedback=feedback,
             created_at=created_at,
             error=error,
+            stdout=stdout,
             duration=duration,
             output_message=output_message,
             prompt_tokens=prompt_tokens,
