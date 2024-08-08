@@ -30,6 +30,9 @@ class OptionalToolConfigRequest(TypedDict, total=False):
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
     parameters: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
+    # Whether the tool is strict or not. If strict, the model will be forced to respond with JSON matching the parameters schema.
+    strict: bool
+
     # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
     source: ToolSource
 

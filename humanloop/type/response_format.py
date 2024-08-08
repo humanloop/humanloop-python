@@ -16,10 +16,12 @@ from typing_extensions import TypedDict, Literal, TYPE_CHECKING
 
 
 class RequiredResponseFormat(TypedDict):
-    type: str
+    type: typing.Union[str, str]
+
 
 class OptionalResponseFormat(TypedDict, total=False):
-    pass
+    # The JSON schema of the response format if type is json_schema.
+    json_schema: typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]
 
 class ResponseFormat(RequiredResponseFormat, OptionalResponseFormat):
     pass

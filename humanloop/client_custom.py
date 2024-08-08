@@ -50,11 +50,19 @@ class ClientCustom:
                 output = chunk["output"] if "output" in chunk else None
                 id = chunk["id"] if "id" in chunk else None
                 index = chunk["index"] if "index" in chunk else None
-                finish_reason = chunk["finish_reason"] if "finish_reason" in chunk else None
-                model_config_id = chunk["model_config_id"] if "model_config_id" in chunk else None
+                finish_reason = (
+                    chunk["finish_reason"] if "finish_reason" in chunk else None
+                )
+                model_config_id = (
+                    chunk["model_config_id"] if "model_config_id" in chunk else None
+                )
                 tool_calls = chunk["tool_calls"] if "tool_calls" in chunk else None
-                output_message = chunk["output_message"] if "output_message" in chunk else None
-                tool_results = chunk["tool_results"] if "tool_results" in chunk else None
+                output_message = (
+                    chunk["output_message"] if "output_message" in chunk else None
+                )
+                tool_results = (
+                    chunk["tool_results"] if "tool_results" in chunk else None
+                )
                 project_id = as_json["project_id"] if "project_id" in as_json else None
 
                 yield {
@@ -66,7 +74,7 @@ class ClientCustom:
                     "tool_calls": tool_calls,
                     "output_message": output_message,
                     "project_id": project_id,
-                    "tool_results": tool_results
+                    "tool_results": tool_results,
                 }
             except Exception as e:
                 # move on silently
@@ -89,18 +97,6 @@ class ClientCustom:
         kwargs["stream"] = True
         args = self.chats._create_deployed_mapped_args(*args, **kwargs)
         response: AsyncGeneratorResponse = await self.chats._acreate_deployed_oapg(stream=True, body=args.body)  # type: ignore
-        return AsyncGeneratorResponse(
-            headers=response.headers,
-            status=response.status,
-            content=self._parsed_generator(response.content),
-            response=response.response,
-        )
-
-    @copy_signature(ChatsApi.acreate_experiment)
-    async def chat_experiment_stream(self, *args, **kwargs):
-        kwargs["stream"] = True
-        args = self.chats._create_experiment_mapped_args(*args, **kwargs)
-        response: AsyncGeneratorResponse = await self.chats._acreate_experiment_oapg(stream=True, body=args.body)  # type: ignore
         return AsyncGeneratorResponse(
             headers=response.headers,
             status=response.status,
@@ -144,18 +140,6 @@ class ClientCustom:
             response=response.response,
         )
 
-    @copy_signature(CompletionsApi.acreate_experiment)
-    async def complete_experiment_stream(self, *args, **kwargs):
-        kwargs["stream"] = True
-        args = self.completions._create_experiment_mapped_args(*args, **kwargs)
-        response: AsyncGeneratorResponse = await self.completions._acreate_experiment_oapg(stream=True, body=args.body)  # type: ignore
-        return AsyncGeneratorResponse(
-            headers=response.headers,
-            status=response.status,
-            content=self._parsed_generator(response.content),
-            response=response.response,
-        )
-
     @copy_signature(CompletionsApi.acreate_model_config)
     async def complete_model_config_stream(self, *args, **kwargs):
         kwargs["stream"] = True
@@ -175,4 +159,4 @@ def _parse_sse_chunk(chunk: bytes):
     prefix = "data: "
     if not decoded.startswith(prefix):
         return None
-    return decoded[len(prefix):].strip()
+    return decoded[len(prefix) :].strip()

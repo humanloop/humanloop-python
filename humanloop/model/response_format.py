@@ -42,21 +42,76 @@ class ResponseFormat(
             
             
             class type(
-                schemas.EnumBase,
-                schemas.StrSchema
+                schemas.ComposedSchema,
             ):
             
             
                 class MetaOapg:
-                    enum_value_to_name = {
-                        "json_object": "JSON_OBJECT",
-                    }
-                
-                @schemas.classproperty
-                def JSON_OBJECT(cls):
-                    return cls("json_object")
+                    
+                    
+                    class any_of_0(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "json_object": "JSON_OBJECT",
+                            }
+                        
+                        @schemas.classproperty
+                        def JSON_OBJECT(cls):
+                            return cls("json_object")
+                    
+                    
+                    class any_of_1(
+                        schemas.EnumBase,
+                        schemas.StrSchema
+                    ):
+                    
+                    
+                        class MetaOapg:
+                            enum_value_to_name = {
+                                "json_schema": "JSON_SCHEMA",
+                            }
+                        
+                        @schemas.classproperty
+                        def JSON_SCHEMA(cls):
+                            return cls("json_schema")
+                    
+                    @classmethod
+                    @functools.lru_cache()
+                    def any_of(cls):
+                        # we need this here to make our import statements work
+                        # we must store _composed_schemas in here so the code is only run
+                        # when we invoke this method. If we kept this at the class
+                        # level we would get an error because the class level
+                        # code would be run when this module is imported, and these composed
+                        # classes don't exist yet because their module has not finished
+                        # loading
+                        return [
+                            cls.any_of_0,
+                            cls.any_of_1,
+                        ]
+            
+            
+                def __new__(
+                    cls,
+                    *args: typing.Union[dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+                    _configuration: typing.Optional[schemas.Configuration] = None,
+                    **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
+                ) -> 'type':
+                    return super().__new__(
+                        cls,
+                        *args,
+                        _configuration=_configuration,
+                        **kwargs,
+                    )
+            json_schema = schemas.DictSchema
             __annotations__ = {
                 "type": type,
+                "json_schema": json_schema,
             }
     
     type: MetaOapg.properties.type
@@ -65,9 +120,12 @@ class ResponseFormat(
     def __getitem__(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["json_schema"]) -> MetaOapg.properties.json_schema: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["type", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["type", "json_schema", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -76,16 +134,20 @@ class ResponseFormat(
     def get_item_oapg(self, name: typing_extensions.Literal["type"]) -> MetaOapg.properties.type: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["json_schema"]) -> typing.Union[MetaOapg.properties.json_schema, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["type", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["type", "json_schema", ], str]):
         return super().get_item_oapg(name)
     
 
     def __new__(
         cls,
         *args: typing.Union[dict, frozendict.frozendict, ],
-        type: typing.Union[MetaOapg.properties.type, str, ],
+        type: typing.Union[MetaOapg.properties.type, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, bool, None, list, tuple, bytes, io.FileIO, io.BufferedReader, ],
+        json_schema: typing.Union[MetaOapg.properties.json_schema, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'ResponseFormat':
@@ -93,6 +155,7 @@ class ResponseFormat(
             cls,
             *args,
             type=type,
+            json_schema=json_schema,
             _configuration=_configuration,
             **kwargs,
         )

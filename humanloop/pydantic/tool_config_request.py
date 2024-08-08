@@ -29,6 +29,9 @@ class ToolConfigRequest(BaseModel):
     # Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
     parameters: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='parameters')
 
+    # Whether the tool is strict or not. If strict, the model will be forced to respond with JSON matching the parameters schema.
+    strict: typing.Optional[bool] = Field(None, alias='strict')
+
     # Source of the tool. If defined at an organization level will be 'organization' else 'inline'.
     source: typing.Optional[ToolSource] = Field(None, alias='source')
 

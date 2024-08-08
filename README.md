@@ -351,7 +351,7 @@ try:
         tool_choice="string_example",
         tool_call="string_example",
         response_format={
-            "type": "json_object",
+            "type": "string_example",
         },
     )
     pprint(create_response.body)
@@ -473,7 +473,7 @@ create_response = humanloop.chat(
     tool_choice="string_example",
     tool_call="string_example",
     response_format={
-        "type": "json_object",
+        "type": "string_example",
     },
 )
 ```
@@ -623,7 +623,7 @@ create_deployed_response = humanloop.chat_deployed(
     tool_choice="string_example",
     tool_call="string_example",
     response_format={
-        "type": "json_object",
+        "type": "string_example",
     },
     environment="string_example",
 )
@@ -772,7 +772,7 @@ create_experiment_response = humanloop.chat_experiment(
     tool_choice="string_example",
     tool_call="string_example",
     response_format={
-        "type": "json_object",
+        "type": "string_example",
     },
 )
 ```
@@ -920,7 +920,7 @@ create_model_config_response = humanloop.chat_model_config(
     tool_choice="string_example",
     tool_call="string_example",
     response_format={
-        "type": "json_object",
+        "type": "string_example",
     },
 )
 ```
@@ -3221,7 +3221,7 @@ register_response = humanloop.model_configs.register(
     other={},
     seed=1,
     response_format={
-        "type": "json_object",
+        "type": "string_example",
     },
     project="string_example",
     project_id="string_example",
@@ -3370,7 +3370,7 @@ serialize_response = humanloop.model_configs.serialize(
     other={},
     seed=1,
     response_format={
-        "type": "json_object",
+        "type": "string_example",
     },
     endpoint="complete",
     chat_template=[

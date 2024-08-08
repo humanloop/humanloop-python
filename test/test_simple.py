@@ -116,7 +116,7 @@ class TestSimple(unittest.TestCase):
 
     def test_parse_sse_chunk(self):
         payload = '{"username": "phoenix", "time": "01:23:45", "text": "Hey hey hey. Here is some cool data: Venus is the only planet to spin clockwise!"}'
-        data = ('data: ' + payload).encode("utf-8")
+        data = ("data: " + payload).encode("utf-8")
         parsed = _parse_sse_chunk(data)
         self.assertEqual(parsed, payload)
 
@@ -179,10 +179,7 @@ class TestSimple(unittest.TestCase):
 
     def test_chat_model_config(self):
         response = self.humanloop.chat_model_config(
-            model_config_id="test",
-            messages=[
-                {"role": "system"}
-            ]
+            model_config_id="test", messages=[{"role": "system"}]
         )
         self.assertIsNotNone(response.provider_responses)
 
@@ -203,10 +200,7 @@ class TestSimple(unittest.TestCase):
         )
 
     def test_projects_update_feedback_type(self):
-        self.humanloop.projects.update_feedback_types(
-            body=[{"class": "text", "type": "test"}], id="test"
-        )
-        self.humanloop.projects.update_feedback_types([], id="test")
+        self.humanloop.projects.update_feedback_types(id="test")
 
 
 humanloop = Humanloop(
@@ -274,6 +268,7 @@ async def test_chat():
     assert response is not None
     assert response.data[0].id is not None
 
+
 @pytest.mark.asyncio
 async def test_model_configs_register():
     humanloop = Humanloop(
@@ -294,6 +289,7 @@ async def test_model_configs_register():
         ],
     )
     assert response is not None
+
 
 @pytest.mark.asyncio
 async def test_complete_stream():
