@@ -58,12 +58,14 @@ class LinkedToolRequest(
             description = schemas.StrSchema
             parameters = schemas.DictSchema
             name = schemas.StrSchema
+            strict = schemas.BoolSchema
             __annotations__ = {
                 "id": id,
                 "source": source,
                 "description": description,
                 "parameters": parameters,
                 "name": name,
+                "strict": strict,
             }
     
     id: MetaOapg.properties.id
@@ -85,9 +87,12 @@ class LinkedToolRequest(
     def __getitem__(self, name: typing_extensions.Literal["name"]) -> MetaOapg.properties.name: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["strict"]) -> MetaOapg.properties.strict: ...
+    
+    @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "source", "description", "parameters", "name", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["id", "source", "description", "parameters", "name", "strict", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -108,9 +113,12 @@ class LinkedToolRequest(
     def get_item_oapg(self, name: typing_extensions.Literal["name"]) -> typing.Union[MetaOapg.properties.name, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["strict"]) -> typing.Union[MetaOapg.properties.strict, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "source", "description", "parameters", "name", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["id", "source", "description", "parameters", "name", "strict", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -122,6 +130,7 @@ class LinkedToolRequest(
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         parameters: typing.Union[MetaOapg.properties.parameters, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
         name: typing.Union[MetaOapg.properties.name, str, schemas.Unset] = schemas.unset,
+        strict: typing.Union[MetaOapg.properties.strict, bool, schemas.Unset] = schemas.unset,
         _configuration: typing.Optional[schemas.Configuration] = None,
         **kwargs: typing.Union[schemas.AnyTypeSchema, dict, frozendict.frozendict, str, date, datetime, uuid.UUID, int, float, decimal.Decimal, None, list, tuple, bytes],
     ) -> 'LinkedToolRequest':
@@ -133,6 +142,7 @@ class LinkedToolRequest(
             description=description,
             parameters=parameters,
             name=name,
+            strict=strict,
             _configuration=_configuration,
             **kwargs,
         )

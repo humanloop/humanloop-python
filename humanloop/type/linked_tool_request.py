@@ -33,5 +33,8 @@ class OptionalLinkedToolRequest(TypedDict, total=False):
     # The name of the linked tool.
     name: str
 
+    # Whether the tool is strict or not. If strict, the model will be forced to respond with JSON matching the parameters schema.
+    strict: bool
+
 class LinkedToolRequest(RequiredLinkedToolRequest, OptionalLinkedToolRequest):
     pass

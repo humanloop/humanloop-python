@@ -17,7 +17,10 @@ from pydantic import BaseModel, Field, RootModel, ConfigDict
 
 
 class ResponseFormat(BaseModel):
-    type: Literal["json_object"] = Field(alias='type')
+    type: typing.Union[str, str] = Field(alias='type')
+
+    # The JSON schema of the response format if type is json_schema.
+    json_schema: typing.Optional[typing.Dict[str, typing.Union[bool, date, datetime, dict, float, int, list, str, None]]] = Field(None, alias='json_schema')
 
     model_config = ConfigDict(
         protected_namespaces=(),

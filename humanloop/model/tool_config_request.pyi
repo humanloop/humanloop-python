@@ -56,6 +56,7 @@ Does not have things like the signature or setup schema.
                     return cls("tool")
             description = schemas.StrSchema
             parameters = schemas.DictSchema
+            strict = schemas.BoolSchema
         
             @staticmethod
             def source() -> typing.Type['ToolSource']:
@@ -68,6 +69,7 @@ Does not have things like the signature or setup schema.
                 "type": type,
                 "description": description,
                 "parameters": parameters,
+                "strict": strict,
                 "source": source,
                 "source_code": source_code,
                 "other": other,
@@ -90,6 +92,9 @@ Does not have things like the signature or setup schema.
     def __getitem__(self, name: typing_extensions.Literal["parameters"]) -> MetaOapg.properties.parameters: ...
     
     @typing.overload
+    def __getitem__(self, name: typing_extensions.Literal["strict"]) -> MetaOapg.properties.strict: ...
+    
+    @typing.overload
     def __getitem__(self, name: typing_extensions.Literal["source"]) -> 'ToolSource': ...
     
     @typing.overload
@@ -104,7 +109,7 @@ Does not have things like the signature or setup schema.
     @typing.overload
     def __getitem__(self, name: str) -> schemas.UnsetAnyTypeSchema: ...
     
-    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "type", "description", "parameters", "source", "source_code", "other", "preset_name", ], str]):
+    def __getitem__(self, name: typing.Union[typing_extensions.Literal["name", "type", "description", "parameters", "strict", "source", "source_code", "other", "preset_name", ], str]):
         # dict_instance[name] accessor
         return super().__getitem__(name)
     
@@ -122,6 +127,9 @@ Does not have things like the signature or setup schema.
     def get_item_oapg(self, name: typing_extensions.Literal["parameters"]) -> typing.Union[MetaOapg.properties.parameters, schemas.Unset]: ...
     
     @typing.overload
+    def get_item_oapg(self, name: typing_extensions.Literal["strict"]) -> typing.Union[MetaOapg.properties.strict, schemas.Unset]: ...
+    
+    @typing.overload
     def get_item_oapg(self, name: typing_extensions.Literal["source"]) -> typing.Union['ToolSource', schemas.Unset]: ...
     
     @typing.overload
@@ -136,7 +144,7 @@ Does not have things like the signature or setup schema.
     @typing.overload
     def get_item_oapg(self, name: str) -> typing.Union[schemas.UnsetAnyTypeSchema, schemas.Unset]: ...
     
-    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "type", "description", "parameters", "source", "source_code", "other", "preset_name", ], str]):
+    def get_item_oapg(self, name: typing.Union[typing_extensions.Literal["name", "type", "description", "parameters", "strict", "source", "source_code", "other", "preset_name", ], str]):
         return super().get_item_oapg(name)
     
 
@@ -147,6 +155,7 @@ Does not have things like the signature or setup schema.
         type: typing.Union[MetaOapg.properties.type, str, ],
         description: typing.Union[MetaOapg.properties.description, str, schemas.Unset] = schemas.unset,
         parameters: typing.Union[MetaOapg.properties.parameters, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
+        strict: typing.Union[MetaOapg.properties.strict, bool, schemas.Unset] = schemas.unset,
         source: typing.Union['ToolSource', schemas.Unset] = schemas.unset,
         source_code: typing.Union[MetaOapg.properties.source_code, str, schemas.Unset] = schemas.unset,
         other: typing.Union[MetaOapg.properties.other, dict, frozendict.frozendict, schemas.Unset] = schemas.unset,
@@ -161,6 +170,7 @@ Does not have things like the signature or setup schema.
             type=type,
             description=description,
             parameters=parameters,
+            strict=strict,
             source=source,
             source_code=source_code,
             other=other,

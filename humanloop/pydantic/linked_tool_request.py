@@ -32,6 +32,9 @@ class LinkedToolRequest(BaseModel):
     # The name of the linked tool.
     name: typing.Optional[str] = Field(None, alias='name')
 
+    # Whether the tool is strict or not. If strict, the model will be forced to respond with JSON matching the parameters schema.
+    strict: typing.Optional[bool] = Field(None, alias='strict')
+
     model_config = ConfigDict(
         protected_namespaces=(),
         arbitrary_types_allowed=True
