@@ -2,4 +2,6 @@
 
 import typing
 
-EvaluatorReturnTypeEnum = typing.Union[typing.Literal["boolean", "number"], typing.Any]
+EvaluatorReturnTypeEnum = typing.Union[
+    typing.Literal["boolean", "number", "select", "multi_select", "text"], typing.Any
+]

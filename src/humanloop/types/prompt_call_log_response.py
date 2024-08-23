@@ -35,6 +35,11 @@ class PromptCallLogResponse(UncheckedBaseModel):
     Duration of the logged event in seconds.
     """
 
+    stdout: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Captured log and debug statements.
+    """
+
     output_message: typing.Optional[ChatMessage] = pydantic.Field(default=None)
     """
     The message returned by the provider.

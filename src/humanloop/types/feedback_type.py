@@ -2,4 +2,4 @@
 
 import typing
 
-FeedbackType = typing.Union[typing.Literal["rating", "action", "issue", "correction", "comment"], typing.Any]
+FeedbackType = typing.Any

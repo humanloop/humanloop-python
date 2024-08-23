@@ -22,7 +22,7 @@ class CodeEvaluatorRequest(UncheckedBaseModel):
     """
 
     evaluator_type: typing.Literal["python"] = "python"
-    code: typing.Optional[str] = pydantic.Field(default=None)
+    code: str = pydantic.Field()
     """
     The code for the evaluator. This code will be executed in a sandboxed environment.
     """

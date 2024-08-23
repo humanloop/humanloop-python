@@ -4,9 +4,35 @@ import typing_extensions
 
 
 class EvaluateeRequestParams(typing_extensions.TypedDict):
-    version_id: str
     """
-    Unique identifier for the Prompt/Tool Version to include in the Evaluation Report. Starts with `pv_` for Prompts and `tv_` for Tools.
+    Specification of a File version on Humanloop.
+
+    This can be done in a couple of ways:
+
+    - Specifying `version_id` directly.
+    - Specifying a File (and optionally an Environment).
+      - A File can be specified by either `path` or `file_id`.
+      - An Environment can be specified by `environment_id`. If no Environment is specified, the default Environment is used.
+    """
+
+    version_id: typing_extensions.NotRequired[str]
+    """
+    Unique identifier for the File Version. If provided, none of the other fields should be specified.
+    """
+
+    path: typing_extensions.NotRequired[str]
+    """
+    Path identifying a File. Provide either this or `file_id` if you want to specify a File.
+    """
+
+    file_id: typing_extensions.NotRequired[str]
+    """
+    Unique identifier for the File. Provide either this or `path` if you want to specify a File.
+    """
+
+    environment: typing_extensions.NotRequired[str]
+    """
+    Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
     """
 
     batch_id: typing_extensions.NotRequired[str]

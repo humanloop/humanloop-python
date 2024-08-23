@@ -7,7 +7,10 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .evaluator_arguments_type import EvaluatorArgumentsType
-from .evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from .evaluator_judgment_number_limit import EvaluatorJudgmentNumberLimit
+from .evaluator_judgment_option_response import EvaluatorJudgmentOptionResponse
+from .human_evaluator_request_return_type import HumanEvaluatorRequestReturnType
+from .valence import Valence
 
 
 class HumanEvaluatorRequest(UncheckedBaseModel):
@@ -16,12 +19,31 @@ class HumanEvaluatorRequest(UncheckedBaseModel):
     Whether this evaluator is target-free or target-required.
     """
 
-    return_type: EvaluatorReturnTypeEnum = pydantic.Field()
+    return_type: HumanEvaluatorRequestReturnType = pydantic.Field()
     """
-    The type of the return value of the evaluator.
+    The type of the return value of the Evaluator.
     """
 
     evaluator_type: typing.Literal["human"] = "human"
+    instructions: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Instructions for the Human annotating the .
+    """
+
+    options: typing.Optional[typing.List[EvaluatorJudgmentOptionResponse]] = pydantic.Field(default=None)
+    """
+    The options that the Human annotator can choose from.
+    """
+
+    number_limits: typing.Optional[EvaluatorJudgmentNumberLimit] = pydantic.Field(default=None)
+    """
+    Limits on the judgment that can be applied. Only for Evaluators with `return_type` of `'number'`.
+    """
+
+    number_valence: typing.Optional[Valence] = pydantic.Field(default=None)
+    """
+    The valence of the number judgment. Only for Evaluators with `return_type` of `'number'`. If 'positive', a higher number is better. If 'negative', a lower number is better.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

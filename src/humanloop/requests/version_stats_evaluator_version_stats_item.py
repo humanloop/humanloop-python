@@ -4,7 +4,12 @@ import typing
 
 from .boolean_evaluator_version_stats import BooleanEvaluatorVersionStatsParams
 from .numeric_evaluator_version_stats import NumericEvaluatorVersionStatsParams
+from .select_evaluator_version_stats import SelectEvaluatorVersionStatsParams
+from .text_evaluator_version_stats import TextEvaluatorVersionStatsParams
 
 VersionStatsEvaluatorVersionStatsItemParams = typing.Union[
-    NumericEvaluatorVersionStatsParams, BooleanEvaluatorVersionStatsParams
+    NumericEvaluatorVersionStatsParams,
+    BooleanEvaluatorVersionStatsParams,
+    SelectEvaluatorVersionStatsParams,
+    TextEvaluatorVersionStatsParams,
 ]

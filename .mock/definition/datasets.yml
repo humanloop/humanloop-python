@@ -176,7 +176,7 @@ service:
                   question: Who wrote Hamlet?
                 target:
                   answer: William Shakespeare
-            action: add
+            action: set
             commit_message: Add two new questions and answers
           response:
             body:
@@ -196,24 +196,53 @@ service:
             datapoints:
               - messages:
                   - role: user
-                    content: >-
-                      Hi Humanloop support team, I'm having trouble
-                      understanding how to use the evaluations feature in your
-                      software. Can you provide a step-by-step guide or any
-                      resources to help me get started?
+                    content: |
+                      How do i manage my organizations API keys?
                 target:
-                  feature: evaluations
-                  issue: needs step-by-step guide
+                  response: >-
+                    Hey, thanks for your questions. Here are steps for how to
+                    achieve: 1. Log in to the Humanloop Dashboard 
+
+
+                    2. Click on "Organization Settings."
+                     If you do not see this option, you might need to contact your organization admin to gain the necessary permissions.
+
+                    3. Within the settings or organization settings, select the
+                    option labeled "API Keys" on the left. Here you will be able
+                    to view and manage your API keys.
+
+
+                    4. You will see a list of existing API keys. You can perform
+                    various actions, such as:
+                         - **Generate New API Key:** Click on the "Generate New Key" button if you need a new API key.
+                         - **Revoke an API Key:** If you need to disable an existing key, find the key in the list and click the "Revoke" or "Delete" button.
+                         - **Copy an API Key:** If you need to use an existing key, you can copy it to your clipboard by clicking the "Copy" button next to the key.
+
+                    5. **Save and Secure API Keys:** Make sure to securely store
+                    any new or existing API keys you are using. Treat them like
+                    passwords and do not share them publicly.
+
+
+                    If you encounter any issues or need further assistance, it
+                    might be helpful to engage with an engineer or your IT
+                    department to ensure you have the necessary permissions and
+                    support.
+
+
+                    Would you need help with anything else?
               - messages:
                   - role: user
                     content: >-
-                      Hi there, I'm interested in fine-tuning a language model
-                      using your software. Can you explain the process and
-                      provide any best practices or guidelines?
+                      Hey, can do I use my code evaluator for monitoring my
+                      legal-copilot prompt?
                 target:
-                  feature: fine-tuning
-                  issue: process explanation and best practices
-            action: add
+                  response: >-
+                    Hey, thanks for your questions. Here are steps for how to
+                    achieve: 1. Navigate to your Prompt dashboard. 
+                     2. Select the `Monitoring` button on the top right of the Prompt dashboard 
+                     3. Within the model select the Version of the Evaluator you want to turn on for monitoring. 
+
+                    Would you need help with anything else?
             commit_message: Add two new questions and answers
           response:
             body:
@@ -770,6 +799,8 @@ service:
                       evaluator_version_id: evaluator_version_id
                       created_at: '2024-01-15T09:30:00Z'
                       updated_at: '2024-01-15T09:30:00Z'
+  source:
+    openapi: openapi/openapi.auto.json
   display-name: Datasets
 docs: >+
   Datasets are collections of input-output pairs that you can use within

@@ -33,6 +33,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "total_logs_count": 1,
             "inputs": [{"name": "question"}],
         },
+        "evaluator_logs": [],
     }
     expected_types: typing.Any = {
         "id": None,
@@ -52,6 +53,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
             "total_logs_count": "integer",
             "inputs": ("list", {0: {"name": None}}),
         },
+        "evaluator_logs": ("list", {}),
     }
     response = client.logs.get(id="prv_Wu6zx1lAWJRqOyL8nWuZk")
     validate_response(response, expected_response, expected_types)

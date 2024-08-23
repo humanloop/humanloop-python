@@ -23,6 +23,8 @@ types:
       - literal<"auto">
       - literal<"required">
       - root.ToolChoice
+    source:
+      openapi: openapi/openapi.auto.json
   PromptCallRequestToolChoice:
     discriminated: false
     docs: >-
@@ -45,11 +47,15 @@ types:
       - literal<"auto">
       - literal<"required">
       - root.ToolChoice
+    source:
+      openapi: openapi/openapi.auto.json
   CallPromptsCallPostResponse:
     discriminated: false
     union:
       - root.PromptCallResponse
       - root.PromptCallStreamResponse
+    source:
+      openapi: openapi/openapi.auto.json
   PromptRequestTemplate:
     discriminated: false
     docs: >-
@@ -59,6 +65,8 @@ types:
     union:
       - string
       - list<root.ChatMessage>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptRequestStop:
     discriminated: false
     docs: >-
@@ -67,6 +75,8 @@ types:
     union:
       - string
       - list<string>
+    source:
+      openapi: openapi/openapi.auto.json
 service:
   auth: false
   base-path: ''
@@ -108,6 +118,11 @@ service:
             docs: Name of the Environment identifying a deployed version to log to.
         body:
           properties:
+            evaluation_id:
+              type: optional<string>
+              docs: >-
+                Unique identifier for the Evaluation Report to associate the Log
+                to.
             path:
               type: optional<string>
               docs: >-
@@ -177,6 +192,9 @@ service:
             provider_latency:
               type: optional<double>
               docs: Duration of the logged event in seconds.
+            stdout:
+              type: optional<string>
+              docs: Captured log and debug statements.
             provider_request:
               type: optional<map<string, unknown>>
               docs: Raw request sent to provider.
@@ -189,7 +207,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests.
+                in subsequent log requests. 
             parent_id:
               type: optional<string>
               docs: >-
@@ -363,7 +381,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests.
+                in subsequent log requests. 
             parent_id:
               type: optional<string>
               docs: >-
@@ -495,29 +513,15 @@ service:
               logs:
                 - output: >-
                     Well, let me tell you, there are a lot of stories about
-                    Roswell, and I hear them all the time. People love to talk
-                    about Roswell. So many theories, so many ideas. Some folks
-                    believe it was a weather balloon, others say it was
-                    something out of this world. Believe me, there's plenty that
-                    we don't know. Very interesting to look into, but the truth,
-                    well, it might still be out there. Could be a great story,
-                    who knows? But what I do know, folks, is that we have to
-                    keep our eyes open and always be on the lookout for the
-                    truth!
+                    Roswell, and I hear them all the time.
+                     People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!
                   created_at: '2024-05-01T12:00:00Z'
                   finish_reason: stop
                   output_message:
                     content: >-
                       Well, let me tell you, there are a lot of stories about
-                      Roswell, and I hear them all the time. People love to talk
-                      about Roswell. So many theories, so many ideas. Some folks
-                      believe it was a weather balloon, others say it was
-                      something out of this world. Believe me, there's plenty
-                      that we don't know. Very interesting to look into, but the
-                      truth, well, it might still be out there. Could be a great
-                      story, who knows? But what I do know, folks, is that we
-                      have to keep our eyes open and always be on the lookout
-                      for the truth!
+                      Roswell, and I hear them all the time.
+                       People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!
                     role: assistant
                   prompt_tokens: 34
                   output_tokens: 125
@@ -565,29 +569,15 @@ service:
               logs:
                 - output: >-
                     Well, let me tell you, there are a lot of stories about
-                    Roswell, and I hear them all the time. People love to talk
-                    about Roswell. So many theories, so many ideas. Some folks
-                    believe it was a weather balloon, others say it was
-                    something out of this world. Believe me, there's plenty that
-                    we don't know. Very interesting to look into, but the truth,
-                    well, it might still be out there. Could be a great story,
-                    who knows? But what I do know, folks, is that we have to
-                    keep our eyes open and always be on the lookout for the
-                    truth!
+                    Roswell, and I hear them all the time.
+                     People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!
                   created_at: '2024-05-01T12:00:00Z'
                   finish_reason: stop
                   output_message:
                     content: >-
                       Well, let me tell you, there are a lot of stories about
-                      Roswell, and I hear them all the time. People love to talk
-                      about Roswell. So many theories, so many ideas. Some folks
-                      believe it was a weather balloon, others say it was
-                      something out of this world. Believe me, there's plenty
-                      that we don't know. Very interesting to look into, but the
-                      truth, well, it might still be out there. Could be a great
-                      story, who knows? But what I do know, folks, is that we
-                      have to keep our eyes open and always be on the lookout
-                      for the truth!
+                      Roswell, and I hear them all the time.
+                       People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!
                     role: assistant
                   prompt_tokens: 34
                   output_tokens: 125
@@ -629,29 +619,15 @@ service:
               logs:
                 - output: >-
                     Well, let me tell you, there are a lot of stories about
-                    Roswell, and I hear them all the time. People love to talk
-                    about Roswell. So many theories, so many ideas. Some folks
-                    believe it was a weather balloon, others say it was
-                    something out of this world. Believe me, there's plenty that
-                    we don't know. Very interesting to look into, but the truth,
-                    well, it might still be out there. Could be a great story,
-                    who knows? But what I do know, folks, is that we have to
-                    keep our eyes open and always be on the lookout for the
-                    truth!
+                    Roswell, and I hear them all the time.
+                     People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!
                   created_at: '2024-05-01T12:00:00Z'
                   finish_reason: stop
                   output_message:
                     content: >-
                       Well, let me tell you, there are a lot of stories about
-                      Roswell, and I hear them all the time. People love to talk
-                      about Roswell. So many theories, so many ideas. Some folks
-                      believe it was a weather balloon, others say it was
-                      something out of this world. Believe me, there's plenty
-                      that we don't know. Very interesting to look into, but the
-                      truth, well, it might still be out there. Could be a great
-                      story, who knows? But what I do know, folks, is that we
-                      have to keep our eyes open and always be on the lookout
-                      for the truth!
+                      Roswell, and I hear them all the time.
+                       People love to talk about Roswell. So many theories, so many ideas. Some folks believe it was a weather balloon, others say it was something out of this world. Believe me, there's plenty that we don't know. Very interesting to look into, but the truth, well, it might still be out there. Could be a great story, who knows? But what I do know, folks, is that we have to keep our eyes open and always be on the lookout for the truth!
                     role: assistant
                   prompt_tokens: 34
                   output_tokens: 125
@@ -1359,14 +1335,18 @@ service:
               seed: 1
               response_format:
                 type: json_object
+                json_schema:
+                  key: value
               tools:
                 - name: name
                   description: description
+                  strict: true
                   parameters:
                     key: value
               linked_tools:
                 - name: name
                   description: description
+                  strict: true
                   parameters:
                     key: value
                   id: id
@@ -1486,6 +1466,8 @@ service:
                   total_logs_count: 0
                   inputs:
                     - name: messages
+  source:
+    openapi: openapi/openapi.auto.json
   display-name: Prompts
 docs: >+
   Prompts define how a large language model behaves.

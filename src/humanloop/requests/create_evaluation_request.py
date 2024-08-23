@@ -23,9 +23,9 @@ class CreateEvaluationRequestParams(typing_extensions.TypedDict):
     The Dataset Version to use in this Evaluation.
     """
 
-    evaluatees: typing.Sequence[EvaluateeRequestParams]
+    evaluatees: typing_extensions.NotRequired[typing.Sequence[EvaluateeRequestParams]]
     """
-    Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
+    Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
     """
 
     evaluators: typing.Sequence[EvaluationsRequestParams]

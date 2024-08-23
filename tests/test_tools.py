@@ -67,20 +67,7 @@ async def test_upsert(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "operation"}],
     }
-    expected_types: typing.Any = {
-        "id": None,
-        "path": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "status": None,
-        "last_used_at": "datetime",
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
+    expected_types: typing.Any = None
     response = client.tools.upsert(
         path="math-tool",
         function={
@@ -127,20 +114,7 @@ async def test_get(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "operation"}],
     }
-    expected_types: typing.Any = {
-        "id": None,
-        "path": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "status": None,
-        "last_used_at": "datetime",
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
+    expected_types: typing.Any = None
     response = client.tools.get(id="tl_789ghi")
     validate_response(response, expected_response, expected_types)
 
@@ -170,20 +144,7 @@ async def test_move(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "operation"}],
     }
-    expected_types: typing.Any = {
-        "id": None,
-        "path": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "status": None,
-        "last_used_at": "datetime",
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
+    expected_types: typing.Any = None
     response = client.tools.move(id="tl_789ghi", path="new directory/new name")
     validate_response(response, expected_response, expected_types)
 
@@ -210,27 +171,7 @@ async def test_list_versions(client: Humanloop, async_client: AsyncHumanloop) ->
             }
         ]
     }
-    expected_types: typing.Any = {
-        "records": (
-            "list",
-            {
-                0: {
-                    "id": None,
-                    "path": None,
-                    "name": None,
-                    "version_id": None,
-                    "type": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                    "status": None,
-                    "last_used_at": "datetime",
-                    "version_logs_count": "integer",
-                    "total_logs_count": "integer",
-                    "inputs": ("list", {0: {"name": None}}),
-                }
-            },
-        )
-    }
+    expected_types: typing.Any = {"records": ("list", {0: None})}
     response = client.tools.list_versions(id="tl_789ghi", status="committed")
     validate_response(response, expected_response, expected_types)
 
@@ -253,20 +194,7 @@ async def test_commit(client: Humanloop, async_client: AsyncHumanloop) -> None:
         "total_logs_count": 1,
         "inputs": [{"name": "operation"}],
     }
-    expected_types: typing.Any = {
-        "id": None,
-        "path": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "status": None,
-        "last_used_at": "datetime",
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
+    expected_types: typing.Any = None
     response = client.tools.commit(id="tl_789ghi", version_id="tv_012jkl", commit_message="Initial commit")
     validate_response(response, expected_response, expected_types)
 
@@ -291,20 +219,7 @@ async def test_update_monitoring(client: Humanloop, async_client: AsyncHumanloop
         "total_logs_count": 1,
         "inputs": [{"name": "operation"}],
     }
-    expected_types: typing.Any = {
-        "id": None,
-        "path": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "status": None,
-        "last_used_at": "datetime",
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
+    expected_types: typing.Any = None
     response = client.tools.update_monitoring(id="tl_789ghi", activate=[{"evaluator_version_id": "evv_1abc4308abd"}])
     validate_response(response, expected_response, expected_types)
 
@@ -329,20 +244,7 @@ async def test_set_deployment(client: Humanloop, async_client: AsyncHumanloop) -
         "total_logs_count": 1,
         "inputs": [{"name": "operation"}],
     }
-    expected_types: typing.Any = {
-        "id": None,
-        "path": None,
-        "name": None,
-        "version_id": None,
-        "type": None,
-        "created_at": "datetime",
-        "updated_at": "datetime",
-        "status": None,
-        "last_used_at": "datetime",
-        "version_logs_count": "integer",
-        "total_logs_count": "integer",
-        "inputs": ("list", {0: {"name": None}}),
-    }
+    expected_types: typing.Any = None
     response = client.tools.set_deployment(id="tl_789ghi", environment_id="staging", version_id="tv_012jkl")
     validate_response(response, expected_response, expected_types)
 
@@ -384,28 +286,7 @@ async def test_list_environments(client: Humanloop, async_client: AsyncHumanloop
     ]
     expected_types: typing.Tuple[typing.Any, typing.Any] = (
         "list",
-        {
-            0: {
-                "id": None,
-                "created_at": "datetime",
-                "name": None,
-                "tag": None,
-                "file": {
-                    "id": None,
-                    "path": None,
-                    "name": None,
-                    "version_id": None,
-                    "type": None,
-                    "created_at": "datetime",
-                    "updated_at": "datetime",
-                    "status": None,
-                    "last_used_at": "datetime",
-                    "version_logs_count": "integer",
-                    "total_logs_count": "integer",
-                    "inputs": ("list", {0: {"name": None}}),
-                },
-            }
-        },
+        {0: {"id": None, "created_at": "datetime", "name": None, "tag": None, "file": None}},
     )
     response = client.tools.list_environments(id="tl_789ghi")
     validate_response(response, expected_response, expected_types)

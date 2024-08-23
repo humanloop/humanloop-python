@@ -2,38 +2,4 @@
 
 import typing
 
-import pydantic
-
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
-from ..core.unchecked_base_model import UncheckedBaseModel
-
-
-class BaseModelsUserResponse(UncheckedBaseModel):
-    id: str = pydantic.Field()
-    """
-    String ID of user. Starts with `usr_`.
-    """
-
-    email_address: str = pydantic.Field()
-    """
-    The user's email address.
-    """
-
-    full_name: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    The user's full name.
-    """
-
-    verified: bool = pydantic.Field()
-    """
-    Whether the user has verified their email address.
-    """
-
-    if IS_PYDANTIC_V2:
-        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
-    else:
-
-        class Config:
-            frozen = True
-            smart_union = True
-            extra = pydantic.Extra.allow
+BaseModelsUserResponse = typing.Any

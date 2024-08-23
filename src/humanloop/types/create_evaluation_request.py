@@ -25,9 +25,9 @@ class CreateEvaluationRequest(UncheckedBaseModel):
     The Dataset Version to use in this Evaluation.
     """
 
-    evaluatees: typing.List[EvaluateeRequest] = pydantic.Field()
+    evaluatees: typing.Optional[typing.List[EvaluateeRequest]] = pydantic.Field(default=None)
     """
-    Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
+    Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
     """
 
     evaluators: typing.List[EvaluationsRequest] = pydantic.Field()

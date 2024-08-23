@@ -50,6 +50,7 @@ class ToolsClient:
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         session_id: typing.Optional[str] = OMIT,
@@ -101,6 +102,9 @@ class ToolsClient:
 
         provider_latency : typing.Optional[float]
             Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
 
         provider_request : typing.Optional[typing.Dict[str, typing.Any]]
             Raw request sent to provider.
@@ -187,6 +191,7 @@ class ToolsClient:
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
+                "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "session_id": session_id,
@@ -941,6 +946,7 @@ class AsyncToolsClient:
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         session_id: typing.Optional[str] = OMIT,
@@ -992,6 +998,9 @@ class AsyncToolsClient:
 
         provider_latency : typing.Optional[float]
             Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
 
         provider_request : typing.Optional[typing.Dict[str, typing.Any]]
             Raw request sent to provider.
@@ -1086,6 +1095,7 @@ class AsyncToolsClient:
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
+                "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "session_id": session_id,

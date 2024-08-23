@@ -55,6 +55,11 @@ service:
             docs: >-
               If provided, only Logs created before the specified date will be
               returned.
+          include_parent:
+            type: optional<boolean>
+            docs: >-
+              If true, include the full parent Log in the response. Only
+              applicable when retrieving Evaluator Logs.
       response:
         docs: Successful Response
         type: root.PaginatedDataLogResponse
@@ -88,6 +93,7 @@ service:
                     total_logs_count: 1
                     inputs:
                       - name: question
+                  evaluator_logs: []
     delete:
       path: /logs
       method: DELETE
@@ -115,7 +121,7 @@ service:
       display-name: Get Log
       response:
         docs: Successful Response
-        type: root.SrcExternalAppModelsV5LogsLogResponse
+        type: root.LogResponse
       errors:
         - root.UnprocessableEntityError
       examples:
@@ -141,6 +147,9 @@ service:
                 total_logs_count: 1
                 inputs:
                   - name: question
+              evaluator_logs: []
+  source:
+    openapi: openapi/openapi.auto.json
   display-name: Logs
 docs: >+
   Logs contain the inputs and outputs of each time a Prompt, Tool or Evaluator

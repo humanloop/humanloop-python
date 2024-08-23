@@ -48,6 +48,10 @@ class EvaluationResponse(UncheckedBaseModel):
     created_at: dt.datetime
     created_by: typing.Optional[UserResponse] = None
     updated_at: dt.datetime
+    url: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    URL to view the Evaluation on the Humanloop.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

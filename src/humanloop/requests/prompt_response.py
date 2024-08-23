@@ -9,6 +9,7 @@ import typing_extensions
 
 from ..types.model_endpoints import ModelEndpoints
 from ..types.model_providers import ModelProviders
+from ..types.user_response import UserResponse
 from ..types.version_status import VersionStatus
 from .environment_response import EnvironmentResponseParams
 from .evaluator_aggregate import EvaluatorAggregateParams
@@ -18,7 +19,6 @@ from .prompt_response_stop import PromptResponseStopParams
 from .prompt_response_template import PromptResponseTemplateParams
 from .response_format import ResponseFormatParams
 from .tool_function import ToolFunctionParams
-from .user_response import UserResponseParams
 
 if typing.TYPE_CHECKING:
     from .monitoring_evaluator_response import MonitoringEvaluatorResponseParams
@@ -145,7 +145,7 @@ class PromptResponseParams(typing_extensions.TypedDict):
 
     created_at: dt.datetime
     updated_at: dt.datetime
-    created_by: typing_extensions.NotRequired[UserResponseParams]
+    created_by: typing_extensions.NotRequired[UserResponse]
     """
     The user who created the Prompt.
     """

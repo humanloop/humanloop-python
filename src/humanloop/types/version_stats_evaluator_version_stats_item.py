@@ -4,5 +4,9 @@ import typing
 
 from .boolean_evaluator_version_stats import BooleanEvaluatorVersionStats
 from .numeric_evaluator_version_stats import NumericEvaluatorVersionStats
+from .select_evaluator_version_stats import SelectEvaluatorVersionStats
+from .text_evaluator_version_stats import TextEvaluatorVersionStats
 
-VersionStatsEvaluatorVersionStatsItem = typing.Union[NumericEvaluatorVersionStats, BooleanEvaluatorVersionStats]
+VersionStatsEvaluatorVersionStatsItem = typing.Union[
+    NumericEvaluatorVersionStats, BooleanEvaluatorVersionStats, SelectEvaluatorVersionStats, TextEvaluatorVersionStats
+]

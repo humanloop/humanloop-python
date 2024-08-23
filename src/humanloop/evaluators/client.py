@@ -21,6 +21,7 @@ from ..types.paginated_data_evaluator_response import PaginatedDataEvaluatorResp
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..types.version_status import VersionStatus
+from .requests.create_evaluator_log_request_judgment import CreateEvaluatorLogRequestJudgmentParams
 from .requests.create_evaluator_log_request_spec import CreateEvaluatorLogRequestSpecParams
 from .requests.src_external_app_models_v_5_evaluators_evaluator_request_spec import (
     SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
@@ -182,7 +183,7 @@ class EvaluatorsClient:
                 "arguments_type": "target_required",
                 "return_type": "number",
                 "evaluator_type": "python",
-                "code": "def evaluate(answer, target):\\n    return 0.5",
+                "code": "def evaluate(answer, target):\n    return 0.5",
             },
             commit_message="Initial commit",
         )
@@ -665,6 +666,7 @@ class EvaluatorsClient:
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         session_id: typing.Optional[str] = OMIT,
@@ -676,12 +678,14 @@ class EvaluatorsClient:
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
-        judgment: typing.Optional[typing.Any] = OMIT,
+        judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateEvaluatorLogResponse:
         """
-        Submit evalutor judgment for an existing Log. Creates a new Log and makes evaluated one its parent.
+        Submit Evaluator judgment for an existing Log.
+
+        Creates a new Log. The evaluated Log will be set as the parent of the created Log.
 
         Parameters
         ----------
@@ -711,6 +715,9 @@ class EvaluatorsClient:
 
         provider_latency : typing.Optional[float]
             Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
 
         provider_request : typing.Optional[typing.Dict[str, typing.Any]]
             Raw request sent to provider. Only populated for LLM Evaluator Logs.
@@ -745,7 +752,8 @@ class EvaluatorsClient:
         create_evaluator_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
 
-        judgment : typing.Optional[typing.Any]
+        judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
+            Evaluator assessment of the Log.
 
         spec : typing.Optional[CreateEvaluatorLogRequestSpecParams]
 
@@ -779,6 +787,7 @@ class EvaluatorsClient:
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
+                "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "session_id": session_id,
@@ -791,7 +800,9 @@ class EvaluatorsClient:
                 "batches": batches,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
-                "judgment": judgment,
+                "judgment": convert_and_respect_annotation_metadata(
+                    object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams
+                ),
                 "spec": convert_and_respect_annotation_metadata(
                     object_=spec, annotation=CreateEvaluatorLogRequestSpecParams
                 ),
@@ -977,7 +988,7 @@ class AsyncEvaluatorsClient:
                     "arguments_type": "target_required",
                     "return_type": "number",
                     "evaluator_type": "python",
-                    "code": "def evaluate(answer, target):\\n    return 0.5",
+                    "code": "def evaluate(answer, target):\n    return 0.5",
                 },
                 commit_message="Initial commit",
             )
@@ -1527,6 +1538,7 @@ class AsyncEvaluatorsClient:
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         session_id: typing.Optional[str] = OMIT,
@@ -1538,12 +1550,14 @@ class AsyncEvaluatorsClient:
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
-        judgment: typing.Optional[typing.Any] = OMIT,
+        judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateEvaluatorLogResponse:
         """
-        Submit evalutor judgment for an existing Log. Creates a new Log and makes evaluated one its parent.
+        Submit Evaluator judgment for an existing Log.
+
+        Creates a new Log. The evaluated Log will be set as the parent of the created Log.
 
         Parameters
         ----------
@@ -1573,6 +1587,9 @@ class AsyncEvaluatorsClient:
 
         provider_latency : typing.Optional[float]
             Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
 
         provider_request : typing.Optional[typing.Dict[str, typing.Any]]
             Raw request sent to provider. Only populated for LLM Evaluator Logs.
@@ -1607,7 +1624,8 @@ class AsyncEvaluatorsClient:
         create_evaluator_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
 
-        judgment : typing.Optional[typing.Any]
+        judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
+            Evaluator assessment of the Log.
 
         spec : typing.Optional[CreateEvaluatorLogRequestSpecParams]
 
@@ -1649,6 +1667,7 @@ class AsyncEvaluatorsClient:
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
+                "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "session_id": session_id,
@@ -1661,7 +1680,9 @@ class AsyncEvaluatorsClient:
                 "batches": batches,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
-                "judgment": judgment,
+                "judgment": convert_and_respect_annotation_metadata(
+                    object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams
+                ),
                 "spec": convert_and_respect_annotation_metadata(
                     object_=spec, annotation=CreateEvaluatorLogRequestSpecParams
                 ),

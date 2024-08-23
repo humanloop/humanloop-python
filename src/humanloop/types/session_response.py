@@ -7,7 +7,7 @@ import pydantic
 
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
-from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponse
+from .session_event_response import SessionEventResponse
 
 
 class SessionResponse(UncheckedBaseModel):
@@ -18,9 +18,24 @@ class SessionResponse(UncheckedBaseModel):
 
     created_at: dt.datetime
     updated_at: dt.datetime
-    logs: typing.List[SrcExternalAppModelsV5LogsLogResponse] = pydantic.Field()
+    first_inputs: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
     """
-    List of Logs associated with this Session.
+    Inputs for the first datapoint in the session.
+    """
+
+    last_output: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Output for the last datapoint in the session.
+    """
+
+    logs_count: int = pydantic.Field()
+    """
+    Number of logs associated to this session.
+    """
+
+    events: typing.List[SessionEventResponse] = pydantic.Field()
+    """
+    List of events associated with this Session.
     """
 
     if IS_PYDANTIC_V2:

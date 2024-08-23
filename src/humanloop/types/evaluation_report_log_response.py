@@ -8,7 +8,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .datapoint_response import DatapointResponse
 from .evaluated_version_response import EvaluatedVersionResponse
-from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponse
+from .log_response import LogResponse
 
 
 class EvaluationReportLogResponse(UncheckedBaseModel):
@@ -22,12 +22,12 @@ class EvaluationReportLogResponse(UncheckedBaseModel):
     The Datapoint used to generate the Log
     """
 
-    log: typing.Optional[SrcExternalAppModelsV5LogsLogResponse] = pydantic.Field(default=None)
+    log: typing.Optional[LogResponse] = pydantic.Field(default=None)
     """
     The Log that was evaluated by the Evaluator.
     """
 
-    evaluator_logs: typing.List[SrcExternalAppModelsV5LogsLogResponse] = pydantic.Field()
+    evaluator_logs: typing.List[LogResponse] = pydantic.Field()
     """
     The Evaluator Logs containing the judgments for the Log.
     """

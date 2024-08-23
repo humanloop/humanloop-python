@@ -53,6 +53,7 @@ class PromptsClient:
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        evaluation_id: typing.Optional[str] = OMIT,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         output_message: typing.Optional[ChatMessageParams] = OMIT,
@@ -68,6 +69,7 @@ class PromptsClient:
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         session_id: typing.Optional[str] = OMIT,
@@ -100,6 +102,9 @@ class PromptsClient:
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed version to log to.
+
+        evaluation_id : typing.Optional[str]
+            Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
             Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
@@ -149,6 +154,9 @@ class PromptsClient:
 
         provider_latency : typing.Optional[float]
             Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
 
         provider_request : typing.Optional[typing.Dict[str, typing.Any]]
             Raw request sent to provider.
@@ -236,6 +244,7 @@ class PromptsClient:
             method="POST",
             params={"version_id": version_id, "environment": environment},
             json={
+                "evaluation_id": evaluation_id,
                 "path": path,
                 "id": id,
                 "output_message": convert_and_respect_annotation_metadata(
@@ -257,6 +266,7 @@ class PromptsClient:
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
+                "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "session_id": session_id,
@@ -1285,6 +1295,7 @@ class AsyncPromptsClient:
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        evaluation_id: typing.Optional[str] = OMIT,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         output_message: typing.Optional[ChatMessageParams] = OMIT,
@@ -1300,6 +1311,7 @@ class AsyncPromptsClient:
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
         provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Any]] = OMIT,
         session_id: typing.Optional[str] = OMIT,
@@ -1332,6 +1344,9 @@ class AsyncPromptsClient:
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed version to log to.
+
+        evaluation_id : typing.Optional[str]
+            Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
             Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
@@ -1381,6 +1396,9 @@ class AsyncPromptsClient:
 
         provider_latency : typing.Optional[float]
             Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
 
         provider_request : typing.Optional[typing.Dict[str, typing.Any]]
             Raw request sent to provider.
@@ -1477,6 +1495,7 @@ class AsyncPromptsClient:
             method="POST",
             params={"version_id": version_id, "environment": environment},
             json={
+                "evaluation_id": evaluation_id,
                 "path": path,
                 "id": id,
                 "output_message": convert_and_respect_annotation_metadata(
@@ -1498,6 +1517,7 @@ class AsyncPromptsClient:
                 "created_at": created_at,
                 "error": error,
                 "provider_latency": provider_latency,
+                "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
                 "session_id": session_id,

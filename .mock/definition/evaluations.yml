@@ -125,7 +125,9 @@ service:
                           arguments_type: target_required
                           return_type: number
                           evaluator_type: python
-                          code: def evaluate(answer, target):\n    return 0.5
+                          code: |-
+                            def evaluate(answer, target):
+                                return 0.5
                         version_logs_count: 1
                         total_logs_count: 1
                         inputs:
@@ -258,7 +260,9 @@ service:
                       arguments_type: target_required
                       return_type: number
                       evaluator_type: python
-                      code: def evaluate(answer, target):\n    return 0.5
+                      code: |-
+                        def evaluate(answer, target):
+                            return 0.5
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
@@ -362,7 +366,9 @@ service:
                       arguments_type: target_required
                       return_type: number
                       evaluator_type: python
-                      code: def evaluate(answer, target):\n    return 0.5
+                      code: |-
+                        def evaluate(answer, target):
+                            return 0.5
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
@@ -507,7 +513,9 @@ service:
                       arguments_type: target_required
                       return_type: number
                       evaluator_type: python
-                      code: def evaluate(answer, target):\n    return 0.5
+                      code: |-
+                        def evaluate(answer, target):
+                            return 0.5
                     version_logs_count: 1
                     total_logs_count: 1
                     inputs:
@@ -596,6 +604,7 @@ service:
                     spec:
                       arguments_type: target_free
                       return_type: boolean
+                      evaluator_type: llm
                     name: name
                     version_id: version_id
                     created_at: '2024-01-15T09:30:00Z'
@@ -614,6 +623,7 @@ service:
                 email_address: email_address
                 full_name: full_name
               updated_at: '2024-01-15T09:30:00Z'
+              url: url
     getStats:
       path: /evaluations/{id}/stats
       method: GET
@@ -734,6 +744,26 @@ service:
                       inputs:
                         - name: name
                     id: id
+                    evaluator_logs:
+                      - id: id
+                        evaluator_logs: []
+                        evaluator:
+                          path: path
+                          id: id
+                          spec:
+                            arguments_type: target_free
+                            return_type: boolean
+                            evaluator_type: llm
+                          name: name
+                          version_id: version_id
+                          created_at: '2024-01-15T09:30:00Z'
+                          updated_at: '2024-01-15T09:30:00Z'
+                          status: uncommitted
+                          last_used_at: '2024-01-15T09:30:00Z'
+                          version_logs_count: 1
+                          total_logs_count: 1
+                          inputs:
+                            - name: name
                   evaluator_logs:
                     - prompt:
                         path: path
@@ -750,9 +780,31 @@ service:
                         inputs:
                           - name: name
                       id: id
+                      evaluator_logs:
+                        - id: id
+                          evaluator_logs: []
+                          evaluator:
+                            path: path
+                            id: id
+                            spec:
+                              arguments_type: target_free
+                              return_type: boolean
+                              evaluator_type: llm
+                            name: name
+                            version_id: version_id
+                            created_at: '2024-01-15T09:30:00Z'
+                            updated_at: '2024-01-15T09:30:00Z'
+                            status: uncommitted
+                            last_used_at: '2024-01-15T09:30:00Z'
+                            version_logs_count: 1
+                            total_logs_count: 1
+                            inputs:
+                              - name: name
               page: 1
               size: 1
               total: 1
+  source:
+    openapi: openapi/openapi.auto.json
   display-name: Evaluations
 docs: >+
   Evaluations help you measure the performance of your Prompts, Tools and LLM

@@ -4,57 +4,6 @@ errors:
     type: HttpValidationError
     docs: Validation Error
 types:
-  AgentConfigResponse:
-    properties:
-      id:
-        type: string
-        docs: String ID of config. Starts with `config_`.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameters that define the config.
-      type: literal<"agent">
-      created_by:
-        type: optional<BaseModelsUserResponse>
-        docs: The user who created the config.
-      status:
-        type: string
-        docs: Whether the config is committed or not.
-      name:
-        type: string
-        docs: Name of config.
-      description:
-        type: optional<string>
-        docs: Description of config.
-      agent_class:
-        type: string
-        docs: Class of the agent.
-      tools:
-        type: optional<list<ToolConfigRequest>>
-        docs: Tools associated with the agent.
-  BaseMetricResponse:
-    properties:
-      id:
-        type: string
-        docs: ID of the metric. Starts with 'metric_'.
-      name:
-        type: string
-        docs: The name of the metric.
-      description:
-        type: string
-        docs: A description of what the metric measures.
-      code:
-        type: string
-        docs: Python code used to calculate a metric value on each logged datapoint.
-      default:
-        type: boolean
-        docs: >-
-          Whether the metric is a global default metric. Metrics with this flag
-          enabled cannot be deleted or modified.
-      active:
-        type: boolean
-        docs: If enabled, the metric is calculated for every logged datapoint.
-      created_at: datetime
-      updated_at: datetime
   BooleanEvaluatorVersionStats:
     docs: |-
       Base attributes for stats for an Evaluator Version-Evaluated Version pair
@@ -87,26 +36,23 @@ types:
       num_false:
         type: integer
         docs: The total number of `False` judgments for this Evaluator Version.
-  CategoricalFeedbackLabel:
-    properties:
-      value: string
-      sentiment:
-        type: LabelSentiment
-        docs: Whether the feedback sentiment is positive or negative.
-      status:
-        type: FeedbackLabelStatus
-        docs: Whether the feedback label is active or inactive.
+    source:
+      openapi: openapi/openapi.auto.json
   ChatMessageContentItem:
     discriminated: false
     union:
       - TextChatContent
       - ImageChatContent
+    source:
+      openapi: openapi/openapi.auto.json
   ChatMessageContent:
     discriminated: false
     docs: The content of the message.
     union:
       - string
       - list<ChatMessageContentItem>
+    source:
+      openapi: openapi/openapi.auto.json
   ChatMessage:
     properties:
       content:
@@ -124,40 +70,8 @@ types:
       tool_calls:
         type: optional<list<ToolCall>>
         docs: A list of tool calls requested by the assistant.
-  ChatMessageWithToolCallContentItem:
-    discriminated: false
-    union:
-      - TextChatContent
-      - ImageChatContent
-  ChatMessageWithToolCallContent:
-    discriminated: false
-    docs: The content of the message.
-    union:
-      - string
-      - list<ChatMessageWithToolCallContentItem>
-  ChatMessageWithToolCall:
-    properties:
-      content:
-        type: optional<ChatMessageWithToolCallContent>
-        docs: The content of the message.
-      name:
-        type: optional<string>
-        docs: Optional name of the message author.
-      tool_call_id:
-        type: optional<string>
-        docs: Tool call that this message is responding to.
-      role:
-        type: ChatRole
-        docs: Role of the message author.
-      tool_calls:
-        type: optional<list<ToolCall>>
-        docs: A list of tool calls requested by the assistant.
-      tool_call:
-        type: optional<FunctionTool>
-        docs: >-
-          NB: Deprecated in favour of tool_calls. A tool call requested by the
-          assistant.
-        availability: deprecated
+    source:
+      openapi: openapi/openapi.auto.json
   ChatRole:
     enum:
       - user
@@ -165,6 +79,8 @@ types:
       - system
       - tool
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   CodeEvaluatorRequest:
     properties:
       arguments_type:
@@ -175,23 +91,19 @@ types:
         docs: The type of the return value of the evaluator.
       evaluator_type: literal<"python">
       code:
-        type: optional<string>
+        type: string
         docs: >-
           The code for the evaluator. This code will be executed in a sandboxed
           environment.
+    source:
+      openapi: openapi/openapi.auto.json
   CommitRequest:
     properties:
       commit_message:
         type: string
         docs: Message describing the changes made.
-  ConfigResponse:
-    discriminated: false
-    union:
-      - ModelConfigResponse
-      - ToolConfigResponse
-      - EvaluatorConfigResponse
-      - AgentConfigResponse
-      - GenericConfigResponse
+    source:
+      openapi: openapi/openapi.auto.json
   CreateDatapointRequestTargetValue:
     discriminated: false
     union:
@@ -199,8 +111,10 @@ types:
       - integer
       - double
       - boolean
-      - map<string, unknown>
       - list<unknown>
+      - map<string, unknown>
+    source:
+      openapi: openapi/openapi.auto.json
   CreateDatapointRequest:
     properties:
       inputs:
@@ -215,6 +129,8 @@ types:
           Object with criteria necessary to evaluate generations with this
           Datapoint. This is passed in as an argument to Evaluators when used in
           an Evaluation.
+    source:
+      openapi: openapi/openapi.auto.json
   CreateEvaluationRequest:
     docs: >-
       Request model for creating an Evaluation.
@@ -232,13 +148,17 @@ types:
         type: EvaluationsDatasetRequest
         docs: The Dataset Version to use in this Evaluation.
       evaluatees:
+        type: optional<list<EvaluateeRequest>>
         docs: >-
           Unique identifiers for the Prompt/Tool Versions to include in the
-          Evaluation Report.
-        type: list<EvaluateeRequest>
+          Evaluation Report. Can be left unpopulated if you wish to add
+          evaluatees to this Evaluation Report by specifying `evaluation_id` in
+          Log calls.
       evaluators:
         docs: The Evaluators used to evaluate.
         type: list<EvaluationsRequest>
+    source:
+      openapi: openapi/openapi.auto.json
   CreateEvaluatorLogResponse:
     properties:
       id:
@@ -256,6 +176,8 @@ types:
       version_id:
         type: string
         docs: Identifier of Evaluator Version for which the Log was registered.
+    source:
+      openapi: openapi/openapi.auto.json
   CreatePromptLogResponse:
     properties:
       id:
@@ -270,6 +192,8 @@ types:
       session_id:
         type: optional<string>
         docs: String ID of session the log belongs to.
+    source:
+      openapi: openapi/openapi.auto.json
   CreateToolLogResponse:
     properties:
       id:
@@ -284,11 +208,15 @@ types:
       session_id:
         type: optional<string>
         docs: String ID of session the log belongs to.
+    source:
+      openapi: openapi/openapi.auto.json
   DashboardConfiguration:
     properties:
       time_unit: TimeUnit
       time_range_days: integer
       model_config_ids: list<string>
+    source:
+      openapi: openapi/openapi.auto.json
   DatapointResponseTargetValue:
     discriminated: false
     union:
@@ -296,8 +224,10 @@ types:
       - integer
       - double
       - boolean
-      - map<string, unknown>
       - list<unknown>
+      - map<string, unknown>
+    source:
+      openapi: openapi/openapi.auto.json
   DatapointResponse:
     properties:
       inputs:
@@ -315,6 +245,8 @@ types:
       id:
         type: string
         docs: Unique identifier for the Datapoint. Starts with `dp_`.
+    source:
+      openapi: openapi/openapi.auto.json
   DatasetResponse:
     docs: >-
       Base type that all File Responses should inherit from.
@@ -373,30 +305,62 @@ types:
         docs: >-
           The list of Datapoints in this Dataset version. Only provided if
           explicitly requested.
+    source:
+      openapi: openapi/openapi.auto.json
   EnvironmentResponse:
     properties:
       id: string
       created_at: datetime
       name: string
       tag: EnvironmentTag
+    source:
+      openapi: openapi/openapi.auto.json
   EnvironmentTag:
     enum:
       - default
       - other
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatedVersionResponse:
     discriminated: false
     union:
       - PromptResponse
       - ToolResponse
       - EvaluatorResponse
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluateeRequest:
+    docs: |-
+      Specification of a File version on Humanloop.
+
+      This can be done in a couple of ways:
+      - Specifying `version_id` directly.
+      - Specifying a File (and optionally an Environment).
+          - A File can be specified by either `path` or `file_id`.
+          - An Environment can be specified by `environment_id`. If no Environment is specified, the default Environment is used.
     properties:
       version_id:
-        type: string
+        type: optional<string>
         docs: >-
-          Unique identifier for the Prompt/Tool Version to include in the
-          Evaluation Report. Starts with `pv_` for Prompts and `tv_` for Tools.
+          Unique identifier for the File Version. If provided, none of the other
+          fields should be specified.
+      path:
+        type: optional<string>
+        docs: >-
+          Path identifying a File. Provide either this or `file_id` if you want
+          to specify a File.
+      file_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the File. Provide either this or `path` if you
+          want to specify a File.
+      environment:
+        type: optional<string>
+        docs: >-
+          Name of the Environment a Version is deployed to. Only provide this
+          when specifying a File. If not provided (and a File is specified), the
+          default Environment is used.
       batch_id:
         type: optional<string>
         docs: >-
@@ -409,6 +373,8 @@ types:
           `True`. If `False`, a log for the Prompt/Tool should be submitted by
           the user via the API.
         default: true
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluateeResponse:
     docs: Version of the Evaluatee being evaluated.
     properties:
@@ -417,13 +383,15 @@ types:
         type: optional<string>
         docs: >-
           Unique identifier for the batch of Logs to include in the Evaluation
-          Report.
+          Report. 
       orchestrated:
         type: boolean
         docs: >-
           Whether the Prompt/Tool is orchestrated by Humanloop. Default is
           `True`. If `False`, a log for the Prompt/Tool should be submitted by
           the user via the API.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluationEvaluatorResponse:
     properties:
       version: EvaluatorResponse
@@ -433,6 +401,8 @@ types:
           Whether the Evaluator is orchestrated by Humanloop. Default is `True`.
           If `False`, a log for the Evaluator should be submitted by the user
           via the API.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluationReportLogResponse:
     properties:
       evaluated_version:
@@ -442,11 +412,13 @@ types:
         type: DatapointResponse
         docs: The Datapoint used to generate the Log
       log:
-        type: optional<SrcExternalAppModelsV5LogsLogResponse>
+        type: optional<LogResponse>
         docs: The Log that was evaluated by the Evaluator.
       evaluator_logs:
         docs: The Evaluator Logs containing the judgments for the Log.
-        type: list<SrcExternalAppModelsV5LogsLogResponse>
+        type: list<LogResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluationResponse:
     properties:
       id:
@@ -480,26 +452,11 @@ types:
       created_at: datetime
       created_by: optional<UserResponse>
       updated_at: datetime
-  EvaluationResultResponseValue:
-    discriminated: false
-    union:
-      - boolean
-      - double
-  EvaluationResultResponse:
-    properties:
-      id: string
-      evaluator_id: string
-      evaluator_version_id: string
-      evaluation_id: optional<string>
-      log_id: string
-      log: optional<SrcExternalAppModelsV4LogLogResponse>
-      version_id: optional<string>
-      version: optional<unknown>
-      value: optional<EvaluationResultResponseValue>
-      error: optional<string>
-      updated_at: datetime
-      created_at: datetime
-      llm_evaluator_log: optional<SrcExternalAppModelsV4LogLogResponse>
+      url:
+        type: optional<string>
+        docs: URL to view the Evaluation on the Humanloop.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluationStats:
     properties:
       overall_stats:
@@ -508,24 +465,31 @@ types:
       version_stats:
         docs: Stats for each Evaluated Version in the Evaluation Report.
         type: list<VersionStats>
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluationStatus:
     enum:
       - pending
       - running
       - completed
       - cancelled
-      - failed
     docs: Status of an evaluation.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorActivationDeactivationRequestActivateItem:
     discriminated: false
     union:
       - MonitoringEvaluatorVersionRequest
       - MonitoringEvaluatorEnvironmentRequest
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorActivationDeactivationRequestDeactivateItem:
     discriminated: false
     union:
       - MonitoringEvaluatorVersionRequest
       - MonitoringEvaluatorEnvironmentRequest
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorActivationDeactivationRequest:
     properties:
       activate:
@@ -536,6 +500,8 @@ types:
       deactivate:
         type: optional<list<EvaluatorActivationDeactivationRequestDeactivateItem>>
         docs: Evaluators to deactivate. These will not be run on new Logs.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorAggregate:
     properties:
       value:
@@ -549,46 +515,48 @@ types:
         docs: ID of the evaluator version.
       created_at: datetime
       updated_at: datetime
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorArgumentsType:
     enum:
       - target_free
       - target_required
     docs: Enum representing the possible argument types of an evaluator.
-  EvaluatorConfigResponse:
+    source:
+      openapi: openapi/openapi.auto.json
+  EvaluatorJudgmentNumberLimit:
     properties:
-      id:
-        type: string
-        docs: String ID of config. Starts with `config_`.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameters that define the config.
-      type: literal<"evaluator">
-      created_by:
-        type: optional<BaseModelsUserResponse>
-        docs: The user who created the config.
-      status:
-        type: string
-        docs: Whether the config is committed or not.
+      min:
+        type: optional<double>
+        docs: The minimum value that can be selected.
+      max:
+        type: optional<double>
+        docs: The maximum value that can be selected.
+      step:
+        type: optional<double>
+        docs: The step size for the number input.
+    source:
+      openapi: openapi/openapi.auto.json
+  EvaluatorJudgmentOptionResponse:
+    properties:
       name:
         type: string
-        docs: Name of config.
-      description:
-        type: optional<string>
-        docs: Description of config.
-      evaluator_type:
-        type: string
-        docs: Type of evaluator.
-      code:
-        type: optional<string>
-        docs: >-
-          The code for the evaluator. This code will be executed in a sandboxed
-          environment.
-      arguments_type:
-        type: optional<EvaluatorArgumentsType>
-        docs: Whether this evaluator is target-free or target-required.
-      return_type:
-        type: optional<EvaluatorReturnTypeEnum>
-        docs: The type of the return value of the evaluator.
+        docs: The name of the option.
+      valence:
+        type: optional<Valence>
+        docs: Whether this option should be considered positive or negative.
+    source:
+      openapi: openapi/openapi.auto.json
+  EvaluatorLogResponseJudgment:
+    discriminated: false
+    docs: Evaluator assessment of the Log.
+    union:
+      - boolean
+      - string
+      - list<string>
+      - double
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorLogResponse:
     docs: General request for creating a Log
     properties:
@@ -607,6 +575,9 @@ types:
       provider_latency:
         type: optional<double>
         docs: Duration of the logged event in seconds.
+      stdout:
+        type: optional<string>
+        docs: Captured log and debug statements.
       provider_request:
         type: optional<map<string, unknown>>
         docs: Raw request sent to provider.
@@ -619,9 +590,9 @@ types:
           Unique identifier for the Session to associate the Log to. Allows you
           to record multiple Logs to a Session (using an ID kept by your
           internal systems) by passing the same `session_id` in subsequent log
-          requests.
+          requests. 
       parent_id:
-        type: string
+        type: optional<string>
         docs: >-
           Identifier of the evaluated Log. The newly created Log will have this
           one set as parent.
@@ -656,13 +627,27 @@ types:
       environment:
         type: optional<string>
         docs: The name of the Environment the Log is associated to.
-      judgment: optional<unknown>
+      judgment:
+        type: optional<EvaluatorLogResponseJudgment>
+        docs: Evaluator assessment of the Log.
       id:
         type: string
         docs: Unique identifier for the Log.
+      evaluator_logs:
+        docs: >-
+          List of Evaluator Logs associated with the Log. These contain
+          Evaluator judgments on the Log.
+        type: list<EvaluatorLogResponse>
       evaluator:
         type: EvaluatorResponse
         docs: The Evaluator used to generate the judgment.
+      parent:
+        type: optional<LogResponse>
+        docs: >-
+          The Log that was evaluated. Only provided if the ?include_parent query
+          parameter is set for the 
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorResponseSpec:
     discriminated: false
     union:
@@ -670,6 +655,8 @@ types:
       - CodeEvaluatorRequest
       - HumanEvaluatorRequest
       - ExternalEvaluatorRequest
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorResponse:
     docs: Version of the Evaluator used to provide judgments.
     properties:
@@ -726,71 +713,18 @@ types:
       evaluator_aggregates:
         type: optional<list<EvaluatorAggregate>>
         docs: Aggregation of Evaluator results for the Evaluator Version.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluatorReturnTypeEnum:
     enum:
       - boolean
       - number
+      - select
+      - multi_select
+      - text
     docs: Enum representing the possible return types of an evaluator.
-  ExperimentResponse:
-    properties:
-      id:
-        type: string
-        docs: String ID of experiment. Starts with `exp_`.
-      file_id:
-        type: string
-        docs: String ID of file the experiment belongs to.
-      name:
-        type: string
-        docs: Name of experiment.
-      status:
-        type: ExperimentStatus
-        docs: Status of experiment.
-      versions:
-        type: optional<list<ExperimentVersionResponse>>
-        docs: List of Versions associated to the experiment.
-      metric:
-        type: BaseMetricResponse
-        docs: Metric used as the experiment's objective.
-      positive_labels:
-        docs: >-
-          Feedback labels to treat as positive user feedback. Used to monitor
-          the performance of model configs in the experiment.
-        type: list<PositiveLabel>
-      created_at: datetime
-      updated_at: datetime
-  ExperimentStatus:
-    enum:
-      - Initialized
-      - value: In progress
-        name: InProgress
-    docs: An enumeration.
-  ExperimentVersionResponse:
-    properties:
-      mean:
-        type: optional<double>
-        docs: The mean performance of the Version.
-      spread:
-        type: optional<double>
-        docs: The spread of performance of the Version.
-      trials_count:
-        type: integer
-        docs: Number of datapoints with feedback associated to the experiment.
-      active:
-        type: boolean
-        docs: >-
-          Whether the Version is active in the experiment. Only active model
-          configs can be sampled from the experiment.
-      id:
-        type: string
-        docs: String ID of Version.
-      commit_message:
-        type: optional<string>
-        docs: Commit message of Version.
-      version_id:
-        type: string
-        docs: Version of the Prompt or Tool.
-      created_at: datetime
-      updated_at: datetime
+    source:
+      openapi: openapi/openapi.auto.json
   ExternalEvaluatorRequest:
     properties:
       arguments_type:
@@ -803,82 +737,8 @@ types:
       metadata:
         type: optional<map<string, unknown>>
         docs: Metadata describing the external Evaluator.
-  FeedbackClass:
-    enum:
-      - select
-      - multi_select
-      - text
-      - number
-    docs: An enumeration.
-  FeedbackLabelStatus:
-    enum:
-      - unset
-      - active
-      - inactive
-    docs: Controls whether the label is displayed in the UI.
-  FeedbackResponseType:
-    discriminated: false
-    docs: >-
-      The type of feedback. The default feedback types available are 'rating',
-      'action', 'issue', 'correction', and 'comment'.
-    union:
-      - FeedbackType
-      - string
-  FeedbackResponseValue:
-    discriminated: false
-    docs: >-
-      The feedback value to set. This would be the appropriate text for
-      'correction' or 'comment', or a label to apply for 'rating', 'action', or
-      'issue'.
-    union:
-      - double
-      - string
-  FeedbackResponse:
-    properties:
-      type:
-        type: FeedbackResponseType
-        docs: >-
-          The type of feedback. The default feedback types available are
-          'rating', 'action', 'issue', 'correction', and 'comment'.
-      value:
-        type: FeedbackResponseValue
-        docs: >-
-          The feedback value to set. This would be the appropriate text for
-          'correction' or 'comment', or a label to apply for 'rating', 'action',
-          or 'issue'.
-      data_id:
-        type: optional<string>
-        docs: ID to associate the feedback to a previously logged datapoint.
-      user:
-        type: optional<string>
-        docs: A unique identifier to who provided the feedback.
-      created_at:
-        type: optional<datetime>
-        docs: 'User defined timestamp for when the feedback was created. '
-      id:
-        type: string
-        docs: String ID of user feedback. Starts with `ann_`, short for annotation.
-  FeedbackTypeModelType:
-    discriminated: false
-    docs: >-
-      The type of feedback. The default feedback types available are 'rating',
-      'action', 'issue', 'correction', and 'comment'.
-    union:
-      - FeedbackType
-      - string
-  FeedbackTypeModel:
-    properties:
-      type:
-        type: FeedbackTypeModelType
-        docs: >-
-          The type of feedback. The default feedback types available are
-          'rating', 'action', 'issue', 'correction', and 'comment'.
-      values:
-        type: optional<list<CategoricalFeedbackLabel>>
-        docs: >-
-          The allowed values for categorical feedback types. Not populated for
-          `correction` and `comment`.
-  FeedbackTypes: list<FeedbackTypeModel>
+    source:
+      openapi: openapi/openapi.auto.json
   FileEnvironmentResponseFile:
     discriminated: false
     docs: >-
@@ -889,6 +749,8 @@ types:
       - ToolResponse
       - DatasetResponse
       - EvaluatorResponse
+    source:
+      openapi: openapi/openapi.auto.json
   FileEnvironmentResponse:
     docs: >-
       Response model for the List Environments endpoint under Files.
@@ -906,54 +768,72 @@ types:
         docs: >-
           The version of the File that is deployed to the Environment, if one is
           deployed.
+    source:
+      openapi: openapi/openapi.auto.json
   FunctionTool:
     docs: A function tool to be called by the model where user owns runtime.
     properties:
       name: string
       arguments: optional<string>
+    source:
+      openapi: openapi/openapi.auto.json
   FunctionToolChoice:
     docs: A function tool to be called by the model where user owns runtime.
     properties:
       name: string
-  GenericConfigResponse:
-    properties:
-      id:
-        type: string
-        docs: String ID of config. Starts with `config_`.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameters that define the config.
-      type: literal<"generic">
-      created_by:
-        type: optional<BaseModelsUserResponse>
-        docs: The user who created the config.
-      status:
-        type: string
-        docs: Whether the config is committed or not.
-      name:
-        type: string
-        docs: Name of config.
-      description:
-        type: optional<string>
-        docs: Description of config.
+    source:
+      openapi: openapi/openapi.auto.json
   HttpValidationError:
     properties:
       detail: optional<list<ValidationError>>
+    source:
+      openapi: openapi/openapi.auto.json
+  HumanEvaluatorRequestReturnType:
+    enum:
+      - select
+      - multi_select
+      - text
+      - number
+      - boolean
+    docs: The type of the return value of the Evaluator.
+    source:
+      openapi: openapi/openapi.auto.json
   HumanEvaluatorRequest:
     properties:
       arguments_type:
         type: EvaluatorArgumentsType
         docs: Whether this evaluator is target-free or target-required.
       return_type:
-        type: EvaluatorReturnTypeEnum
-        docs: The type of the return value of the evaluator.
+        type: HumanEvaluatorRequestReturnType
+        docs: The type of the return value of the Evaluator.
       evaluator_type: literal<"human">
+      instructions:
+        type: optional<string>
+        docs: Instructions for the Human annotating the .
+      options:
+        type: optional<list<EvaluatorJudgmentOptionResponse>>
+        docs: The options that the Human annotator can choose from.
+      number_limits:
+        type: optional<EvaluatorJudgmentNumberLimit>
+        docs: >-
+          Limits on the judgment that can be applied. Only for Evaluators with
+          `return_type` of `'number'`.
+      number_valence:
+        type: optional<Valence>
+        docs: >-
+          The valence of the number judgment. Only for Evaluators with
+          `return_type` of `'number'`. If 'positive', a higher number is better.
+          If 'negative', a lower number is better.
+    source:
+      openapi: openapi/openapi.auto.json
   ImageChatContent:
     properties:
       type: literal<"image_url">
       image_url:
         type: ImageUrl
         docs: The message's image content.
+    source:
+      openapi: openapi/openapi.auto.json
   ImageUrlDetail:
     enum:
       - high
@@ -963,6 +843,8 @@ types:
       Specify the detail level of the image provided to the model. For more
       details see:
       https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding
+    source:
+      openapi: openapi/openapi.auto.json
   ImageUrl:
     properties:
       url:
@@ -974,11 +856,15 @@ types:
           Specify the detail level of the image provided to the model. For more
           details see:
           https://platform.openai.com/docs/guides/vision/low-or-high-fidelity-image-understanding
+    source:
+      openapi: openapi/openapi.auto.json
   InputResponse:
     properties:
       name:
         type: string
         docs: Type of input.
+    source:
+      openapi: openapi/openapi.auto.json
   LlmEvaluatorRequest:
     properties:
       arguments_type:
@@ -991,35 +877,8 @@ types:
       prompt:
         type: optional<PromptKernelRequest>
         docs: The prompt parameters used to generate.
-  LabelSentiment:
-    enum:
-      - positive
-      - negative
-      - neutral
-      - unset
-    docs: |-
-      How a label should be treated in calculating Version performance.
-
-      Used by a File's PAPV (Positive Action Per View) metric.
-  LinkedToolRequest:
-    properties:
-      id:
-        type: string
-        docs: The ID of the linked tool. Starts with "oc_"
-      source:
-        type: literal<"organization">
-        docs: >-
-          The source of the linked tool. For a linked tool it should be
-          `organization`
-      name:
-        type: optional<string>
-        docs: The name of the linked tool.
-      description:
-        type: optional<string>
-        docs: The description of the linked tool.
-      parameters:
-        type: optional<map<string, unknown>>
-        docs: The parameters of the linked tool.
+    source:
+      openapi: openapi/openapi.auto.json
   LinkedToolResponse:
     properties:
       name:
@@ -1028,6 +887,12 @@ types:
       description:
         type: string
         docs: Description of the tool referenced by the model
+      strict:
+        type: optional<boolean>
+        docs: >-
+          If true, forces the model to output json data in the structure of the
+          parameters schema.
+        default: false
       parameters:
         type: optional<map<string, unknown>>
         docs: >-
@@ -1039,280 +904,52 @@ types:
       version_id:
         type: string
         docs: Unique identifier for the Tool Version linked.
+    source:
+      openapi: openapi/openapi.auto.json
   ListDatasets:
     properties:
       records:
         docs: The list of Datasets.
         type: list<DatasetResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   ListEvaluators:
     properties:
       records:
         docs: The list of Evaluators.
         type: list<EvaluatorResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   ListPrompts:
     properties:
       records:
         docs: The list of Prompts.
         type: list<PromptResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   ListTools:
     properties:
       records:
         docs: The list of Tools.
         type: list<ToolResponse>
-  MetricValueResponse:
-    properties:
-      metric_id: string
-      metric_name: string
-      metric_value: double
-  ModelConfigRequestStop:
-    discriminated: false
-    docs: >-
-      The string (or list of strings) after which the model will stop
-      generating. The returned text will not contain the stop sequence.
-    union:
-      - string
-      - list<string>
-  ModelConfigRequestToolsItem:
+    source:
+      openapi: openapi/openapi.auto.json
+  LogResponse:
     discriminated: false
     union:
-      - LinkedToolRequest
-      - ModelConfigToolRequest
-  ModelConfigRequest:
-    docs: Model config used for logging both chat and completion.
-    properties:
-      name:
-        type: optional<string>
-        docs: >-
-          A friendly display name for the model config. If not provided, a name
-          will be generated.
-      description:
-        type: optional<string>
-        docs: A description of the model config.
-      provider:
-        type: optional<ModelProviders>
-        docs: The company providing the underlying model service.
-      model:
-        type: string
-        docs: The model instance used. E.g. text-davinci-002.
-      max_tokens:
-        type: optional<integer>
-        docs: >-
-          The maximum number of tokens to generate. Provide max_tokens=-1 to
-          dynamically calculate the maximum number of tokens to generate given
-          the length of the prompt
-        default: -1
-      temperature:
-        type: optional<double>
-        docs: >-
-          What sampling temperature to use when making a generation. Higher
-          values means the model will be more creative.
-        default: 1
-      top_p:
-        type: optional<double>
-        docs: >-
-          An alternative to sampling with temperature, called nucleus sampling,
-          where the model considers the results of the tokens with top_p
-          probability mass.
-        default: 1
-      stop:
-        type: optional<ModelConfigRequestStop>
-        docs: >-
-          The string (or list of strings) after which the model will stop
-          generating. The returned text will not contain the stop sequence.
-      presence_penalty:
-        type: optional<double>
-        docs: >-
-          Number between -2.0 and 2.0. Positive values penalize new tokens based
-          on whether they appear in the generation so far.
-        default: 0
-      frequency_penalty:
-        type: optional<double>
-        docs: >-
-          Number between -2.0 and 2.0. Positive values penalize new tokens based
-          on how frequently they appear in the generation so far.
-        default: 0
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameter values to be passed to the provider call.
-      seed:
-        type: optional<integer>
-        docs: >-
-          If specified, model will make a best effort to sample
-          deterministically, but it is not guaranteed.
-      response_format:
-        type: optional<ResponseFormat>
-        docs: >-
-          The format of the response. Only type json_object is currently
-          supported for chat.
-      endpoint:
-        type: optional<ModelEndpoints>
-        docs: The provider model endpoint used.
-      prompt_template:
-        type: optional<string>
-        docs: >-
-          Prompt template that will take your specified inputs to form your
-          final request to the model. Input variables within the prompt template
-          should be specified with syntax: {{INPUT_NAME}}.
-      chat_template:
-        type: optional<list<ChatMessageWithToolCall>>
-        docs: >-
-          Messages prepended to the list of messages sent to the provider. These
-          messages that will take your specified inputs to form your final
-          request to the provider model. Input variables within the template
-          should be specified with syntax: {{INPUT_NAME}}.
-      tools:
-        type: optional<list<ModelConfigRequestToolsItem>>
-        docs: Make tools available to OpenAIs chat model as functions.
-      type: optional<literal<"model">>
-  ModelConfigResponseStop:
-    discriminated: false
-    docs: >-
-      The string (or list of strings) after which the model will stop
-      generating. The returned text will not contain the stop sequence.
-    union:
-      - string
-      - list<string>
-  ModelConfigResponse:
-    docs: >-
-      Model config request.
-
-
-      Contains fields that are common to all (i.e. both chat and complete)
-      endpoints.
-    properties:
-      id:
-        type: string
-        docs: String ID of config. Starts with `config_`.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameter values to be passed to the provider call.
-      type: literal<"model">
-      name:
-        type: optional<string>
-        docs: >-
-          A friendly display name for the model config. If not provided, a name
-          will be generated.
-      description:
-        type: optional<string>
-        docs: A description of the model config.
-      provider:
-        type: optional<ModelProviders>
-        docs: The company providing the underlying model service.
-      model:
-        type: string
-        docs: The model instance used. E.g. text-davinci-002.
-      max_tokens:
-        type: optional<integer>
-        docs: >-
-          The maximum number of tokens to generate. Provide max_tokens=-1 to
-          dynamically calculate the maximum number of tokens to generate given
-          the length of the prompt
-        default: -1
-      temperature:
-        type: optional<double>
-        docs: >-
-          What sampling temperature to use when making a generation. Higher
-          values means the model will be more creative.
-        default: 1
-      top_p:
-        type: optional<double>
-        docs: >-
-          An alternative to sampling with temperature, called nucleus sampling,
-          where the model considers the results of the tokens with top_p
-          probability mass.
-        default: 1
-      stop:
-        type: optional<ModelConfigResponseStop>
-        docs: >-
-          The string (or list of strings) after which the model will stop
-          generating. The returned text will not contain the stop sequence.
-      presence_penalty:
-        type: optional<double>
-        docs: >-
-          Number between -2.0 and 2.0. Positive values penalize new tokens based
-          on whether they appear in the generation so far.
-        default: 0
-      frequency_penalty:
-        type: optional<double>
-        docs: >-
-          Number between -2.0 and 2.0. Positive values penalize new tokens based
-          on how frequently they appear in the generation so far.
-        default: 0
-      seed:
-        type: optional<integer>
-        docs: >-
-          If specified, model will make a best effort to sample
-          deterministically, but it is not guaranteed.
-      response_format:
-        type: optional<ResponseFormat>
-        docs: >-
-          The format of the response. Only type json_object is currently
-          supported for chat.
-      prompt_template:
-        type: optional<string>
-        docs: >-
-          Prompt template that will take your specified inputs to form your
-          final request to the model. NB: Input variables within the prompt
-          template should be specified with syntax: {{INPUT_NAME}}.
-      chat_template:
-        type: optional<list<ChatMessageWithToolCall>>
-        docs: >-
-          Messages prepended to the list of messages sent to the provider. These
-          messages that will take your specified inputs to form your final
-          request to the provider model. NB: Input variables within the template
-          should be specified with syntax: {{INPUT_NAME}}.
-      tool_configs:
-        type: optional<list<ToolConfigResponse>>
-        docs: >-
-          NB: Deprecated with tools field. Definition of tools shown to the
-          model.
-        availability: deprecated
-      tools:
-        type: optional<list<ConfigToolResponse>>
-        docs: Tools shown to the model.
-      endpoint:
-        type: optional<ModelEndpoints>
-        docs: The provider model endpoint used.
-  ModelConfigToolRequest:
-    docs: |-
-      Definition of tool within a model config.
-
-      The subset of ToolConfig parameters received by the chat endpoint.
-      Does not have things like the signature or setup schema.
-    properties:
-      name:
-        type: string
-        docs: The name of the tool shown to the model.
-      description:
-        type: optional<string>
-        docs: The description of the tool shown to the model.
-      parameters:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Definition of parameters needed to run the tool. Provided in
-          jsonschema format: https://json-schema.org/
-      source:
-        type: optional<ToolSource>
-        docs: >-
-          Source of the tool. If defined at an organization level will be
-          'organization' else 'inline'.
-      source_code:
-        type: optional<string>
-        docs: Code source of the tool.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameters that define the config.
-      preset_name:
-        type: optional<string>
-        docs: >-
-          If is_preset = true, this is the name of the preset tool on Humanloop.
-          This is used as the key to look up the Humanloop runtime of the tool
+      - PromptLogResponse
+      - ToolLogResponse
+      - EvaluatorLogResponse
+    source:
+      openapi: openapi/openapi.auto.json
   ModelEndpoints:
     enum:
       - complete
       - chat
       - edit
     docs: Supported model provider endpoints.
+    source:
+      openapi: openapi/openapi.auto.json
   ModelProviders:
     enum:
       - openai
@@ -1324,6 +961,8 @@ types:
       - google
       - groq
     docs: Supported model providers.
+    source:
+      openapi: openapi/openapi.auto.json
   MonitoringEvaluatorEnvironmentRequest:
     properties:
       evaluator_id:
@@ -1334,6 +973,8 @@ types:
         docs: >-
           Unique identifier for the Environment. The Evaluator Version deployed
           to this Environment will be used for monitoring.
+    source:
+      openapi: openapi/openapi.auto.json
   MonitoringEvaluatorResponse:
     properties:
       version_reference:
@@ -1349,16 +990,22 @@ types:
         docs: The state of the Monitoring Evaluator. Either `active` or `inactive`
       created_at: datetime
       updated_at: datetime
+    source:
+      openapi: openapi/openapi.auto.json
   MonitoringEvaluatorState:
     enum:
       - active
       - inactive
     docs: State of an evaluator connected to a file
+    source:
+      openapi: openapi/openapi.auto.json
   MonitoringEvaluatorVersionRequest:
     properties:
       evaluator_version_id:
         type: string
         docs: Unique identifier for the Evaluator Version to be used for monitoring.
+    source:
+      openapi: openapi/openapi.auto.json
   NumericEvaluatorVersionStats:
     docs: |-
       Base attributes for stats for an Evaluator Version-Evaluated Version pair
@@ -1388,6 +1035,8 @@ types:
       mean: optional<double>
       std: optional<double>
       percentiles: map<string, double>
+    source:
+      openapi: openapi/openapi.auto.json
   ObservabilityStatus:
     enum:
       - pending
@@ -1398,6 +1047,8 @@ types:
       Status of a Log for observability.
 
       Observability is implemented by running monitoring Evaluators on Logs.
+    source:
+      openapi: openapi/openapi.auto.json
   OverallStats:
     properties:
       num_datapoints:
@@ -1411,76 +1062,96 @@ types:
       total_evaluator_logs:
         type: integer
         docs: The total number of Evaluator Logs in the Evaluation Report.
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDatapointResponse:
     properties:
       records: list<DatapointResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDatasetResponse:
     properties:
       records: list<DatasetResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDataEvaluationReportLogResponse:
     properties:
       records: list<EvaluationReportLogResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedEvaluationResponse:
     properties:
       records: list<EvaluationResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDataEvaluatorResponse:
     properties:
       records: list<EvaluatorResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDataLogResponse:
     properties:
-      records: list<SrcExternalAppModelsV5LogsLogResponse>
+      records: list<LogResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDataPromptResponse:
     properties:
       records: list<PromptResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedSessionResponse:
     properties:
       records: list<SessionResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PaginatedDataToolResponse:
     properties:
       records: list<ToolResponse>
       page: integer
       size: integer
       total: integer
+    source:
+      openapi: openapi/openapi.auto.json
   PlatformAccessEnum:
     enum:
       - superadmin
       - supportadmin
       - user
     docs: An enumeration.
-  PositiveLabel:
-    properties:
-      type: string
-      value: string
+    source:
+      openapi: openapi/openapi.auto.json
   ProjectSortBy:
     enum:
       - created_at
       - updated_at
       - name
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   PromptCallLogResponse:
     docs: Sample specific response details for a Prompt call
     properties:
@@ -1499,6 +1170,9 @@ types:
       provider_latency:
         type: optional<double>
         docs: Duration of the logged event in seconds.
+      stdout:
+        type: optional<string>
+        docs: Captured log and debug statements.
       output_message:
         type: optional<ChatMessage>
         docs: The message returned by the provider.
@@ -1520,6 +1194,8 @@ types:
       index:
         type: integer
         docs: The index of the sample in the batch.
+    source:
+      openapi: openapi/openapi.auto.json
   PromptCallResponseToolChoice:
     discriminated: false
     docs: >-
@@ -1542,6 +1218,8 @@ types:
       - literal<"auto">
       - literal<"required">
       - ToolChoice
+    source:
+      openapi: openapi/openapi.auto.json
   PromptCallResponse:
     docs: Response model for a Prompt call with potentially multiple log samples.
     properties:
@@ -1576,7 +1254,7 @@ types:
           Unique identifier for the Session to associate the Log to. Allows you
           to record multiple Logs to a Session (using an ID kept by your
           internal systems) by passing the same `session_id` in subsequent log
-          requests.
+          requests. 
       parent_id:
         type: optional<string>
         docs: >-
@@ -1620,6 +1298,8 @@ types:
       logs:
         docs: The logs generated by the Prompt call.
         type: list<PromptCallLogResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptCallStreamResponse:
     docs: Response model for calling Prompt in streaming mode.
     properties:
@@ -1638,6 +1318,9 @@ types:
       provider_latency:
         type: optional<double>
         docs: Duration of the logged event in seconds.
+      stdout:
+        type: optional<string>
+        docs: Captured log and debug statements.
       output_message:
         type: optional<ChatMessage>
         docs: The message returned by the provider.
@@ -1668,6 +1351,8 @@ types:
       version_id:
         type: string
         docs: ID of the specific version of the Prompt.
+    source:
+      openapi: openapi/openapi.auto.json
   PromptKernelRequestTemplate:
     discriminated: false
     docs: >-
@@ -1677,6 +1362,8 @@ types:
     union:
       - string
       - list<ChatMessage>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptKernelRequestStop:
     discriminated: false
     docs: >-
@@ -1685,6 +1372,8 @@ types:
     union:
       - string
       - list<string>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptKernelRequest:
     properties:
       model:
@@ -1765,6 +1454,8 @@ types:
           The IDs of the Tools in your organization that the model can choose to
           call if Tool calling is supported. The default deployed version of
           that tool is called.
+    source:
+      openapi: openapi/openapi.auto.json
   PromptLogResponseToolChoice:
     discriminated: false
     docs: >-
@@ -1787,6 +1478,8 @@ types:
       - literal<"auto">
       - literal<"required">
       - ToolChoice
+    source:
+      openapi: openapi/openapi.auto.json
   PromptLogResponse:
     docs: General request for creating a Log
     properties:
@@ -1848,6 +1541,9 @@ types:
       provider_latency:
         type: optional<double>
         docs: Duration of the logged event in seconds.
+      stdout:
+        type: optional<string>
+        docs: Captured log and debug statements.
       provider_request:
         type: optional<map<string, unknown>>
         docs: Raw request sent to provider.
@@ -1860,7 +1556,7 @@ types:
           Unique identifier for the Session to associate the Log to. Allows you
           to record multiple Logs to a Session (using an ID kept by your
           internal systems) by passing the same `session_id` in subsequent log
-          requests.
+          requests. 
       parent_id:
         type: optional<string>
         docs: >-
@@ -1901,6 +1597,13 @@ types:
       id:
         type: string
         docs: Unique identifier for the Log.
+      evaluator_logs:
+        docs: >-
+          List of Evaluator Logs associated with the Log. These contain
+          Evaluator judgments on the Log.
+        type: list<EvaluatorLogResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptResponseTemplate:
     discriminated: false
     docs: >-
@@ -1910,6 +1613,8 @@ types:
     union:
       - string
       - list<ChatMessage>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptResponseStop:
     discriminated: false
     docs: >-
@@ -1918,6 +1623,8 @@ types:
     union:
       - string
       - list<string>
+    source:
+      openapi: openapi/openapi.auto.json
   PromptResponse:
     docs: >-
       Base type that all File Responses should inherit from.
@@ -2058,6 +1765,8 @@ types:
       evaluator_aggregates:
         type: optional<list<EvaluatorAggregate>>
         docs: Aggregation of Evaluator results for the Prompt Version.
+    source:
+      openapi: openapi/openapi.auto.json
   ProviderApiKeys:
     properties:
       openai: optional<string>
@@ -2067,10 +1776,61 @@ types:
       cohere: optional<string>
       openai_azure: optional<string>
       openai_azure_endpoint: optional<string>
+    source:
+      openapi: openapi/openapi.auto.json
+  ResponseFormatType:
+    enum:
+      - json_object
+      - json_schema
+    source:
+      openapi: openapi/openapi.auto.json
   ResponseFormat:
     docs: Response format of the model.
     properties:
-      type: literal<"json_object">
+      type: ResponseFormatType
+      json_schema:
+        type: optional<map<string, unknown>>
+        docs: The JSON schema of the response format if type is json_schema.
+    source:
+      openapi: openapi/openapi.auto.json
+  SelectEvaluatorVersionStats:
+    docs: Also used for 'multi_select' Evaluator versions
+    properties:
+      evaluator_version_id:
+        type: string
+        docs: Unique identifier for the Evaluator Version.
+      total_logs:
+        type: integer
+        docs: >-
+          The total number of Logs generated by this Evaluator Version on the
+          Evaluated Version's Logs. This includes Nulls and Errors.
+      num_judgments:
+        type: integer
+        docs: >-
+          The total number of Evaluator judgments for this Evaluator Version.
+          This excludes Nulls and Errors.
+      num_nulls:
+        type: integer
+        docs: >-
+          The total number of null judgments (i.e. abstentions) for this
+          Evaluator Version.
+      num_errors:
+        type: integer
+        docs: The total number of errored Evaluators for this Evaluator Version.
+      num_judgments_per_option:
+        type: map<string, integer>
+        docs: >-
+          The total number of Evaluator judgments for this Evaluator Version.
+          This is a mapping of the option name to the number of judgments for
+          that option.
+    source:
+      openapi: openapi/openapi.auto.json
+  SessionEventResponse:
+    properties:
+      log: LogResponse
+      children: list<SessionEventResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   SessionResponse:
     properties:
       id:
@@ -2078,122 +1838,86 @@ types:
         docs: Unique identifier for the Session.
       created_at: datetime
       updated_at: datetime
-      logs:
-        docs: List of Logs associated with this Session.
-        type: list<SrcExternalAppModelsV5LogsLogResponse>
+      first_inputs:
+        type: optional<map<string, unknown>>
+        docs: Inputs for the first datapoint in the session.
+      last_output:
+        type: optional<string>
+        docs: Output for the last datapoint in the session.
+      logs_count:
+        type: integer
+        docs: Number of logs associated to this session.
+      events:
+        docs: List of events associated with this Session.
+        type: list<SessionEventResponse>
+    source:
+      openapi: openapi/openapi.auto.json
   SortOrder:
     enum:
       - asc
       - desc
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   TextChatContent:
     properties:
       type: literal<"text">
       text:
         type: string
         docs: The message's text content.
+    source:
+      openapi: openapi/openapi.auto.json
+  TextEvaluatorVersionStats:
+    docs: |-
+      Base attributes for stats for an Evaluator Version-Evaluated Version pair
+      in the Evaluation Report.
+    properties:
+      evaluator_version_id:
+        type: string
+        docs: Unique identifier for the Evaluator Version.
+      total_logs:
+        type: integer
+        docs: >-
+          The total number of Logs generated by this Evaluator Version on the
+          Evaluated Version's Logs. This includes Nulls and Errors.
+      num_judgments:
+        type: integer
+        docs: >-
+          The total number of Evaluator judgments for this Evaluator Version.
+          This excludes Nulls and Errors.
+      num_nulls:
+        type: integer
+        docs: >-
+          The total number of null judgments (i.e. abstentions) for this
+          Evaluator Version.
+      num_errors:
+        type: integer
+        docs: The total number of errored Evaluators for this Evaluator Version.
+    source:
+      openapi: openapi/openapi.auto.json
   TimeUnit:
     enum:
       - day
       - week
       - month
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   ToolCall:
     docs: A tool call to be made.
     properties:
       id: string
       type: ChatToolType
       function: FunctionTool
+    source:
+      openapi: openapi/openapi.auto.json
   ToolChoice:
     docs: Tool choice to force the model to use a tool.
     properties:
       type: ChatToolType
       function: FunctionToolChoice
-  ToolConfigRequest:
-    docs: |-
-      Definition of tool within a model config.
-
-      The subset of ToolConfig parameters received by the chat endpoint.
-      Does not have things like the signature or setup schema.
-    properties:
-      name:
-        type: string
-        docs: The name of the tool shown to the model.
-      description:
-        type: optional<string>
-        docs: The description of the tool shown to the model.
-      parameters:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Definition of parameters needed to run the tool. Provided in
-          jsonschema format: https://json-schema.org/
-      source:
-        type: optional<ToolSource>
-        docs: >-
-          Source of the tool. If defined at an organization level will be
-          'organization' else 'inline'.
-      source_code:
-        type: optional<string>
-        docs: Code source of the tool.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameters that define the config.
-      preset_name:
-        type: optional<string>
-        docs: >-
-          If is_preset = true, this is the name of the preset tool on Humanloop.
-          This is used as the key to look up the Humanloop runtime of the tool
-      type: literal<"tool">
-  ToolConfigResponse:
-    properties:
-      id:
-        type: string
-        docs: String ID of config. Starts with `config_`.
-      other:
-        type: optional<map<string, unknown>>
-        docs: Other parameters that define the config.
-      type: literal<"tool">
-      created_by:
-        type: optional<BaseModelsUserResponse>
-        docs: The user who created the config.
-      status:
-        type: string
-        docs: Whether the config is committed or not.
-      name:
-        type: string
-        docs: Name for the tool referenced by the model.
-      description:
-        type: optional<string>
-        docs: Description of the tool referenced by the model
-      source:
-        type: optional<ToolSource>
-        docs: >-
-          Source of the tool. If defined at an organization level will be
-          'organization' else 'inline'.
-      source_code:
-        type: optional<string>
-        docs: Code source of the tool.
-      setup_schema:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Definition of parameters needed to run the tool. Provided in
-          jsonschema format: https://json-schema.org/
-      parameters:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Definition of parameters needed to run the tool. Provided in
-          jsonschema format: https://json-schema.org/
-      signature:
-        type: optional<string>
-        docs: The function signature of the tool when being called.
-      is_preset:
-        type: optional<boolean>
-        docs: Whether the tool is one where Humanloop defines runtime or not.
-      preset_name:
-        type: optional<string>
-        docs: >-
-          If is_preset = true, this is the name of the preset tool on Humanloop.
-          This is used as the key to lookup the Humanloop runtime of the tool
+    source:
+      openapi: openapi/openapi.auto.json
   ToolFunction:
     properties:
       name:
@@ -2202,11 +1926,19 @@ types:
       description:
         type: string
         docs: Description of the tool referenced by the model
+      strict:
+        type: optional<boolean>
+        docs: >-
+          If true, forces the model to output json data in the structure of the
+          parameters schema.
+        default: false
       parameters:
         type: optional<map<string, unknown>>
         docs: >-
           Parameters needed to run the Tool, defined in JSON Schema format:
           https://json-schema.org/
+    source:
+      openapi: openapi/openapi.auto.json
   ToolKernelRequest:
     properties:
       function:
@@ -2222,6 +1954,8 @@ types:
         docs: >-
           Values needed to setup the Tool, defined in JSON Schema format:
           https://json-schema.org/
+    source:
+      openapi: openapi/openapi.auto.json
   ToolLogResponse:
     docs: General request for creating a Log
     properties:
@@ -2240,6 +1974,9 @@ types:
       provider_latency:
         type: optional<double>
         docs: Duration of the logged event in seconds.
+      stdout:
+        type: optional<string>
+        docs: Captured log and debug statements.
       provider_request:
         type: optional<map<string, unknown>>
         docs: Raw request sent to provider.
@@ -2252,7 +1989,7 @@ types:
           Unique identifier for the Session to associate the Log to. Allows you
           to record multiple Logs to a Session (using an ID kept by your
           internal systems) by passing the same `session_id` in subsequent log
-          requests.
+          requests. 
       parent_id:
         type: optional<string>
         docs: >-
@@ -2293,43 +2030,48 @@ types:
       id:
         type: string
         docs: Unique identifier for the Log.
+      evaluator_logs:
+        docs: >-
+          List of Evaluator Logs associated with the Log. These contain
+          Evaluator judgments on the Log.
+        type: list<EvaluatorLogResponse>
       tool:
         type: ToolResponse
         docs: Tool details used to generate the Log.
-  ToolResultResponse:
-    docs: A result from a tool used to populate the prompt template
-    properties:
-      id: string
-      name: string
-      signature: string
-      result: string
-  ToolSource:
-    enum:
-      - organization
-      - inline
-    docs: >-
-      Source of tool. Used to differentiate between tools and tool versions when
-      they are combined in a list.
-
-
-      V4 uses organization and inline. Those are deprecated and will be removed
-      in favour of tool and tool_version.
+    source:
+      openapi: openapi/openapi.auto.json
+  ToolResponse: unknown
   UpdateDatesetAction:
     enum:
       - set
       - add
       - remove
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
+  UserResponse: unknown
+  Valence:
+    enum:
+      - positive
+      - negative
+      - neutral
+    docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   ValidationErrorLocItem:
     discriminated: false
     union:
       - string
       - integer
+    source:
+      openapi: openapi/openapi.auto.json
   ValidationError:
     properties:
       loc: list<ValidationErrorLocItem>
       msg: string
       type: string
+    source:
+      openapi: openapi/openapi.auto.json
   VersionDeploymentResponseFile:
     discriminated: false
     docs: The File that the deployed Version belongs to.
@@ -2338,6 +2080,8 @@ types:
       - ToolResponse
       - DatasetResponse
       - EvaluatorResponse
+    source:
+      openapi: openapi/openapi.auto.json
   VersionDeploymentResponse:
     docs: A variable reference to the Version deployed to an Environment
     properties:
@@ -2348,6 +2092,8 @@ types:
         type: EnvironmentResponse
         docs: The Environment that the Version is deployed to.
       type: literal<"environment">
+    source:
+      openapi: openapi/openapi.auto.json
   VersionIdResponseVersion:
     discriminated: false
     docs: The specific Version being referenced.
@@ -2356,6 +2102,8 @@ types:
       - ToolResponse
       - DatasetResponse
       - EvaluatorResponse
+    source:
+      openapi: openapi/openapi.auto.json
   VersionIdResponse:
     docs: A reference to a specific Version by its ID
     properties:
@@ -2363,16 +2111,24 @@ types:
         type: VersionIdResponseVersion
         docs: The specific Version being referenced.
       type: literal<"version">
+    source:
+      openapi: openapi/openapi.auto.json
   VersionReferenceResponse:
     discriminated: false
     union:
       - VersionDeploymentResponse
       - VersionIdResponse
+    source:
+      openapi: openapi/openapi.auto.json
   VersionStatsEvaluatorVersionStatsItem:
     discriminated: false
     union:
       - NumericEvaluatorVersionStats
       - BooleanEvaluatorVersionStats
+      - SelectEvaluatorVersionStats
+      - TextEvaluatorVersionStats
+    source:
+      openapi: openapi/openapi.auto.json
   VersionStats:
     docs: Stats for an Evaluated Version in the Evaluation Report.
     properties:
@@ -2391,12 +2147,16 @@ types:
           Stats for each Evaluator Version used to evaluate this Evaluated
           Version.
         type: list<VersionStatsEvaluatorVersionStatsItem>
+    source:
+      openapi: openapi/openapi.auto.json
   VersionStatus:
     enum:
       - uncommitted
       - committed
       - deleted
     docs: An enumeration.
+    source:
+      openapi: openapi/openapi.auto.json
   ChatToolType:
     type: literal<"function">
     docs: The type of tool to call.
@@ -2409,219 +2169,72 @@ types:
       - json_schema
       - get_api_call
     docs: Type of tool.
-  ConfigToolResponse:
+    source:
+      openapi: openapi/openapi.auto.json
+  EvaluationsDatasetRequest:
+    docs: |-
+      Specification of a File version on Humanloop.
+
+      This can be done in a couple of ways:
+      - Specifying `version_id` directly.
+      - Specifying a File (and optionally an Environment).
+          - A File can be specified by either `path` or `file_id`.
+          - An Environment can be specified by `environment_id`. If no Environment is specified, the default Environment is used.
     properties:
-      id:
-        type: string
-        docs: The ID of the tool. Starts with either `config_` or `oc_`.
-      name:
-        type: string
-        docs: Name for the tool referenced by the model.
-      description:
-        type: optional<string>
-        docs: Description of the tool referenced by the model
-      parameters:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Definition of parameters needed to run the tool. Provided in
-          jsonschema format: https://json-schema.org/
-      source:
-        type: optional<string>
-        docs: The origin of the tool
-  FeedbackType:
-    enum:
-      - rating
-      - action
-      - issue
-      - correction
-      - comment
-    docs: An enumeration.
-  SrcExternalAppModelsV4LogLogResponseJudgment:
-    discriminated: false
-    union:
-      - boolean
-      - double
-  SrcExternalAppModelsV4LogLogResponseToolChoice:
-    discriminated: false
-    docs: >-
-      Controls how the model uses tools. The following options are supported:
-      'none' forces the model to not call a tool; the default when no tools are
-      provided as part of the model config. 'auto' the model can decide to call
-      one of the provided tools; the default when tools are provided as part of
-      the model config. Providing {'type': 'function', 'function': {name':
-      <TOOL_NAME>}} forces the model to use the named function.
-    union:
-      - literal<"none">
-      - literal<"auto">
-      - literal<"required">
-      - ToolChoice
-  SrcExternalAppModelsV4LogLogResponse:
-    docs: Request model for logging a datapoint.
-    properties:
-      project:
-        type: optional<string>
-        docs: The name of the project associated with this log
-      project_id:
-        type: optional<string>
-        docs: The unique ID of the project associated with this log.
-      session_id:
-        type: optional<string>
-        docs: ID of the session to associate the datapoint.
-      session_reference_id:
+      version_id:
         type: optional<string>
         docs: >-
-          A unique string identifying the session to associate the datapoint to.
-          Allows you to log multiple datapoints to a session (using an ID kept
-          by your internal systems) by passing the same `session_reference_id`
-          in subsequent log requests. Specify at most one of this or
-          `session_id`.
-      parent_id:
-        type: optional<string>
-        docs: ID associated to the parent datapoint in a session.
-      parent_reference_id:
+          Unique identifier for the File Version. If provided, none of the other
+          fields should be specified.
+      path:
         type: optional<string>
         docs: >-
-          A unique string identifying the previously-logged parent datapoint in
-          a session. Allows you to log nested datapoints with your internal
-          system IDs by passing the same reference ID as `parent_id` in a prior
-          log request. Specify at most one of this or `parent_id`. Note that
-          this cannot refer to a datapoint being logged in the same request.
-      inputs:
-        type: optional<map<string, unknown>>
-        docs: The inputs passed to the prompt template.
-      source:
-        type: optional<string>
-        docs: Identifies where the model was called from.
-      metadata:
-        type: optional<map<string, unknown>>
-        docs: Any additional metadata to record.
-      save:
-        type: optional<boolean>
-        docs: Whether the request/response payloads will be stored on Humanloop.
-        default: true
-      source_datapoint_id:
+          Path identifying a File. Provide either this or `file_id` if you want
+          to specify a File.
+      file_id:
         type: optional<string>
         docs: >-
-          ID of the source datapoint if this is a log derived from a datapoint
-          in a dataset.
-      id:
-        type: string
-        docs: String ID of logged datapoint. Starts with `data_`.
-      reference_id:
-        type: optional<string>
-        docs: Unique user-provided string identifying the datapoint.
-      trial_id:
-        type: optional<string>
-        docs: Unique ID of an experiment trial to associate to the log.
-      messages:
-        type: optional<list<ChatMessageWithToolCall>>
-        docs: The messages passed to the to provider chat endpoint.
-      output:
-        type: optional<string>
-        docs: >-
-          Generated output from your model for the provided inputs. Can be
-          `None` if logging an error, or if logging a parent datapoint with the
-          intention to populate it later
-      judgment: optional<SrcExternalAppModelsV4LogLogResponseJudgment>
-      config_id:
-        type: optional<string>
-        docs: Unique ID of a config to associate to the log.
-      config: ConfigResponse
+          Unique identifier for the File. Provide either this or `path` if you
+          want to specify a File.
       environment:
         type: optional<string>
-        docs: The environment name used to create the log.
-      feedback: optional<list<FeedbackResponse>>
-      created_at:
-        type: optional<datetime>
-        docs: 'User defined timestamp for when the log was created. '
-      error:
-        type: optional<string>
-        docs: Error message if the log is an error.
-      duration:
-        type: optional<double>
-        docs: Duration of the logged event in seconds.
-      output_message:
-        type: optional<ChatMessageWithToolCall>
-        docs: The message returned by the provider.
-      prompt_tokens:
-        type: optional<integer>
-        docs: Number of tokens in the prompt used to generate the output.
-      output_tokens:
-        type: optional<integer>
-        docs: Number of tokens in the output generated by the model.
-      prompt_cost:
-        type: optional<double>
-        docs: Cost in dollars associated to the tokens in the prompt.
-      output_cost:
-        type: optional<double>
-        docs: Cost in dollars associated to the tokens in the output.
-      provider_request:
-        type: optional<map<string, unknown>>
-        docs: Raw request sent to provider.
-      provider_response:
-        type: optional<map<string, unknown>>
-        docs: Raw response received the provider.
-      user:
-        type: optional<string>
-        docs: User email address provided when creating the datapoint.
-      provider_latency:
-        type: optional<double>
-        docs: Latency of provider response.
-      tokens:
-        type: optional<integer>
-        docs: Total number of tokens in the prompt and output.
-      raw_output:
-        type: optional<string>
-        docs: Raw output from the provider.
-      finish_reason:
-        type: optional<string>
-        docs: Reason the generation finished.
-      metric_values: optional<list<MetricValueResponse>>
-      tools: optional<list<ToolResultResponse>>
-      tool_choice:
-        type: optional<SrcExternalAppModelsV4LogLogResponseToolChoice>
         docs: >-
-          Controls how the model uses tools. The following options are
-          supported: 'none' forces the model to not call a tool; the default
-          when no tools are provided as part of the model config. 'auto' the
-          model can decide to call one of the provided tools; the default when
-          tools are provided as part of the model config. Providing {'type':
-          'function', 'function': {name': <TOOL_NAME>}} forces the model to use
-          the named function.
-      evaluation_results: list<EvaluationResultResponse>
-      observability_status: ObservabilityStatus
-      updated_at: datetime
-      batch_ids:
-        type: optional<list<string>>
-        docs: List of batch IDs the log belongs to.
-  BaseModelsUserResponse:
-    properties:
-      id:
-        type: string
-        docs: String ID of user. Starts with `usr_`.
-      email_address:
-        type: string
-        docs: The user's email address.
-      full_name:
-        type: optional<string>
-        docs: The user's full name.
-      verified:
-        type: boolean
-        docs: Whether the user has verified their email address.
-  EvaluationsDatasetRequest:
-    properties:
-      version_id:
-        type: string
-        docs: >-
-          Unique identifier for the Dataset Version to use in this evaluation.
-          Starts with `dsv_`.
+          Name of the Environment a Version is deployed to. Only provide this
+          when specifying a File. If not provided (and a File is specified), the
+          default Environment is used.
+    source:
+      openapi: openapi/openapi.auto.json
   EvaluationsRequest:
+    docs: |-
+      Specification of a File version on Humanloop.
+
+      This can be done in a couple of ways:
+      - Specifying `version_id` directly.
+      - Specifying a File (and optionally an Environment).
+          - A File can be specified by either `path` or `file_id`.
+          - An Environment can be specified by `environment_id`. If no Environment is specified, the default Environment is used.
     properties:
       version_id:
-        type: string
+        type: optional<string>
         docs: >-
-          Unique identifier for the Evaluator Version to use in this evaluation.
-          Starts with `evv_`.
+          Unique identifier for the File Version. If provided, none of the other
+          fields should be specified.
+      path:
+        type: optional<string>
+        docs: >-
+          Path identifying a File. Provide either this or `file_id` if you want
+          to specify a File.
+      file_id:
+        type: optional<string>
+        docs: >-
+          Unique identifier for the File. Provide either this or `path` if you
+          want to specify a File.
+      environment:
+        type: optional<string>
+        docs: >-
+          Name of the Environment a Version is deployed to. Only provide this
+          when specifying a File. If not provided (and a File is specified), the
+          default Environment is used.
       orchestrated:
         type: optional<boolean>
         docs: >-
@@ -2629,106 +2242,18 @@ types:
           If `False`, a log for the Evaluator should be submitted by the user
           via the API.
         default: true
-  SrcExternalAppModelsV5LogsLogResponse:
-    discriminated: false
-    union:
-      - PromptLogResponse
-      - ToolLogResponse
-      - EvaluatorLogResponse
-  ToolResponse:
-    docs: >-
-      Base type that all File Responses should inherit from.
-
-
-      Attributes defined here are common to all File Responses and should be
-      overridden
-
-      in the inheriting classes with documentation and appropriate Field
-      definitions.
-    properties:
-      path:
-        type: string
-        docs: >-
-          Path of the Tool, including the name, which is used as a unique
-          identifier.
-      id:
-        type: string
-        docs: Unique identifier for the Tool.
-      directory_id:
-        type: optional<string>
-        docs: ID of the directory that the file is in on Humanloop.
-      function:
-        type: optional<ToolFunction>
-        docs: >-
-          Callable function specification of the Tool shown to the model for
-          tool calling.
-      source_code:
-        type: optional<string>
-        docs: Code source of the Tool.
-      setup_values:
-        type: optional<map<string, unknown>>
-        docs: >-
-          Values needed to setup the Tool, defined in JSON Schema format:
-          https://json-schema.org/
-      tool_type:
-        type: optional<FilesToolType>
-        docs: Type of Tool.
-      commit_message:
-        type: optional<string>
-        docs: Message describing the changes made.
-      name:
-        type: string
-        docs: Name of the Tool, which is used as a unique identifier.
-      version_id:
-        type: string
-        docs: >-
-          Unique identifier for the specific Tool Version. If no query params
-          provided, the default deployed Tool Version is returned.
-      type: optional<literal<"tool">>
-      environments:
-        type: optional<list<EnvironmentResponse>>
-        docs: The list of environments the Tool Version is deployed to.
-      created_at: datetime
-      updated_at: datetime
-      created_by:
-        type: optional<UserResponse>
-        docs: The user who created the Tool.
-      status:
-        type: VersionStatus
-        docs: The status of the Tool Version.
-      last_used_at: datetime
-      version_logs_count:
-        type: integer
-        docs: The number of logs that have been generated for this Tool Version
-      total_logs_count:
-        type: integer
-        docs: The number of logs that have been generated across all Tool Versions
-      inputs:
-        docs: >-
-          Inputs associated to the Prompt. Inputs correspond to any of the
-          variables used within the Tool template.
-        type: list<InputResponse>
-      evaluators:
-        type: optional<list<MonitoringEvaluatorResponse>>
-        docs: >-
-          Evaluators that have been attached to this Tool that are used for
-          monitoring logs.
-      signature:
-        type: optional<string>
-        docs: Signature of the Tool.
-      evaluator_aggregates:
-        type: optional<list<EvaluatorAggregate>>
-        docs: Aggregation of Evaluator results for the Tool Version.
-  UserResponse:
-    properties:
-      id:
-        type: string
-        docs: Unique identifier for User. Starts with `usr`.
-      email_address:
-        type: string
-        docs: The User's email address.
-      full_name:
-        type: optional<string>
-        docs: The User's full name.
+    source:
+      openapi: openapi/openapi.auto.json
+  AgentConfigResponse:
+    properties: {}
+    source:
+      openapi: openapi/openapi.auto.json
+  EvaluatorConfigResponse:
+    properties: {}
+    source:
+      openapi: openapi/openapi.auto.json
   UpdateEvaluationStatusRequest: unknown
   PaginatedPromptLogResponse: unknown
+  ConfigToolResponse: unknown
+  FeedbackType: unknown
+  BaseModelsUserResponse: unknown

@@ -6,11 +6,11 @@ import pydantic
 
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
-from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponse
+from .log_response import LogResponse
 
 
 class PaginatedDataLogResponse(UncheckedBaseModel):
-    records: typing.List[SrcExternalAppModelsV5LogsLogResponse]
+    records: typing.List[LogResponse]
     page: int
     size: int
     total: int

@@ -16,6 +16,11 @@ class ToolFunctionParams(typing_extensions.TypedDict):
     Description of the tool referenced by the model
     """
 
+    strict: typing_extensions.NotRequired[bool]
+    """
+    If true, forces the model to output json data in the structure of the parameters schema.
+    """
+
     parameters: typing_extensions.NotRequired[typing.Dict[str, typing.Any]]
     """
     Parameters needed to run the Tool, defined in JSON Schema format: https://json-schema.org/

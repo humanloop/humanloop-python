@@ -216,7 +216,7 @@ class DatasetsClient:
                     "target": {"answer": "William Shakespeare"},
                 },
             ],
-            action="add",
+            action="set",
             commit_message="Add two new questions and answers",
         )
         """
@@ -1057,7 +1057,7 @@ class AsyncDatasetsClient:
                         "target": {"answer": "William Shakespeare"},
                     },
                 ],
-                action="add",
+                action="set",
                 commit_message="Add two new questions and answers",
             )
 

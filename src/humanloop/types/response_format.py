@@ -6,6 +6,7 @@ import pydantic
 
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .response_format_type import ResponseFormatType
 
 
 class ResponseFormat(UncheckedBaseModel):
@@ -13,7 +14,11 @@ class ResponseFormat(UncheckedBaseModel):
     Response format of the model.
     """
 
-    type: typing.Literal["json_object"] = "json_object"
+    type: ResponseFormatType
+    json_schema: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
+    """
+    The JSON schema of the response format if type is json_schema.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

@@ -6,10 +6,10 @@ import typing
 import typing_extensions
 
 from ..types.evaluation_status import EvaluationStatus
+from ..types.user_response import UserResponse
 from .dataset_response import DatasetResponseParams
 from .evaluatee_response import EvaluateeResponseParams
 from .evaluation_evaluator_response import EvaluationEvaluatorResponseParams
-from .user_response import UserResponseParams
 
 
 class EvaluationResponseParams(typing_extensions.TypedDict):
@@ -44,5 +44,9 @@ class EvaluationResponseParams(typing_extensions.TypedDict):
     """
 
     created_at: dt.datetime
-    created_by: typing_extensions.NotRequired[UserResponseParams]
+    created_by: typing_extensions.NotRequired[UserResponse]
     updated_at: dt.datetime
+    url: typing_extensions.NotRequired[str]
+    """
+    URL to view the Evaluation on the Humanloop.
+    """

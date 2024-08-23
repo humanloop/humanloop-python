@@ -13,8 +13,8 @@ from ..core.request_options import RequestOptions
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
+from ..types.log_response import LogResponse
 from ..types.paginated_data_log_response import PaginatedDataLogResponse
-from ..types.src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponse
 from ..types.version_status import VersionStatus
 
 
@@ -34,8 +34,9 @@ class LogsClient:
         metadata_search: typing.Optional[str] = None,
         start_date: typing.Optional[dt.datetime] = None,
         end_date: typing.Optional[dt.datetime] = None,
+        include_parent: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SyncPager[SrcExternalAppModelsV5LogsLogResponse]:
+    ) -> SyncPager[LogResponse]:
         """
         List all Logs for the given filter criteria.
 
@@ -68,12 +69,15 @@ class LogsClient:
         end_date : typing.Optional[dt.datetime]
             If provided, only Logs created before the specified date will be returned.
 
+        include_parent : typing.Optional[bool]
+            If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        SyncPager[SrcExternalAppModelsV5LogsLogResponse]
+        SyncPager[LogResponse]
             Successful Response
 
         Examples
@@ -107,6 +111,7 @@ class LogsClient:
                 "metadata_search": metadata_search,
                 "start_date": serialize_datetime(start_date) if start_date is not None else None,
                 "end_date": serialize_datetime(end_date) if end_date is not None else None,
+                "include_parent": include_parent,
             },
             request_options=request_options,
         )
@@ -124,6 +129,7 @@ class LogsClient:
                     metadata_search=metadata_search,
                     start_date=start_date,
                     end_date=end_date,
+                    include_parent=include_parent,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records
@@ -184,9 +190,7 @@ class LogsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> SrcExternalAppModelsV5LogsLogResponse:
+    def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> LogResponse:
         """
         Retrieve the Log with the given ID.
 
@@ -200,7 +204,7 @@ class LogsClient:
 
         Returns
         -------
-        SrcExternalAppModelsV5LogsLogResponse
+        LogResponse
             Successful Response
 
         Examples
@@ -219,7 +223,7 @@ class LogsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(SrcExternalAppModelsV5LogsLogResponse, construct_type(type_=SrcExternalAppModelsV5LogsLogResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(LogResponse, construct_type(type_=LogResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore
@@ -246,8 +250,9 @@ class AsyncLogsClient:
         metadata_search: typing.Optional[str] = None,
         start_date: typing.Optional[dt.datetime] = None,
         end_date: typing.Optional[dt.datetime] = None,
+        include_parent: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncPager[SrcExternalAppModelsV5LogsLogResponse]:
+    ) -> AsyncPager[LogResponse]:
         """
         List all Logs for the given filter criteria.
 
@@ -280,12 +285,15 @@ class AsyncLogsClient:
         end_date : typing.Optional[dt.datetime]
             If provided, only Logs created before the specified date will be returned.
 
+        include_parent : typing.Optional[bool]
+            If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        AsyncPager[SrcExternalAppModelsV5LogsLogResponse]
+        AsyncPager[LogResponse]
             Successful Response
 
         Examples
@@ -327,6 +335,7 @@ class AsyncLogsClient:
                 "metadata_search": metadata_search,
                 "start_date": serialize_datetime(start_date) if start_date is not None else None,
                 "end_date": serialize_datetime(end_date) if end_date is not None else None,
+                "include_parent": include_parent,
             },
             request_options=request_options,
         )
@@ -344,6 +353,7 @@ class AsyncLogsClient:
                     metadata_search=metadata_search,
                     start_date=start_date,
                     end_date=end_date,
+                    include_parent=include_parent,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records
@@ -412,9 +422,7 @@ class AsyncLogsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> SrcExternalAppModelsV5LogsLogResponse:
+    async def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> LogResponse:
         """
         Retrieve the Log with the given ID.
 
@@ -428,7 +436,7 @@ class AsyncLogsClient:
 
         Returns
         -------
-        SrcExternalAppModelsV5LogsLogResponse
+        LogResponse
             Successful Response
 
         Examples
@@ -455,7 +463,7 @@ class AsyncLogsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(SrcExternalAppModelsV5LogsLogResponse, construct_type(type_=SrcExternalAppModelsV5LogsLogResponse, object_=_response.json()))  # type: ignore
+                return typing.cast(LogResponse, construct_type(type_=LogResponse, object_=_response.json()))  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(HttpValidationError, construct_type(type_=HttpValidationError, object_=_response.json()))  # type: ignore

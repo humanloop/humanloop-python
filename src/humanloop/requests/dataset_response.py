@@ -5,10 +5,10 @@ import typing
 
 import typing_extensions
 
+from ..types.user_response import UserResponse
 from ..types.version_status import VersionStatus
 from .datapoint_response import DatapointResponseParams
 from .environment_response import EnvironmentResponseParams
-from .user_response import UserResponseParams
 
 
 class DatasetResponseParams(typing_extensions.TypedDict):
@@ -52,7 +52,7 @@ class DatasetResponseParams(typing_extensions.TypedDict):
 
     created_at: dt.datetime
     updated_at: dt.datetime
-    created_by: typing_extensions.NotRequired[UserResponseParams]
+    created_by: typing_extensions.NotRequired[UserResponse]
     """
     The user who created the Dataset.
     """

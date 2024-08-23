@@ -20,7 +20,7 @@ class CodeEvaluatorRequestParams(typing_extensions.TypedDict):
     """
 
     evaluator_type: typing.Literal["python"]
-    code: typing_extensions.NotRequired[str]
+    code: str
     """
     The code for the evaluator. This code will be executed in a sandboxed environment.
     """

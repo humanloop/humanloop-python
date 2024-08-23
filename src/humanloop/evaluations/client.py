@@ -107,8 +107,8 @@ class EvaluationsClient:
         self,
         *,
         dataset: EvaluationsDatasetRequestParams,
-        evaluatees: typing.Sequence[EvaluateeRequestParams],
         evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -130,11 +130,11 @@ class EvaluationsClient:
         dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequestParams]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
-
         evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
+
+        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -281,8 +281,8 @@ class EvaluationsClient:
         id: str,
         *,
         dataset: EvaluationsDatasetRequestParams,
-        evaluatees: typing.Sequence[EvaluateeRequestParams],
         evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -299,11 +299,11 @@ class EvaluationsClient:
         dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequestParams]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
-
         evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
+
+        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -613,8 +613,8 @@ class AsyncEvaluationsClient:
         self,
         *,
         dataset: EvaluationsDatasetRequestParams,
-        evaluatees: typing.Sequence[EvaluateeRequestParams],
         evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -636,11 +636,11 @@ class AsyncEvaluationsClient:
         dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequestParams]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
-
         evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
+
+        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -811,8 +811,8 @@ class AsyncEvaluationsClient:
         id: str,
         *,
         dataset: EvaluationsDatasetRequestParams,
-        evaluatees: typing.Sequence[EvaluateeRequestParams],
         evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -829,11 +829,11 @@ class AsyncEvaluationsClient:
         dataset : EvaluationsDatasetRequestParams
             The Dataset Version to use in this Evaluation.
 
-        evaluatees : typing.Sequence[EvaluateeRequestParams]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
-
         evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
+
+        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

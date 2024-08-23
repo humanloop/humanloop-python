@@ -61,7 +61,9 @@ service:
                     arguments_type: target_required
                     return_type: number
                     evaluator_type: python
-                    code: def evaluate(answer, target):\n    return 0.5
+                    code: |-
+                      def evaluate(answer, target):
+                          return 0.5
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
@@ -119,7 +121,9 @@ service:
               arguments_type: target_required
               return_type: number
               evaluator_type: python
-              code: def evaluate(answer, target):\n    return 0.5
+              code: |-
+                def evaluate(answer, target):
+                    return 0.5
             commit_message: Initial commit
           response:
             body:
@@ -136,7 +140,9 @@ service:
                 arguments_type: target_required
                 return_type: number
                 evaluator_type: python
-                code: def evaluate(answer, target):\n    return 0.5
+                code: |-
+                  def evaluate(answer, target):
+                      return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
@@ -192,7 +198,9 @@ service:
                 arguments_type: target_required
                 return_type: number
                 evaluator_type: python
-                code: def evaluate(answer, target):\n    return 0.5
+                code: |-
+                  def evaluate(answer, target):
+                      return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
@@ -261,7 +269,9 @@ service:
                 arguments_type: target_required
                 return_type: number
                 evaluator_type: python
-                code: def evaluate(answer, target):\n    return 0.5
+                code: |-
+                  def evaluate(answer, target):
+                      return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
@@ -314,7 +324,9 @@ service:
                     arguments_type: target_required
                     return_type: number
                     evaluator_type: python
-                    code: def evaluate(answer, target):\n    return 0.5
+                    code: |-
+                      def evaluate(answer, target):
+                          return 0.5
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
@@ -364,7 +376,9 @@ service:
                 arguments_type: target_required
                 return_type: number
                 evaluator_type: python
-                code: def evaluate(answer, target):\n    return 0.5
+                code: |-
+                  def evaluate(answer, target):
+                      return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
@@ -419,7 +433,9 @@ service:
                 arguments_type: target_required
                 return_type: number
                 evaluator_type: python
-                code: def evaluate(answer, target):\n    return 0.5
+                code: |-
+                  def evaluate(answer, target):
+                      return 0.5
               version_logs_count: 1
               total_logs_count: 1
               inputs:
@@ -491,7 +507,9 @@ service:
                     arguments_type: target_required
                     return_type: number
                     evaluator_type: python
-                    code: def evaluate(answer, target):\n    return 0.5
+                    code: |-
+                      def evaluate(answer, target):
+                          return 0.5
                   version_logs_count: 1
                   total_logs_count: 1
                   inputs:
@@ -501,8 +519,11 @@ service:
       method: POST
       auth: true
       docs: >-
-        Submit evalutor judgment for an existing Log. Creates a new Log and
-        makes evaluated one its parent.
+        Submit Evaluator judgment for an existing Log.
+
+
+        Creates a new Log. The evaluated Log will be set as the parent of the
+        created Log.
       display-name: Log
       request:
         name: CreateEvaluatorLogRequest
@@ -538,6 +559,9 @@ service:
             provider_latency:
               type: optional<double>
               docs: Duration of the logged event in seconds.
+            stdout:
+              type: optional<string>
+              docs: Captured log and debug statements.
             provider_request:
               type: optional<map<string, unknown>>
               docs: >-
@@ -554,7 +578,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests.
+                in subsequent log requests. 
             parent_id:
               type: string
               docs: >-
@@ -595,7 +619,9 @@ service:
               type: optional<string>
               docs: The name of the Environment the Log is associated to.
               name: createEvaluatorLogRequestEnvironment
-            judgment: optional<unknown>
+            judgment:
+              type: optional<CreateEvaluatorLogRequestJudgment>
+              docs: Evaluator assessment of the Log.
             spec: optional<CreateEvaluatorLogRequestSpec>
       response:
         docs: Successful Response
@@ -611,6 +637,8 @@ service:
               parent_id: parent_id
               session_id: session_id
               version_id: version_id
+  source:
+    openapi: openapi/openapi.auto.json
 types:
   SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec:
     discriminated: false
@@ -619,6 +647,18 @@ types:
       - root.CodeEvaluatorRequest
       - root.HumanEvaluatorRequest
       - root.ExternalEvaluatorRequest
+    source:
+      openapi: openapi/openapi.auto.json
+  CreateEvaluatorLogRequestJudgment:
+    discriminated: false
+    docs: Evaluator assessment of the Log.
+    union:
+      - boolean
+      - string
+      - list<string>
+      - double
+    source:
+      openapi: openapi/openapi.auto.json
   CreateEvaluatorLogRequestSpec:
     discriminated: false
     union:
@@ -626,3 +666,5 @@ types:
       - root.CodeEvaluatorRequest
       - root.HumanEvaluatorRequest
       - root.ExternalEvaluatorRequest
+    source:
+      openapi: openapi/openapi.auto.json

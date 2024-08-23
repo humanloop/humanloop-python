@@ -4,10 +4,16 @@ import typing
 
 import typing_extensions
 
+from ..types.response_format_type import ResponseFormatType
+
 
 class ResponseFormatParams(typing_extensions.TypedDict):
     """
     Response format of the model.
     """
 
-    type: typing.Literal["json_object"]
+    type: ResponseFormatType
+    json_schema: typing_extensions.NotRequired[typing.Dict[str, typing.Any]]
+    """
+    The JSON schema of the response format if type is json_schema.
+    """

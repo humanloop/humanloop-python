@@ -28,24 +28,28 @@ service:
               id: sesh_456hij
               created_at: '2024-05-01T12:00:00Z'
               updated_at: '2024-05-01T12:00:00Z'
-              logs:
-                - id: log_123efg
-                  created_at: '2024-05-01T12:00:00Z'
-                  output: This is a sample output.
-                  prompt:
-                    id: pr_123abc
-                    name: Test Prompt
-                    path: test-prompt
-                    version_id: pv_456def
+              events:
+                - log:
+                    id: log_123efg
                     created_at: '2024-05-01T12:00:00Z'
-                    updated_at: '2024-05-01T12:00:00Z'
-                    status: committed
-                    last_used_at: '2024-05-01T12:00:00Z'
-                    model: gpt-4
-                    version_logs_count: 1
-                    total_logs_count: 1
-                    inputs:
-                      - name: question
+                    output: This is a sample output.
+                    prompt:
+                      id: pr_123abc
+                      name: Test Prompt
+                      path: test-prompt
+                      version_id: pv_456def
+                      created_at: '2024-05-01T12:00:00Z'
+                      updated_at: '2024-05-01T12:00:00Z'
+                      status: committed
+                      last_used_at: '2024-05-01T12:00:00Z'
+                      model: gpt-4
+                      version_logs_count: 1
+                      total_logs_count: 1
+                      inputs:
+                        - name: question
+                    evaluator_logs: []
+                  children: []
+              logs_count: 1
     delete:
       path: /sessions/{id}
       method: DELETE
@@ -106,27 +110,33 @@ service:
                 - id: sesh_456hij
                   created_at: '2024-05-01T12:00:00Z'
                   updated_at: '2024-05-01T12:00:00Z'
-                  logs:
-                    - id: log_123efg
-                      created_at: '2024-05-01T12:00:00Z'
-                      output: This is a sample output.
-                      prompt:
-                        id: pr_123abc
-                        name: Test Prompt
-                        path: test-prompt
-                        version_id: pv_456def
+                  events:
+                    - log:
+                        id: log_123efg
                         created_at: '2024-05-01T12:00:00Z'
-                        updated_at: '2024-05-01T12:00:00Z'
-                        status: committed
-                        last_used_at: '2024-05-01T12:00:00Z'
-                        model: gpt-4
-                        version_logs_count: 1
-                        total_logs_count: 1
-                        inputs:
-                          - name: question
+                        output: This is a sample output.
+                        prompt:
+                          id: pr_123abc
+                          name: Test Prompt
+                          path: test-prompt
+                          version_id: pv_456def
+                          created_at: '2024-05-01T12:00:00Z'
+                          updated_at: '2024-05-01T12:00:00Z'
+                          status: committed
+                          last_used_at: '2024-05-01T12:00:00Z'
+                          model: gpt-4
+                          version_logs_count: 1
+                          total_logs_count: 1
+                          inputs:
+                            - name: question
+                        evaluator_logs: []
+                      children: []
+                  logs_count: 1
               page: 1
               size: 11
               total: 1
+  source:
+    openapi: openapi/openapi.auto.json
   display-name: Sessions
 docs: >+
   Sessions are groups of Logs that track sequences of LLM actions.

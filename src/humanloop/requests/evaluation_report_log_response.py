@@ -6,7 +6,7 @@ import typing_extensions
 
 from .datapoint_response import DatapointResponseParams
 from .evaluated_version_response import EvaluatedVersionResponseParams
-from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponseParams
+from .log_response import LogResponseParams
 
 
 class EvaluationReportLogResponseParams(typing_extensions.TypedDict):
@@ -20,12 +20,12 @@ class EvaluationReportLogResponseParams(typing_extensions.TypedDict):
     The Datapoint used to generate the Log
     """
 
-    log: typing_extensions.NotRequired[SrcExternalAppModelsV5LogsLogResponseParams]
+    log: typing_extensions.NotRequired[LogResponseParams]
     """
     The Log that was evaluated by the Evaluator.
     """
 
-    evaluator_logs: typing.Sequence[SrcExternalAppModelsV5LogsLogResponseParams]
+    evaluator_logs: typing.Sequence[LogResponseParams]
     """
     The Evaluator Logs containing the judgments for the Log.
     """

@@ -4,11 +4,11 @@ import typing
 
 import typing_extensions
 
-from .tool_response import ToolResponseParams
+from ..types.tool_response import ToolResponse
 
 
 class ListToolsParams(typing_extensions.TypedDict):
-    records: typing.Sequence[ToolResponseParams]
+    records: typing.Sequence[ToolResponse]
     """
     The list of Tools.
     """

@@ -4,11 +4,11 @@ import typing
 
 import typing_extensions
 
-from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponseParams
+from .log_response import LogResponseParams
 
 
 class PaginatedDataLogResponseParams(typing_extensions.TypedDict):
-    records: typing.Sequence[SrcExternalAppModelsV5LogsLogResponseParams]
+    records: typing.Sequence[LogResponseParams]
     page: int
     size: int
     total: int

@@ -32,6 +32,11 @@ class PromptCallStreamResponseParams(typing_extensions.TypedDict):
     Duration of the logged event in seconds.
     """
 
+    stdout: typing_extensions.NotRequired[str]
+    """
+    Captured log and debug statements.
+    """
+
     output_message: typing_extensions.NotRequired[ChatMessageParams]
     """
     The message returned by the provider.

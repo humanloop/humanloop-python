@@ -5,7 +5,7 @@ import typing
 
 import typing_extensions
 
-from .src_external_app_models_v_5_logs_log_response import SrcExternalAppModelsV5LogsLogResponseParams
+from .session_event_response import SessionEventResponseParams
 
 
 class SessionResponseParams(typing_extensions.TypedDict):
@@ -16,7 +16,22 @@ class SessionResponseParams(typing_extensions.TypedDict):
 
     created_at: dt.datetime
     updated_at: dt.datetime
-    logs: typing.Sequence[SrcExternalAppModelsV5LogsLogResponseParams]
+    first_inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Any]]
     """
-    List of Logs associated with this Session.
+    Inputs for the first datapoint in the session.
+    """
+
+    last_output: typing_extensions.NotRequired[str]
+    """
+    Output for the last datapoint in the session.
+    """
+
+    logs_count: int
+    """
+    Number of logs associated to this session.
+    """
+
+    events: typing.Sequence[SessionEventResponseParams]
+    """
+    List of events associated with this Session.
     """

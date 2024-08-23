@@ -2,11 +2,11 @@
 
 import typing
 
+from ..types.tool_response import ToolResponse
 from .dataset_response import DatasetResponseParams
 from .evaluator_response import EvaluatorResponseParams
 from .prompt_response import PromptResponseParams
-from .tool_response import ToolResponseParams
 
 VersionDeploymentResponseFileParams = typing.Union[
-    PromptResponseParams, ToolResponseParams, DatasetResponseParams, EvaluatorResponseParams
+    PromptResponseParams, ToolResponse, DatasetResponseParams, EvaluatorResponseParams
 ]

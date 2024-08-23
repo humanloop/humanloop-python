@@ -100,6 +100,14 @@ client.prompts.log(
 <dl>
 <dd>
 
+**evaluation_id:** `typing.Optional[str]` — Unique identifier for the Evaluation Report to associate the Log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
     
 </dd>
@@ -226,6 +234,14 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider.
     
 </dd>
@@ -242,7 +258,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
     
 </dd>
 </dl>
@@ -460,7 +476,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
     
 </dd>
 </dl>
@@ -1844,6 +1860,14 @@ client.tools.log(
 <dl>
 <dd>
 
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider.
     
 </dd>
@@ -1860,7 +1884,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
     
 </dd>
 </dl>
@@ -3140,28 +3164,25 @@ client.datasets.upsert(
             "messages": [
                 {
                     "role": "user",
-                    "content": "Hi Humanloop support team, I'm having trouble understanding how to use the evaluations feature in your software. Can you provide a step-by-step guide or any resources to help me get started?",
+                    "content": "How do i manage my organizations API keys?\n",
                 }
             ],
             "target": {
-                "feature": "evaluations",
-                "issue": "needs step-by-step guide",
+                "response": 'Hey, thanks for your questions. Here are steps for how to achieve: 1. Log in to the Humanloop Dashboard \n\n2. Click on "Organization Settings."\n If you do not see this option, you might need to contact your organization admin to gain the necessary permissions.\n\n3. Within the settings or organization settings, select the option labeled "API Keys" on the left. Here you will be able to view and manage your API keys.\n\n4. You will see a list of existing API keys. You can perform various actions, such as:\n     - **Generate New API Key:** Click on the "Generate New Key" button if you need a new API key.\n     - **Revoke an API Key:** If you need to disable an existing key, find the key in the list and click the "Revoke" or "Delete" button.\n     - **Copy an API Key:** If you need to use an existing key, you can copy it to your clipboard by clicking the "Copy" button next to the key.\n\n5. **Save and Secure API Keys:** Make sure to securely store any new or existing API keys you are using. Treat them like passwords and do not share them publicly.\n\nIf you encounter any issues or need further assistance, it might be helpful to engage with an engineer or your IT department to ensure you have the necessary permissions and support.\n\nWould you need help with anything else?'
             },
         },
         {
             "messages": [
                 {
                     "role": "user",
-                    "content": "Hi there, I'm interested in fine-tuning a language model using your software. Can you explain the process and provide any best practices or guidelines?",
+                    "content": "Hey, can do I use my code evaluator for monitoring my legal-copilot prompt?",
                 }
             ],
             "target": {
-                "feature": "fine-tuning",
-                "issue": "process explanation and best practices",
+                "response": "Hey, thanks for your questions. Here are steps for how to achieve: 1. Navigate to your Prompt dashboard. \n 2. Select the `Monitoring` button on the top right of the Prompt dashboard \n 3. Within the model select the Version of the Evaluator you want to turn on for monitoring. \n\nWould you need help with anything else?"
             },
         },
     ],
-    action="add",
     commit_message="Add two new questions and answers",
 )
 
@@ -4313,7 +4334,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluatees:** `typing.Sequence[EvaluateeRequestParams]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
+**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
     
 </dd>
 </dl>
@@ -4321,7 +4342,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
+**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
     
 </dd>
 </dl>
@@ -4558,7 +4579,7 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**evaluatees:** `typing.Sequence[EvaluateeRequestParams]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
+**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
     
 </dd>
 </dl>
@@ -4566,7 +4587,7 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
+**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
     
 </dd>
 </dl>
@@ -4991,7 +5012,7 @@ client.evaluators.upsert(
         "arguments_type": "target_required",
         "return_type": "number",
         "evaluator_type": "python",
-        "code": "def evaluate(answer, target):\\n    return 0.5",
+        "code": "def evaluate(answer, target):\n    return 0.5",
     },
     commit_message="Initial commit",
 )
@@ -5731,7 +5752,9 @@ client.evaluators.list_environments(
 <dl>
 <dd>
 
-Submit evalutor judgment for an existing Log. Creates a new Log and makes evaluated one its parent.
+Submit Evaluator judgment for an existing Log.
+
+Creates a new Log. The evaluated Log will be set as the parent of the created Log.
 </dd>
 </dl>
 </dd>
@@ -5841,6 +5864,14 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
     
 </dd>
@@ -5857,7 +5888,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
     
 </dd>
 </dl>
@@ -5929,7 +5960,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**judgment:** `typing.Optional[typing.Any]` 
+**judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
     
 </dd>
 </dl>
@@ -6079,6 +6110,14 @@ for page in response.iter_pages():
 <dd>
 
 **end_date:** `typing.Optional[dt.datetime]` — If provided, only Logs created before the specified date will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_parent:** `typing.Optional[bool]` — If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
     
 </dd>
 </dl>

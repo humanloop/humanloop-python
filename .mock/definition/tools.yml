@@ -64,6 +64,9 @@ service:
             provider_latency:
               type: optional<double>
               docs: Duration of the logged event in seconds.
+            stdout:
+              type: optional<string>
+              docs: Captured log and debug statements.
             provider_request:
               type: optional<map<string, unknown>>
               docs: Raw request sent to provider.
@@ -76,7 +79,7 @@ service:
                 Unique identifier for the Session to associate the Log to.
                 Allows you to record multiple Logs to a Session (using an ID
                 kept by your internal systems) by passing the same `session_id`
-                in subsequent log requests.
+                in subsequent log requests. 
             parent_id:
               type: optional<string>
               docs: >-
@@ -668,3 +671,5 @@ service:
                   total_logs_count: 1
                   inputs:
                     - name: operation
+  source:
+    openapi: openapi/openapi.auto.json
