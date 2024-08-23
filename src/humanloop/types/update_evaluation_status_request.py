@@ -2,4 +2,4 @@
 
 import typing
 
-UpdateEvaluationStatusRequest = typing.Any
+UpdateEvaluationStatusRequest = typing.Optional[typing.Any]

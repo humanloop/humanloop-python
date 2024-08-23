@@ -3,5 +3,5 @@
 import typing
 
 CreateDatapointRequestTargetValueParams = typing.Union[
-    str, int, float, bool, typing.Sequence[typing.Any], typing.Dict[str, typing.Any]
+    str, int, float, bool, typing.Sequence[typing.Optional[typing.Any]], typing.Dict[str, typing.Optional[typing.Any]]
 ]

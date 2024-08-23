@@ -2,4 +2,4 @@
 
 import typing
 
-FeedbackType = typing.Any
+FeedbackType = typing.Optional[typing.Any]

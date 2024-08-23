@@ -2,4 +2,4 @@
 
 import typing
 
-ConfigToolResponse = typing.Any
+ConfigToolResponse = typing.Optional[typing.Any]

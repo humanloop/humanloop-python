@@ -242,7 +242,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider.
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
     
 </dd>
 </dl>
@@ -250,7 +250,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw response received the provider.
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
     
 </dd>
 </dl>
@@ -274,7 +274,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -290,7 +290,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -492,7 +492,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -508,7 +508,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -901,7 +901,7 @@ client.prompts.upsert(
 <dl>
 <dd>
 
-**other:** `typing.Optional[typing.Dict[str, typing.Any]]` — Other parameter values to be passed to the provider call.
+**other:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Other parameter values to be passed to the provider call.
     
 </dd>
 </dl>
@@ -1868,7 +1868,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider.
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
     
 </dd>
 </dl>
@@ -1876,7 +1876,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw response received the provider.
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
     
 </dd>
 </dl>
@@ -1900,7 +1900,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -1916,7 +1916,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -2197,7 +2197,7 @@ client.tools.upsert(
 <dl>
 <dd>
 
-**setup_values:** `typing.Optional[typing.Dict[str, typing.Any]]` — Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+**setup_values:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
     
 </dd>
 </dl>
@@ -5872,7 +5872,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
     
 </dd>
 </dl>
@@ -5880,7 +5880,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw response received the provider. Only populated for LLM Evaluator Logs.
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider. Only populated for LLM Evaluator Logs.
     
 </dd>
 </dl>
@@ -5896,7 +5896,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -5912,7 +5912,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
     
 </dd>
 </dl>

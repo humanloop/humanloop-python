@@ -2,4 +2,4 @@
 
 import typing
 
-BaseModelsUserResponse = typing.Any
+BaseModelsUserResponse = typing.Optional[typing.Any]

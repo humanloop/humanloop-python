@@ -2,4 +2,4 @@
 
 import typing
 
-PaginatedPromptLogResponse = typing.Any
+PaginatedPromptLogResponse = typing.Optional[typing.Any]
