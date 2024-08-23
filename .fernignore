@@ -2,3 +2,4 @@
 
 # Date deserialization (no impact)
 tests/
+.github/workflows/
