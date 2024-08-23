@@ -10,5 +10,5 @@ from .log_response import LogResponseParams
 
 if typing.TYPE_CHECKING:
     class SessionEventResponseParams(typing_extensions.TypedDict):
-    log: LogResponseParams
-    children: typing.Sequence["SessionEventResponseParams"]
+        log: LogResponseParams
+        children: typing.Sequence["SessionEventResponseParams"]
