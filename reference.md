@@ -100,14 +100,6 @@ client.prompts.log(
 <dl>
 <dd>
 
-**evaluation_id:** `typing.Optional[str]` — Unique identifier for the Evaluation Report to associate the Log to.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
     
 </dd>
@@ -234,7 +226,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider.
     
 </dd>
 </dl>
@@ -242,15 +234,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw response received the provider.
     
 </dd>
 </dl>
@@ -274,7 +258,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -290,7 +274,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -492,7 +476,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -508,7 +492,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -901,7 +885,7 @@ client.prompts.upsert(
 <dl>
 <dd>
 
-**other:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Other parameter values to be passed to the provider call.
+**other:** `typing.Optional[typing.Dict[str, typing.Any]]` — Other parameter values to be passed to the provider call.
     
 </dd>
 </dl>
@@ -1860,7 +1844,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider.
     
 </dd>
 </dl>
@@ -1868,15 +1852,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw response received the provider.
     
 </dd>
 </dl>
@@ -1900,7 +1876,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -1916,7 +1892,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -2197,7 +2173,7 @@ client.tools.upsert(
 <dl>
 <dd>
 
-**setup_values:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+**setup_values:** `typing.Optional[typing.Dict[str, typing.Any]]` — Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
     
 </dd>
 </dl>
@@ -4334,7 +4310,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
+**evaluatees:** `typing.Sequence[EvaluateeRequestParams]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
     
 </dd>
 </dl>
@@ -4342,7 +4318,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
     
 </dd>
 </dl>
@@ -4579,7 +4555,7 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
+**evaluatees:** `typing.Sequence[EvaluateeRequestParams]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report.
     
 </dd>
 </dl>
@@ -4587,7 +4563,7 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
     
 </dd>
 </dl>
@@ -5752,9 +5728,7 @@ client.evaluators.list_environments(
 <dl>
 <dd>
 
-Submit Evaluator judgment for an existing Log.
-
-Creates a new Log. The evaluated Log will be set as the parent of the created Log.
+Submit evalutor judgment for an existing Log. Creates a new Log and makes evaluated one its parent.
 </dd>
 </dl>
 </dd>
@@ -5864,7 +5838,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
     
 </dd>
 </dl>
@@ -5872,15 +5846,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider. Only populated for LLM Evaluator Logs.
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Any]]` — Raw response received the provider. Only populated for LLM Evaluator Logs.
     
 </dd>
 </dl>
@@ -5896,7 +5862,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+**inputs:** `typing.Optional[typing.Dict[str, typing.Any]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -5912,7 +5878,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+**metadata:** `typing.Optional[typing.Dict[str, typing.Any]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -5960,7 +5926,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
+**judgment:** `typing.Optional[typing.Any]` 
     
 </dd>
 </dl>
@@ -6110,14 +6076,6 @@ for page in response.iter_pages():
 <dd>
 
 **end_date:** `typing.Optional[dt.datetime]` — If provided, only Logs created before the specified date will be returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**include_parent:** `typing.Optional[bool]` — If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
     
 </dd>
 </dl>

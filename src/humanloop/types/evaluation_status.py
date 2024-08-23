@@ -2,4 +2,4 @@
 
 import typing
 
-EvaluationStatus = typing.Union[typing.Literal["pending", "running", "completed", "cancelled"], typing.Any]
+EvaluationStatus = typing.Union[typing.Literal["pending", "running", "completed", "cancelled", "failed"], typing.Any]

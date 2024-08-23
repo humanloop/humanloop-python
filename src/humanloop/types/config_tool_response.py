@@ -2,4 +2,43 @@
 
 import typing
 
-ConfigToolResponse = typing.Optional[typing.Any]
+import pydantic
+
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
+from ..core.unchecked_base_model import UncheckedBaseModel
+
+
+class ConfigToolResponse(UncheckedBaseModel):
+    id: str = pydantic.Field()
+    """
+    The ID of the tool. Starts with either `config_` or `oc_`.
+    """
+
+    name: str = pydantic.Field()
+    """
+    Name for the tool referenced by the model.
+    """
+
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the tool referenced by the model
+    """
+
+    parameters: typing.Optional[typing.Dict[str, typing.Any]] = pydantic.Field(default=None)
+    """
+    Definition of parameters needed to run the tool. Provided in jsonschema format: https://json-schema.org/
+    """
+
+    source: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    The origin of the tool
+    """
+
+    if IS_PYDANTIC_V2:
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
+    else:
+
+        class Config:
+            frozen = True
+            smart_union = True
+            extra = pydantic.Extra.allow

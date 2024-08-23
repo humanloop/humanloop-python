@@ -3,5 +3,5 @@
 import typing
 
 DatapointResponseTargetValue = typing.Union[
-    str, int, float, bool, typing.List[typing.Optional[typing.Any]], typing.Dict[str, typing.Optional[typing.Any]]
+    str, int, float, bool, typing.Dict[str, typing.Any], typing.List[typing.Any]
 ]
