@@ -151,6 +151,7 @@ class DatasetsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
+        attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
@@ -198,6 +199,9 @@ class DatasetsClient:
              - If `"remove"`, the created version will contain the Datapoints in the target version except for the Datapoints provided in this request.
 
             If `"add"` or `"remove"`, one of the `version_id` or `environment` query parameters may be provided.
+
+        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
 
         commit_message : typing.Optional[str]
             Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
@@ -247,6 +251,7 @@ class DatasetsClient:
                     object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
                 ),
                 "action": action,
+                "attributes": attributes,
                 "commit_message": commit_message,
             },
             request_options=request_options,
@@ -1151,6 +1156,7 @@ class AsyncDatasetsClient:
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
+        attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
@@ -1198,6 +1204,9 @@ class AsyncDatasetsClient:
              - If `"remove"`, the created version will contain the Datapoints in the target version except for the Datapoints provided in this request.
 
             If `"add"` or `"remove"`, one of the `version_id` or `environment` query parameters may be provided.
+
+        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
 
         commit_message : typing.Optional[str]
             Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
@@ -1255,6 +1264,7 @@ class AsyncDatasetsClient:
                     object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
                 ),
                 "action": action,
+                "attributes": attributes,
                 "commit_message": commit_message,
             },
             request_options=request_options,

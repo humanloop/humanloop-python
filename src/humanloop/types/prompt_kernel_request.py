@@ -88,6 +88,11 @@ class PromptKernelRequest(UncheckedBaseModel):
     The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
     """
 
+    attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

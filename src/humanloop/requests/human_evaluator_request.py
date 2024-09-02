@@ -3,8 +3,8 @@
 import typing_extensions
 from ..types.evaluator_arguments_type import EvaluatorArgumentsType
 from ..types.human_evaluator_request_return_type import HumanEvaluatorRequestReturnType
-import typing
 import typing_extensions
+import typing
 from .evaluator_judgment_option_response import EvaluatorJudgmentOptionResponseParams
 from .evaluator_judgment_number_limit import EvaluatorJudgmentNumberLimitParams
 from ..types.valence import Valence
@@ -19,6 +19,11 @@ class HumanEvaluatorRequestParams(typing_extensions.TypedDict):
     return_type: HumanEvaluatorRequestReturnType
     """
     The type of the return value of the Evaluator.
+    """
+
+    attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
     """
 
     evaluator_type: typing.Literal["human"]

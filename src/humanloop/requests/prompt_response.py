@@ -121,6 +121,11 @@ class PromptResponseParams(typing_extensions.TypedDict):
     The tools linked to your prompt that the model can call.
     """
 
+    attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
+    """
+
     commit_message: typing_extensions.NotRequired[str]
     """
     Message describing the changes made.

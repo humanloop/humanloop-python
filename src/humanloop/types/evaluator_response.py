@@ -91,6 +91,11 @@ class EvaluatorResponse(UncheckedBaseModel):
     Aggregation of Evaluator results for the Evaluator Version.
     """
 
+    attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

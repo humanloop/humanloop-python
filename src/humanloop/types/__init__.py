@@ -52,6 +52,7 @@ from .external_evaluator_request import ExternalEvaluatorRequest
 from .feedback_type import FeedbackType
 from .file_environment_response import FileEnvironmentResponse
 from .file_environment_response_file import FileEnvironmentResponseFile
+from .file_type import FileType
 from .files_tool_type import FilesToolType
 from .function_tool import FunctionTool
 from .function_tool_choice import FunctionToolChoice
@@ -83,6 +84,12 @@ from .paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
 from .paginated_data_log_response import PaginatedDataLogResponse
 from .paginated_data_prompt_response import PaginatedDataPromptResponse
 from .paginated_data_tool_response import PaginatedDataToolResponse
+from .paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,
+)
+from .paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_records_item import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItem,
+)
 from .paginated_datapoint_response import PaginatedDatapointResponse
 from .paginated_dataset_response import PaginatedDatasetResponse
 from .paginated_evaluation_response import PaginatedEvaluationResponse
@@ -184,6 +191,7 @@ __all__ = [
     "FeedbackType",
     "FileEnvironmentResponse",
     "FileEnvironmentResponseFile",
+    "FileType",
     "FilesToolType",
     "FunctionTool",
     "FunctionToolChoice",
@@ -215,6 +223,8 @@ __all__ = [
     "PaginatedDataLogResponse",
     "PaginatedDataPromptResponse",
     "PaginatedDataToolResponse",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItem",
     "PaginatedDatapointResponse",
     "PaginatedDatasetResponse",
     "PaginatedEvaluationResponse",

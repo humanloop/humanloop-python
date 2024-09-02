@@ -21,3 +21,8 @@ class ToolKernelRequestParams(typing_extensions.TypedDict):
     """
     Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
     """
+
+    attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
+    """

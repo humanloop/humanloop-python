@@ -92,3 +92,8 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
     """
     Aggregation of Evaluator results for the Evaluator Version.
     """
+
+    attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
+    """

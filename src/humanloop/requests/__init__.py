@@ -69,6 +69,12 @@ from .paginated_data_evaluator_response import PaginatedDataEvaluatorResponsePar
 from .paginated_data_log_response import PaginatedDataLogResponseParams
 from .paginated_data_prompt_response import PaginatedDataPromptResponseParams
 from .paginated_data_tool_response import PaginatedDataToolResponseParams
+from .paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseParams,
+)
+from .paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_records_item import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItemParams,
+)
 from .paginated_datapoint_response import PaginatedDatapointResponseParams
 from .paginated_dataset_response import PaginatedDatasetResponseParams
 from .paginated_evaluation_response import PaginatedEvaluationResponseParams
@@ -173,6 +179,8 @@ __all__ = [
     "PaginatedDataLogResponseParams",
     "PaginatedDataPromptResponseParams",
     "PaginatedDataToolResponseParams",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseParams",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItemParams",
     "PaginatedDatapointResponseParams",
     "PaginatedDatasetResponseParams",
     "PaginatedEvaluationResponseParams",

@@ -941,6 +941,14 @@ client.prompts.upsert(
 <dl>
 <dd>
 
+**attributes:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **commit_message:** `typing.Optional[str]` — Message describing the changes made.
     
 </dd>
@@ -2205,6 +2213,14 @@ client.tools.upsert(
 <dl>
 <dd>
 
+**attributes:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **tool_type:** `typing.Optional[FilesToolType]` — Type of Tool.
     
 </dd>
@@ -3256,6 +3272,14 @@ If `"add"` or `"remove"`, one of the `version_id` or `environment` query paramet
 <dl>
 <dd>
 
+**attributes:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **commit_message:** `typing.Optional[str]` — Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
     
 </dd>
@@ -4147,6 +4171,123 @@ client.datasets.list_environments(
 <dd>
 
 **id:** `str` — Unique identifier for Dataset.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Files
+<details><summary><code>client.files.<a href="src/humanloop/files/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a paginated list of files.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.files.list()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page offset for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of files to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for file name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**type:** `typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]]` — List of file types to filter for.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Case-sensitive filter for files with a deployment in the specified environment. Requires the environment name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort files by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
     
 </dd>
 </dl>

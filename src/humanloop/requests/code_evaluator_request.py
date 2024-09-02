@@ -3,6 +3,7 @@
 import typing_extensions
 from ..types.evaluator_arguments_type import EvaluatorArgumentsType
 from ..types.evaluator_return_type_enum import EvaluatorReturnTypeEnum
+import typing_extensions
 import typing
 
 
@@ -15,6 +16,11 @@ class CodeEvaluatorRequestParams(typing_extensions.TypedDict):
     return_type: EvaluatorReturnTypeEnum
     """
     The type of the return value of the evaluator.
+    """
+
+    attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
     """
 
     evaluator_type: typing.Literal["python"]

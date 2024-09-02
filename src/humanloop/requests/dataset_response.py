@@ -76,3 +76,8 @@ class DatasetResponseParams(typing_extensions.TypedDict):
     """
     The list of Datapoints in this Dataset version. Only provided if explicitly requested.
     """
+
+    attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
+    """

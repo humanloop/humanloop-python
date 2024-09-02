@@ -51,6 +51,7 @@ from .types import (
     FeedbackType,
     FileEnvironmentResponse,
     FileEnvironmentResponseFile,
+    FileType,
     FilesToolType,
     FunctionTool,
     FunctionToolChoice,
@@ -82,6 +83,8 @@ from .types import (
     PaginatedDataLogResponse,
     PaginatedDataPromptResponse,
     PaginatedDataToolResponse,
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItem,
     PaginatedDatapointResponse,
     PaginatedDatasetResponse,
     PaginatedEvaluationResponse,
@@ -133,7 +136,7 @@ from .types import (
     VersionStatus,
 )
 from .errors import UnprocessableEntityError
-from . import datasets, evaluations, evaluators, logs, prompts, sessions, tools
+from . import datasets, evaluations, evaluators, files, logs, prompts, sessions, tools
 from .client import AsyncHumanloop, Humanloop
 from .environment import HumanloopEnvironment
 from .evaluators import (
@@ -222,6 +225,8 @@ from .requests import (
     PaginatedDataLogResponseParams,
     PaginatedDataPromptResponseParams,
     PaginatedDataToolResponseParams,
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseParams,
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItemParams,
     PaginatedDatapointResponseParams,
     PaginatedDatasetResponseParams,
     PaginatedEvaluationResponseParams,
@@ -361,6 +366,7 @@ __all__ = [
     "FileEnvironmentResponseFile",
     "FileEnvironmentResponseFileParams",
     "FileEnvironmentResponseParams",
+    "FileType",
     "FilesToolType",
     "FunctionTool",
     "FunctionToolChoice",
@@ -418,6 +424,10 @@ __all__ = [
     "PaginatedDataPromptResponseParams",
     "PaginatedDataToolResponse",
     "PaginatedDataToolResponseParams",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseParams",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItem",
+    "PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItemParams",
     "PaginatedDatapointResponse",
     "PaginatedDatapointResponseParams",
     "PaginatedDatasetResponse",
@@ -519,6 +529,7 @@ __all__ = [
     "datasets",
     "evaluations",
     "evaluators",
+    "files",
     "logs",
     "prompts",
     "sessions",

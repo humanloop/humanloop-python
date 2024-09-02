@@ -353,6 +353,7 @@ class ToolsClient:
         function: typing.Optional[ToolFunctionParams] = OMIT,
         source_code: typing.Optional[str] = OMIT,
         setup_values: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         tool_type: typing.Optional[FilesToolType] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -382,6 +383,9 @@ class ToolsClient:
 
         setup_values : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+
+        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
 
         tool_type : typing.Optional[FilesToolType]
             Type of Tool.
@@ -427,6 +431,7 @@ class ToolsClient:
                 "function": convert_and_respect_annotation_metadata(object_=function, annotation=ToolFunctionParams),
                 "source_code": source_code,
                 "setup_values": setup_values,
+                "attributes": attributes,
                 "tool_type": tool_type,
                 "commit_message": commit_message,
             },
@@ -1417,6 +1422,7 @@ class AsyncToolsClient:
         function: typing.Optional[ToolFunctionParams] = OMIT,
         source_code: typing.Optional[str] = OMIT,
         setup_values: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         tool_type: typing.Optional[FilesToolType] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1446,6 +1452,9 @@ class AsyncToolsClient:
 
         setup_values : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Values needed to setup the Tool, defined in JSON Schema format: https://json-schema.org/
+
+        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
 
         tool_type : typing.Optional[FilesToolType]
             Type of Tool.
@@ -1502,6 +1511,7 @@ class AsyncToolsClient:
                 "function": convert_and_respect_annotation_metadata(object_=function, annotation=ToolFunctionParams),
                 "source_code": source_code,
                 "setup_values": setup_values,
+                "attributes": attributes,
                 "tool_type": tool_type,
                 "commit_message": commit_message,
             },

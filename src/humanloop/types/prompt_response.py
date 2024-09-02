@@ -119,6 +119,11 @@ class PromptResponse(UncheckedBaseModel):
     The tools linked to your prompt that the model can call.
     """
 
+    attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
+    """
+
     commit_message: typing.Optional[str] = pydantic.Field(default=None)
     """
     Message describing the changes made.

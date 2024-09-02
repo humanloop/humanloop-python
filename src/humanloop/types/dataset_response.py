@@ -78,6 +78,11 @@ class DatasetResponse(UncheckedBaseModel):
     The list of Datapoints in this Dataset version. Only provided if explicitly requested.
     """
 
+    attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
+    """
+    Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

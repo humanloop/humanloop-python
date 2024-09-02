@@ -666,6 +666,7 @@ class PromptsClient:
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
+        attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
@@ -730,6 +731,9 @@ class PromptsClient:
 
         linked_tools : typing.Optional[typing.Sequence[str]]
             The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
+
+        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
 
         commit_message : typing.Optional[str]
             Message describing the changes made.
@@ -798,6 +802,7 @@ class PromptsClient:
                     object_=tools, annotation=typing.Sequence[ToolFunctionParams]
                 ),
                 "linked_tools": linked_tools,
+                "attributes": attributes,
                 "commit_message": commit_message,
             },
             request_options=request_options,
@@ -2100,6 +2105,7 @@ class AsyncPromptsClient:
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
+        attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
@@ -2164,6 +2170,9 @@ class AsyncPromptsClient:
 
         linked_tools : typing.Optional[typing.Sequence[str]]
             The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
+
+        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
 
         commit_message : typing.Optional[str]
             Message describing the changes made.
@@ -2240,6 +2249,7 @@ class AsyncPromptsClient:
                     object_=tools, annotation=typing.Sequence[ToolFunctionParams]
                 ),
                 "linked_tools": linked_tools,
+                "attributes": attributes,
                 "commit_message": commit_message,
             },
             request_options=request_options,
