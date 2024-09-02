@@ -795,15 +795,15 @@ class EvaluatorsClient:
         stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -851,9 +851,6 @@ class EvaluatorsClient:
         provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Raw response received the provider. Only populated for LLM Evaluator Logs.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
 
@@ -863,8 +860,8 @@ class EvaluatorsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -877,6 +874,9 @@ class EvaluatorsClient:
 
         create_evaluator_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
@@ -919,16 +919,16 @@ class EvaluatorsClient:
                 "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
+                "save": save,
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams
                 ),
@@ -1807,15 +1807,15 @@ class AsyncEvaluatorsClient:
         stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1863,9 +1863,6 @@ class AsyncEvaluatorsClient:
         provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Raw response received the provider. Only populated for LLM Evaluator Logs.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
 
@@ -1875,8 +1872,8 @@ class AsyncEvaluatorsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -1889,6 +1886,9 @@ class AsyncEvaluatorsClient:
 
         create_evaluator_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
@@ -1939,16 +1939,16 @@ class AsyncEvaluatorsClient:
                 "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
+                "save": save,
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams
                 ),

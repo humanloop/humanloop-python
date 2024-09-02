@@ -50,16 +50,6 @@ class ToolLogResponse(UncheckedBaseModel):
     Raw response received the provider.
     """
 
-    session_id: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-    """
-
-    parent_id: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    """
-
     inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     The inputs passed to the prompt template.
@@ -75,9 +65,14 @@ class ToolLogResponse(UncheckedBaseModel):
     Any additional metadata to record.
     """
 
-    save: typing.Optional[bool] = pydantic.Field(default=None)
+    session_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Whether the request/response payloads will be stored on Humanloop.
+    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+    """
+
+    parent_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
     """
 
     source_datapoint_id: typing.Optional[str] = pydantic.Field(default=None)
@@ -98,6 +93,11 @@ class ToolLogResponse(UncheckedBaseModel):
     environment: typing.Optional[str] = pydantic.Field(default=None)
     """
     The name of the Environment the Log is associated to.
+    """
+
+    save: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether the request/response payloads will be stored on Humanloop.
     """
 
     id: str = pydantic.Field()

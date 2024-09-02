@@ -117,6 +117,95 @@ except ApiError as e:
     print(e.body)
 ```
 
+## Streaming
+
+The SDK supports streaming responses, as well, the response will be a generator that you can loop over.
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.prompts.call_stream(
+    version_id="string",
+    environment="string",
+    path="string",
+    id="string",
+    messages=[
+        {
+            "content": "string",
+            "name": "string",
+            "tool_call_id": "string",
+            "role": "user",
+            "tool_calls": [
+                {
+                    "id": "string",
+                    "type": "function",
+                    "function": {
+                        "name": "string",
+                        "arguments": {"key": "value"},
+                    },
+                }
+            ],
+        }
+    ],
+    prompt={
+        "model": "string",
+        "endpoint": "complete",
+        "template": "string",
+        "provider": "openai",
+        "max_tokens": 1,
+        "temperature": 1.1,
+        "top_p": 1.1,
+        "stop": "string",
+        "presence_penalty": 1.1,
+        "frequency_penalty": 1.1,
+        "other": {"string": {"key": "value"}},
+        "seed": 1,
+        "response_format": {
+            "type": "json_object",
+            "json_schema": {"string": {"key": "value"}},
+        },
+        "tools": [
+            {
+                "name": "string",
+                "description": "string",
+                "strict": {"key": "value"},
+                "parameters": {"key": "value"},
+            }
+        ],
+        "linked_tools": ["string"],
+        "attributes": {"string": {"key": "value"}},
+    },
+    inputs={"string": {"key": "value"}},
+    source="string",
+    metadata={"string": {"key": "value"}},
+    session_id="string",
+    parent_id="string",
+    source_datapoint_id="string",
+    batches=["string"],
+    user="string",
+    prompts_call_stream_request_environment="string",
+    save=True,
+    provider_api_keys={
+        "openai": "string",
+        "ai_21": "string",
+        "mock": "string",
+        "anthropic": "string",
+        "cohere": "string",
+        "openai_azure": "string",
+        "openai_azure_endpoint": "string",
+    },
+    num_samples=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string",
+)
+for chunk in response:
+    yield chunk
+```
+
 ## Pagination
 
 Paginated requests will return a `SyncPager` or `AsyncPager`, which can be used as generators for the underlying object.

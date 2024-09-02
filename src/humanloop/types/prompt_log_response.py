@@ -5,8 +5,8 @@ from ..core.unchecked_base_model import UncheckedBaseModel
 import typing
 from .chat_message import ChatMessage
 import pydantic
-from .prompt_response import PromptResponse
 from .prompt_log_response_tool_choice import PromptLogResponseToolChoice
+from .prompt_response import PromptResponse
 import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
@@ -47,11 +47,6 @@ class PromptLogResponse(UncheckedBaseModel):
     Reason the generation finished.
     """
 
-    prompt: PromptResponse = pydantic.Field()
-    """
-    Prompt details used to generate the Log.
-    """
-
     messages: typing.Optional[typing.List[ChatMessage]] = pydantic.Field(default=None)
     """
     The messages passed to the to provider chat endpoint.
@@ -65,6 +60,11 @@ class PromptLogResponse(UncheckedBaseModel):
     - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
     - `'required'` means the model can decide to call one or more of the provided tools.
     - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    """
+
+    prompt: PromptResponse = pydantic.Field()
+    """
+    Prompt details used to generate the Log.
     """
 
     output: typing.Optional[str] = pydantic.Field(default=None)
@@ -102,16 +102,6 @@ class PromptLogResponse(UncheckedBaseModel):
     Raw response received the provider.
     """
 
-    session_id: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-    """
-
-    parent_id: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    """
-
     inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     The inputs passed to the prompt template.
@@ -127,9 +117,14 @@ class PromptLogResponse(UncheckedBaseModel):
     Any additional metadata to record.
     """
 
-    save: typing.Optional[bool] = pydantic.Field(default=None)
+    session_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Whether the request/response payloads will be stored on Humanloop.
+    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+    """
+
+    parent_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
     """
 
     source_datapoint_id: typing.Optional[str] = pydantic.Field(default=None)
@@ -150,6 +145,11 @@ class PromptLogResponse(UncheckedBaseModel):
     environment: typing.Optional[str] = pydantic.Field(default=None)
     """
     The name of the Environment the Log is associated to.
+    """
+
+    save: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether the request/response payloads will be stored on Humanloop.
     """
 
     id: str = pydantic.Field()

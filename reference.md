@@ -172,7 +172,294 @@ client.prompts.log(
 <dl>
 <dd>
 
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_choice:** `typing.Optional[PromptLogRequestToolChoiceParams]` 
+
+Controls how the model uses tools. The following options are supported: 
+- `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
+- `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
+- `'required'` means the model can decide to call one or more of the provided tools. 
+- `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **prompt:** `typing.Optional[PromptKernelRequestParams]` — Details of your Prompt. A new Prompt version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**created_at:** `typing.Optional[dt.datetime]` — User defined timestamp for when the log was created. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — Error message if the log is an error.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_latency:** `typing.Optional[float]` — Duration of the logged event in seconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update a Log.
+
+Update the details of a Log with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.update(
+    id="id",
+    log_id="log_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `str` — Unique identifier for the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_message:** `typing.Optional[ChatMessageParams]` — The message returned by the provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_tokens:** `typing.Optional[int]` — Number of tokens in the prompt used to generate the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_tokens:** `typing.Optional[int]` — Number of tokens in the output generated by the model.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_cost:** `typing.Optional[float]` — Cost in dollars associated to the tokens in the prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_cost:** `typing.Optional[float]` — Cost in dollars associated to the tokens in the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**finish_reason:** `typing.Optional[str]` — Reason the generation finished.
     
 </dd>
 </dl>
@@ -188,7 +475,7 @@ client.prompts.log(
 <dl>
 <dd>
 
-**tool_choice:** `typing.Optional[PromptLogRequestToolChoiceParams]` 
+**tool_choice:** `typing.Optional[PromptLogUpdateRequestToolChoiceParams]` 
 
 Controls how the model uses tools. The following options are supported: 
 - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
@@ -258,7 +545,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
 </dl>
@@ -266,7 +553,224 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">call_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Call a Prompt.
+
+Calling a Prompt calls the model provider before logging
+the request, responses and metadata to Humanloop.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+
+Instead of targeting an existing version explicitly, you can instead pass in
+Prompt details in the request body. In this case, we will check if the details correspond
+to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+in the case where you are storing or deriving your Prompt details in code.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.prompts.call_stream(
+    version_id="string",
+    environment="string",
+    path="string",
+    id="string",
+    messages=[
+        {
+            "content": "string",
+            "name": "string",
+            "tool_call_id": "string",
+            "role": "user",
+            "tool_calls": [
+                {
+                    "id": "string",
+                    "type": "function",
+                    "function": {
+                        "name": "string",
+                        "arguments": {"key": "value"},
+                    },
+                }
+            ],
+        }
+    ],
+    prompt={
+        "model": "string",
+        "endpoint": "complete",
+        "template": "string",
+        "provider": "openai",
+        "max_tokens": 1,
+        "temperature": 1.1,
+        "top_p": 1.1,
+        "stop": "string",
+        "presence_penalty": 1.1,
+        "frequency_penalty": 1.1,
+        "other": {"string": {"key": "value"}},
+        "seed": 1,
+        "response_format": {
+            "type": "json_object",
+            "json_schema": {"string": {"key": "value"}},
+        },
+        "tools": [
+            {
+                "name": "string",
+                "description": "string",
+                "strict": {"key": "value"},
+                "parameters": {"key": "value"},
+            }
+        ],
+        "linked_tools": ["string"],
+        "attributes": {"string": {"key": "value"}},
+    },
+    inputs={"string": {"key": "value"}},
+    source="string",
+    metadata={"string": {"key": "value"}},
+    session_id="string",
+    parent_id="string",
+    source_datapoint_id="string",
+    batches=["string"],
+    user="string",
+    prompts_call_stream_request_environment="string",
+    save=True,
+    provider_api_keys={
+        "openai": "string",
+        "ai_21": "string",
+        "mock": "string",
+        "anthropic": "string",
+        "cohere": "string",
+        "openai_azure": "string",
+        "openai_azure_endpoint": "string",
+    },
+    num_samples=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string",
+)
+for chunk in response:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Prompt to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_choice:** `typing.Optional[PromptsCallStreamRequestToolChoiceParams]` 
+
+Controls how the model uses tools. The following options are supported: 
+- `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
+- `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
+- `'required'` means the model can decide to call one or more of the provided tools. 
+- `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt:** `typing.Optional[PromptKernelRequestParams]` — Details of your Prompt. A new Prompt version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -298,7 +802,15 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
     
 </dd>
 </dl>
@@ -330,7 +842,55 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**prompt_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+**prompts_call_stream_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_api_keys:** `typing.Optional[ProviderApiKeysParams]` — API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**num_samples:** `typing.Optional[int]` — The number of generations.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**return_inputs:** `typing.Optional[bool]` — Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**logprobs:** `typing.Optional[int]` — Include the log probabilities of the top n tokens in the provider_response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**suffix:** `typing.Optional[str]` — The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
     
 </dd>
 </dl>
@@ -446,14 +1006,6 @@ client.prompts.call(
 <dl>
 <dd>
 
-**prompt:** `typing.Optional[PromptKernelRequestParams]` — Details of your Prompt. A new Prompt version will be created if the provided details are new.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
     
 </dd>
@@ -462,7 +1014,7 @@ client.prompts.call(
 <dl>
 <dd>
 
-**tool_choice:** `typing.Optional[PromptCallRequestToolChoiceParams]` 
+**tool_choice:** `typing.Optional[PromptsCallRequestToolChoiceParams]` 
 
 Controls how the model uses tools. The following options are supported: 
 - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
@@ -476,15 +1028,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+**prompt:** `typing.Optional[PromptKernelRequestParams]` — Details of your Prompt. A new Prompt version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -516,7 +1060,15 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
     
 </dd>
 </dl>
@@ -548,7 +1100,15 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**prompt_call_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+**prompts_call_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
     
 </dd>
 </dl>
@@ -565,14 +1125,6 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **num_samples:** `typing.Optional[int]` — The number of generations.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**stream:** `typing.Optional[bool]` — If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
     
 </dd>
 </dl>
@@ -1892,22 +2444,6 @@ client.tools.log(
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
@@ -1932,7 +2468,15 @@ client.tools.log(
 <dl>
 <dd>
 
-**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
     
 </dd>
 </dl>
@@ -1972,7 +2516,176 @@ client.tools.log(
 <dl>
 <dd>
 
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **tool:** `typing.Optional[ToolKernelRequestParams]` — Details of your Tool. A new Tool version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">update</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update a Log.
+
+Update the details of a Log with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.update(
+    id="id",
+    log_id="log_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `str` — Unique identifier for the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**created_at:** `typing.Optional[dt.datetime]` — User defined timestamp for when the log was created. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — Error message if the log is an error.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_latency:** `typing.Optional[float]` — Duration of the logged event in seconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
     
 </dd>
 </dl>
@@ -6029,14 +6742,6 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
     
 </dd>
@@ -6061,7 +6766,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
     
 </dd>
 </dl>
@@ -6094,6 +6799,14 @@ client.evaluators.log(
 <dd>
 
 **create_evaluator_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
     
 </dd>
 </dl>

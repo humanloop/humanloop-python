@@ -12,6 +12,8 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.log_response import LogResponse
+from ..core.jsonable_encoder import jsonable_encoder
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
@@ -19,7 +21,6 @@ from ..types.tool_response import ToolResponse
 from ..types.paginated_data_tool_response import PaginatedDataToolResponse
 from ..requests.tool_function import ToolFunctionParams
 from ..types.files_tool_type import FilesToolType
-from ..core.jsonable_encoder import jsonable_encoder
 from ..types.version_status import VersionStatus
 from ..types.list_tools import ListTools
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
@@ -54,16 +55,16 @@ class ToolsClient:
         stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
@@ -113,12 +114,6 @@ class ToolsClient:
         provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Raw response received the provider.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
 
@@ -128,8 +123,11 @@ class ToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -142,6 +140,9 @@ class ToolsClient:
 
         tool_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         tool : typing.Optional[ToolKernelRequestParams]
             Details of your Tool. A new Tool version will be created if the provided details are new.
@@ -198,16 +199,16 @@ class ToolsClient:
                 "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
+                "save": save,
                 "tool": convert_and_respect_annotation_metadata(object_=tool, annotation=ToolKernelRequestParams),
             },
             request_options=request_options,
@@ -219,6 +220,128 @@ class ToolsClient:
                     CreateToolLogResponse,
                     construct_type(
                         type_=CreateToolLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update(
+        self,
+        id: str,
+        log_id: str,
+        *,
+        output: typing.Optional[str] = OMIT,
+        created_at: typing.Optional[dt.datetime] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
+        provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> LogResponse:
+        """
+        Update a Log.
+
+        Update the details of a Log with the given ID.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        log_id : str
+            Unique identifier for the Log.
+
+        output : typing.Optional[str]
+            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+
+        created_at : typing.Optional[dt.datetime]
+            User defined timestamp for when the log was created.
+
+        error : typing.Optional[str]
+            Error message if the log is an error.
+
+        provider_latency : typing.Optional[float]
+            Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
+
+        provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw request sent to provider.
+
+        provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw response received the provider.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        LogResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.update(
+            id="id",
+            log_id="log_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    LogResponse,
+                    construct_type(
+                        type_=LogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1107,16 +1230,16 @@ class AsyncToolsClient:
         stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
@@ -1166,12 +1289,6 @@ class AsyncToolsClient:
         provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Raw response received the provider.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
 
@@ -1181,8 +1298,11 @@ class AsyncToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -1195,6 +1315,9 @@ class AsyncToolsClient:
 
         tool_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         tool : typing.Optional[ToolKernelRequestParams]
             Details of your Tool. A new Tool version will be created if the provided details are new.
@@ -1259,16 +1382,16 @@ class AsyncToolsClient:
                 "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
+                "save": save,
                 "tool": convert_and_respect_annotation_metadata(object_=tool, annotation=ToolKernelRequestParams),
             },
             request_options=request_options,
@@ -1280,6 +1403,136 @@ class AsyncToolsClient:
                     CreateToolLogResponse,
                     construct_type(
                         type_=CreateToolLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update(
+        self,
+        id: str,
+        log_id: str,
+        *,
+        output: typing.Optional[str] = OMIT,
+        created_at: typing.Optional[dt.datetime] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
+        provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> LogResponse:
+        """
+        Update a Log.
+
+        Update the details of a Log with the given ID.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        log_id : str
+            Unique identifier for the Log.
+
+        output : typing.Optional[str]
+            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+
+        created_at : typing.Optional[dt.datetime]
+            User defined timestamp for when the log was created.
+
+        error : typing.Optional[str]
+            Error message if the log is an error.
+
+        provider_latency : typing.Optional[float]
+            Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
+
+        provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw request sent to provider.
+
+        provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw response received the provider.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        LogResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.tools.update(
+                id="id",
+                log_id="log_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    LogResponse,
+                    construct_type(
+                        type_=LogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

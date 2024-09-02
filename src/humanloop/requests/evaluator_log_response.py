@@ -53,16 +53,6 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     Raw response received the provider.
     """
 
-    session_id: typing_extensions.NotRequired[str]
-    """
-    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-    """
-
-    parent_id: typing_extensions.NotRequired[str]
-    """
-    Identifier of the evaluated Log. The newly created Log will have this one set as parent.
-    """
-
     inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
     The inputs passed to the prompt template.
@@ -78,9 +68,14 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     Any additional metadata to record.
     """
 
-    save: typing_extensions.NotRequired[bool]
+    session_id: typing_extensions.NotRequired[str]
     """
-    Whether the request/response payloads will be stored on Humanloop.
+    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+    """
+
+    parent_id: typing_extensions.NotRequired[str]
+    """
+    Identifier of the evaluated Log. The newly created Log will have this one set as parent.
     """
 
     source_datapoint_id: typing_extensions.NotRequired[str]
@@ -101,6 +96,11 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     environment: typing_extensions.NotRequired[str]
     """
     The name of the Environment the Log is associated to.
+    """
+
+    save: typing_extensions.NotRequired[bool]
+    """
+    Whether the request/response payloads will be stored on Humanloop.
     """
 
     judgment: typing_extensions.NotRequired[EvaluatorLogResponseJudgmentParams]

@@ -3,6 +3,6 @@
 import typing
 from ...types.tool_choice import ToolChoice
 
-PromptCallRequestToolChoice = typing.Union[
+PromptsCallStreamRequestToolChoice = typing.Union[
     typing.Literal["none"], typing.Literal["auto"], typing.Literal["required"], ToolChoice
 ]

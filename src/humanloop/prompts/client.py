@@ -3,8 +3,8 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..requests.chat_message import ChatMessageParams
-from ..requests.prompt_kernel_request import PromptKernelRequestParams
 from .requests.prompt_log_request_tool_choice import PromptLogRequestToolChoiceParams
+from ..requests.prompt_kernel_request import PromptKernelRequestParams
 import datetime as dt
 from ..core.request_options import RequestOptions
 from ..types.create_prompt_log_response import CreatePromptLogResponse
@@ -14,9 +14,16 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from .requests.prompt_call_request_tool_choice import PromptCallRequestToolChoiceParams
+from .requests.prompt_log_update_request_tool_choice import PromptLogUpdateRequestToolChoiceParams
+from ..types.log_response import LogResponse
+from ..core.jsonable_encoder import jsonable_encoder
+from .requests.prompts_call_stream_request_tool_choice import PromptsCallStreamRequestToolChoiceParams
 from ..requests.provider_api_keys import ProviderApiKeysParams
-from .types.call_prompts_call_post_response import CallPromptsCallPostResponse
+from ..types.prompt_call_stream_response import PromptCallStreamResponse
+import httpx_sse
+import json
+from .requests.prompts_call_request_tool_choice import PromptsCallRequestToolChoiceParams
+from ..types.prompt_call_response import PromptCallResponse
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
@@ -28,7 +35,6 @@ from ..types.model_providers import ModelProviders
 from .requests.prompt_request_stop import PromptRequestStopParams
 from ..requests.response_format import ResponseFormatParams
 from ..requests.tool_function import ToolFunctionParams
-from ..core.jsonable_encoder import jsonable_encoder
 from ..types.version_status import VersionStatus
 from ..types.list_prompts import ListPrompts
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
@@ -63,9 +69,9 @@ class PromptsClient:
         prompt_cost: typing.Optional[float] = OMIT,
         output_cost: typing.Optional[float] = OMIT,
         finish_reason: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
@@ -73,16 +79,16 @@ class PromptsClient:
         stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompt_log_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreatePromptLogResponse:
         """
@@ -131,9 +137,6 @@ class PromptsClient:
         finish_reason : typing.Optional[str]
             Reason the generation finished.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
-
         messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
@@ -143,6 +146,9 @@ class PromptsClient:
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
             - `'required'` means the model can decide to call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+
+        prompt : typing.Optional[PromptKernelRequestParams]
+            Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
@@ -165,12 +171,6 @@ class PromptsClient:
         provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Raw response received the provider.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
 
@@ -180,8 +180,11 @@ class PromptsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -194,6 +197,9 @@ class PromptsClient:
 
         prompt_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -259,13 +265,13 @@ class PromptsClient:
                 "prompt_cost": prompt_cost,
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "messages": convert_and_respect_annotation_metadata(
                     object_=messages, annotation=typing.Sequence[ChatMessageParams]
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
                     object_=tool_choice, annotation=PromptLogRequestToolChoiceParams
                 ),
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "output": output,
                 "created_at": created_at,
                 "error": error,
@@ -273,16 +279,16 @@ class PromptsClient:
                 "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
                 "environment": prompt_log_request_environment,
+                "save": save,
             },
             request_options=request_options,
             omit=OMIT,
@@ -311,34 +317,205 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def call(
+    def update(
+        self,
+        id: str,
+        log_id: str,
+        *,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
+        prompt_tokens: typing.Optional[int] = OMIT,
+        output_tokens: typing.Optional[int] = OMIT,
+        prompt_cost: typing.Optional[float] = OMIT,
+        output_cost: typing.Optional[float] = OMIT,
+        finish_reason: typing.Optional[str] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptLogUpdateRequestToolChoiceParams] = OMIT,
+        output: typing.Optional[str] = OMIT,
+        created_at: typing.Optional[dt.datetime] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
+        provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> LogResponse:
+        """
+        Update a Log.
+
+        Update the details of a Log with the given ID.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        log_id : str
+            Unique identifier for the Log.
+
+        output_message : typing.Optional[ChatMessageParams]
+            The message returned by the provider.
+
+        prompt_tokens : typing.Optional[int]
+            Number of tokens in the prompt used to generate the output.
+
+        output_tokens : typing.Optional[int]
+            Number of tokens in the output generated by the model.
+
+        prompt_cost : typing.Optional[float]
+            Cost in dollars associated to the tokens in the prompt.
+
+        output_cost : typing.Optional[float]
+            Cost in dollars associated to the tokens in the output.
+
+        finish_reason : typing.Optional[str]
+            Reason the generation finished.
+
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+            The messages passed to the to provider chat endpoint.
+
+        tool_choice : typing.Optional[PromptLogUpdateRequestToolChoiceParams]
+            Controls how the model uses tools. The following options are supported:
+            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+            - `'required'` means the model can decide to call one or more of the provided tools.
+            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+
+        output : typing.Optional[str]
+            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+
+        created_at : typing.Optional[dt.datetime]
+            User defined timestamp for when the log was created.
+
+        error : typing.Optional[str]
+            Error message if the log is an error.
+
+        provider_latency : typing.Optional[float]
+            Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
+
+        provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw request sent to provider.
+
+        provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw response received the provider.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        LogResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.prompts.update(
+            id="id",
+            log_id="log_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams
+                ),
+                "prompt_tokens": prompt_tokens,
+                "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
+                "finish_reason": finish_reason,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams
+                ),
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    LogResponse,
+                    construct_type(
+                        type_=LogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def call_stream(
         self,
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
-        tool_choice: typing.Optional[PromptCallRequestToolChoiceParams] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
+        tool_choice: typing.Optional[PromptsCallStreamRequestToolChoiceParams] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
-        prompt_call_request_environment: typing.Optional[str] = OMIT,
+        prompts_call_stream_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
-        stream: typing.Optional[bool] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CallPromptsCallPostResponse:
+    ) -> typing.Iterator[PromptCallStreamResponse]:
         """
         Call a Prompt.
 
@@ -367,24 +544,18 @@ class PromptsClient:
         id : typing.Optional[str]
             ID for an existing Prompt.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
-
         messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptCallRequestToolChoiceParams]
+        tool_choice : typing.Optional[PromptsCallStreamRequestToolChoiceParams]
             Controls how the model uses tools. The following options are supported:
             - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
             - `'required'` means the model can decide to call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+        prompt : typing.Optional[PromptKernelRequestParams]
+            Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -395,8 +566,11 @@ class PromptsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -407,8 +581,11 @@ class PromptsClient:
         user : typing.Optional[str]
             End-user ID related to the Log.
 
-        prompt_call_request_environment : typing.Optional[str]
+        prompts_call_stream_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
@@ -416,8 +593,281 @@ class PromptsClient:
         num_samples : typing.Optional[int]
             The number of generations.
 
-        stream : typing.Optional[bool]
-            If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
+        return_inputs : typing.Optional[bool]
+            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
+        logprobs : typing.Optional[int]
+            Include the log probabilities of the top n tokens in the provider_response
+
+        suffix : typing.Optional[str]
+            The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.Iterator[PromptCallStreamResponse]
+
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        response = client.prompts.call_stream(
+            version_id="string",
+            environment="string",
+            path="string",
+            id="string",
+            messages=[
+                {
+                    "content": "string",
+                    "name": "string",
+                    "tool_call_id": "string",
+                    "role": "user",
+                    "tool_calls": [
+                        {
+                            "id": "string",
+                            "type": "function",
+                            "function": {
+                                "name": "string",
+                                "arguments": {"key": "value"},
+                            },
+                        }
+                    ],
+                }
+            ],
+            prompt={
+                "model": "string",
+                "endpoint": "complete",
+                "template": "string",
+                "provider": "openai",
+                "max_tokens": 1,
+                "temperature": 1.1,
+                "top_p": 1.1,
+                "stop": "string",
+                "presence_penalty": 1.1,
+                "frequency_penalty": 1.1,
+                "other": {"string": {"key": "value"}},
+                "seed": 1,
+                "response_format": {
+                    "type": "json_object",
+                    "json_schema": {"string": {"key": "value"}},
+                },
+                "tools": [
+                    {
+                        "name": "string",
+                        "description": "string",
+                        "strict": {"key": "value"},
+                        "parameters": {"key": "value"},
+                    }
+                ],
+                "linked_tools": ["string"],
+                "attributes": {"string": {"key": "value"}},
+            },
+            inputs={"string": {"key": "value"}},
+            source="string",
+            metadata={"string": {"key": "value"}},
+            session_id="string",
+            parent_id="string",
+            source_datapoint_id="string",
+            batches=["string"],
+            user="string",
+            prompts_call_stream_request_environment="string",
+            save=True,
+            provider_api_keys={
+                "openai": "string",
+                "ai_21": "string",
+                "mock": "string",
+                "anthropic": "string",
+                "cohere": "string",
+                "openai_azure": "string",
+                "openai_azure_endpoint": "string",
+            },
+            num_samples=1,
+            return_inputs=True,
+            logprobs=1,
+            suffix="string",
+        )
+        for chunk in response:
+            yield chunk
+        """
+        with self._client_wrapper.httpx_client.stream(
+            "prompts/call",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams
+                ),
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "session_id": session_id,
+                "parent_id": parent_id,
+                "source_datapoint_id": source_datapoint_id,
+                "batches": batches,
+                "user": user,
+                "environment": prompts_call_stream_request_environment,
+                "save": save,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                ),
+                "num_samples": num_samples,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
+                "stream": True,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+            try:
+                if 200 <= _response.status_code < 300:
+                    _event_source = httpx_sse.EventSource(_response)
+                    for _sse in _event_source.iter_sse():
+                        try:
+                            yield typing.cast(
+                                PromptCallStreamResponse,
+                                construct_type(
+                                    type_=PromptCallStreamResponse,  # type: ignore
+                                    object_=json.loads(_sse.data),
+                                ),
+                            )
+                        except:
+                            pass
+                    return
+                _response.read()
+                if _response.status_code == 422:
+                    raise UnprocessableEntityError(
+                        typing.cast(
+                            HttpValidationError,
+                            construct_type(
+                                type_=HttpValidationError,  # type: ignore
+                                object_=_response.json(),
+                            ),
+                        )
+                    )
+                _response_json = _response.json()
+            except JSONDecodeError:
+                raise ApiError(status_code=_response.status_code, body=_response.text)
+            raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def call(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptsCallRequestToolChoiceParams] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        prompts_call_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
+        num_samples: typing.Optional[int] = OMIT,
+        return_inputs: typing.Optional[bool] = OMIT,
+        logprobs: typing.Optional[int] = OMIT,
+        suffix: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PromptCallResponse:
+        """
+        Call a Prompt.
+
+        Calling a Prompt calls the model provider before logging
+        the request, responses and metadata to Humanloop.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Prompt details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+        in the case where you are storing or deriving your Prompt details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Prompt to log to.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to log to.
+
+        path : typing.Optional[str]
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Prompt.
+
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+            The messages passed to the to provider chat endpoint.
+
+        tool_choice : typing.Optional[PromptsCallRequestToolChoiceParams]
+            Controls how the model uses tools. The following options are supported:
+            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+            - `'required'` means the model can decide to call one or more of the provided tools.
+            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+
+        prompt : typing.Optional[PromptKernelRequestParams]
+            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        batches : typing.Optional[typing.Sequence[str]]
+            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        prompts_call_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        provider_api_keys : typing.Optional[ProviderApiKeysParams]
+            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+
+        num_samples : typing.Optional[int]
+            The number of generations.
 
         return_inputs : typing.Optional[bool]
             Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
@@ -433,8 +883,8 @@ class PromptsClient:
 
         Returns
         -------
-        CallPromptsCallPostResponse
-            Successful Response
+        PromptCallResponse
+
 
         Examples
         --------
@@ -472,7 +922,6 @@ class PromptsClient:
                 ],
             },
             messages=[{"role": "user", "content": "latest apple"}],
-            stream=False,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -485,31 +934,31 @@ class PromptsClient:
             json={
                 "path": path,
                 "id": id,
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "messages": convert_and_respect_annotation_metadata(
                     object_=messages, annotation=typing.Sequence[ChatMessageParams]
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptCallRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams
                 ),
-                "session_id": session_id,
-                "parent_id": parent_id,
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
-                "environment": prompt_call_request_environment,
+                "environment": prompts_call_request_environment,
+                "save": save,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
                     object_=provider_api_keys, annotation=ProviderApiKeysParams
                 ),
                 "num_samples": num_samples,
-                "stream": stream,
                 "return_inputs": return_inputs,
                 "logprobs": logprobs,
                 "suffix": suffix,
+                "stream": False,
             },
             request_options=request_options,
             omit=OMIT,
@@ -517,9 +966,9 @@ class PromptsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CallPromptsCallPostResponse,
+                    PromptCallResponse,
                     construct_type(
-                        type_=CallPromptsCallPostResponse,  # type: ignore
+                        type_=PromptCallResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1477,9 +1926,9 @@ class AsyncPromptsClient:
         prompt_cost: typing.Optional[float] = OMIT,
         output_cost: typing.Optional[float] = OMIT,
         finish_reason: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
@@ -1487,16 +1936,16 @@ class AsyncPromptsClient:
         stdout: typing.Optional[str] = OMIT,
         provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompt_log_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreatePromptLogResponse:
         """
@@ -1545,9 +1994,6 @@ class AsyncPromptsClient:
         finish_reason : typing.Optional[str]
             Reason the generation finished.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
-
         messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
@@ -1557,6 +2003,9 @@ class AsyncPromptsClient:
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
             - `'required'` means the model can decide to call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+
+        prompt : typing.Optional[PromptKernelRequestParams]
+            Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
@@ -1579,12 +2028,6 @@ class AsyncPromptsClient:
         provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Raw response received the provider.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
 
@@ -1594,8 +2037,11 @@ class AsyncPromptsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -1608,6 +2054,9 @@ class AsyncPromptsClient:
 
         prompt_log_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1682,13 +2131,13 @@ class AsyncPromptsClient:
                 "prompt_cost": prompt_cost,
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "messages": convert_and_respect_annotation_metadata(
                     object_=messages, annotation=typing.Sequence[ChatMessageParams]
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
                     object_=tool_choice, annotation=PromptLogRequestToolChoiceParams
                 ),
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "output": output,
                 "created_at": created_at,
                 "error": error,
@@ -1696,16 +2145,16 @@ class AsyncPromptsClient:
                 "stdout": stdout,
                 "provider_request": provider_request,
                 "provider_response": provider_response,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
                 "environment": prompt_log_request_environment,
+                "save": save,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1734,34 +2183,213 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def call(
+    async def update(
+        self,
+        id: str,
+        log_id: str,
+        *,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
+        prompt_tokens: typing.Optional[int] = OMIT,
+        output_tokens: typing.Optional[int] = OMIT,
+        prompt_cost: typing.Optional[float] = OMIT,
+        output_cost: typing.Optional[float] = OMIT,
+        finish_reason: typing.Optional[str] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptLogUpdateRequestToolChoiceParams] = OMIT,
+        output: typing.Optional[str] = OMIT,
+        created_at: typing.Optional[dt.datetime] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        provider_latency: typing.Optional[float] = OMIT,
+        stdout: typing.Optional[str] = OMIT,
+        provider_request: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        provider_response: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> LogResponse:
+        """
+        Update a Log.
+
+        Update the details of a Log with the given ID.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        log_id : str
+            Unique identifier for the Log.
+
+        output_message : typing.Optional[ChatMessageParams]
+            The message returned by the provider.
+
+        prompt_tokens : typing.Optional[int]
+            Number of tokens in the prompt used to generate the output.
+
+        output_tokens : typing.Optional[int]
+            Number of tokens in the output generated by the model.
+
+        prompt_cost : typing.Optional[float]
+            Cost in dollars associated to the tokens in the prompt.
+
+        output_cost : typing.Optional[float]
+            Cost in dollars associated to the tokens in the output.
+
+        finish_reason : typing.Optional[str]
+            Reason the generation finished.
+
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+            The messages passed to the to provider chat endpoint.
+
+        tool_choice : typing.Optional[PromptLogUpdateRequestToolChoiceParams]
+            Controls how the model uses tools. The following options are supported:
+            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+            - `'required'` means the model can decide to call one or more of the provided tools.
+            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+
+        output : typing.Optional[str]
+            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+
+        created_at : typing.Optional[dt.datetime]
+            User defined timestamp for when the log was created.
+
+        error : typing.Optional[str]
+            Error message if the log is an error.
+
+        provider_latency : typing.Optional[float]
+            Duration of the logged event in seconds.
+
+        stdout : typing.Optional[str]
+            Captured log and debug statements.
+
+        provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw request sent to provider.
+
+        provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Raw response received the provider.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        LogResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.prompts.update(
+                id="id",
+                log_id="log_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams
+                ),
+                "prompt_tokens": prompt_tokens,
+                "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
+                "finish_reason": finish_reason,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams
+                ),
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    LogResponse,
+                    construct_type(
+                        type_=LogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def call_stream(
         self,
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
-        tool_choice: typing.Optional[PromptCallRequestToolChoiceParams] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
+        tool_choice: typing.Optional[PromptsCallStreamRequestToolChoiceParams] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        save: typing.Optional[bool] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
-        prompt_call_request_environment: typing.Optional[str] = OMIT,
+        prompts_call_stream_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
-        stream: typing.Optional[bool] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CallPromptsCallPostResponse:
+    ) -> typing.AsyncIterator[PromptCallStreamResponse]:
         """
         Call a Prompt.
 
@@ -1790,24 +2418,18 @@ class AsyncPromptsClient:
         id : typing.Optional[str]
             ID for an existing Prompt.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
-
         messages : typing.Optional[typing.Sequence[ChatMessageParams]]
             The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptCallRequestToolChoiceParams]
+        tool_choice : typing.Optional[PromptsCallStreamRequestToolChoiceParams]
             Controls how the model uses tools. The following options are supported:
             - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
             - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
             - `'required'` means the model can decide to call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+        prompt : typing.Optional[PromptKernelRequestParams]
+            Details of your Prompt. A new Prompt version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -1818,8 +2440,11 @@ class AsyncPromptsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -1830,8 +2455,11 @@ class AsyncPromptsClient:
         user : typing.Optional[str]
             End-user ID related to the Log.
 
-        prompt_call_request_environment : typing.Optional[str]
+        prompts_call_stream_request_environment : typing.Optional[str]
             The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
 
         provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
@@ -1839,8 +2467,289 @@ class AsyncPromptsClient:
         num_samples : typing.Optional[int]
             The number of generations.
 
-        stream : typing.Optional[bool]
-            If true, tokens will be sent as data-only server-sent events. If num_samples > 1, samples are streamed back independently.
+        return_inputs : typing.Optional[bool]
+            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+
+        logprobs : typing.Optional[int]
+            Include the log probabilities of the top n tokens in the provider_response
+
+        suffix : typing.Optional[str]
+            The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Yields
+        ------
+        typing.AsyncIterator[PromptCallStreamResponse]
+
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            response = await client.prompts.call_stream(
+                version_id="string",
+                environment="string",
+                path="string",
+                id="string",
+                messages=[
+                    {
+                        "content": "string",
+                        "name": "string",
+                        "tool_call_id": "string",
+                        "role": "user",
+                        "tool_calls": [
+                            {
+                                "id": "string",
+                                "type": "function",
+                                "function": {
+                                    "name": "string",
+                                    "arguments": {"key": "value"},
+                                },
+                            }
+                        ],
+                    }
+                ],
+                prompt={
+                    "model": "string",
+                    "endpoint": "complete",
+                    "template": "string",
+                    "provider": "openai",
+                    "max_tokens": 1,
+                    "temperature": 1.1,
+                    "top_p": 1.1,
+                    "stop": "string",
+                    "presence_penalty": 1.1,
+                    "frequency_penalty": 1.1,
+                    "other": {"string": {"key": "value"}},
+                    "seed": 1,
+                    "response_format": {
+                        "type": "json_object",
+                        "json_schema": {"string": {"key": "value"}},
+                    },
+                    "tools": [
+                        {
+                            "name": "string",
+                            "description": "string",
+                            "strict": {"key": "value"},
+                            "parameters": {"key": "value"},
+                        }
+                    ],
+                    "linked_tools": ["string"],
+                    "attributes": {"string": {"key": "value"}},
+                },
+                inputs={"string": {"key": "value"}},
+                source="string",
+                metadata={"string": {"key": "value"}},
+                session_id="string",
+                parent_id="string",
+                source_datapoint_id="string",
+                batches=["string"],
+                user="string",
+                prompts_call_stream_request_environment="string",
+                save=True,
+                provider_api_keys={
+                    "openai": "string",
+                    "ai_21": "string",
+                    "mock": "string",
+                    "anthropic": "string",
+                    "cohere": "string",
+                    "openai_azure": "string",
+                    "openai_azure_endpoint": "string",
+                },
+                num_samples=1,
+                return_inputs=True,
+                logprobs=1,
+                suffix="string",
+            )
+            async for chunk in response:
+                yield chunk
+
+
+        asyncio.run(main())
+        """
+        async with self._client_wrapper.httpx_client.stream(
+            "prompts/call",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams
+                ),
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "session_id": session_id,
+                "parent_id": parent_id,
+                "source_datapoint_id": source_datapoint_id,
+                "batches": batches,
+                "user": user,
+                "environment": prompts_call_stream_request_environment,
+                "save": save,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                ),
+                "num_samples": num_samples,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
+                "stream": True,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        ) as _response:
+            try:
+                if 200 <= _response.status_code < 300:
+                    _event_source = httpx_sse.EventSource(_response)
+                    async for _sse in _event_source.aiter_sse():
+                        try:
+                            yield typing.cast(
+                                PromptCallStreamResponse,
+                                construct_type(
+                                    type_=PromptCallStreamResponse,  # type: ignore
+                                    object_=json.loads(_sse.data),
+                                ),
+                            )
+                        except:
+                            pass
+                    return
+                await _response.aread()
+                if _response.status_code == 422:
+                    raise UnprocessableEntityError(
+                        typing.cast(
+                            HttpValidationError,
+                            construct_type(
+                                type_=HttpValidationError,  # type: ignore
+                                object_=_response.json(),
+                            ),
+                        )
+                    )
+                _response_json = _response.json()
+            except JSONDecodeError:
+                raise ApiError(status_code=_response.status_code, body=_response.text)
+            raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def call(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        tool_choice: typing.Optional[PromptsCallRequestToolChoiceParams] = OMIT,
+        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        session_id: typing.Optional[str] = OMIT,
+        parent_id: typing.Optional[str] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        prompts_call_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
+        num_samples: typing.Optional[int] = OMIT,
+        return_inputs: typing.Optional[bool] = OMIT,
+        logprobs: typing.Optional[int] = OMIT,
+        suffix: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PromptCallResponse:
+        """
+        Call a Prompt.
+
+        Calling a Prompt calls the model provider before logging
+        the request, responses and metadata to Humanloop.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Prompt details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+        in the case where you are storing or deriving your Prompt details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Prompt to log to.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to log to.
+
+        path : typing.Optional[str]
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Prompt.
+
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+            The messages passed to the to provider chat endpoint.
+
+        tool_choice : typing.Optional[PromptsCallRequestToolChoiceParams]
+            Controls how the model uses tools. The following options are supported:
+            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+            - `'required'` means the model can decide to call one or more of the provided tools.
+            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+
+        prompt : typing.Optional[PromptKernelRequestParams]
+            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        session_id : typing.Optional[str]
+            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+
+        parent_id : typing.Optional[str]
+            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        batches : typing.Optional[typing.Sequence[str]]
+            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        prompts_call_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        provider_api_keys : typing.Optional[ProviderApiKeysParams]
+            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+
+        num_samples : typing.Optional[int]
+            The number of generations.
 
         return_inputs : typing.Optional[bool]
             Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
@@ -1856,8 +2765,8 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        CallPromptsCallPostResponse
-            Successful Response
+        PromptCallResponse
+
 
         Examples
         --------
@@ -1900,7 +2809,6 @@ class AsyncPromptsClient:
                     ],
                 },
                 messages=[{"role": "user", "content": "latest apple"}],
-                stream=False,
             )
 
 
@@ -1916,31 +2824,31 @@ class AsyncPromptsClient:
             json={
                 "path": path,
                 "id": id,
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "messages": convert_and_respect_annotation_metadata(
                     object_=messages, annotation=typing.Sequence[ChatMessageParams]
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptCallRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams
                 ),
-                "session_id": session_id,
-                "parent_id": parent_id,
+                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "save": save,
+                "session_id": session_id,
+                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "batches": batches,
                 "user": user,
-                "environment": prompt_call_request_environment,
+                "environment": prompts_call_request_environment,
+                "save": save,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
                     object_=provider_api_keys, annotation=ProviderApiKeysParams
                 ),
                 "num_samples": num_samples,
-                "stream": stream,
                 "return_inputs": return_inputs,
                 "logprobs": logprobs,
                 "suffix": suffix,
+                "stream": False,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1948,9 +2856,9 @@ class AsyncPromptsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CallPromptsCallPostResponse,
+                    PromptCallResponse,
                     construct_type(
-                        type_=CallPromptsCallPostResponse,  # type: ignore
+                        type_=PromptCallResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

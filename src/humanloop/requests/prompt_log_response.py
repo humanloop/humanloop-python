@@ -4,9 +4,9 @@ from __future__ import annotations
 import typing_extensions
 import typing_extensions
 from .chat_message import ChatMessageParams
-from .prompt_response import PromptResponseParams
 import typing
 from .prompt_log_response_tool_choice import PromptLogResponseToolChoiceParams
+from .prompt_response import PromptResponseParams
 import datetime as dt
 import typing
 
@@ -49,11 +49,6 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     Reason the generation finished.
     """
 
-    prompt: PromptResponseParams
-    """
-    Prompt details used to generate the Log.
-    """
-
     messages: typing_extensions.NotRequired[typing.Sequence[ChatMessageParams]]
     """
     The messages passed to the to provider chat endpoint.
@@ -67,6 +62,11 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
     - `'required'` means the model can decide to call one or more of the provided tools.
     - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    """
+
+    prompt: PromptResponseParams
+    """
+    Prompt details used to generate the Log.
     """
 
     output: typing_extensions.NotRequired[str]
@@ -104,16 +104,6 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     Raw response received the provider.
     """
 
-    session_id: typing_extensions.NotRequired[str]
-    """
-    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-    """
-
-    parent_id: typing_extensions.NotRequired[str]
-    """
-    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    """
-
     inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
     The inputs passed to the prompt template.
@@ -129,9 +119,14 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     Any additional metadata to record.
     """
 
-    save: typing_extensions.NotRequired[bool]
+    session_id: typing_extensions.NotRequired[str]
     """
-    Whether the request/response payloads will be stored on Humanloop.
+    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+    """
+
+    parent_id: typing_extensions.NotRequired[str]
+    """
+    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
     """
 
     source_datapoint_id: typing_extensions.NotRequired[str]
@@ -152,6 +147,11 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     environment: typing_extensions.NotRequired[str]
     """
     The name of the Environment the Log is associated to.
+    """
+
+    save: typing_extensions.NotRequired[bool]
+    """
+    Whether the request/response payloads will be stored on Humanloop.
     """
 
     id: str
