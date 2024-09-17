@@ -2,11 +2,11 @@
 
 from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class BooleanEvaluatorVersionStats(UncheckedBaseModel):
+class NumericEvaluatorStatsResponse(UncheckedBaseModel):
     """
     Base attributes for stats for an Evaluator Version-Evaluated Version pair
     in the Evaluation Report.
@@ -37,15 +37,9 @@ class BooleanEvaluatorVersionStats(UncheckedBaseModel):
     The total number of errored Evaluators for this Evaluator Version.
     """
 
-    num_true: int = pydantic.Field()
-    """
-    The total number of `True` judgments for this Evaluator Version.
-    """
-
-    num_false: int = pydantic.Field()
-    """
-    The total number of `False` judgments for this Evaluator Version.
-    """
+    mean: typing.Optional[float] = None
+    std: typing.Optional[float] = None
+    percentiles: typing.Dict[str, float]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

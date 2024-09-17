@@ -10,12 +10,12 @@ import typing
 class CodeEvaluatorRequestParams(typing_extensions.TypedDict):
     arguments_type: EvaluatorArgumentsType
     """
-    Whether this evaluator is target-free or target-required.
+    Whether this Evaluator is target-free or target-required.
     """
 
     return_type: EvaluatorReturnTypeEnum
     """
-    The type of the return value of the evaluator.
+    The type of the return value of the Evaluator.
     """
 
     attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -26,5 +26,5 @@ class CodeEvaluatorRequestParams(typing_extensions.TypedDict):
     evaluator_type: typing.Literal["python"]
     code: str
     """
-    The code for the evaluator. This code will be executed in a sandboxed environment.
+    The code for the Evaluator. This code will be executed in a sandboxed environment.
     """

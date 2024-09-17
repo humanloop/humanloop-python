@@ -2,7 +2,7 @@
 
 from .agent_config_response import AgentConfigResponse
 from .base_models_user_response import BaseModelsUserResponse
-from .boolean_evaluator_version_stats import BooleanEvaluatorVersionStats
+from .boolean_evaluator_stats_response import BooleanEvaluatorStatsResponse
 from .chat_message import ChatMessage
 from .chat_message_content import ChatMessageContent
 from .chat_message_content_item import ChatMessageContentItem
@@ -81,7 +81,7 @@ from .monitoring_evaluator_environment_request import MonitoringEvaluatorEnviron
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse
 from .monitoring_evaluator_state import MonitoringEvaluatorState
 from .monitoring_evaluator_version_request import MonitoringEvaluatorVersionRequest
-from .numeric_evaluator_version_stats import NumericEvaluatorVersionStats
+from .numeric_evaluator_stats_response import NumericEvaluatorStatsResponse
 from .observability_status import ObservabilityStatus
 from .overall_stats import OverallStats
 from .paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
@@ -118,12 +118,12 @@ from .prompt_response_template import PromptResponseTemplate
 from .provider_api_keys import ProviderApiKeys
 from .response_format import ResponseFormat
 from .response_format_type import ResponseFormatType
-from .select_evaluator_version_stats import SelectEvaluatorVersionStats
+from .select_evaluator_stats_response import SelectEvaluatorStatsResponse
 from .session_event_response import SessionEventResponse
 from .session_response import SessionResponse
 from .sort_order import SortOrder
 from .text_chat_content import TextChatContent
-from .text_evaluator_version_stats import TextEvaluatorVersionStats
+from .text_evaluator_stats_response import TextEvaluatorStatsResponse
 from .time_unit import TimeUnit
 from .tool_call import ToolCall
 from .tool_choice import ToolChoice
@@ -143,14 +143,14 @@ from .version_deployment_response_file import VersionDeploymentResponseFile
 from .version_id_response import VersionIdResponse
 from .version_id_response_version import VersionIdResponseVersion
 from .version_reference_response import VersionReferenceResponse
-from .version_stats import VersionStats
-from .version_stats_evaluator_version_stats_item import VersionStatsEvaluatorVersionStatsItem
+from .version_stats_response import VersionStatsResponse
+from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItem
 from .version_status import VersionStatus
 
 __all__ = [
     "AgentConfigResponse",
     "BaseModelsUserResponse",
-    "BooleanEvaluatorVersionStats",
+    "BooleanEvaluatorStatsResponse",
     "ChatMessage",
     "ChatMessageContent",
     "ChatMessageContentItem",
@@ -227,7 +227,7 @@ __all__ = [
     "MonitoringEvaluatorResponse",
     "MonitoringEvaluatorState",
     "MonitoringEvaluatorVersionRequest",
-    "NumericEvaluatorVersionStats",
+    "NumericEvaluatorStatsResponse",
     "ObservabilityStatus",
     "OverallStats",
     "PaginatedDataEvaluationReportLogResponse",
@@ -260,12 +260,12 @@ __all__ = [
     "ProviderApiKeys",
     "ResponseFormat",
     "ResponseFormatType",
-    "SelectEvaluatorVersionStats",
+    "SelectEvaluatorStatsResponse",
     "SessionEventResponse",
     "SessionResponse",
     "SortOrder",
     "TextChatContent",
-    "TextEvaluatorVersionStats",
+    "TextEvaluatorStatsResponse",
     "TimeUnit",
     "ToolCall",
     "ToolChoice",
@@ -285,7 +285,7 @@ __all__ = [
     "VersionIdResponse",
     "VersionIdResponseVersion",
     "VersionReferenceResponse",
-    "VersionStats",
-    "VersionStatsEvaluatorVersionStatsItem",
+    "VersionStatsResponse",
+    "VersionStatsResponseEvaluatorVersionStatsItem",
     "VersionStatus",
 ]

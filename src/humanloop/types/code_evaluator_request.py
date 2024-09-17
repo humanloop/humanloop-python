@@ -11,12 +11,12 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class CodeEvaluatorRequest(UncheckedBaseModel):
     arguments_type: EvaluatorArgumentsType = pydantic.Field()
     """
-    Whether this evaluator is target-free or target-required.
+    Whether this Evaluator is target-free or target-required.
     """
 
     return_type: EvaluatorReturnTypeEnum = pydantic.Field()
     """
-    The type of the return value of the evaluator.
+    The type of the return value of the Evaluator.
     """
 
     attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
@@ -27,7 +27,7 @@ class CodeEvaluatorRequest(UncheckedBaseModel):
     evaluator_type: typing.Literal["python"] = "python"
     code: str = pydantic.Field()
     """
-    The code for the evaluator. This code will be executed in a sandboxed environment.
+    The code for the Evaluator. This code will be executed in a sandboxed environment.
     """
 
     if IS_PYDANTIC_V2:

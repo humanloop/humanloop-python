@@ -12,12 +12,12 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class LlmEvaluatorRequest(UncheckedBaseModel):
     arguments_type: EvaluatorArgumentsType = pydantic.Field()
     """
-    Whether this evaluator is target-free or target-required.
+    Whether this Evaluator is target-free or target-required.
     """
 
     return_type: EvaluatorReturnTypeEnum = pydantic.Field()
     """
-    The type of the return value of the evaluator.
+    The type of the return value of the Evaluator.
     """
 
     attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)

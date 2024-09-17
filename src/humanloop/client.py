@@ -9,22 +9,22 @@ from .core.client_wrapper import SyncClientWrapper
 from .prompts.client import PromptsClient
 from .tools.client import ToolsClient
 from .datasets.client import DatasetsClient
+from .evaluators.client import EvaluatorsClient
+from .flows.client import FlowsClient
 from .files.client import FilesClient
 from .evaluations.client import EvaluationsClient
-from .evaluators.client import EvaluatorsClient
 from .logs.client import LogsClient
 from .sessions.client import SessionsClient
-from .flows.client import FlowsClient
 from .core.client_wrapper import AsyncClientWrapper
 from .prompts.client import AsyncPromptsClient
 from .tools.client import AsyncToolsClient
 from .datasets.client import AsyncDatasetsClient
+from .evaluators.client import AsyncEvaluatorsClient
+from .flows.client import AsyncFlowsClient
 from .files.client import AsyncFilesClient
 from .evaluations.client import AsyncEvaluationsClient
-from .evaluators.client import AsyncEvaluatorsClient
 from .logs.client import AsyncLogsClient
 from .sessions.client import AsyncSessionsClient
-from .flows.client import AsyncFlowsClient
 
 
 class Humanloop:
@@ -92,12 +92,12 @@ class Humanloop:
         self.prompts = PromptsClient(client_wrapper=self._client_wrapper)
         self.tools = ToolsClient(client_wrapper=self._client_wrapper)
         self.datasets = DatasetsClient(client_wrapper=self._client_wrapper)
+        self.evaluators = EvaluatorsClient(client_wrapper=self._client_wrapper)
+        self.flows = FlowsClient(client_wrapper=self._client_wrapper)
         self.files = FilesClient(client_wrapper=self._client_wrapper)
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
-        self.evaluators = EvaluatorsClient(client_wrapper=self._client_wrapper)
         self.logs = LogsClient(client_wrapper=self._client_wrapper)
         self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
-        self.flows = FlowsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncHumanloop:
@@ -165,12 +165,12 @@ class AsyncHumanloop:
         self.prompts = AsyncPromptsClient(client_wrapper=self._client_wrapper)
         self.tools = AsyncToolsClient(client_wrapper=self._client_wrapper)
         self.datasets = AsyncDatasetsClient(client_wrapper=self._client_wrapper)
+        self.evaluators = AsyncEvaluatorsClient(client_wrapper=self._client_wrapper)
+        self.flows = AsyncFlowsClient(client_wrapper=self._client_wrapper)
         self.files = AsyncFilesClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
-        self.evaluators = AsyncEvaluatorsClient(client_wrapper=self._client_wrapper)
         self.logs = AsyncLogsClient(client_wrapper=self._client_wrapper)
         self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
-        self.flows = AsyncFlowsClient(client_wrapper=self._client_wrapper)
 
 
 def _get_base_url(*, base_url: typing.Optional[str] = None, environment: HumanloopEnvironment) -> str:

@@ -54,36 +54,36 @@ class EvaluatorResponse(UncheckedBaseModel):
     type: typing.Optional[typing.Literal["evaluator"]] = None
     environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(default=None)
     """
-    The list of environments the Prompt Version is deployed to.
+    The list of environments the Evaluator Version is deployed to.
     """
 
     created_at: dt.datetime
     updated_at: dt.datetime
     created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
     """
-    The user who created the Prompt.
+    The user who created the Evaluator.
     """
 
     status: VersionStatus
     last_used_at: dt.datetime
     version_logs_count: int = pydantic.Field()
     """
-    The number of logs that have been generated for this Prompt Version
+    The number of logs that have been generated for this Evaluator Version
     """
 
     total_logs_count: int = pydantic.Field()
     """
-    The number of logs that have been generated across all Prompt Versions
+    The number of logs that have been generated across all Evaluator Versions
     """
 
     inputs: typing.List[InputResponse] = pydantic.Field()
     """
-    Inputs associated to the Prompt. Inputs correspond to any of the variables used within the Prompt template.
+    Inputs associated to the Evaluator. Inputs correspond to any of the variables used within the Evaluator template.
     """
 
     evaluators: typing.Optional[typing.List["MonitoringEvaluatorResponse"]] = pydantic.Field(default=None)
     """
-    Evaluators that have been attached to this Prompt that are used for monitoring logs.
+    Evaluators that have been attached to this Evaluator that are used for monitoring logs.
     """
 
     evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic.Field(default=None)

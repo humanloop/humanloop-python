@@ -4,7 +4,8 @@ from ..core.unchecked_base_model import UncheckedBaseModel
 from .overall_stats import OverallStats
 import pydantic
 import typing
-from .version_stats import VersionStats
+from .version_stats_response import VersionStatsResponse
+from .evaluation_status import EvaluationStatus
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -14,9 +15,24 @@ class EvaluationStats(UncheckedBaseModel):
     Stats for the Evaluation Report as a whole.
     """
 
-    version_stats: typing.List[VersionStats] = pydantic.Field()
+    version_stats: typing.List[VersionStatsResponse] = pydantic.Field()
     """
     Stats for each Evaluated Version in the Evaluation Report.
+    """
+
+    progress: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    A summary string report of the Evaluation's progress you can print to the command line;helpful when integrating Evaluations with CI/CD.
+    """
+
+    report: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    A summary string report of the Evaluation you can print to command line;helpful when integrating Evaluations with CI/CD.
+    """
+
+    status: EvaluationStatus = pydantic.Field()
+    """
+    The current status of the Evaluation.
     """
 
     if IS_PYDANTIC_V2:

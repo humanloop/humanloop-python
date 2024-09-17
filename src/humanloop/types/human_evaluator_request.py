@@ -14,7 +14,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class HumanEvaluatorRequest(UncheckedBaseModel):
     arguments_type: EvaluatorArgumentsType = pydantic.Field()
     """
-    Whether this evaluator is target-free or target-required.
+    Whether this Evaluator is target-free or target-required.
     """
 
     return_type: HumanEvaluatorRequestReturnType = pydantic.Field()

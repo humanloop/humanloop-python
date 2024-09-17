@@ -56,36 +56,36 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
     type: typing_extensions.NotRequired[typing.Literal["evaluator"]]
     environments: typing_extensions.NotRequired[typing.Sequence[EnvironmentResponseParams]]
     """
-    The list of environments the Prompt Version is deployed to.
+    The list of environments the Evaluator Version is deployed to.
     """
 
     created_at: dt.datetime
     updated_at: dt.datetime
     created_by: typing_extensions.NotRequired[UserResponse]
     """
-    The user who created the Prompt.
+    The user who created the Evaluator.
     """
 
     status: VersionStatus
     last_used_at: dt.datetime
     version_logs_count: int
     """
-    The number of logs that have been generated for this Prompt Version
+    The number of logs that have been generated for this Evaluator Version
     """
 
     total_logs_count: int
     """
-    The number of logs that have been generated across all Prompt Versions
+    The number of logs that have been generated across all Evaluator Versions
     """
 
     inputs: typing.Sequence[InputResponseParams]
     """
-    Inputs associated to the Prompt. Inputs correspond to any of the variables used within the Prompt template.
+    Inputs associated to the Evaluator. Inputs correspond to any of the variables used within the Evaluator template.
     """
 
     evaluators: typing_extensions.NotRequired[typing.Sequence["MonitoringEvaluatorResponseParams"]]
     """
-    Evaluators that have been attached to this Prompt that are used for monitoring logs.
+    Evaluators that have been attached to this Evaluator that are used for monitoring logs.
     """
 
     evaluator_aggregates: typing_extensions.NotRequired[typing.Sequence[EvaluatorAggregateParams]]

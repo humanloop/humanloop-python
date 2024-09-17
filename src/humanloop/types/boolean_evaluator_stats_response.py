@@ -2,13 +2,14 @@
 
 from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
-import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
+import typing
 
 
-class SelectEvaluatorVersionStats(UncheckedBaseModel):
+class BooleanEvaluatorStatsResponse(UncheckedBaseModel):
     """
-    Also used for 'multi_select' Evaluator versions
+    Base attributes for stats for an Evaluator Version-Evaluated Version pair
+    in the Evaluation Report.
     """
 
     evaluator_version_id: str = pydantic.Field()
@@ -36,9 +37,14 @@ class SelectEvaluatorVersionStats(UncheckedBaseModel):
     The total number of errored Evaluators for this Evaluator Version.
     """
 
-    num_judgments_per_option: typing.Dict[str, int] = pydantic.Field()
+    num_true: int = pydantic.Field()
     """
-    The total number of Evaluator judgments for this Evaluator Version. This is a mapping of the option name to the number of judgments for that option.
+    The total number of `True` judgments for this Evaluator Version.
+    """
+
+    num_false: int = pydantic.Field()
+    """
+    The total number of `False` judgments for this Evaluator Version.
     """
 
     if IS_PYDANTIC_V2:

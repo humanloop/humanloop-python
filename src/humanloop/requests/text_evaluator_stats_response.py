@@ -3,7 +3,7 @@
 import typing_extensions
 
 
-class BooleanEvaluatorVersionStatsParams(typing_extensions.TypedDict):
+class TextEvaluatorStatsResponseParams(typing_extensions.TypedDict):
     """
     Base attributes for stats for an Evaluator Version-Evaluated Version pair
     in the Evaluation Report.
@@ -32,14 +32,4 @@ class BooleanEvaluatorVersionStatsParams(typing_extensions.TypedDict):
     num_errors: int
     """
     The total number of errored Evaluators for this Evaluator Version.
-    """
-
-    num_true: int
-    """
-    The total number of `True` judgments for this Evaluator Version.
-    """
-
-    num_false: int
-    """
-    The total number of `False` judgments for this Evaluator Version.
     """

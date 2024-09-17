@@ -13,7 +13,7 @@ from ..types.valence import Valence
 class HumanEvaluatorRequestParams(typing_extensions.TypedDict):
     arguments_type: EvaluatorArgumentsType
     """
-    Whether this evaluator is target-free or target-required.
+    Whether this Evaluator is target-free or target-required.
     """
 
     return_type: HumanEvaluatorRequestReturnType
