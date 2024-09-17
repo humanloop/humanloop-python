@@ -6,12 +6,12 @@ import typing
 import datetime as dt
 import pydantic
 from .trace_status import TraceStatus
-from .tool_response import ToolResponse
+from .flow_response import FlowResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
 
 
-class ToolLogResponse(UncheckedBaseModel):
+class FlowLogResponse(UncheckedBaseModel):
     """
     General request for creating a Log
     """
@@ -63,7 +63,7 @@ class ToolLogResponse(UncheckedBaseModel):
 
     inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
-    The inputs passed to the prompt template.
+    The inputs passed to the Trace.
     """
 
     source: typing.Optional[str] = pydantic.Field(default=None)
@@ -136,9 +136,9 @@ class ToolLogResponse(UncheckedBaseModel):
     Logs nested under this Log in the Trace.
     """
 
-    tool: ToolResponse = pydantic.Field()
+    flow: FlowResponse = pydantic.Field()
     """
-    Tool used to generate the Log.
+    Flow used to generate the Log.
     """
 
     if IS_PYDANTIC_V2:
@@ -154,4 +154,4 @@ class ToolLogResponse(UncheckedBaseModel):
 from .evaluator_log_response import EvaluatorLogResponse  # noqa: E402
 from .log_response import LogResponse  # noqa: E402
 
-update_forward_refs(ToolLogResponse)
+update_forward_refs(FlowLogResponse)

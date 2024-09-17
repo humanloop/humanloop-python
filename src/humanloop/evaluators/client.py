@@ -788,6 +788,8 @@ class EvaluatorsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
@@ -798,8 +800,9 @@ class EvaluatorsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        trace_parent_log_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
@@ -829,6 +832,12 @@ class EvaluatorsClient:
 
         id : typing.Optional[str]
             ID for an existing Evaluator.
+
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
 
         output : typing.Optional[str]
             Generated output from the LLM. Only populated for LLM Evaluator Logs.
@@ -860,11 +869,14 @@ class EvaluatorsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_id : typing.Optional[str]
+            Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+
+        trace_parent_log_id : typing.Optional[str]
+            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -912,6 +924,8 @@ class EvaluatorsClient:
             json={
                 "path": path,
                 "id": id,
+                "start_time": start_time,
+                "end_time": end_time,
                 "output": output,
                 "created_at": created_at,
                 "error": error,
@@ -922,9 +936,10 @@ class EvaluatorsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "session_id": session_id,
                 "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
+                "trace_id": trace_id,
+                "trace_parent_log_id": trace_parent_log_id,
                 "batches": batches,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
@@ -1800,6 +1815,8 @@ class AsyncEvaluatorsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
@@ -1810,8 +1827,9 @@ class AsyncEvaluatorsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        trace_parent_log_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
@@ -1841,6 +1859,12 @@ class AsyncEvaluatorsClient:
 
         id : typing.Optional[str]
             ID for an existing Evaluator.
+
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
 
         output : typing.Optional[str]
             Generated output from the LLM. Only populated for LLM Evaluator Logs.
@@ -1872,11 +1896,14 @@ class AsyncEvaluatorsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_id : typing.Optional[str]
+            Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+
+        trace_parent_log_id : typing.Optional[str]
+            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -1932,6 +1959,8 @@ class AsyncEvaluatorsClient:
             json={
                 "path": path,
                 "id": id,
+                "start_time": start_time,
+                "end_time": end_time,
                 "output": output,
                 "created_at": created_at,
                 "error": error,
@@ -1942,9 +1971,10 @@ class AsyncEvaluatorsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "session_id": session_id,
                 "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
+                "trace_id": trace_id,
+                "trace_parent_log_id": trace_parent_log_id,
                 "batches": batches,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,

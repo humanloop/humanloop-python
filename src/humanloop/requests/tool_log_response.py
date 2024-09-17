@@ -5,16 +5,28 @@ import typing_extensions
 import typing_extensions
 import datetime as dt
 import typing
+from ..types.trace_status import TraceStatus
 from ..types.tool_response import ToolResponse
 import typing
 
 if typing.TYPE_CHECKING:
     from .evaluator_log_response import EvaluatorLogResponseParams
+    from .log_response import LogResponseParams
 
 
 class ToolLogResponseParams(typing_extensions.TypedDict):
     """
     General request for creating a Log
+    """
+
+    start_time: typing_extensions.NotRequired[dt.datetime]
+    """
+    When the logged event started.
+    """
+
+    end_time: typing_extensions.NotRequired[dt.datetime]
+    """
+    When the logged event ended.
     """
 
     output: typing_extensions.NotRequired[str]
@@ -67,19 +79,19 @@ class ToolLogResponseParams(typing_extensions.TypedDict):
     Any additional metadata to record.
     """
 
-    session_id: typing_extensions.NotRequired[str]
-    """
-    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-    """
-
-    parent_id: typing_extensions.NotRequired[str]
-    """
-    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    """
-
     source_datapoint_id: typing_extensions.NotRequired[str]
     """
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    """
+
+    trace_id: typing_extensions.NotRequired[str]
+    """
+    Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    """
+
+    trace_parent_log_id: typing_extensions.NotRequired[str]
+    """
+    Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     """
 
     batches: typing_extensions.NotRequired[typing.Sequence[str]]
@@ -112,7 +124,22 @@ class ToolLogResponseParams(typing_extensions.TypedDict):
     List of Evaluator Logs associated with the Log. These contain Evaluator judgments on the Log.
     """
 
+    trace_flow_id: typing_extensions.NotRequired[str]
+    """
+    Identifier for the Flow that the Trace belongs to.
+    """
+
+    trace_status: typing_extensions.NotRequired[TraceStatus]
+    """
+    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
+    """
+
+    trace_children: typing_extensions.NotRequired[typing.Sequence["LogResponseParams"]]
+    """
+    Logs nested under this Log in the Trace.
+    """
+
     tool: ToolResponse
     """
-    Tool details used to generate the Log.
+    Tool used to generate the Log.
     """

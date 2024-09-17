@@ -2,15 +2,17 @@
 
 from ..core.unchecked_base_model import UncheckedBaseModel
 import typing
-from .paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_records_item import (
-    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItem,
+from .paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response_records_item import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseRecordsItem,
 )
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse(UncheckedBaseModel):
-    records: typing.List[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseRecordsItem]
+class PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse(UncheckedBaseModel):
+    records: typing.List[
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseRecordsItem
+    ]
     page: int
     size: int
     total: int

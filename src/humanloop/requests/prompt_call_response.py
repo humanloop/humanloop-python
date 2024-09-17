@@ -6,6 +6,7 @@ import typing
 from .chat_message import ChatMessageParams
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoiceParams
 from .prompt_response import PromptResponseParams
+import datetime as dt
 from .prompt_call_log_response import PromptCallLogResponseParams
 
 
@@ -31,7 +32,7 @@ class PromptCallResponseParams(typing_extensions.TypedDict):
 
     prompt: PromptResponseParams
     """
-    Prompt details used to generate the log.
+    Prompt used to generate the Log.
     """
 
     inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -49,19 +50,29 @@ class PromptCallResponseParams(typing_extensions.TypedDict):
     Any additional metadata to record.
     """
 
-    session_id: typing_extensions.NotRequired[str]
+    start_time: typing_extensions.NotRequired[dt.datetime]
     """
-    Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
+    When the logged event started.
     """
 
-    parent_id: typing_extensions.NotRequired[str]
+    end_time: typing_extensions.NotRequired[dt.datetime]
     """
-    Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+    When the logged event ended.
     """
 
     source_datapoint_id: typing_extensions.NotRequired[str]
     """
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    """
+
+    trace_id: typing_extensions.NotRequired[str]
+    """
+    Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    """
+
+    trace_parent_log_id: typing_extensions.NotRequired[str]
+    """
+    Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     """
 
     batches: typing_extensions.NotRequired[typing.Sequence[str]]

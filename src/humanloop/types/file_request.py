@@ -6,15 +6,16 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ProviderApiKeys(UncheckedBaseModel):
-    openai: typing.Optional[str] = None
-    ai_21: typing.Optional[str] = pydantic.Field(alias="ai21", default=None)
-    mock: typing.Optional[str] = None
-    anthropic: typing.Optional[str] = None
-    bedrock: typing.Optional[str] = None
-    cohere: typing.Optional[str] = None
-    openai_azure: typing.Optional[str] = None
-    openai_azure_endpoint: typing.Optional[str] = None
+class FileRequest(UncheckedBaseModel):
+    id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    ID for an existing File.
+    """
+
+    path: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Path of the File, including the name. This locates the File in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

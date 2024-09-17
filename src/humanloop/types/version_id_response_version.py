@@ -9,4 +9,7 @@ import typing
 if typing.TYPE_CHECKING:
     from .prompt_response import PromptResponse
     from .evaluator_response import EvaluatorResponse
-VersionIdResponseVersion = typing.Union["PromptResponse", ToolResponse, DatasetResponse, "EvaluatorResponse"]
+    from .flow_response import FlowResponse
+VersionIdResponseVersion = typing.Union[
+    "PromptResponse", ToolResponse, DatasetResponse, "EvaluatorResponse", "FlowResponse"
+]

@@ -202,6 +202,22 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **output:** `typing.Optional[str]` — Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
     
 </dd>
@@ -282,23 +298,23 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     
 </dd>
 </dl>
@@ -569,6 +585,22 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -619,6 +651,8 @@ in the case where you are storing or deriving your Prompt details in code.
 <dd>
 
 ```python
+import datetime
+
 from humanloop import Humanloop
 
 client = Humanloop(
@@ -678,9 +712,15 @@ response = client.prompts.call_stream(
     inputs={"string": {"key": "value"}},
     source="string",
     metadata={"string": {"key": "value"}},
-    session_id="string",
-    parent_id="string",
+    start_time=datetime.datetime.fromisoformat(
+        "2024-01-15 09:30:00+00:00",
+    ),
+    end_time=datetime.datetime.fromisoformat(
+        "2024-01-15 09:30:00+00:00",
+    ),
     source_datapoint_id="string",
+    trace_id="string",
+    trace_parent_log_id="string",
     batches=["string"],
     user="string",
     prompts_call_stream_request_environment="string",
@@ -690,6 +730,7 @@ response = client.prompts.call_stream(
         "ai_21": "string",
         "mock": "string",
         "anthropic": "string",
+        "bedrock": "string",
         "cohere": "string",
         "openai_azure": "string",
         "openai_azure_endpoint": "string",
@@ -802,7 +843,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
     
 </dd>
 </dl>
@@ -810,7 +851,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
     
 </dd>
 </dl>
@@ -819,6 +860,22 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     
 </dd>
 </dl>
@@ -1060,7 +1117,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
     
 </dd>
 </dl>
@@ -1068,7 +1125,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
     
 </dd>
 </dl>
@@ -1077,6 +1134,22 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     
 </dd>
 </dl>
@@ -2388,6 +2461,22 @@ client.tools.log(
 <dl>
 <dd>
 
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **output:** `typing.Optional[str]` — Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
     
 </dd>
@@ -2468,23 +2557,23 @@ client.tools.log(
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**parent_id:** `typing.Optional[str]` — Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     
 </dd>
 </dl>
@@ -2686,6 +2775,22 @@ client.tools.update(
 <dd>
 
 **metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
     
 </dd>
 </dl>
@@ -5180,7 +5285,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**dataset:** `EvaluationsDatasetRequestParams` — The Dataset Version to use in this Evaluation.
+**dataset:** `EvaluationsDatasetRequestParams` — Dataset to use in this Evaluation.
     
 </dd>
 </dl>
@@ -5196,7 +5301,23 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add Evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Evaluation to help identify it. Must be unique within the associated File.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file:** `typing.Optional[FileRequestParams]` — The File to associate with the Evaluation.
     
 </dd>
 </dl>
@@ -5425,7 +5546,7 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**dataset:** `EvaluationsDatasetRequestParams` — The Dataset Version to use in this Evaluation.
+**dataset:** `typing.Optional[EvaluationsDatasetRequestParams]` — Dataset to use in this Evaluation.
     
 </dd>
 </dl>
@@ -5433,7 +5554,7 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
+**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
     
 </dd>
 </dl>
@@ -5441,7 +5562,23 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+**evaluators:** `typing.Optional[typing.Sequence[EvaluationsRequestParams]]` — The Evaluators used to evaluate.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Evaluation to help identify it. Must be unique within the associated File.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file:** `typing.Optional[FileRequestParams]` — The File to associate with the Evaluation.
     
 </dd>
 </dl>
@@ -6686,6 +6823,22 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **output:** `typing.Optional[str]` — Generated output from the LLM. Only populated for LLM Evaluator Logs.
     
 </dd>
@@ -6766,7 +6919,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**session_id:** `typing.Optional[str]` — Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests. 
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
 </dl>
@@ -6774,7 +6927,15 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
     
 </dd>
 </dl>
@@ -6972,6 +7133,14 @@ for page in response.iter_pages():
 <dd>
 
 **include_parent:** `typing.Optional[bool]` — If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**in_trace_filter:** `typing.Optional[typing.Union[bool, typing.Sequence[bool]]]` — If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
     
 </dd>
 </dl>
@@ -7353,6 +7522,1309 @@ for page in response.iter_pages():
 <dd>
 
 **size:** `typing.Optional[int]` — Page size for pagination. Number of Sessions to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Flows
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Flow with the given ID.
+
+By default, the deployed version of the Flow is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Flow to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Flow with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.delete(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">move</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Move the Flow to a different path or change the name.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.move(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Flow including the Flow name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**directory_id:** `typing.Optional[str]` — Unique identifier for the Directory to move Flow to. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all Flows.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.list()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Flows to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for Flow name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Flows by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">upsert</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.upsert(
+    attributes={"key": "value"},
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**attributes:** `typing.Dict[str, typing.Optional[typing.Any]]` — A key-value object identifying the Flow Version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">log</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Log a Flow Trace.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.log()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Flow to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluation_id:** `typing.Optional[str]` — Unique identifier for the Evaluation Report to associate the Log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — The start time of the Trace. Will be updated if a child Log with an earlier start time is added.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — The end time of the Trace. Will be updated if a child Log with a later end time is added.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**created_at:** `typing.Optional[dt.datetime]` — User defined timestamp for when the log was created. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — Error message if the log is an error.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_latency:** `typing.Optional[float]` — Duration of the logged event in seconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_id:** `typing.Optional[str]` — ID of the Trace. If not provided, one will be assigned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**flow_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**flow:** `typing.Optional[FlowKernelRequestParams]` — Flow used to generate the Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_status:** `typing.Optional[TraceStatus]` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces. If you do not intend to add more Logs to the Trace after creation, set this to `complete`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_trace</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.update_trace(
+    trace_id="trace_id",
+    status="complete",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**trace_id:** `str` — Unique identifier for Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `TraceStatus` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the Flow Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — The output of the Flow Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">list_versions</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all the versions of a Flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.list_versions(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">commit</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Commit a version of the Flow with a commit message.
+
+If the version is already committed, an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.commit(
+    id="id",
+    version_id="version_id",
+    commit_message="commit_message",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">set_deployment</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deploy Flow to an Environment.
+
+Set the deployed version for the specified Environment. This Flow
+will be used for calls made to the Flow in this Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.set_deployment(
+    id="id",
+    environment_id="environment_id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment_id:** `str` — Unique identifier for the Environment to deploy the Version to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">remove_deployment</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove deployed Flow from the Environment.
+
+Remove the deployed version for the specified Environment. This Flow
+will no longer be used for calls made to the Flow in this Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.remove_deployment(
+    id="id",
+    environment_id="environment_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment_id:** `str` — Unique identifier for the Environment to remove the deployment from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">list_environments</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List all Environments and their deployed versions for the Flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.list_environments(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Flow.
+
+An activated Evaluator will automatically be run on all new "completed" Logs
+within the Flow for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.update_monitoring(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
+]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
+]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>

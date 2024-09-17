@@ -9,6 +9,7 @@ import typing
 if typing.TYPE_CHECKING:
     from .prompt_response import PromptResponseParams
     from .evaluator_response import EvaluatorResponseParams
+    from .flow_response import FlowResponseParams
 VersionIdResponseVersionParams = typing.Union[
-    "PromptResponseParams", ToolResponse, DatasetResponseParams, "EvaluatorResponseParams"
+    "PromptResponseParams", ToolResponse, DatasetResponseParams, "EvaluatorResponseParams", "FlowResponseParams"
 ]

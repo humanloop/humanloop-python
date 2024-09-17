@@ -43,6 +43,16 @@ class EvaluationResponse(UncheckedBaseModel):
     - `"cancelled"`: The Evaluation has been cancelled by the user. Humanloop will stop generating Logs and Evaluator Logs.
     """
 
+    name: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Name of the Evaluation to help identify it. Must be unique among Evaluations associated with File.
+    """
+
+    file_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Unique identifier for the File associated with the Evaluation.
+    """
+
     created_at: dt.datetime
     created_by: typing.Optional[UserResponse] = None
     updated_at: dt.datetime

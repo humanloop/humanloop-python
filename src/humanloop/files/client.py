@@ -6,8 +6,8 @@ from ..types.file_type import FileType
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
-from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response import (
-    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,
+from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
 )
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
@@ -32,7 +32,7 @@ class FilesClient:
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse:
+    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse:
         """
         Get a paginated list of files.
 
@@ -64,7 +64,7 @@ class FilesClient:
 
         Returns
         -------
-        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse
             Successful Response
 
         Examples
@@ -93,9 +93,9 @@ class FilesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,
+                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
                     construct_type(
-                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,  # type: ignore
+                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -130,7 +130,7 @@ class AsyncFilesClient:
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse:
+    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse:
         """
         Get a paginated list of files.
 
@@ -162,7 +162,7 @@ class AsyncFilesClient:
 
         Returns
         -------
-        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse
             Successful Response
 
         Examples
@@ -199,9 +199,9 @@ class AsyncFilesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,
+                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
                     construct_type(
-                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponse,  # type: ignore
+                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

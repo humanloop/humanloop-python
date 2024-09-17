@@ -36,6 +36,7 @@ class LogsClient:
         start_date: typing.Optional[dt.datetime] = None,
         end_date: typing.Optional[dt.datetime] = None,
         include_parent: typing.Optional[bool] = None,
+        in_trace_filter: typing.Optional[typing.Union[bool, typing.Sequence[bool]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[LogResponse]:
         """
@@ -72,6 +73,9 @@ class LogsClient:
 
         include_parent : typing.Optional[bool]
             If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
+
+        in_trace_filter : typing.Optional[typing.Union[bool, typing.Sequence[bool]]]
+            If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -113,6 +117,7 @@ class LogsClient:
                 "start_date": serialize_datetime(start_date) if start_date is not None else None,
                 "end_date": serialize_datetime(end_date) if end_date is not None else None,
                 "include_parent": include_parent,
+                "in_trace_filter": in_trace_filter,
             },
             request_options=request_options,
         )
@@ -137,6 +142,7 @@ class LogsClient:
                     start_date=start_date,
                     end_date=end_date,
                     include_parent=include_parent,
+                    in_trace_filter=in_trace_filter,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records
@@ -289,6 +295,7 @@ class AsyncLogsClient:
         start_date: typing.Optional[dt.datetime] = None,
         end_date: typing.Optional[dt.datetime] = None,
         include_parent: typing.Optional[bool] = None,
+        in_trace_filter: typing.Optional[typing.Union[bool, typing.Sequence[bool]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[LogResponse]:
         """
@@ -325,6 +332,9 @@ class AsyncLogsClient:
 
         include_parent : typing.Optional[bool]
             If true, include the full parent Log in the response. Only applicable when retrieving Evaluator Logs.
+
+        in_trace_filter : typing.Optional[typing.Union[bool, typing.Sequence[bool]]]
+            If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -374,6 +384,7 @@ class AsyncLogsClient:
                 "start_date": serialize_datetime(start_date) if start_date is not None else None,
                 "end_date": serialize_datetime(end_date) if end_date is not None else None,
                 "include_parent": include_parent,
+                "in_trace_filter": in_trace_filter,
             },
             request_options=request_options,
         )
@@ -398,6 +409,7 @@ class AsyncLogsClient:
                     start_date=start_date,
                     end_date=end_date,
                     include_parent=include_parent,
+                    in_trace_filter=in_trace_filter,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records

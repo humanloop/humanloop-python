@@ -48,6 +48,8 @@ class ToolsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
@@ -58,9 +60,9 @@ class ToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        trace_parent_log_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
@@ -93,6 +95,12 @@ class ToolsClient:
         id : typing.Optional[str]
             ID for an existing Tool.
 
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
 
@@ -123,14 +131,14 @@ class ToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_id : typing.Optional[str]
+            Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+
+        trace_parent_log_id : typing.Optional[str]
+            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -192,6 +200,8 @@ class ToolsClient:
             json={
                 "path": path,
                 "id": id,
+                "start_time": start_time,
+                "end_time": end_time,
                 "output": output,
                 "created_at": created_at,
                 "error": error,
@@ -202,9 +212,9 @@ class ToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
+                "trace_id": trace_id,
+                "trace_parent_log_id": trace_parent_log_id,
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
@@ -253,6 +263,8 @@ class ToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> LogResponse:
         """
@@ -298,6 +310,12 @@ class ToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -332,6 +350,8 @@ class ToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1223,6 +1243,8 @@ class AsyncToolsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
         created_at: typing.Optional[dt.datetime] = OMIT,
         error: typing.Optional[str] = OMIT,
@@ -1233,9 +1255,9 @@ class AsyncToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        session_id: typing.Optional[str] = OMIT,
-        parent_id: typing.Optional[str] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        trace_parent_log_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
@@ -1268,6 +1290,12 @@ class AsyncToolsClient:
         id : typing.Optional[str]
             ID for an existing Tool.
 
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
         output : typing.Optional[str]
             Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
 
@@ -1298,14 +1326,14 @@ class AsyncToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        session_id : typing.Optional[str]
-            Unique identifier for the Session to associate the Log to. Allows you to record multiple Logs to a Session (using an ID kept by your internal systems) by passing the same `session_id` in subsequent log requests.
-
-        parent_id : typing.Optional[str]
-            Unique identifier for the parent Log in a Session. Should only be provided if `session_id` is provided. If provided, the Log will be nested under the parent Log within the Session.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_id : typing.Optional[str]
+            Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
+
+        trace_parent_log_id : typing.Optional[str]
+            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -1375,6 +1403,8 @@ class AsyncToolsClient:
             json={
                 "path": path,
                 "id": id,
+                "start_time": start_time,
+                "end_time": end_time,
                 "output": output,
                 "created_at": created_at,
                 "error": error,
@@ -1385,9 +1415,9 @@ class AsyncToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "session_id": session_id,
-                "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
+                "trace_id": trace_id,
+                "trace_parent_log_id": trace_parent_log_id,
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
@@ -1436,6 +1466,8 @@ class AsyncToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> LogResponse:
         """
@@ -1481,6 +1513,12 @@ class AsyncToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1523,6 +1561,8 @@ class AsyncToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
             },
             request_options=request_options,
             omit=OMIT,

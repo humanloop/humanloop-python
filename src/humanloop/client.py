@@ -14,6 +14,7 @@ from .evaluations.client import EvaluationsClient
 from .evaluators.client import EvaluatorsClient
 from .logs.client import LogsClient
 from .sessions.client import SessionsClient
+from .flows.client import FlowsClient
 from .core.client_wrapper import AsyncClientWrapper
 from .prompts.client import AsyncPromptsClient
 from .tools.client import AsyncToolsClient
@@ -23,6 +24,7 @@ from .evaluations.client import AsyncEvaluationsClient
 from .evaluators.client import AsyncEvaluatorsClient
 from .logs.client import AsyncLogsClient
 from .sessions.client import AsyncSessionsClient
+from .flows.client import AsyncFlowsClient
 
 
 class Humanloop:
@@ -95,6 +97,7 @@ class Humanloop:
         self.evaluators = EvaluatorsClient(client_wrapper=self._client_wrapper)
         self.logs = LogsClient(client_wrapper=self._client_wrapper)
         self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
+        self.flows = FlowsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncHumanloop:
@@ -167,6 +170,7 @@ class AsyncHumanloop:
         self.evaluators = AsyncEvaluatorsClient(client_wrapper=self._client_wrapper)
         self.logs = AsyncLogsClient(client_wrapper=self._client_wrapper)
         self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
+        self.flows = AsyncFlowsClient(client_wrapper=self._client_wrapper)
 
 
 def _get_base_url(*, base_url: typing.Optional[str] = None, environment: HumanloopEnvironment) -> str:

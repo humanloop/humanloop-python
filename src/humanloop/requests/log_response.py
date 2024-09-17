@@ -8,4 +8,7 @@ if typing.TYPE_CHECKING:
     from .prompt_log_response import PromptLogResponseParams
     from .tool_log_response import ToolLogResponseParams
     from .evaluator_log_response import EvaluatorLogResponseParams
-LogResponseParams = typing.Union["PromptLogResponseParams", "ToolLogResponseParams", "EvaluatorLogResponseParams"]
+    from .flow_log_response import FlowLogResponseParams
+LogResponseParams = typing.Union[
+    "PromptLogResponseParams", "ToolLogResponseParams", "EvaluatorLogResponseParams", "FlowLogResponseParams"
+]

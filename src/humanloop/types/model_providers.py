@@ -3,5 +3,6 @@
 import typing
 
 ModelProviders = typing.Union[
-    typing.Literal["openai", "openai_azure", "mock", "anthropic", "cohere", "replicate", "google", "groq"], typing.Any
+    typing.Literal["openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"],
+    typing.Any,
 ]

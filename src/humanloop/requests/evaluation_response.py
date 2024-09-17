@@ -6,8 +6,8 @@ import typing
 from .evaluatee_response import EvaluateeResponseParams
 from .evaluation_evaluator_response import EvaluationEvaluatorResponseParams
 from ..types.evaluation_status import EvaluationStatus
-import datetime as dt
 import typing_extensions
+import datetime as dt
 from ..types.user_response import UserResponse
 
 
@@ -40,6 +40,16 @@ class EvaluationResponseParams(typing_extensions.TypedDict):
     - `"running"`: Humanloop is checking for any missing Logs and Evaluator Logs, and will generate them where appropriate.
     - `"completed"`: All Logs an Evaluator Logs have been generated.
     - `"cancelled"`: The Evaluation has been cancelled by the user. Humanloop will stop generating Logs and Evaluator Logs.
+    """
+
+    name: typing_extensions.NotRequired[str]
+    """
+    Name of the Evaluation to help identify it. Must be unique among Evaluations associated with File.
+    """
+
+    file_id: typing_extensions.NotRequired[str]
+    """
+    Unique identifier for the File associated with the Evaluation.
     """
 
     created_at: dt.datetime

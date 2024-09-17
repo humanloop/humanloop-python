@@ -14,6 +14,7 @@ from ..core.api_error import ApiError
 from ..requests.evaluations_dataset_request import EvaluationsDatasetRequestParams
 from ..requests.evaluations_request import EvaluationsRequestParams
 from ..requests.evaluatee_request import EvaluateeRequestParams
+from ..requests.file_request import FileRequestParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.evaluation_status import EvaluationStatus
@@ -129,6 +130,8 @@ class EvaluationsClient:
         dataset: EvaluationsDatasetRequestParams,
         evaluators: typing.Sequence[EvaluationsRequestParams],
         evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        file: typing.Optional[FileRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -148,13 +151,19 @@ class EvaluationsClient:
         Parameters
         ----------
         dataset : EvaluationsDatasetRequestParams
-            The Dataset Version to use in this Evaluation.
+            Dataset to use in this Evaluation.
 
         evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
 
         evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add Evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+
+        name : typing.Optional[str]
+            Name of the Evaluation to help identify it. Must be unique within the associated File.
+
+        file : typing.Optional[FileRequestParams]
+            The File to associate with the Evaluation.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -192,6 +201,8 @@ class EvaluationsClient:
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
                 ),
+                "name": name,
+                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
             },
             request_options=request_options,
             omit=OMIT,
@@ -334,9 +345,11 @@ class EvaluationsClient:
         self,
         id: str,
         *,
-        dataset: EvaluationsDatasetRequestParams,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
+        dataset: typing.Optional[EvaluationsDatasetRequestParams] = OMIT,
         evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
+        evaluators: typing.Optional[typing.Sequence[EvaluationsRequestParams]] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        file: typing.Optional[FileRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -350,14 +363,20 @@ class EvaluationsClient:
         id : str
             Unique identifier for Evaluation.
 
-        dataset : EvaluationsDatasetRequestParams
-            The Dataset Version to use in this Evaluation.
-
-        evaluators : typing.Sequence[EvaluationsRequestParams]
-            The Evaluators used to evaluate.
+        dataset : typing.Optional[EvaluationsDatasetRequestParams]
+            Dataset to use in this Evaluation.
 
         evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+
+        evaluators : typing.Optional[typing.Sequence[EvaluationsRequestParams]]
+            The Evaluators used to evaluate.
+
+        name : typing.Optional[str]
+            Name of the Evaluation to help identify it. Must be unique within the associated File.
+
+        file : typing.Optional[FileRequestParams]
+            The File to associate with the Evaluation.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -396,6 +415,8 @@ class EvaluationsClient:
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
                 ),
+                "name": name,
+                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
             },
             request_options=request_options,
             omit=OMIT,
@@ -743,6 +764,8 @@ class AsyncEvaluationsClient:
         dataset: EvaluationsDatasetRequestParams,
         evaluators: typing.Sequence[EvaluationsRequestParams],
         evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        file: typing.Optional[FileRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -762,13 +785,19 @@ class AsyncEvaluationsClient:
         Parameters
         ----------
         dataset : EvaluationsDatasetRequestParams
-            The Dataset Version to use in this Evaluation.
+            Dataset to use in this Evaluation.
 
         evaluators : typing.Sequence[EvaluationsRequestParams]
             The Evaluators used to evaluate.
 
         evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add Evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+
+        name : typing.Optional[str]
+            Name of the Evaluation to help identify it. Must be unique within the associated File.
+
+        file : typing.Optional[FileRequestParams]
+            The File to associate with the Evaluation.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -814,6 +843,8 @@ class AsyncEvaluationsClient:
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
                 ),
+                "name": name,
+                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
             },
             request_options=request_options,
             omit=OMIT,
@@ -972,9 +1003,11 @@ class AsyncEvaluationsClient:
         self,
         id: str,
         *,
-        dataset: EvaluationsDatasetRequestParams,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
+        dataset: typing.Optional[EvaluationsDatasetRequestParams] = OMIT,
         evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
+        evaluators: typing.Optional[typing.Sequence[EvaluationsRequestParams]] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        file: typing.Optional[FileRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
@@ -988,14 +1021,20 @@ class AsyncEvaluationsClient:
         id : str
             Unique identifier for Evaluation.
 
-        dataset : EvaluationsDatasetRequestParams
-            The Dataset Version to use in this Evaluation.
-
-        evaluators : typing.Sequence[EvaluationsRequestParams]
-            The Evaluators used to evaluate.
+        dataset : typing.Optional[EvaluationsDatasetRequestParams]
+            Dataset to use in this Evaluation.
 
         evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation Report. Can be left unpopulated if you wish to add evaluatees to this Evaluation Report by specifying `evaluation_id` in Log calls.
+            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+
+        evaluators : typing.Optional[typing.Sequence[EvaluationsRequestParams]]
+            The Evaluators used to evaluate.
+
+        name : typing.Optional[str]
+            Name of the Evaluation to help identify it. Must be unique within the associated File.
+
+        file : typing.Optional[FileRequestParams]
+            The File to associate with the Evaluation.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1042,6 +1081,8 @@ class AsyncEvaluationsClient:
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
                 ),
+                "name": name,
+                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
             },
             request_options=request_options,
             omit=OMIT,

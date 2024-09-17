@@ -122,6 +122,8 @@ except ApiError as e:
 The SDK supports streaming responses, as well, the response will be a generator that you can loop over.
 
 ```python
+import datetime
+
 from humanloop import Humanloop
 
 client = Humanloop(
@@ -181,9 +183,15 @@ response = client.prompts.call_stream(
     inputs={"string": {"key": "value"}},
     source="string",
     metadata={"string": {"key": "value"}},
-    session_id="string",
-    parent_id="string",
+    start_time=datetime.datetime.fromisoformat(
+        "2024-01-15 09:30:00+00:00",
+    ),
+    end_time=datetime.datetime.fromisoformat(
+        "2024-01-15 09:30:00+00:00",
+    ),
     source_datapoint_id="string",
+    trace_id="string",
+    trace_parent_log_id="string",
     batches=["string"],
     user="string",
     prompts_call_stream_request_environment="string",
@@ -193,6 +201,7 @@ response = client.prompts.call_stream(
         "ai_21": "string",
         "mock": "string",
         "anthropic": "string",
+        "bedrock": "string",
         "cohere": "string",
         "openai_azure": "string",
         "openai_azure_endpoint": "string",

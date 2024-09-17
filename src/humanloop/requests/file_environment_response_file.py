@@ -5,7 +5,8 @@ from .prompt_response import PromptResponseParams
 from ..types.tool_response import ToolResponse
 from .dataset_response import DatasetResponseParams
 from .evaluator_response import EvaluatorResponseParams
+from .flow_response import FlowResponseParams
 
 FileEnvironmentResponseFileParams = typing.Union[
-    PromptResponseParams, ToolResponse, DatasetResponseParams, EvaluatorResponseParams
+    PromptResponseParams, ToolResponse, DatasetResponseParams, EvaluatorResponseParams, FlowResponseParams
 ]

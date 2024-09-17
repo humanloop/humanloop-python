@@ -5,5 +5,8 @@ from .prompt_response import PromptResponse
 from .tool_response import ToolResponse
 from .dataset_response import DatasetResponse
 from .evaluator_response import EvaluatorResponse
+from .flow_response import FlowResponse
 
-FileEnvironmentResponseFile = typing.Union[PromptResponse, ToolResponse, DatasetResponse, EvaluatorResponse]
+FileEnvironmentResponseFile = typing.Union[
+    PromptResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse
+]
