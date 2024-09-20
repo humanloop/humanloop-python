@@ -5,8 +5,8 @@ import typing_extensions
 import typing_extensions
 import datetime as dt
 import typing
-from ..types.trace_status import TraceStatus
 from .flow_response import FlowResponseParams
+from ..types.trace_status import TraceStatus
 import typing
 
 if typing.TYPE_CHECKING:
@@ -66,7 +66,7 @@ class FlowLogResponseParams(typing_extensions.TypedDict):
 
     inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
-    The inputs passed to the Trace.
+    The inputs passed to the Flow Log.
     """
 
     source: typing_extensions.NotRequired[str]
@@ -84,14 +84,9 @@ class FlowLogResponseParams(typing_extensions.TypedDict):
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     """
 
-    trace_id: typing_extensions.NotRequired[str]
+    trace_parent_id: typing_extensions.NotRequired[str]
     """
-    Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    """
-
-    trace_parent_log_id: typing_extensions.NotRequired[str]
-    """
-    Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+    The ID of the parent Log to nest this Log under in a Trace.
     """
 
     batches: typing_extensions.NotRequired[typing.Sequence[str]]
@@ -129,9 +124,9 @@ class FlowLogResponseParams(typing_extensions.TypedDict):
     Identifier for the Flow that the Trace belongs to.
     """
 
-    trace_status: typing_extensions.NotRequired[TraceStatus]
+    trace_id: typing_extensions.NotRequired[str]
     """
-    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
+    Identifier for the Trace that the Log belongs to.
     """
 
     trace_children: typing_extensions.NotRequired[typing.Sequence["LogResponseParams"]]
@@ -142,4 +137,9 @@ class FlowLogResponseParams(typing_extensions.TypedDict):
     flow: FlowResponseParams
     """
     Flow used to generate the Log.
+    """
+
+    trace_status: typing_extensions.NotRequired[TraceStatus]
+    """
+    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
     """

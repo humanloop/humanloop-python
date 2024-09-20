@@ -306,15 +306,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
     
 </dd>
 </dl>
@@ -719,8 +711,7 @@ response = client.prompts.call_stream(
         "2024-01-15 09:30:00+00:00",
     ),
     source_datapoint_id="string",
-    trace_id="string",
-    trace_parent_log_id="string",
+    trace_parent_id="string",
     batches=["string"],
     user="string",
     prompts_call_stream_request_environment="string",
@@ -867,15 +858,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
     
 </dd>
 </dl>
@@ -1141,15 +1124,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
     
 </dd>
 </dl>
@@ -2565,15 +2540,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
     
 </dd>
 </dl>
@@ -4304,7 +4271,7 @@ client.datasets.delete(
 <dl>
 <dd>
 
-Update the Dataset with the given ID.
+Move the Dataset to a different path or change the name.
 </dd>
 </dl>
 </dd>
@@ -6092,15 +6059,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
     
 </dd>
 </dl>
@@ -6434,7 +6393,7 @@ client.flows.move(
 <dl>
 <dd>
 
-Get a list of all Flows.
+Get a list of Flows.
 </dd>
 </dl>
 </dd>
@@ -6534,6 +6493,26 @@ client.flows.list()
 <dl>
 <dd>
 
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create or update a Flow.
+
+Flows can also be identified by the `ID` or their `path`.
+
+If you provide a commit message, then the new version will be committed;
+otherwise it will be uncommitted. If you try to commit an already committed version,
+an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
 #### 🔌 Usage
 
 <dl>
@@ -6622,7 +6601,10 @@ client.flows.upsert(
 <dl>
 <dd>
 
-Log a Flow Trace.
+Log to a Flow.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 </dd>
 </dl>
 </dd>
@@ -6802,15 +6784,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — ID of the Trace. If not provided, one will be assigned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_log_id:** `typing.Optional[str]` — Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
     
 </dd>
 </dl>
@@ -6850,6 +6824,14 @@ client.flows.log()
 <dl>
 <dd>
 
+**trace_id:** `typing.Optional[str]` — ID of the Trace. If not provided, one will be assigned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **flow:** `typing.Optional[FlowKernelRequestParams]` — Flow used to generate the Trace.
     
 </dd>
@@ -6878,9 +6860,26 @@ client.flows.log()
 </dl>
 </details>
 
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_trace</a>(...)</code></summary>
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_log</a>(...)</code></summary>
 <dl>
 <dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the status, inputs, output of a Flow Log.
+
+Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
+Inputs and output (or error) must be provided in order to mark it as complete.
+</dd>
+</dl>
+</dd>
+</dl>
 
 #### 🔌 Usage
 
@@ -6896,9 +6895,9 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.flows.update_trace(
-    trace_id="trace_id",
-    status="complete",
+client.flows.update_log(
+    log_id="log_id",
+    trace_status="complete",
 )
 
 ```
@@ -6915,7 +6914,7 @@ client.flows.update_trace(
 <dl>
 <dd>
 
-**trace_id:** `str` — Unique identifier for Trace.
+**log_id:** `str` — Unique identifier of the Flow Log.
     
 </dd>
 </dl>
@@ -6923,7 +6922,7 @@ client.flows.update_trace(
 <dl>
 <dd>
 
-**status:** `TraceStatus` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
+**trace_status:** `TraceStatus` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
     
 </dd>
 </dl>
@@ -6939,7 +6938,15 @@ client.flows.update_trace(
 <dl>
 <dd>
 
-**output:** `typing.Optional[str]` — The output of the Flow Log.
+**output:** `typing.Optional[str]` — The output of the Flow Log. Provide None to unset existing `output` value. Provide either this or `error`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this or `output`.
     
 </dd>
 </dl>

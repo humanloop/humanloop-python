@@ -2,17 +2,27 @@
 
 import typing_extensions
 import typing_extensions
+import datetime as dt
 import typing
 from .chat_message import ChatMessageParams
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoiceParams
 from .prompt_response import PromptResponseParams
-import datetime as dt
 from .prompt_call_log_response import PromptCallLogResponseParams
 
 
 class PromptCallResponseParams(typing_extensions.TypedDict):
     """
     Response model for a Prompt call with potentially multiple log samples.
+    """
+
+    start_time: typing_extensions.NotRequired[dt.datetime]
+    """
+    When the logged event started.
+    """
+
+    end_time: typing_extensions.NotRequired[dt.datetime]
+    """
+    When the logged event ended.
     """
 
     messages: typing_extensions.NotRequired[typing.Sequence[ChatMessageParams]]
@@ -50,29 +60,14 @@ class PromptCallResponseParams(typing_extensions.TypedDict):
     Any additional metadata to record.
     """
 
-    start_time: typing_extensions.NotRequired[dt.datetime]
-    """
-    When the logged event started.
-    """
-
-    end_time: typing_extensions.NotRequired[dt.datetime]
-    """
-    When the logged event ended.
-    """
-
     source_datapoint_id: typing_extensions.NotRequired[str]
     """
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     """
 
-    trace_id: typing_extensions.NotRequired[str]
+    trace_parent_id: typing_extensions.NotRequired[str]
     """
-    Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    """
-
-    trace_parent_log_id: typing_extensions.NotRequired[str]
-    """
-    Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+    The ID of the parent Log to nest this Log under in a Trace.
     """
 
     batches: typing_extensions.NotRequired[typing.Sequence[str]]
@@ -98,6 +93,11 @@ class PromptCallResponseParams(typing_extensions.TypedDict):
     id: str
     """
     ID of the log.
+    """
+
+    trace_id: typing_extensions.NotRequired[str]
+    """
+    ID of the Trace containing the Prompt Call Log.
     """
 
     logs: typing.Sequence[PromptCallLogResponseParams]

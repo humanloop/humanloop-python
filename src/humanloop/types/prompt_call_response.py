@@ -2,11 +2,11 @@
 
 from ..core.unchecked_base_model import UncheckedBaseModel
 import typing
-from .chat_message import ChatMessage
+import datetime as dt
 import pydantic
+from .chat_message import ChatMessage
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoice
 from .prompt_response import PromptResponse
-import datetime as dt
 from .prompt_call_log_response import PromptCallLogResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -14,6 +14,16 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class PromptCallResponse(UncheckedBaseModel):
     """
     Response model for a Prompt call with potentially multiple log samples.
+    """
+
+    start_time: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    When the logged event started.
+    """
+
+    end_time: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    When the logged event ended.
     """
 
     messages: typing.Optional[typing.List[ChatMessage]] = pydantic.Field(default=None)
@@ -51,29 +61,14 @@ class PromptCallResponse(UncheckedBaseModel):
     Any additional metadata to record.
     """
 
-    start_time: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    When the logged event started.
-    """
-
-    end_time: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    When the logged event ended.
-    """
-
     source_datapoint_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     """
 
-    trace_id: typing.Optional[str] = pydantic.Field(default=None)
+    trace_parent_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-    """
-
-    trace_parent_log_id: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+    The ID of the parent Log to nest this Log under in a Trace.
     """
 
     batches: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
@@ -99,6 +94,11 @@ class PromptCallResponse(UncheckedBaseModel):
     id: str = pydantic.Field()
     """
     ID of the log.
+    """
+
+    trace_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    ID of the Trace containing the Prompt Call Log.
     """
 
     logs: typing.List[PromptCallLogResponse] = pydantic.Field()
