@@ -257,7 +257,7 @@ class FlowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedDataFlowResponse:
         """
-        Get a list of Flows.
+        Get a list of all Flows.
 
         Parameters
         ----------
@@ -343,14 +343,6 @@ class FlowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FlowResponse:
         """
-        Create or update a Flow.
-
-        Flows can also be identified by the `ID` or their `path`.
-
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
-
         Parameters
         ----------
         attributes : typing.Dict[str, typing.Optional[typing.Any]]
@@ -441,21 +433,18 @@ class FlowsClient:
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
-        trace_parent_id: typing.Optional[str] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        trace_parent_log_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         flow_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
-        trace_id: typing.Optional[str] = OMIT,
         flow: typing.Optional[FlowKernelRequestParams] = OMIT,
         trace_status: typing.Optional[TraceStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateFlowLogResponse:
         """
-        Log to a Flow.
-
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Flow. Otherwise, the default deployed version will be chosen.
+        Log a Flow Trace.
 
         Parameters
         ----------
@@ -513,8 +502,11 @@ class FlowsClient:
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+        trace_id : typing.Optional[str]
+            ID of the Trace. If not provided, one will be assigned.
+
+        trace_parent_log_id : typing.Optional[str]
+            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -527,9 +519,6 @@ class FlowsClient:
 
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
-
-        trace_id : typing.Optional[str]
-            ID of the Trace. If not provided, one will be assigned.
 
         flow : typing.Optional[FlowKernelRequestParams]
             Flow used to generate the Trace.
@@ -578,12 +567,12 @@ class FlowsClient:
                 "source": source,
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
-                "trace_parent_id": trace_parent_id,
+                "trace_id": trace_id,
+                "trace_parent_log_id": trace_parent_log_id,
                 "batches": batches,
                 "user": user,
                 "environment": flow_log_request_environment,
                 "save": save,
-                "trace_id": trace_id,
                 "flow": convert_and_respect_annotation_metadata(object_=flow, annotation=FlowKernelRequestParams),
                 "trace_status": trace_status,
             },
@@ -614,38 +603,29 @@ class FlowsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_log(
+    def update_trace(
         self,
-        log_id: str,
+        trace_id: str,
         *,
-        trace_status: TraceStatus,
+        status: TraceStatus,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         output: typing.Optional[str] = OMIT,
-        error: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FlowLogResponse:
         """
-        Update the status, inputs, output of a Flow Log.
-
-        Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
-        Inputs and output (or error) must be provided in order to mark it as complete.
-
         Parameters
         ----------
-        log_id : str
-            Unique identifier of the Flow Log.
+        trace_id : str
+            Unique identifier for Trace.
 
-        trace_status : TraceStatus
-            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
+        status : TraceStatus
+            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the Flow Log.
 
         output : typing.Optional[str]
-            The output of the Flow Log. Provide None to unset existing `output` value. Provide either this or `error`.
-
-        error : typing.Optional[str]
-            The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this or `output`.
+            The output of the Flow Log.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -662,19 +642,18 @@ class FlowsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.flows.update_log(
-            log_id="log_id",
-            trace_status="complete",
+        client.flows.update_trace(
+            trace_id="trace_id",
+            status="complete",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"flows/logs/{jsonable_encoder(log_id)}",
+            f"flows/log/{jsonable_encoder(trace_id)}",
             method="PATCH",
             json={
                 "inputs": inputs,
                 "output": output,
-                "error": error,
-                "trace_status": trace_status,
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1372,7 +1351,7 @@ class AsyncFlowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedDataFlowResponse:
         """
-        Get a list of Flows.
+        Get a list of all Flows.
 
         Parameters
         ----------
@@ -1466,14 +1445,6 @@ class AsyncFlowsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FlowResponse:
         """
-        Create or update a Flow.
-
-        Flows can also be identified by the `ID` or their `path`.
-
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
-
         Parameters
         ----------
         attributes : typing.Dict[str, typing.Optional[typing.Any]]
@@ -1572,21 +1543,18 @@ class AsyncFlowsClient:
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
-        trace_parent_id: typing.Optional[str] = OMIT,
+        trace_id: typing.Optional[str] = OMIT,
+        trace_parent_log_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         flow_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
-        trace_id: typing.Optional[str] = OMIT,
         flow: typing.Optional[FlowKernelRequestParams] = OMIT,
         trace_status: typing.Optional[TraceStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateFlowLogResponse:
         """
-        Log to a Flow.
-
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Flow. Otherwise, the default deployed version will be chosen.
+        Log a Flow Trace.
 
         Parameters
         ----------
@@ -1644,8 +1612,11 @@ class AsyncFlowsClient:
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+        trace_id : typing.Optional[str]
+            ID of the Trace. If not provided, one will be assigned.
+
+        trace_parent_log_id : typing.Optional[str]
+            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -1658,9 +1629,6 @@ class AsyncFlowsClient:
 
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
-
-        trace_id : typing.Optional[str]
-            ID of the Trace. If not provided, one will be assigned.
 
         flow : typing.Optional[FlowKernelRequestParams]
             Flow used to generate the Trace.
@@ -1717,12 +1685,12 @@ class AsyncFlowsClient:
                 "source": source,
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
-                "trace_parent_id": trace_parent_id,
+                "trace_id": trace_id,
+                "trace_parent_log_id": trace_parent_log_id,
                 "batches": batches,
                 "user": user,
                 "environment": flow_log_request_environment,
                 "save": save,
-                "trace_id": trace_id,
                 "flow": convert_and_respect_annotation_metadata(object_=flow, annotation=FlowKernelRequestParams),
                 "trace_status": trace_status,
             },
@@ -1753,38 +1721,29 @@ class AsyncFlowsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_log(
+    async def update_trace(
         self,
-        log_id: str,
+        trace_id: str,
         *,
-        trace_status: TraceStatus,
+        status: TraceStatus,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         output: typing.Optional[str] = OMIT,
-        error: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FlowLogResponse:
         """
-        Update the status, inputs, output of a Flow Log.
-
-        Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
-        Inputs and output (or error) must be provided in order to mark it as complete.
-
         Parameters
         ----------
-        log_id : str
-            Unique identifier of the Flow Log.
+        trace_id : str
+            Unique identifier for Trace.
 
-        trace_status : TraceStatus
-            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
+        status : TraceStatus
+            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the Flow Log.
 
         output : typing.Optional[str]
-            The output of the Flow Log. Provide None to unset existing `output` value. Provide either this or `error`.
-
-        error : typing.Optional[str]
-            The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this or `output`.
+            The output of the Flow Log.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1806,22 +1765,21 @@ class AsyncFlowsClient:
 
 
         async def main() -> None:
-            await client.flows.update_log(
-                log_id="log_id",
-                trace_status="complete",
+            await client.flows.update_trace(
+                trace_id="trace_id",
+                status="complete",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"flows/logs/{jsonable_encoder(log_id)}",
+            f"flows/log/{jsonable_encoder(trace_id)}",
             method="PATCH",
             json={
                 "inputs": inputs,
                 "output": output,
-                "error": error,
-                "trace_status": trace_status,
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
