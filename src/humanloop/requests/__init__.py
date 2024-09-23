@@ -84,7 +84,6 @@ from .paginated_data_union_prompt_response_tool_response_dataset_response_evalua
 from .paginated_datapoint_response import PaginatedDatapointResponseParams
 from .paginated_dataset_response import PaginatedDatasetResponseParams
 from .paginated_evaluation_response import PaginatedEvaluationResponseParams
-from .paginated_session_response import PaginatedSessionResponseParams
 from .prompt_call_log_response import PromptCallLogResponseParams
 from .prompt_call_response import PromptCallResponseParams
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoiceParams
@@ -100,8 +99,6 @@ from .prompt_response_template import PromptResponseTemplateParams
 from .provider_api_keys import ProviderApiKeysParams
 from .response_format import ResponseFormatParams
 from .select_evaluator_stats_response import SelectEvaluatorStatsResponseParams
-from .session_event_response import SessionEventResponseParams
-from .session_response import SessionResponseParams
 from .text_chat_content import TextChatContentParams
 from .text_evaluator_stats_response import TextEvaluatorStatsResponseParams
 from .tool_call import ToolCallParams
@@ -196,7 +193,6 @@ __all__ = [
     "PaginatedDatapointResponseParams",
     "PaginatedDatasetResponseParams",
     "PaginatedEvaluationResponseParams",
-    "PaginatedSessionResponseParams",
     "PromptCallLogResponseParams",
     "PromptCallResponseParams",
     "PromptCallResponseToolChoiceParams",
@@ -212,8 +208,6 @@ __all__ = [
     "ProviderApiKeysParams",
     "ResponseFormatParams",
     "SelectEvaluatorStatsResponseParams",
-    "SessionEventResponseParams",
-    "SessionResponseParams",
     "TextChatContentParams",
     "TextEvaluatorStatsResponseParams",
     "ToolCallParams",

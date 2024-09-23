@@ -119,8 +119,6 @@ from .provider_api_keys import ProviderApiKeys
 from .response_format import ResponseFormat
 from .response_format_type import ResponseFormatType
 from .select_evaluator_stats_response import SelectEvaluatorStatsResponse
-from .session_event_response import SessionEventResponse
-from .session_response import SessionResponse
 from .sort_order import SortOrder
 from .text_chat_content import TextChatContent
 from .text_evaluator_stats_response import TextEvaluatorStatsResponse
@@ -261,8 +259,6 @@ __all__ = [
     "ResponseFormat",
     "ResponseFormatType",
     "SelectEvaluatorStatsResponse",
-    "SessionEventResponse",
-    "SessionResponse",
     "SortOrder",
     "TextChatContent",
     "TextEvaluatorStatsResponse",

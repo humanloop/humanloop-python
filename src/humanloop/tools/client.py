@@ -61,8 +61,7 @@ class ToolsClient:
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
-        trace_id: typing.Optional[str] = OMIT,
-        trace_parent_log_id: typing.Optional[str] = OMIT,
+        trace_parent_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
@@ -134,11 +133,8 @@ class ToolsClient:
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_id : typing.Optional[str]
-            Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-
-        trace_parent_log_id : typing.Optional[str]
-            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+        trace_parent_id : typing.Optional[str]
+            The ID of the parent Log to nest this Log under in a Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -213,8 +209,7 @@ class ToolsClient:
                 "source": source,
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
-                "trace_id": trace_id,
-                "trace_parent_log_id": trace_parent_log_id,
+                "trace_parent_id": trace_parent_id,
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,
@@ -1256,8 +1251,7 @@ class AsyncToolsClient:
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
-        trace_id: typing.Optional[str] = OMIT,
-        trace_parent_log_id: typing.Optional[str] = OMIT,
+        trace_parent_id: typing.Optional[str] = OMIT,
         batches: typing.Optional[typing.Sequence[str]] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
@@ -1329,11 +1323,8 @@ class AsyncToolsClient:
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_id : typing.Optional[str]
-            Identifier of the Flow Log to which the Log will be associated. Multiple Logs can be associated by passing the same trace_id in subsequent log requests. Use the Flow File log endpoint to create the Trace first.
-
-        trace_parent_log_id : typing.Optional[str]
-            Log under which this Log should be nested. Leave field blank if the Log should be nested directly under root Trace Log. Parent Log should already be added to the Trace.
+        trace_parent_id : typing.Optional[str]
+            The ID of the parent Log to nest this Log under in a Trace.
 
         batches : typing.Optional[typing.Sequence[str]]
             Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
@@ -1416,8 +1407,7 @@ class AsyncToolsClient:
                 "source": source,
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
-                "trace_id": trace_id,
-                "trace_parent_log_id": trace_parent_log_id,
+                "trace_parent_id": trace_parent_id,
                 "batches": batches,
                 "user": user,
                 "environment": tool_log_request_environment,

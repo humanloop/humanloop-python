@@ -429,7 +429,7 @@ class DatasetsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
-        Update the Dataset with the given ID.
+        Move the Dataset to a different path or change the name.
 
         Parameters
         ----------
@@ -1458,7 +1458,7 @@ class AsyncDatasetsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
-        Update the Dataset with the given ID.
+        Move the Dataset to a different path or change the name.
 
         Parameters
         ----------

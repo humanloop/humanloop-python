@@ -114,8 +114,6 @@ from .types import (
     ResponseFormat,
     ResponseFormatType,
     SelectEvaluatorStatsResponse,
-    SessionEventResponse,
-    SessionResponse,
     SortOrder,
     TextChatContent,
     TextEvaluatorStatsResponse,
@@ -143,7 +141,7 @@ from .types import (
     VersionStatus,
 )
 from .errors import UnprocessableEntityError
-from . import datasets, evaluations, evaluators, files, flows, logs, prompts, sessions, tools
+from . import datasets, evaluations, evaluators, files, flows, logs, prompts, tools
 from .client import AsyncHumanloop, Humanloop
 from .environment import HumanloopEnvironment
 from .evaluators import (
@@ -245,7 +243,6 @@ from .requests import (
     PaginatedDatapointResponseParams,
     PaginatedDatasetResponseParams,
     PaginatedEvaluationResponseParams,
-    PaginatedSessionResponseParams,
     PromptCallLogResponseParams,
     PromptCallResponseParams,
     PromptCallResponseToolChoiceParams,
@@ -261,8 +258,6 @@ from .requests import (
     ProviderApiKeysParams,
     ResponseFormatParams,
     SelectEvaluatorStatsResponseParams,
-    SessionEventResponseParams,
-    SessionResponseParams,
     TextChatContentParams,
     TextEvaluatorStatsResponseParams,
     ToolCallParams,
@@ -461,7 +456,6 @@ __all__ = [
     "PaginatedEvaluationResponseParams",
     "PaginatedPromptLogResponse",
     "PaginatedSessionResponse",
-    "PaginatedSessionResponseParams",
     "PlatformAccessEnum",
     "ProjectSortBy",
     "PromptCallLogResponse",
@@ -507,10 +501,6 @@ __all__ = [
     "ResponseFormatType",
     "SelectEvaluatorStatsResponse",
     "SelectEvaluatorStatsResponseParams",
-    "SessionEventResponse",
-    "SessionEventResponseParams",
-    "SessionResponse",
-    "SessionResponseParams",
     "SortOrder",
     "SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec",
     "SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams",
@@ -563,6 +553,5 @@ __all__ = [
     "flows",
     "logs",
     "prompts",
-    "sessions",
     "tools",
 ]
