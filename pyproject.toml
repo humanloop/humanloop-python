@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "humanloop"
-version = "0.8.1"
+version = "0.8.2b1"
 description = ""
 readme = "README.md"
 authors = []
@@ -28,7 +28,7 @@ packages = [
 ]
 
 [project.urls]
-Repository = 'https://github.com/humanloop/humanloop-python-beta'
+Repository = 'https://github.com/humanloop/humanloop-python'
 
 [tool.poetry.dependencies]
 python = "^3.8"

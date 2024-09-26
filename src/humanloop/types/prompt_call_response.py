@@ -71,9 +71,9 @@ class PromptCallResponse(UncheckedBaseModel):
     The ID of the parent Log to nest this Log under in a Trace.
     """
 
-    batches: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    batch_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+    Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     """
 
     user: typing.Optional[str] = pydantic.Field(default=None)

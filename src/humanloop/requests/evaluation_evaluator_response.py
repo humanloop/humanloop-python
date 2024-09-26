@@ -2,6 +2,7 @@
 
 import typing_extensions
 from .evaluator_response import EvaluatorResponseParams
+import datetime as dt
 
 
 class EvaluationEvaluatorResponseParams(typing_extensions.TypedDict):
@@ -9,4 +10,9 @@ class EvaluationEvaluatorResponseParams(typing_extensions.TypedDict):
     orchestrated: bool
     """
     Whether the Evaluator is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Evaluator should be submitted by the user via the API.
+    """
+
+    added_at: dt.datetime
+    """
+    When the Evaluator was added to the Evaluation.
     """

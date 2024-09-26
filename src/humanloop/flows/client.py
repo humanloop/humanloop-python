@@ -442,11 +442,11 @@ class FlowsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         flow_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
-        trace_id: typing.Optional[str] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         flow: typing.Optional[FlowKernelRequestParams] = OMIT,
         trace_status: typing.Optional[TraceStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -516,8 +516,8 @@ class FlowsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -528,8 +528,8 @@ class FlowsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
-        trace_id : typing.Optional[str]
-            ID of the Trace. If not provided, one will be assigned.
+        log_id : typing.Optional[str]
+            The identifier for the Log. If not specified, a default ID will be generated. This allows additional Logs to be appended to the trace without waiting for Humanloop to return an ID.
 
         flow : typing.Optional[FlowKernelRequestParams]
             Flow used to generate the Trace.
@@ -579,11 +579,11 @@ class FlowsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": flow_log_request_environment,
                 "save": save,
-                "trace_id": trace_id,
+                "log_id": log_id,
                 "flow": convert_and_respect_annotation_metadata(object_=flow, annotation=FlowKernelRequestParams),
                 "trace_status": trace_status,
             },
@@ -1573,11 +1573,11 @@ class AsyncFlowsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         flow_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
-        trace_id: typing.Optional[str] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         flow: typing.Optional[FlowKernelRequestParams] = OMIT,
         trace_status: typing.Optional[TraceStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1647,8 +1647,8 @@ class AsyncFlowsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -1659,8 +1659,8 @@ class AsyncFlowsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
-        trace_id : typing.Optional[str]
-            ID of the Trace. If not provided, one will be assigned.
+        log_id : typing.Optional[str]
+            The identifier for the Log. If not specified, a default ID will be generated. This allows additional Logs to be appended to the trace without waiting for Humanloop to return an ID.
 
         flow : typing.Optional[FlowKernelRequestParams]
             Flow used to generate the Trace.
@@ -1718,11 +1718,11 @@ class AsyncFlowsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": flow_log_request_environment,
                 "save": save,
-                "trace_id": trace_id,
+                "log_id": log_id,
                 "flow": convert_and_respect_annotation_metadata(object_=flow, annotation=FlowKernelRequestParams),
                 "trace_status": trace_status,
             },

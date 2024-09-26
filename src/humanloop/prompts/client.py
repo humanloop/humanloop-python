@@ -86,7 +86,7 @@ class PromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompt_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -193,8 +193,8 @@ class PromptsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -290,7 +290,7 @@ class PromptsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": prompt_log_request_environment,
                 "save": save,
@@ -521,7 +521,7 @@ class PromptsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompts_call_stream_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -594,8 +594,8 @@ class PromptsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -653,10 +653,7 @@ class PromptsClient:
                         {
                             "id": "string",
                             "type": "function",
-                            "function": {
-                                "name": "string",
-                                "arguments": {"key": "value"},
-                            },
+                            "function": {"name": "string"},
                         }
                     ],
                 }
@@ -674,18 +671,8 @@ class PromptsClient:
                 "frequency_penalty": 1.1,
                 "other": {"string": {"key": "value"}},
                 "seed": 1,
-                "response_format": {
-                    "type": "json_object",
-                    "json_schema": {"string": {"key": "value"}},
-                },
-                "tools": [
-                    {
-                        "name": "string",
-                        "description": "string",
-                        "strict": {"key": "value"},
-                        "parameters": {"key": "value"},
-                    }
-                ],
+                "response_format": {"type": "json_object", "json_schema": {}},
+                "tools": [{"name": "string", "description": "string"}],
                 "linked_tools": ["string"],
                 "attributes": {"string": {"key": "value"}},
             },
@@ -700,7 +687,7 @@ class PromptsClient:
             ),
             source_datapoint_id="string",
             trace_parent_id="string",
-            batches=["string"],
+            batch_id="string",
             user="string",
             prompts_call_stream_request_environment="string",
             save=True,
@@ -746,7 +733,7 @@ class PromptsClient:
                 "end_time": end_time,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": prompts_call_stream_request_environment,
                 "save": save,
@@ -810,7 +797,7 @@ class PromptsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompts_call_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -883,8 +870,8 @@ class PromptsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -980,7 +967,7 @@ class PromptsClient:
                 "end_time": end_time,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": prompts_call_request_environment,
                 "save": save,
@@ -1976,7 +1963,7 @@ class AsyncPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompt_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -2083,8 +2070,8 @@ class AsyncPromptsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2189,7 +2176,7 @@ class AsyncPromptsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": prompt_log_request_environment,
                 "save": save,
@@ -2428,7 +2415,7 @@ class AsyncPromptsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompts_call_stream_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -2501,8 +2488,8 @@ class AsyncPromptsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2564,10 +2551,7 @@ class AsyncPromptsClient:
                             {
                                 "id": "string",
                                 "type": "function",
-                                "function": {
-                                    "name": "string",
-                                    "arguments": {"key": "value"},
-                                },
+                                "function": {"name": "string"},
                             }
                         ],
                     }
@@ -2585,18 +2569,8 @@ class AsyncPromptsClient:
                     "frequency_penalty": 1.1,
                     "other": {"string": {"key": "value"}},
                     "seed": 1,
-                    "response_format": {
-                        "type": "json_object",
-                        "json_schema": {"string": {"key": "value"}},
-                    },
-                    "tools": [
-                        {
-                            "name": "string",
-                            "description": "string",
-                            "strict": {"key": "value"},
-                            "parameters": {"key": "value"},
-                        }
-                    ],
+                    "response_format": {"type": "json_object", "json_schema": {}},
+                    "tools": [{"name": "string", "description": "string"}],
                     "linked_tools": ["string"],
                     "attributes": {"string": {"key": "value"}},
                 },
@@ -2611,7 +2585,7 @@ class AsyncPromptsClient:
                 ),
                 source_datapoint_id="string",
                 trace_parent_id="string",
-                batches=["string"],
+                batch_id="string",
                 user="string",
                 prompts_call_stream_request_environment="string",
                 save=True,
@@ -2660,7 +2634,7 @@ class AsyncPromptsClient:
                 "end_time": end_time,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": prompts_call_stream_request_environment,
                 "save": save,
@@ -2724,7 +2698,7 @@ class AsyncPromptsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         prompts_call_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -2797,8 +2771,8 @@ class AsyncPromptsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2902,7 +2876,7 @@ class AsyncPromptsClient:
                 "end_time": end_time,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": prompts_call_request_environment,
                 "save": save,

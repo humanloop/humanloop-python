@@ -20,6 +20,12 @@ from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.version_status import VersionStatus
 from ..types.list_evaluators import ListEvaluators
+from ..requests.evaluator_activation_deactivation_request_activate_item import (
+    EvaluatorActivationDeactivationRequestActivateItemParams,
+)
+from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
+    EvaluatorActivationDeactivationRequestDeactivateItemParams,
+)
 from ..types.file_environment_response import FileEnvironmentResponse
 import datetime as dt
 from .requests.create_evaluator_log_request_judgment import CreateEvaluatorLogRequestJudgmentParams
@@ -589,6 +595,89 @@ class EvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluatorResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Evaluator.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Evaluator for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluatorResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluators.update_monitoring(
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluatorResponse,
+                    construct_type(
+                        type_=EvaluatorResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> EvaluatorResponse:
@@ -802,7 +891,7 @@ class EvaluatorsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -874,8 +963,8 @@ class EvaluatorsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -935,7 +1024,7 @@ class EvaluatorsClient:
                 "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
                 "save": save,
@@ -1587,6 +1676,97 @@ class AsyncEvaluatorsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluatorResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Evaluator.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Evaluator for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluatorResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluators.update_monitoring(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluators/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluatorResponse,
+                    construct_type(
+                        type_=EvaluatorResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> EvaluatorResponse:
@@ -1824,7 +2004,7 @@ class AsyncEvaluatorsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batches: typing.Optional[typing.Sequence[str]] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -1896,8 +2076,8 @@ class AsyncEvaluatorsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batches : typing.Optional[typing.Sequence[str]]
-            Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+        batch_id : typing.Optional[str]
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -1965,7 +2145,7 @@ class AsyncEvaluatorsClient:
                 "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batches": batches,
+                "batch_id": batch_id,
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
                 "save": save,

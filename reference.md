@@ -314,7 +314,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -665,10 +665,7 @@ response = client.prompts.call_stream(
                 {
                     "id": "string",
                     "type": "function",
-                    "function": {
-                        "name": "string",
-                        "arguments": {"key": "value"},
-                    },
+                    "function": {"name": "string"},
                 }
             ],
         }
@@ -686,18 +683,8 @@ response = client.prompts.call_stream(
         "frequency_penalty": 1.1,
         "other": {"string": {"key": "value"}},
         "seed": 1,
-        "response_format": {
-            "type": "json_object",
-            "json_schema": {"string": {"key": "value"}},
-        },
-        "tools": [
-            {
-                "name": "string",
-                "description": "string",
-                "strict": {"key": "value"},
-                "parameters": {"key": "value"},
-            }
-        ],
+        "response_format": {"type": "json_object", "json_schema": {}},
+        "tools": [{"name": "string", "description": "string"}],
         "linked_tools": ["string"],
         "attributes": {"string": {"key": "value"}},
     },
@@ -712,7 +699,7 @@ response = client.prompts.call_stream(
     ),
     source_datapoint_id="string",
     trace_parent_id="string",
-    batches=["string"],
+    batch_id="string",
     user="string",
     prompts_call_stream_request_environment="string",
     save=True,
@@ -866,7 +853,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -1132,7 +1119,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -2548,7 +2535,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -5620,6 +5607,99 @@ client.evaluators.commit(
 </dl>
 </details>
 
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Evaluator.
+
+An activated Evaluator will automatically be run on all new Logs
+within the Evaluator for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.update_monitoring(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
+]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
+]` — Evaluators to deactivate. These will not be run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -6067,7 +6147,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -6792,7 +6872,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**batches:** `typing.Optional[typing.Sequence[str]]` — Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -6824,7 +6904,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**trace_id:** `typing.Optional[str]` — ID of the Trace. If not provided, one will be assigned.
+**log_id:** `typing.Optional[str]` — The identifier for the Log. If not specified, a default ID will be generated. This allows additional Logs to be appended to the trace without waiting for Humanloop to return an ID.
     
 </dd>
 </dl>
@@ -8294,6 +8374,127 @@ client.evaluations.get_logs(
 <dd>
 
 **size:** `typing.Optional[int]` — Page size for pagination. Number of Logs to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">pin_evaluatee</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Pin the specified Evaluatee.
+
+Pinned Evaluatees are always displayed in the Evaluation Overview,
+and serve as the baseline for comparison with other Evaluatees.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.pin_evaluatee(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — Unique identifier for the File Version. If provided, none of the other fields should be specified.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path identifying a File. Provide either this or `file_id` if you want to specify a File.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**file_id:** `typing.Optional[str]` — Unique identifier for the File. Provide either this or `path` if you want to specify a File.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**batch_id:** `typing.Optional[str]` — Unique identifier for the batch of Logs to include in the Evaluation Report.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**orchestrated:** `typing.Optional[bool]` — Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
     
 </dd>
 </dl>

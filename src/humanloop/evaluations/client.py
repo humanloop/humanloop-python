@@ -652,6 +652,104 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def pin_evaluatee(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = OMIT,
+        path: typing.Optional[str] = OMIT,
+        file_id: typing.Optional[str] = OMIT,
+        environment: typing.Optional[str] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
+        orchestrated: typing.Optional[bool] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationResponse:
+        """
+        Pin the specified Evaluatee.
+
+        Pinned Evaluatees are always displayed in the Evaluation Overview,
+        and serve as the baseline for comparison with other Evaluatees.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        version_id : typing.Optional[str]
+            Unique identifier for the File Version. If provided, none of the other fields should be specified.
+
+        path : typing.Optional[str]
+            Path identifying a File. Provide either this or `file_id` if you want to specify a File.
+
+        file_id : typing.Optional[str]
+            Unique identifier for the File. Provide either this or `path` if you want to specify a File.
+
+        environment : typing.Optional[str]
+            Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
+
+        batch_id : typing.Optional[str]
+            Unique identifier for the batch of Logs to include in the Evaluation Report.
+
+        orchestrated : typing.Optional[bool]
+            Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.pin_evaluatee(
+            id="id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/pin-evaluatee",
+            method="POST",
+            json={
+                "version_id": version_id,
+                "path": path,
+                "file_id": file_id,
+                "environment": environment,
+                "batch_id": batch_id,
+                "orchestrated": orchestrated,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationResponse,
+                    construct_type(
+                        type_=EvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncEvaluationsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1324,6 +1422,112 @@ class AsyncEvaluationsClient:
                     PaginatedDataEvaluationReportLogResponse,
                     construct_type(
                         type_=PaginatedDataEvaluationReportLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def pin_evaluatee(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = OMIT,
+        path: typing.Optional[str] = OMIT,
+        file_id: typing.Optional[str] = OMIT,
+        environment: typing.Optional[str] = OMIT,
+        batch_id: typing.Optional[str] = OMIT,
+        orchestrated: typing.Optional[bool] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationResponse:
+        """
+        Pin the specified Evaluatee.
+
+        Pinned Evaluatees are always displayed in the Evaluation Overview,
+        and serve as the baseline for comparison with other Evaluatees.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        version_id : typing.Optional[str]
+            Unique identifier for the File Version. If provided, none of the other fields should be specified.
+
+        path : typing.Optional[str]
+            Path identifying a File. Provide either this or `file_id` if you want to specify a File.
+
+        file_id : typing.Optional[str]
+            Unique identifier for the File. Provide either this or `path` if you want to specify a File.
+
+        environment : typing.Optional[str]
+            Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
+
+        batch_id : typing.Optional[str]
+            Unique identifier for the batch of Logs to include in the Evaluation Report.
+
+        orchestrated : typing.Optional[bool]
+            Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.pin_evaluatee(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/pin-evaluatee",
+            method="POST",
+            json={
+                "version_id": version_id,
+                "path": path,
+                "file_id": file_id,
+                "environment": environment,
+                "batch_id": batch_id,
+                "orchestrated": orchestrated,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationResponse,
+                    construct_type(
+                        type_=EvaluationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

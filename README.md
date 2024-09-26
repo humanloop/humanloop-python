@@ -144,10 +144,7 @@ response = client.prompts.call_stream(
                 {
                     "id": "string",
                     "type": "function",
-                    "function": {
-                        "name": "string",
-                        "arguments": {"key": "value"},
-                    },
+                    "function": {"name": "string"},
                 }
             ],
         }
@@ -165,18 +162,8 @@ response = client.prompts.call_stream(
         "frequency_penalty": 1.1,
         "other": {"string": {"key": "value"}},
         "seed": 1,
-        "response_format": {
-            "type": "json_object",
-            "json_schema": {"string": {"key": "value"}},
-        },
-        "tools": [
-            {
-                "name": "string",
-                "description": "string",
-                "strict": {"key": "value"},
-                "parameters": {"key": "value"},
-            }
-        ],
+        "response_format": {"type": "json_object", "json_schema": {}},
+        "tools": [{"name": "string", "description": "string"}],
         "linked_tools": ["string"],
         "attributes": {"string": {"key": "value"}},
     },
@@ -191,7 +178,7 @@ response = client.prompts.call_stream(
     ),
     source_datapoint_id="string",
     trace_parent_id="string",
-    batches=["string"],
+    batch_id="string",
     user="string",
     prompts_call_stream_request_environment="string",
     save=True,

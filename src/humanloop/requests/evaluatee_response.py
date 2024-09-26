@@ -3,6 +3,7 @@
 import typing_extensions
 from .evaluated_version_response import EvaluatedVersionResponseParams
 import typing_extensions
+import datetime as dt
 
 
 class EvaluateeResponseParams(typing_extensions.TypedDict):
@@ -19,4 +20,14 @@ class EvaluateeResponseParams(typing_extensions.TypedDict):
     orchestrated: bool
     """
     Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+    """
+
+    pinned: bool
+    """
+    Pinned Evaluatees are shown in Humanloop's Overview, allowing you to use them as baselines for comparison.
+    """
+
+    added_at: typing_extensions.NotRequired[dt.datetime]
+    """
+    When the Evaluatee was added to the Evaluation.
     """

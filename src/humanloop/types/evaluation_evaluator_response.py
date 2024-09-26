@@ -3,6 +3,7 @@
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .evaluator_response import EvaluatorResponse
 import pydantic
+import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -12,6 +13,11 @@ class EvaluationEvaluatorResponse(UncheckedBaseModel):
     orchestrated: bool = pydantic.Field()
     """
     Whether the Evaluator is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Evaluator should be submitted by the user via the API.
+    """
+
+    added_at: dt.datetime = pydantic.Field()
+    """
+    When the Evaluator was added to the Evaluation.
     """
 
     if IS_PYDANTIC_V2:

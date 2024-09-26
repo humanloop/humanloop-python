@@ -87,7 +87,7 @@ class ToolLogResponse(UncheckedBaseModel):
 
     batches: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+    Array of Batch IDs that this Log is part of. Batches are used to group Logs together for offline Evaluations
     """
 
     user: typing.Optional[str] = pydantic.Field(default=None)

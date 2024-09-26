@@ -4,6 +4,7 @@ from ..core.unchecked_base_model import UncheckedBaseModel
 from .evaluated_version_response import EvaluatedVersionResponse
 import typing
 import pydantic
+import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -21,6 +22,16 @@ class EvaluateeResponse(UncheckedBaseModel):
     orchestrated: bool = pydantic.Field()
     """
     Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+    """
+
+    pinned: bool = pydantic.Field()
+    """
+    Pinned Evaluatees are shown in Humanloop's Overview, allowing you to use them as baselines for comparison.
+    """
+
+    added_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    When the Evaluatee was added to the Evaluation.
     """
 
     if IS_PYDANTIC_V2:

@@ -142,7 +142,7 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
 
     batches: typing_extensions.NotRequired[typing.Sequence[str]]
     """
-    Array of Batch Ids that this log is part of. Batches are used to group Logs together for offline Evaluations
+    Array of Batch IDs that this Log is part of. Batches are used to group Logs together for offline Evaluations
     """
 
     user: typing_extensions.NotRequired[str]
