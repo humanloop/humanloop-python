@@ -314,7 +314,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -853,7 +853,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -1119,7 +1119,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -2535,7 +2535,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -6147,7 +6147,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -6872,7 +6872,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>

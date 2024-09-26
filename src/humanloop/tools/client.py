@@ -137,7 +137,7 @@ class ToolsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -1327,7 +1327,7 @@ class AsyncToolsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
