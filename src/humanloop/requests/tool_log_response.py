@@ -5,7 +5,7 @@ import typing_extensions
 import typing_extensions
 import datetime as dt
 import typing
-from ..types.tool_response import ToolResponse
+from .tool_response import ToolResponseParams
 import typing
 
 if typing.TYPE_CHECKING:
@@ -133,7 +133,7 @@ class ToolLogResponseParams(typing_extensions.TypedDict):
     Logs nested under this Log in the Trace.
     """
 
-    tool: ToolResponse
+    tool: ToolResponseParams
     """
     Tool used to generate the Log.
     """

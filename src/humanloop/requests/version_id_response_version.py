@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 import typing
-from ..types.tool_response import ToolResponse
 from .dataset_response import DatasetResponseParams
 import typing
 
 if typing.TYPE_CHECKING:
     from .prompt_response import PromptResponseParams
+    from .tool_response import ToolResponseParams
     from .evaluator_response import EvaluatorResponseParams
     from .flow_response import FlowResponseParams
 VersionIdResponseVersionParams = typing.Union[
-    "PromptResponseParams", ToolResponse, DatasetResponseParams, "EvaluatorResponseParams", "FlowResponseParams"
+    "PromptResponseParams", "ToolResponseParams", DatasetResponseParams, "EvaluatorResponseParams", "FlowResponseParams"
 ]

@@ -58,7 +58,12 @@ class PromptResponseParams(typing_extensions.TypedDict):
 
     template: typing_extensions.NotRequired[PromptResponseTemplateParams]
     """
-    For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+    The template contains the main structure and instructions for the model, including input variables for dynamic values.
+    
+    For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+    For completion models, provide a prompt template as a string.
+    
+    Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
     """
 
     provider: typing_extensions.NotRequired[ModelProviders]

@@ -115,7 +115,7 @@ class PromptsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -194,7 +194,7 @@ class PromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -236,7 +236,7 @@ class PromptsClient:
             messages=[{"role": "user", "content": "What really happened at Roswell?"}],
             inputs={"person": "Trump"},
             created_at=datetime.datetime.fromisoformat(
-                "2024-07-19 00:29:35.178000+00:00",
+                "2024-07-18 23:29:35.178000+00:00",
             ),
             provider_latency=6.5931549072265625,
             output_message={
@@ -555,7 +555,7 @@ class PromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -595,7 +595,7 @@ class PromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -831,7 +831,7 @@ class PromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -871,7 +871,7 @@ class PromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -1154,7 +1154,7 @@ class PromptsClient:
             The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -1163,7 +1163,12 @@ class PromptsClient:
             The provider model endpoint used.
 
         template : typing.Optional[PromptRequestTemplateParams]
-            For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+            The template contains the main structure and instructions for the model, including input variables for dynamic values.
+
+            For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+            For completion models, provide a prompt template as a string.
+
+            Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
 
         provider : typing.Optional[ModelProviders]
             The company providing the underlying model service.
@@ -1992,7 +1997,7 @@ class AsyncPromptsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -2071,7 +2076,7 @@ class AsyncPromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2119,7 +2124,7 @@ class AsyncPromptsClient:
                 ],
                 inputs={"person": "Trump"},
                 created_at=datetime.datetime.fromisoformat(
-                    "2024-07-19 00:29:35.178000+00:00",
+                    "2024-07-18 23:29:35.178000+00:00",
                 ),
                 provider_latency=6.5931549072265625,
                 output_message={
@@ -2449,7 +2454,7 @@ class AsyncPromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -2489,7 +2494,7 @@ class AsyncPromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2732,7 +2737,7 @@ class AsyncPromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -2772,7 +2777,7 @@ class AsyncPromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -3071,7 +3076,7 @@ class AsyncPromptsClient:
             The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -3080,7 +3085,12 @@ class AsyncPromptsClient:
             The provider model endpoint used.
 
         template : typing.Optional[PromptRequestTemplateParams]
-            For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+            The template contains the main structure and instructions for the model, including input variables for dynamic values.
+
+            For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+            For completion models, provide a prompt template as a string.
+
+            Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
 
         provider : typing.Optional[ModelProviders]
             The company providing the underlying model service.

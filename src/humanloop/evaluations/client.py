@@ -146,7 +146,7 @@ class EvaluationsClient:
         your runtime.
 
         To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-        the GET /evaluations/{id} endpoint and check its status.
+        the `GET /evaluations/:id` endpoint and check its status.
 
         Parameters
         ----------
@@ -878,7 +878,7 @@ class AsyncEvaluationsClient:
         your runtime.
 
         To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-        the GET /evaluations/{id} endpoint and check its status.
+        the `GET /evaluations/:id` endpoint and check its status.
 
         Parameters
         ----------

@@ -14,7 +14,7 @@ class FileRequest(UncheckedBaseModel):
 
     path: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Path of the File, including the name. This locates the File in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    Path of the File, including the name. This locates the File in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     """
 
     if IS_PYDANTIC_V2:

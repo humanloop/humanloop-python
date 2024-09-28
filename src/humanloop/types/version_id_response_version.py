@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 import typing
-from .tool_response import ToolResponse
 from .dataset_response import DatasetResponse
 import typing
 
 if typing.TYPE_CHECKING:
     from .prompt_response import PromptResponse
+    from .tool_response import ToolResponse
     from .evaluator_response import EvaluatorResponse
     from .flow_response import FlowResponse
 VersionIdResponseVersion = typing.Union[
-    "PromptResponse", ToolResponse, DatasetResponse, "EvaluatorResponse", "FlowResponse"
+    "PromptResponse", "ToolResponse", DatasetResponse, "EvaluatorResponse", "FlowResponse"
 ]

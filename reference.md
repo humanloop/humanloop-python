@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-19 00:29:35.178000+00:00",
+        "2024-07-18 23:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -108,7 +108,7 @@ client.prompts.log(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -314,7 +314,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -751,7 +751,7 @@ for chunk in response:
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -853,7 +853,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -1017,7 +1017,7 @@ client.prompts.call(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -1119,7 +1119,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -1400,7 +1400,7 @@ client.prompts.upsert(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -1424,7 +1424,14 @@ client.prompts.upsert(
 <dl>
 <dd>
 
-**template:** `typing.Optional[PromptRequestTemplateParams]` — For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+**template:** `typing.Optional[PromptRequestTemplateParams]` 
+
+The template contains the main structure and instructions for the model, including input variables for dynamic values. 
+
+For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+For completion models, provide a prompt template as a string. 
+
+Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
     
 </dd>
 </dl>
@@ -2407,7 +2414,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -2535,7 +2542,7 @@ client.tools.log(
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -2945,7 +2952,7 @@ client.tools.upsert(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -4012,7 +4019,7 @@ client.datasets.upsert(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -5149,7 +5156,7 @@ client.evaluators.upsert(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6019,7 +6026,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6147,7 +6154,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -6633,7 +6640,7 @@ client.flows.upsert(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6744,7 +6751,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6872,7 +6879,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -7793,7 +7800,7 @@ can set `orchestrated=false` and then generate and submit the required logs usin
 your runtime.
 
 To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-the GET /evaluations/{id} endpoint and check its status.
+the `GET /evaluations/:id` endpoint and check its status.
 </dd>
 </dl>
 </dd>

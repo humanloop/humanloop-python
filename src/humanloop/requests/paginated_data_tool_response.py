@@ -2,11 +2,11 @@
 
 import typing_extensions
 import typing
-from ..types.tool_response import ToolResponse
+from .tool_response import ToolResponseParams
 
 
 class PaginatedDataToolResponseParams(typing_extensions.TypedDict):
-    records: typing.Sequence[ToolResponse]
+    records: typing.Sequence[ToolResponseParams]
     page: int
     size: int
     total: int
