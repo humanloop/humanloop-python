@@ -39,6 +39,7 @@ from .types import FlowKernelRequest as FlowKernel
 from .types import BooleanEvaluatorStatsResponse as BooleanStats
 from .types import NumericEvaluatorStatsResponse as NumericStats
 from .types import UpdateDatesetAction as UpdateDatasetAction  # TODO: fix original type typo
+from .types import DatapointResponse as Datapoint
 from .types import (
     EvaluationStats,
     VersionStatsResponse,
@@ -69,12 +70,28 @@ class Identifiers(TypedDict, total=False):
     """The path of the File on Humanloop."""
 
 
-class File(Identifiers):
+class File(Identifiers, total=False):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
     type: NotRequired[Literal["flow", "prompt", "tool", "evaluator"]]
     """The type of File this pipeline relates to on Humanloop."""
     version: NotRequired[Version]
     """The contents uniquely define the version of the File on Humanloop"""
+    function: Callable
+    """The function being evaluated.
+    It will be called using your Dataset `inputs` as follows: `output = pipeline(**datapoint.inputs)`.
+    If `messages` are defined in your Dataset, then `output = pipeline(**datapoint.inputs, messages=datapoint.messages)`.
+    It should return a single string output. If not, you must provide a `custom_logger`.
+    """
+    custom_logger: NotRequired[Callable]
+    """function that logs the output of your pipeline to Humanloop
+    If provided, it will be called as follows:
+        ```
+        output = pipeline(**datapoint.inputs).
+        log = custom_logger(client, output)
+        ```
+        Inside the custom_logger, you can use the Humanloop `client` to log the output of your pipeline.
+        If not provided your pipline must return a single string.
+    """
 
 
 class RunDataset(Identifiers):
@@ -91,7 +108,7 @@ class RunEvaluator(Identifiers):
     """The type of arguments the Evaluator expects - only required for local Evaluators."""
     return_type: NotRequired[EvaluatorReturnTypeEnum]
     """The type of return value the Evaluator produces - only required for local Evaluators."""
-    callable: NotRequired[Callable]
+    function: NotRequired[Callable]
     """The function to run on the logs to produce the judgment - only required for local Evaluators."""
     custom_logger: NotRequired[Callable]
     """optional function that logs the output judgment from your Evaluator to Humanloop, if provided, it will be called as follows:
@@ -128,10 +145,8 @@ def _run_eval(
     client: BaseHumanloop,
     file: File,
     name: str | None,
-    pipeline: Callable,
     dataset: RunDataset,
     evaluators: Sequence[RunEvaluator] | None = None,
-    custom_logger: Callable | None = None,
     # logs: typing.Sequence[dict] | None = None,
     workers: int = 5,
 ) -> list[EvaluatorCheck]:
@@ -139,21 +154,10 @@ def _run_eval(
     Evaluate your `pipeline` for a given `Dataset` and set of `Evaluators`
 
     :param client: the Humanloop API client.
-    :param file: the corresponding Humanloop file where the Evaluation is created and data populated.
-    :param pipeline: The function being evaluated.
-        It will be called using your Dataset `inputs` as follows: `output = pipeline(**datapoint.inputs)`.
-        If `messages` are defined in your Dataset, then `output = pipeline(**datapoint.inputs, messages=datapoint.messages)`.
-        It should return a single string output. If not, you must provide a `custom_logger`.
+    :param file: the Humanloop file being evaluated.
     :param name: the name of the Evaluation to run. If it does not exist, a new Evaluation will be created under your File.
     :param dataset: the dataset to map your pipeline over to produce the outputs required by the Evaluation.
     :param evaluators: define how judgments are provided for this Evaluation.
-    :param custom_logger: optional function that logs the output of your pipeline to Humanloop, if provided, it will be called as follows:
-        ```
-        output = pipeline(**datapoint.inputs).
-        log = custom_logger(client, output)
-        ```
-        Inside the custom_logger, you can use the Humanloop `client` to log the output of your pipeline.
-        If not provided your pipline must return a single string.
     :param workers: the number of threads to process datapoints using your pipeline concurrently.
     :return: per Evaluator checks.
     """
@@ -161,12 +165,16 @@ def _run_eval(
     # Get or create the file on Humanloop
     version = file.pop("version", {})
     try:
+        function_ = file.pop("function")
+    except KeyError as _:
+        raise ValueError("You must provide a function to run your Evaluation.")
+    try:
         type_ = file.pop("type")
     except KeyError as _:
         # Default to flows if not type specified
         type_ = "flow"
         logger.warning("No type specified, defaulting to 'flow'.")
-
+    custom_logger = file.pop("custom_logger", None)
     file_dict = {**file, **version}
     match type_:
         case "flow":
@@ -178,9 +186,9 @@ def _run_eval(
                 file_dict = {**file, **version}
             file = client.flows.upsert(**file_dict)
         case "prompt":
-            file = client.flows.upsert(**file_dict)
+            file = client.prompts.upsert(**file_dict)
         case "tool":
-            file = client.flows.upsert(**file_dict)
+            file = client.tools.upsert(**file_dict)
         case "evaluator":
             file = client.evaluators.upsert(**file_dict)
         case _:
@@ -195,33 +203,34 @@ def _run_eval(
     if evaluators:
         for evaluator in evaluators:
             # If a callable is provided for an Evaluator, we treat it as External
-            eval_callable = evaluator.get("callable")
-            if eval_callable is not None:
+            eval_function = evaluator.get("function")
+            if eval_function is not None:
                 local_evaluators.append(evaluator)
                 spec = ExternalEvaluator(
                     arguments_type=evaluator["args_type"],
                     return_type=evaluator["return_type"],
-                    attributes={"code": inspect.getsource(eval_callable)},
+                    attributes={"code": inspect.getsource(eval_function)},
                     evaluator_type="external"
                 )
                 _ = client.evaluators.upsert(
-                    id=evaluator["id"],
-                    path=evaluator["path"],
+                    id=evaluator.get("id"),
+                    path=evaluator.get("path"),
                     spec=spec
                 )
+
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
     for local_evaluator in local_evaluators:
-        if local_evaluators["args_type"] == "target_required":
+        if local_evaluator["args_type"] == "target_required":
             requires_target = True
             break
     if requires_target:
         missing_target = 0
-        for datapoint in dataset.datapoints:
+        for datapoint in hl_dataset.datapoints:
             if not datapoint.target:
-                missing_target +=1
+                missing_target += 1
         if missing_target > 0:
-            raise ValueError(f"Datapoint {datapoint.id} has no target is required for this Evaluator: {local_evaluator['path']}")
+            raise ValueError(f"{missing_target} Datapoints have no target. A target is required for the Evaluator: {local_evaluator['path']}")
 
     # TODO: Should we try a single call to pipeline and local evaluators to check if there are issues before trying to process full dataset?
 
@@ -240,6 +249,8 @@ def _run_eval(
             evals = client.evaluations.list(file_id=file.id, size=50)
             for page in evals.iter_pages():
                 evaluation = next((e for e in page.items if e.name == name), None)
+        else:
+            raise error_
         if not evaluation:
             raise ValueError(f"Evaluation with name {name} not found.")
 
@@ -255,18 +266,18 @@ def _run_eval(
     )
 
     # Define the function to execute your pipeline in parallel and Log to Humanloop
-    def process_datapoint(datapoint):
+    def process_datapoint(datapoint: Datapoint):
         start_time = datetime.now()
         try:
             if datapoint.messages:
-                output = pipeline(**datapoint.inputs, messages=datapoint.messages)
+                output = function_(**datapoint.inputs, messages=datapoint.messages)
             else:
-                output = pipeline(**datapoint.inputs)
+                output = function_(**datapoint.inputs)
             if custom_logger:
-                log = custom_logger(client=client, output=output)
+                log = function_(client=client, output=output)
             else:
                 if not isinstance(output, str):
-                    raise ValueError("Your pipeline must return a string if you do not provide a custom logger.")
+                    raise ValueError("Your File function must return a string if you do not provide a custom logger.")
                 log = log_func(
                     inputs=datapoint.inputs,
                     output=output,
@@ -282,17 +293,17 @@ def _run_eval(
                 start_time=start_time,
                 end_time=datetime.now(),
             )
-            logger.warning(msg=f"Pipeline failed for Datapoint: {datapoint.id}. \n Error: {e.args[0]}")
+            logger.warning(msg=f"\nFile function failed for Datapoint: {datapoint.id}. \n Error: {str(e)}")
 
         # Apply local Evaluators
         for local_evaluator in local_evaluators:
             try:
                 start_time = datetime.now()
-                callable_ = local_evaluator["callable"]
+                eval_function = local_evaluator["function"]
                 if local_evaluator["args_type"] == "target_required":
-                    judgment = callable_(log.dict(), datapoint.target)
+                    judgment = eval_function(log.dict(), datapoint.target)
                 else:
-                    judgment = callable_(log.dict())
+                    judgment = eval_function(log.dict())
 
                 if local_evaluator.get("custom_logger", None):
                     local_evaluator["custom_logger"](client=client, judgment=judgment)
@@ -315,12 +326,13 @@ def _run_eval(
                     start_time=start_time,
                     end_time=datetime.now(),
                 )
-                logger.warning(f"Evaluator {local_evaluator['path']} failed with error {e.args[0]}")
+                logger.warning(f"\nEvaluator {local_evaluator['path']} failed with error {str(e)}")
 
     # Execute the pipeline and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
     print(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
-    print(f"{CYAN}\nVersion:{RESET}\n {json.dumps(version, indent=4)}")
+    print(f"{CYAN}Version Id: {file.version_id}{RESET}")
+    print(f"{CYAN}Run Id: {batch_id}{RESET}")
     print(f"{CYAN}\nRunning your pipeline over the Dataset...{RESET}")
 
     completed_tasks = 0
