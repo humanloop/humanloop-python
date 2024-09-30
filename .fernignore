@@ -1,2 +1,5 @@
 # Specify files that shouldn't be modified by Fern
 
+src/humanloop/eval_utils.py
+src/humanloop/client.py
+
