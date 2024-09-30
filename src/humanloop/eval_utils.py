@@ -13,7 +13,7 @@ import inspect
 import json
 from logging import Logger, INFO
 from pydantic import BaseModel, ValidationError
-from typing import Any, Callable, Sequence, Literal
+from typing import Callable, Sequence, Literal
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
