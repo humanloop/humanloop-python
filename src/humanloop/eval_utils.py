@@ -1,8 +1,8 @@
 """
 Evaluation utils for the Humanloop SDK.
 
-This module provides a set of utilities to aid running Eval workflows in Humanloop
-where you are managing the runtime of your task of evaluators in your code.
+This module provides a set of utilities to aid running Eval workflows on Humanloop
+where you are managing the runtime of your application in your code.
 
 Functions in this module should be accessed via the Humanloop client. They should
 not be called directly.
@@ -72,7 +72,7 @@ class Identifiers(TypedDict, total=False):
 class File(Identifiers):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
     type: NotRequired[Literal["flow", "prompt", "tool", "evaluator"]]
-    """The type of File this task relates to on Humanloop."""
+    """The type of File this pipeline relates to on Humanloop."""
     version: NotRequired[Version]
     """The contents uniquely define the version of the File on Humanloop"""
 
@@ -184,7 +184,7 @@ def _run_eval(
         case "evaluator":
             file = client.evaluators.upsert(**file_dict)
         case _:
-            raise NotImplementedError(f"Unsupported task type: {type_}")
+            raise NotImplementedError(f"Unsupported File type: {type_}")
 
     # Upsert the Dataset
     hl_dataset = client.datasets.upsert(**dataset)
@@ -321,7 +321,7 @@ def _run_eval(
     total_datapoints = len(hl_dataset.datapoints)
     print(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
     print(f"{CYAN}\nVersion:{RESET}\n {json.dumps(version, indent=4)}")
-    print(f"{CYAN}\nRunning your task on Datapoints...{RESET}")
+    print(f"{CYAN}\nRunning your pipeline over the Dataset...{RESET}")
 
     completed_tasks = 0
     with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -403,7 +403,7 @@ def _get_log_func(
         case "tool":
             return partial(client.tools.log, **log_request)
         case _:
-            raise NotImplementedError(f"Unsupported task version type: {type_}")
+            raise NotImplementedError(f"Unsupported File version: {type_}")
 
 
 def get_score_from_evaluator_stat(stat: NumericStats | BooleanStats) -> float | None:
