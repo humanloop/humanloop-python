@@ -48,9 +48,16 @@ from .types import (
     EvaluationResponse
 )
 
-# logger = Logger(name=__name__, level=INFO)
+# Setup logging
 logger = logging.getLogger(__name__)
 logger.setLevel(level=INFO)
+console_handler = logging.StreamHandler()
+logger.setLevel(INFO)
+formatter = logging.Formatter('%(message)s')
+console_handler.setFormatter(formatter)
+if not logger.hasHandlers():
+    logger.addHandler(console_handler)
+
 EvaluatorDict = CodeEvaluatorDict | LLMEvaluatorDict | HumanEvaluatorDict | ExternalEvaluator
 Version = FlowDict | PromptDict | ToolDict | EvaluatorDict
 FileType = Literal["flow", "prompt", "tool", "evaluator"]
@@ -80,25 +87,25 @@ class File(Identifiers, total=False):
     """The contents uniquely define the version of the File on Humanloop"""
     function: Callable
     """The function being evaluated.
-    It will be called using your Dataset `inputs` as follows: `output = pipeline(**datapoint.inputs)`.
-    If `messages` are defined in your Dataset, then `output = pipeline(**datapoint.inputs, messages=datapoint.messages)`.
+    It will be called using your Dataset `inputs` as follows: `output = function(**datapoint.inputs)`.
+    If `messages` are defined in your Dataset, then `output = function(**datapoint.inputs, messages=datapoint.messages)`.
     It should return a single string output. If not, you must provide a `custom_logger`.
     """
     custom_logger: NotRequired[Callable]
-    """function that logs the output of your pipeline to Humanloop, replacing the default logging.
+    """function that logs the output of your function to Humanloop, replacing the default logging.
     If provided, it will be called as follows:
         ```
-        output = pipeline(**datapoint.inputs).
+        output = function(**datapoint.inputs).
         log = custom_logger(client, output)
         ```
-        Inside the custom_logger, you can use the Humanloop `client` to log the output of your pipeline.
+        Inside the custom_logger, you can use the Humanloop `client` to log the output of your function.
         If not provided your pipline must return a single string.
     """
 
 
 class RunDataset(Identifiers):
     datapoints: Sequence[DatapointDict]
-    """The datapoints to map your pipeline over to produce the outputs required by the evaluation."""
+    """The datapoints to map your function over to produce the outputs required by the evaluation."""
     action: NotRequired[UpdateDatasetAction]
     """How to update the Dataset given the provided Datapoints; 
     `set` replaces the existing Datapoints and `add` appends to the existing Datapoints."""
@@ -115,7 +122,7 @@ class RunEvaluator(Identifiers):
     custom_logger: NotRequired[Callable]
     """optional function that logs the output judgment from your Evaluator to Humanloop, if provided, it will be called as follows:
     ```
-    judgment = callable(log_dict)
+    judgment = function(log_dict)
     log = custom_logger(client, judgmemt)
     ```
     Inside the custom_logger, you can use the Humanloop `client` to log the judgment to Humanloop.
@@ -132,9 +139,9 @@ class EvaluatorCheck(BaseModel):
     improvement_check: bool
     """Whether the latest version of your function has improved across the Dataset for a specific Evaluator."""
     score: float
-    """The score of the latest version of your pipeline for a specific Evaluator."""
+    """The score of the latest version of your function for a specific Evaluator."""
     delta: float
-    """The change in score since the previous version of your pipeline for a specific Evaluator."""
+    """The change in score since the previous version of your function for a specific Evaluator."""
     threshold: float | None
     """The threshold to check the Evaluator against."""
     threshold_check: bool | None
@@ -158,9 +165,9 @@ def _run_eval(
     :param client: the Humanloop API client.
     :param file: the Humanloop file being evaluated, including a function to run over the dataset.
     :param name: the name of the Evaluation to run. If it does not exist, a new Evaluation will be created under your File.
-    :param dataset: the dataset to map your pipeline over to produce the outputs required by the Evaluation.
+    :param dataset: the dataset to map your function over to produce the outputs required by the Evaluation.
     :param evaluators: define how judgments are provided for this Evaluation.
-    :param workers: the number of threads to process datapoints using your pipeline concurrently.
+    :param workers: the number of threads to process datapoints using your function concurrently.
     :return: per Evaluator checks.
     """
 
@@ -265,7 +272,7 @@ def _run_eval(
         batch_id=batch_id
     )
 
-    # Define the function to execute your pipeline in parallel and Log to Humanloop
+    # Define the function to execute your function in parallel and Log to Humanloop
     def process_datapoint(datapoint: Datapoint):
         start_time = datetime.now()
         try:
@@ -328,12 +335,12 @@ def _run_eval(
                 )
                 logger.warning(f"\nEvaluator {local_evaluator['path']} failed with error {str(e)}")
 
-    # Execute the pipeline and send the logs to Humanloop in parallel
+    # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
     logger.info(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
     logger.info(f"{CYAN}Version Id: {file.version_id}{RESET}")
     logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
-    logger.info(f"{CYAN}\nRunning your pipeline over the Dataset...{RESET}")
+    logger.info(f"{CYAN}\nRunning function for File {file.name} over the Dataset {hl_dataset.name}{RESET}")
 
     completed_tasks = 0
     with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -350,8 +357,7 @@ def _run_eval(
     stats = None
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
-        logger.info(stats.progress)
-        sys.stdout.flush()
+        logger.info(f"\r{stats.progress}")
         complete = stats.status == "completed"
         if not complete:
             time.sleep(5)
@@ -461,10 +467,10 @@ def _progress_bar(total: int, progress: int):
         progress_display += " | DONE"
         _progress_bar.start_time = None
 
-    logger.info(progress_display)
+    sys.stderr.write(progress_display)
 
     if progress >= total:
-        logger.info("\n")
+        sys.stderr.write("\n")
 
 
 def get_evaluator_stats_by_path(
