@@ -7,10 +7,10 @@ where you are managing the runtime of your application in your code.
 Functions in this module should be accessed via the Humanloop client. They should
 not be called directly.
 """
+import logging
 from datetime import datetime
 from functools import partial
 import inspect
-import json
 from logging import Logger, INFO
 from pydantic import BaseModel, ValidationError
 from typing import Callable, Sequence, Literal
@@ -48,10 +48,12 @@ from .types import (
     EvaluationResponse
 )
 
-# TODO: use logger instead of printing?
-logger = Logger(name=__name__, level=INFO)
+# logger = Logger(name=__name__, level=INFO)
+logger = logging.getLogger(__name__)
+logger.setLevel(level=INFO)
 EvaluatorDict = CodeEvaluatorDict | LLMEvaluatorDict | HumanEvaluatorDict | ExternalEvaluator
 Version = FlowDict | PromptDict | ToolDict | EvaluatorDict
+FileType = Literal["flow", "prompt", "tool", "evaluator"]
 
 
 # ANSI escape codes for colors
@@ -62,7 +64,7 @@ RED = "\033[91m"
 RESET = "\033[0m"
 
 
-class Identifiers(TypedDict, total=False):
+class Identifiers(TypedDict):
     """Common identifiers for the objects required to run an Evaluation."""
     id: NotRequired[str]
     """The ID of the File on Humanloop."""
@@ -72,8 +74,8 @@ class Identifiers(TypedDict, total=False):
 
 class File(Identifiers, total=False):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
-    type: NotRequired[Literal["flow", "prompt", "tool", "evaluator"]]
-    """The type of File this pipeline relates to on Humanloop."""
+    type: NotRequired[FileType]
+    """The type of File this function relates to on Humanloop."""
     version: NotRequired[Version]
     """The contents uniquely define the version of the File on Humanloop"""
     function: Callable
@@ -83,7 +85,7 @@ class File(Identifiers, total=False):
     It should return a single string output. If not, you must provide a `custom_logger`.
     """
     custom_logger: NotRequired[Callable]
-    """function that logs the output of your pipeline to Humanloop
+    """function that logs the output of your pipeline to Humanloop, replacing the default logging.
     If provided, it will be called as follows:
         ```
         output = pipeline(**datapoint.inputs).
@@ -103,7 +105,7 @@ class RunDataset(Identifiers):
 
 
 class RunEvaluator(Identifiers):
-    """A to provide judgments for this Evaluation."""
+    """The Evaluator to provide judgments for this Evaluation."""
     args_type: NotRequired[EvaluatorArgumentsType]
     """The type of arguments the Evaluator expects - only required for local Evaluators."""
     return_type: NotRequired[EvaluatorReturnTypeEnum]
@@ -117,10 +119,10 @@ class RunEvaluator(Identifiers):
     log = custom_logger(client, judgmemt)
     ```
     Inside the custom_logger, you can use the Humanloop `client` to log the judgment to Humanloop.
-    If not provided your pipline must return a single string.
+    If not provided your function must return a single string and by default the code will be used to inform the version of the external Evaluator on Humanloop.
     """
     threshold: NotRequired[float]
-    """The threshold to check the Evaluator against."""
+    """The threshold to check the Evaluator against. If the aggregate value of the Evaluator is below this threshold, the check will fail."""
 
 
 class EvaluatorCheck(BaseModel):
@@ -128,7 +130,7 @@ class EvaluatorCheck(BaseModel):
     path: str
     """The path of the Evaluator used in the check."""
     improvement_check: bool
-    """Whether the latest version of your pipeline has improved across for a specific Evaluator."""
+    """Whether the latest version of your function has improved across the Dataset for a specific Evaluator."""
     score: float
     """The score of the latest version of your pipeline for a specific Evaluator."""
     delta: float
@@ -151,10 +153,10 @@ def _run_eval(
     workers: int = 5,
 ) -> list[EvaluatorCheck]:
     """
-    Evaluate your `pipeline` for a given `Dataset` and set of `Evaluators`
+    Evaluate your function for a given `Dataset` and set of `Evaluators`
 
     :param client: the Humanloop API client.
-    :param file: the Humanloop file being evaluated.
+    :param file: the Humanloop file being evaluated, including a function to run over the dataset.
     :param name: the name of the Evaluation to run. If it does not exist, a new Evaluation will be created under your File.
     :param dataset: the dataset to map your pipeline over to produce the outputs required by the Evaluation.
     :param evaluators: define how judgments are provided for this Evaluation.
@@ -231,8 +233,6 @@ def _run_eval(
                 missing_target += 1
         if missing_target > 0:
             raise ValueError(f"{missing_target} Datapoints have no target. A target is required for the Evaluator: {local_evaluator['path']}")
-
-    # TODO: Should we try a single call to pipeline and local evaluators to check if there are issues before trying to process full dataset?
 
     # Get or create the Evaluation based on the name
     evaluation = None
@@ -330,10 +330,10 @@ def _run_eval(
 
     # Execute the pipeline and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
-    print(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
-    print(f"{CYAN}Version Id: {file.version_id}{RESET}")
-    print(f"{CYAN}Run Id: {batch_id}{RESET}")
-    print(f"{CYAN}\nRunning your pipeline over the Dataset...{RESET}")
+    logger.info(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
+    logger.info(f"{CYAN}Version Id: {file.version_id}{RESET}")
+    logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
+    logger.info(f"{CYAN}\nRunning your pipeline over the Dataset...{RESET}")
 
     completed_tasks = 0
     with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -350,14 +350,14 @@ def _run_eval(
     stats = None
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
-        sys.stdout.write(stats.progress)
+        logger.info(stats.progress)
         sys.stdout.flush()
         complete = stats.status == "completed"
         if not complete:
             time.sleep(5)
 
     # Print Evaluation results
-    print(stats.report)
+    logger.info(stats.report)
 
     checks: list[EvaluatorCheck] = []
     for evaluator in evaluators:
@@ -365,6 +365,7 @@ def _run_eval(
             evaluation=evaluation,
             stats=stats,
             evaluator_path=evaluator["path"],
+            batch_id=batch_id,
         )
         threshold_check = None
         threshold = evaluator.get("threshold")
@@ -374,6 +375,7 @@ def _run_eval(
                 stats=stats,
                 evaluator_path=evaluator["path"],
                 threshold=threshold,
+                batch_id=batch_id,
             )
         checks.append(
             EvaluatorCheck(
@@ -389,12 +391,12 @@ def _run_eval(
 
 
 def _get_log_func(
-        client: BaseHumanloop,
-        type_: Literal["flow", "prompt", "tool", "evaluator"],
-        file_id: str,
-        version_id: str,
-        evaluation_id: str,
-        batch_id: str,
+    client: BaseHumanloop,
+    type_: FileType,
+    file_id: str,
+    version_id: str,
+    evaluation_id: str,
+    batch_id: str,
 ) -> Callable:
     """Returns the appropriate log function pre-filled with common parameters."""
     log_request = {
@@ -459,11 +461,10 @@ def _progress_bar(total: int, progress: int):
         progress_display += " | DONE"
         _progress_bar.start_time = None
 
-    sys.stdout.write(progress_display)
-    sys.stdout.flush()
+    logger.info(progress_display)
 
     if progress >= total:
-        sys.stdout.write("\n")
+        logger.info("\n")
 
 
 def get_evaluator_stats_by_path(
@@ -486,23 +487,24 @@ def check_evaluation_threshold(
     stats: EvaluationStats,
     evaluator_path: str,
     threshold: float,
+    batch_id: str,
 ) -> bool:
     """Checks if the latest version has an average Evaluator result above a threshold."""
     # TODO: Update the API so this is not necessary
     evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=stats.version_stats[-1],
+        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None),
         evaluation=evaluation
     )
     if evaluator_path in evaluator_stats_by_path:
         evaluator_stat = evaluator_stats_by_path[evaluator_path]
         score = get_score_from_evaluator_stat(stat=evaluator_stat)
         if score >= threshold:
-            print(
+            logger.info(
                 f"{GREEN}✅ Latest eval [{score}] above threshold [{threshold}] for evaluator {evaluator_path}.{RESET}"
             )
             return True
         else:
-            print(
+            logger.info(
                 f"{RED}❌ Latest score [{score}] below the threshold [{threshold}] for evaluator {evaluator_path}.{RESET}"
             )
             return False
@@ -513,7 +515,8 @@ def check_evaluation_threshold(
 def check_evaluation_improvement(
     evaluation: EvaluationResponse,
     evaluator_path: str,
-    stats: EvaluationStats
+    stats: EvaluationStats,
+    batch_id: str,
 ) -> tuple[bool, float, float]:
     """
     Check the latest version has improved across for a specific Evaluator.
@@ -521,12 +524,13 @@ def check_evaluation_improvement(
     :returns: A tuple of (improvement, latest_score, delta since previous score)
     """
     # TODO: Update the API so this is not necessary
+
     latest_evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=stats.version_stats[-1],
+        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None),
         evaluation=evaluation
     )
     if len(stats.version_stats) == 1:
-        print(
+        logger.info(
             f"{YELLOW}⚠️ No previous versions to compare with.{RESET}"
         )
         return True, 0, 0
@@ -542,12 +546,12 @@ def check_evaluation_improvement(
         previous_score = get_score_from_evaluator_stat(stat=previous_evaluator_stat)
         diff = round(latest_score - previous_score, 2)
         if diff >= 0:
-            print(
+            logger.info(
                 f"{GREEN}✅ Improvement of [{diff}] for evaluator {evaluator_path}{RESET}"
             )
             return True, latest_score, diff
         else:
-            print(
+            logger.info(
                 f"{RED}❌ Regression of [{diff}] for evaluator {evaluator_path}{RESET}"
             )
             return False, latest_score, diff
