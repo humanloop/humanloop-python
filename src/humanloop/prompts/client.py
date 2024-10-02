@@ -37,13 +37,13 @@ from ..requests.response_format import ResponseFormatParams
 from ..requests.tool_function import ToolFunctionParams
 from ..types.version_status import VersionStatus
 from ..types.list_prompts import ListPrompts
+from ..types.file_environment_response import FileEnvironmentResponse
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
     EvaluatorActivationDeactivationRequestActivateItemParams,
 )
 from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
-from ..types.file_environment_response import FileEnvironmentResponse
 from ..core.client_wrapper import AsyncClientWrapper
 from ..core.pagination import AsyncPager
 
@@ -115,7 +115,7 @@ class PromptsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -194,7 +194,7 @@ class PromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -262,7 +262,7 @@ class PromptsClient:
                 "path": path,
                 "id": id,
                 "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
                 ),
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
@@ -270,12 +270,14 @@ class PromptsClient:
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams, direction="write"
                 ),
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
                 "start_time": start_time,
                 "end_time": end_time,
                 "output": output,
@@ -322,7 +324,7 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def update_log(
         self,
         id: str,
         log_id: str,
@@ -441,7 +443,7 @@ class PromptsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.prompts.update(
+        client.prompts.update_log(
             id="id",
             log_id="log_id",
         )
@@ -451,7 +453,7 @@ class PromptsClient:
             method="PATCH",
             json={
                 "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
                 ),
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
@@ -459,10 +461,10 @@ class PromptsClient:
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams, direction="write"
                 ),
                 "output": output,
                 "created_at": created_at,
@@ -595,7 +597,7 @@ class PromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -720,12 +722,14 @@ class PromptsClient:
                 "path": path,
                 "id": id,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams, direction="write"
                 ),
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
@@ -738,7 +742,7 @@ class PromptsClient:
                 "environment": prompts_call_stream_request_environment,
                 "save": save,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
-                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
                 "num_samples": num_samples,
                 "return_inputs": return_inputs,
@@ -871,7 +875,7 @@ class PromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -954,12 +958,14 @@ class PromptsClient:
                 "path": path,
                 "id": id,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams, direction="write"
                 ),
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
@@ -972,7 +978,7 @@ class PromptsClient:
                 "environment": prompts_call_request_environment,
                 "save": save,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
-                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
                 "num_samples": num_samples,
                 "return_inputs": return_inputs,
@@ -1151,10 +1157,10 @@ class PromptsClient:
         Parameters
         ----------
         model : str
-            The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+            The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -1163,7 +1169,12 @@ class PromptsClient:
             The provider model endpoint used.
 
         template : typing.Optional[PromptRequestTemplateParams]
-            For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+            The template contains the main structure and instructions for the model, including input variables for dynamic values.
+
+            For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+            For completion models, provide a prompt template as a string.
+
+            Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
 
         provider : typing.Optional[ModelProviders]
             The company providing the underlying model service.
@@ -1253,22 +1264,24 @@ class PromptsClient:
                 "model": model,
                 "endpoint": endpoint,
                 "template": convert_and_respect_annotation_metadata(
-                    object_=template, annotation=PromptRequestTemplateParams
+                    object_=template, annotation=PromptRequestTemplateParams, direction="write"
                 ),
                 "provider": provider,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
                 "top_p": top_p,
-                "stop": convert_and_respect_annotation_metadata(object_=stop, annotation=PromptRequestStopParams),
+                "stop": convert_and_respect_annotation_metadata(
+                    object_=stop, annotation=PromptRequestStopParams, direction="write"
+                ),
                 "presence_penalty": presence_penalty,
                 "frequency_penalty": frequency_penalty,
                 "other": other,
                 "seed": seed,
                 "response_format": convert_and_respect_annotation_metadata(
-                    object_=response_format, annotation=ResponseFormatParams
+                    object_=response_format, annotation=ResponseFormatParams, direction="write"
                 ),
                 "tools": convert_and_respect_annotation_metadata(
-                    object_=tools, annotation=typing.Sequence[ToolFunctionParams]
+                    object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
                 ),
                 "linked_tools": linked_tools,
                 "attributes": attributes,
@@ -1652,90 +1665,6 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_monitoring(
-        self,
-        id: str,
-        *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
-        """
-        Activate and deactivate Evaluators for monitoring the Prompt.
-
-        An activated Evaluator will automatically be run on all new Logs
-        within the Prompt for monitoring purposes.
-
-        Parameters
-        ----------
-        id : str
-
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
-            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
-            Evaluators to deactivate. These will not be run on new Logs.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PromptResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.update_monitoring(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptResponse,
-                    construct_type(
-                        type_=PromptResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> PromptResponse:
@@ -1927,6 +1856,92 @@ class PromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PromptResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Prompt.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Prompt for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.prompts.update_monitoring(
+            id="pr_30gco7dx6JDq4200GVOHa",
+            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncPromptsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1992,7 +2007,7 @@ class AsyncPromptsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -2071,7 +2086,7 @@ class AsyncPromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2148,7 +2163,7 @@ class AsyncPromptsClient:
                 "path": path,
                 "id": id,
                 "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
                 ),
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
@@ -2156,12 +2171,14 @@ class AsyncPromptsClient:
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams, direction="write"
                 ),
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
                 "start_time": start_time,
                 "end_time": end_time,
                 "output": output,
@@ -2208,7 +2225,7 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def update_log(
         self,
         id: str,
         log_id: str,
@@ -2332,7 +2349,7 @@ class AsyncPromptsClient:
 
 
         async def main() -> None:
-            await client.prompts.update(
+            await client.prompts.update_log(
                 id="id",
                 log_id="log_id",
             )
@@ -2345,7 +2362,7 @@ class AsyncPromptsClient:
             method="PATCH",
             json={
                 "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
                 ),
                 "prompt_tokens": prompt_tokens,
                 "output_tokens": output_tokens,
@@ -2353,10 +2370,10 @@ class AsyncPromptsClient:
                 "output_cost": output_cost,
                 "finish_reason": finish_reason,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams, direction="write"
                 ),
                 "output": output,
                 "created_at": created_at,
@@ -2489,7 +2506,7 @@ class AsyncPromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2621,12 +2638,14 @@ class AsyncPromptsClient:
                 "path": path,
                 "id": id,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams, direction="write"
                 ),
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
@@ -2639,7 +2658,7 @@ class AsyncPromptsClient:
                 "environment": prompts_call_stream_request_environment,
                 "save": save,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
-                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
                 "num_samples": num_samples,
                 "return_inputs": return_inputs,
@@ -2772,7 +2791,7 @@ class AsyncPromptsClient:
             The ID of the parent Log to nest this Log under in a Trace.
 
         batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Log to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -2863,12 +2882,14 @@ class AsyncPromptsClient:
                 "path": path,
                 "id": id,
                 "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams]
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
                 ),
                 "tool_choice": convert_and_respect_annotation_metadata(
-                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams
+                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams, direction="write"
                 ),
-                "prompt": convert_and_respect_annotation_metadata(object_=prompt, annotation=PromptKernelRequestParams),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
@@ -2881,7 +2902,7 @@ class AsyncPromptsClient:
                 "environment": prompts_call_request_environment,
                 "save": save,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
-                    object_=provider_api_keys, annotation=ProviderApiKeysParams
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
                 "num_samples": num_samples,
                 "return_inputs": return_inputs,
@@ -3068,10 +3089,10 @@ class AsyncPromptsClient:
         Parameters
         ----------
         model : str
-            The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+            The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -3080,7 +3101,12 @@ class AsyncPromptsClient:
             The provider model endpoint used.
 
         template : typing.Optional[PromptRequestTemplateParams]
-            For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+            The template contains the main structure and instructions for the model, including input variables for dynamic values.
+
+            For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+            For completion models, provide a prompt template as a string.
+
+            Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
 
         provider : typing.Optional[ModelProviders]
             The company providing the underlying model service.
@@ -3178,22 +3204,24 @@ class AsyncPromptsClient:
                 "model": model,
                 "endpoint": endpoint,
                 "template": convert_and_respect_annotation_metadata(
-                    object_=template, annotation=PromptRequestTemplateParams
+                    object_=template, annotation=PromptRequestTemplateParams, direction="write"
                 ),
                 "provider": provider,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
                 "top_p": top_p,
-                "stop": convert_and_respect_annotation_metadata(object_=stop, annotation=PromptRequestStopParams),
+                "stop": convert_and_respect_annotation_metadata(
+                    object_=stop, annotation=PromptRequestStopParams, direction="write"
+                ),
                 "presence_penalty": presence_penalty,
                 "frequency_penalty": frequency_penalty,
                 "other": other,
                 "seed": seed,
                 "response_format": convert_and_respect_annotation_metadata(
-                    object_=response_format, annotation=ResponseFormatParams
+                    object_=response_format, annotation=ResponseFormatParams, direction="write"
                 ),
                 "tools": convert_and_respect_annotation_metadata(
-                    object_=tools, annotation=typing.Sequence[ToolFunctionParams]
+                    object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
                 ),
                 "linked_tools": linked_tools,
                 "attributes": attributes,
@@ -3617,98 +3645,6 @@ class AsyncPromptsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_monitoring(
-        self,
-        id: str,
-        *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
-        """
-        Activate and deactivate Evaluators for monitoring the Prompt.
-
-        An activated Evaluator will automatically be run on all new Logs
-        within the Prompt for monitoring purposes.
-
-        Parameters
-        ----------
-        id : str
-
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
-            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
-            Evaluators to deactivate. These will not be run on new Logs.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PromptResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.update_monitoring(
-                id="pr_30gco7dx6JDq4200GVOHa",
-                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"prompts/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PromptResponse,
-                    construct_type(
-                        type_=PromptResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> PromptResponse:
@@ -3906,6 +3842,100 @@ class AsyncPromptsClient:
                     typing.List[FileEnvironmentResponse],
                     construct_type(
                         type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> PromptResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Prompt.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Prompt for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.prompts.update_monitoring(
+                id="pr_30gco7dx6JDq4200GVOHa",
+                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

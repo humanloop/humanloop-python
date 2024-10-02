@@ -2,10 +2,16 @@
 
 from __future__ import annotations
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .evaluator_response import EvaluatorResponse
+from .flow_response import FlowResponse
+from .monitoring_evaluator_response import MonitoringEvaluatorResponse
+from .prompt_response import PromptResponse
+from .tool_response import ToolResponse
+from .version_deployment_response import VersionDeploymentResponse
+from .version_id_response import VersionIdResponse
 import typing
 import datetime as dt
 import pydantic
-from .tool_response import ToolResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
 
@@ -146,6 +152,18 @@ class ToolLogResponse(UncheckedBaseModel):
 
 
 from .evaluator_log_response import EvaluatorLogResponse  # noqa: E402
+from .flow_log_response import FlowLogResponse  # noqa: E402
+from .prompt_log_response import PromptLogResponse  # noqa: E402
 from .log_response import LogResponse  # noqa: E402
 
+update_forward_refs(EvaluatorLogResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(EvaluatorResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(FlowLogResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(FlowResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(MonitoringEvaluatorResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(PromptLogResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(PromptResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(ToolResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(VersionDeploymentResponse, ToolLogResponse=ToolLogResponse)
+update_forward_refs(VersionIdResponse, ToolLogResponse=ToolLogResponse)
 update_forward_refs(ToolLogResponse)

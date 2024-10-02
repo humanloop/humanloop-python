@@ -2,13 +2,15 @@
 
 from ..core.unchecked_base_model import UncheckedBaseModel
 import typing
-import pydantic
+import typing_extensions
+from ..core.serialization import FieldMetadata
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
+import pydantic
 
 
 class ProviderApiKeys(UncheckedBaseModel):
     openai: typing.Optional[str] = None
-    ai_21: typing.Optional[str] = pydantic.Field(alias="ai21", default=None)
+    ai_21: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="ai21")] = None
     mock: typing.Optional[str] = None
     anthropic: typing.Optional[str] = None
     bedrock: typing.Optional[str] = None

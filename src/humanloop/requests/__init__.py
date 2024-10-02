@@ -106,6 +106,7 @@ from .tool_choice import ToolChoiceParams
 from .tool_function import ToolFunctionParams
 from .tool_kernel_request import ToolKernelRequestParams
 from .tool_log_response import ToolLogResponseParams
+from .tool_response import ToolResponseParams
 from .validation_error import ValidationErrorParams
 from .validation_error_loc_item import ValidationErrorLocItemParams
 from .version_deployment_response import VersionDeploymentResponseParams
@@ -215,6 +216,7 @@ __all__ = [
     "ToolFunctionParams",
     "ToolKernelRequestParams",
     "ToolLogResponseParams",
+    "ToolResponseParams",
     "ValidationErrorLocItemParams",
     "ValidationErrorParams",
     "VersionDeploymentResponseFileParams",

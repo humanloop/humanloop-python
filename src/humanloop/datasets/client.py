@@ -186,7 +186,7 @@ class DatasetsClient:
             Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
 
         path : typing.Optional[str]
-            Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Dataset.
@@ -248,7 +248,7 @@ class DatasetsClient:
                 "path": path,
                 "id": id,
                 "datapoints": convert_and_respect_annotation_metadata(
-                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
+                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams], direction="write"
                 ),
                 "action": action,
                 "attributes": attributes,
@@ -1191,7 +1191,7 @@ class AsyncDatasetsClient:
             Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
 
         path : typing.Optional[str]
-            Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Dataset.
@@ -1261,7 +1261,7 @@ class AsyncDatasetsClient:
                 "path": path,
                 "id": id,
                 "datapoints": convert_and_respect_annotation_metadata(
-                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
+                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams], direction="write"
                 ),
                 "action": action,
                 "attributes": attributes,

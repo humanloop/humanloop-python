@@ -36,6 +36,18 @@ class VersionDeploymentResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .evaluator_response import EvaluatorResponse  # noqa: E402
+from .flow_response import FlowResponse  # noqa: E402
+from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
+from .prompt_response import PromptResponse  # noqa: E402
+from .tool_response import ToolResponse  # noqa: E402
+from .version_id_response import VersionIdResponse  # noqa: E402
 from .version_deployment_response_file import VersionDeploymentResponseFile  # noqa: E402
 
+update_forward_refs(EvaluatorResponse, VersionDeploymentResponse=VersionDeploymentResponse)
+update_forward_refs(FlowResponse, VersionDeploymentResponse=VersionDeploymentResponse)
+update_forward_refs(MonitoringEvaluatorResponse, VersionDeploymentResponse=VersionDeploymentResponse)
+update_forward_refs(PromptResponse, VersionDeploymentResponse=VersionDeploymentResponse)
+update_forward_refs(ToolResponse, VersionDeploymentResponse=VersionDeploymentResponse)
+update_forward_refs(VersionIdResponse, VersionDeploymentResponse=VersionDeploymentResponse)
 update_forward_refs(VersionDeploymentResponse)

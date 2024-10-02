@@ -146,7 +146,7 @@ class EvaluationsClient:
         your runtime.
 
         To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-        the GET /evaluations/{id} endpoint and check its status.
+        the `GET /evaluations/:id` endpoint and check its status.
 
         Parameters
         ----------
@@ -193,16 +193,18 @@ class EvaluationsClient:
             method="POST",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
                 ),
                 "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
                 ),
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
                 ),
                 "name": name,
-                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
+                "file": convert_and_respect_annotation_metadata(
+                    object_=file, annotation=FileRequestParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -407,16 +409,18 @@ class EvaluationsClient:
             method="PATCH",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
                 ),
                 "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
                 ),
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
                 ),
                 "name": name,
-                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
+                "file": convert_and_respect_annotation_metadata(
+                    object_=file, annotation=FileRequestParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -878,7 +882,7 @@ class AsyncEvaluationsClient:
         your runtime.
 
         To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-        the GET /evaluations/{id} endpoint and check its status.
+        the `GET /evaluations/:id` endpoint and check its status.
 
         Parameters
         ----------
@@ -933,16 +937,18 @@ class AsyncEvaluationsClient:
             method="POST",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
                 ),
                 "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
                 ),
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
                 ),
                 "name": name,
-                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
+                "file": convert_and_respect_annotation_metadata(
+                    object_=file, annotation=FileRequestParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -1171,16 +1177,18 @@ class AsyncEvaluationsClient:
             method="PATCH",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams
+                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
                 ),
                 "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams]
+                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
                 ),
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams]
+                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
                 ),
                 "name": name,
-                "file": convert_and_respect_annotation_metadata(object_=file, annotation=FileRequestParams),
+                "file": convert_and_respect_annotation_metadata(
+                    object_=file, annotation=FileRequestParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,

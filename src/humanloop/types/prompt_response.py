@@ -46,7 +46,7 @@ class PromptResponse(UncheckedBaseModel):
 
     model: str = pydantic.Field()
     """
-    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
     """
 
     endpoint: typing.Optional[ModelEndpoints] = pydantic.Field(default=None)
@@ -56,7 +56,12 @@ class PromptResponse(UncheckedBaseModel):
 
     template: typing.Optional[PromptResponseTemplate] = pydantic.Field(default=None)
     """
-    For chat endpoint, provide a Chat template. For completion endpoint, provide a Prompt template. Input variables within the template should be specified with double curly bracket syntax: {{INPUT_NAME}}.
+    The template contains the main structure and instructions for the model, including input variables for dynamic values.
+    
+    For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+    For completion models, provide a prompt template as a string.
+    
+    Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
     """
 
     provider: typing.Optional[ModelProviders] = pydantic.Field(default=None)
@@ -193,6 +198,17 @@ class PromptResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .evaluator_response import EvaluatorResponse  # noqa: E402
+from .flow_response import FlowResponse  # noqa: E402
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
+from .tool_response import ToolResponse  # noqa: E402
+from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
+from .version_id_response import VersionIdResponse  # noqa: E402
 
+update_forward_refs(EvaluatorResponse, PromptResponse=PromptResponse)
+update_forward_refs(FlowResponse, PromptResponse=PromptResponse)
+update_forward_refs(MonitoringEvaluatorResponse, PromptResponse=PromptResponse)
+update_forward_refs(ToolResponse, PromptResponse=PromptResponse)
+update_forward_refs(VersionDeploymentResponse, PromptResponse=PromptResponse)
+update_forward_refs(VersionIdResponse, PromptResponse=PromptResponse)
 update_forward_refs(PromptResponse)

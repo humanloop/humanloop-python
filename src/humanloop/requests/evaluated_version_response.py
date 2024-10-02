@@ -2,10 +2,10 @@
 
 import typing
 from .prompt_response import PromptResponseParams
-from ..types.tool_response import ToolResponse
+from .tool_response import ToolResponseParams
 from .evaluator_response import EvaluatorResponseParams
 from .flow_response import FlowResponseParams
 
 EvaluatedVersionResponseParams = typing.Union[
-    PromptResponseParams, ToolResponse, EvaluatorResponseParams, FlowResponseParams
+    PromptResponseParams, ToolResponseParams, EvaluatorResponseParams, FlowResponseParams
 ]
