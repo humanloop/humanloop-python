@@ -13,7 +13,7 @@ from functools import partial
 import inspect
 from logging import INFO
 from pydantic import BaseModel, ValidationError
-from typing import Callable, Sequence, Literal, Union, Optional, List, Dict
+from typing import Callable, Sequence, Literal, Union, Optional, List, Dict, Tuple
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
@@ -520,7 +520,7 @@ def check_evaluation_improvement(
     evaluator_path: str,
     stats: EvaluationStats,
     batch_id: str,
-) -> tuple[bool, float, float]:
+) -> Tuple[bool, float, float]:
     """
     Check the latest version has improved across for a specific Evaluator.
 
