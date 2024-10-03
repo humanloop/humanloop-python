@@ -13,7 +13,7 @@ from functools import partial
 import inspect
 from logging import INFO
 from pydantic import BaseModel, ValidationError
-from typing import Callable, Sequence, Literal
+from typing import Callable, Sequence, Literal, Union, Optional
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
@@ -58,8 +58,8 @@ console_handler.setFormatter(formatter)
 if not logger.hasHandlers():
     logger.addHandler(console_handler)
 
-EvaluatorDict = CodeEvaluatorDict | LLMEvaluatorDict | HumanEvaluatorDict | ExternalEvaluator
-Version = FlowDict | PromptDict | ToolDict | EvaluatorDict
+EvaluatorDict = Union[CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator]
+Version = Union[FlowDict, PromptDict, ToolDict, EvaluatorDict]
 FileType = Literal["flow", "prompt", "tool", "evaluator"]
 
 
@@ -142,9 +142,9 @@ class EvaluatorCheck(BaseModel):
     """The score of the latest version of your function for a specific Evaluator."""
     delta: float
     """The change in score since the previous version of your function for a specific Evaluator."""
-    threshold: float | None
+    threshold: Optional[float]
     """The threshold to check the Evaluator against."""
-    threshold_check: bool | None
+    threshold_check: Optional[bool]
     """Whether the latest version has an average Evaluator result above a threshold."""
 
 # TODO: Explore restarting runs, but without having to regenerate logs
@@ -153,9 +153,9 @@ class EvaluatorCheck(BaseModel):
 def _run_eval(
     client: BaseHumanloop,
     file: File,
-    name: str | None,
+    name: Optional[str],
     dataset: RunDataset,
-    evaluators: Sequence[RunEvaluator] | None = None,
+    evaluators: Optional[Sequence[RunEvaluator]] = None,
     # logs: typing.Sequence[dict] | None = None,
     workers: int = 5,
 ) -> list[EvaluatorCheck]:
@@ -424,7 +424,7 @@ def _get_log_func(
         raise NotImplementedError(f"Unsupported File version: {type_}")
 
 
-def get_score_from_evaluator_stat(stat: NumericStats | BooleanStats) -> float | None:
+def get_score_from_evaluator_stat(stat: Union[NumericStats, BooleanStats]) -> Union[float, None]:
     """Get the score from an Evaluator Stat."""
     score = None
     if isinstance(stat, BooleanStats):
@@ -472,7 +472,7 @@ def _progress_bar(total: int, progress: int):
 
 def get_evaluator_stats_by_path(
     stat: VersionStatsResponse, evaluation: EvaluationResponse
-) -> dict[str, NumericStats | BooleanStats]:
+) -> dict[str, Union[NumericStats, BooleanStats]]:
     """Get the Evaluator stats by path."""
     # TODO: Update the API so this is not necessary
     evaluators_by_id = {
