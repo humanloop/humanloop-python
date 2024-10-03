@@ -18,9 +18,9 @@ class Humanloop(BaseHumanloop):
     def __init__(
         self,
         *,
-        base_url: str | None = None,
+        base_url: typing.Optional[str] = None,
         environment: HumanloopEnvironment = HumanloopEnvironment.DEFAULT,
-        api_key: str | None = os.getenv("HUMANLOOP_API_KEY"),
+        api_key: typing.Optional[str] = os.getenv("HUMANLOOP_API_KEY"),
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
         httpx_client: typing.Optional[httpx.Client] = None,

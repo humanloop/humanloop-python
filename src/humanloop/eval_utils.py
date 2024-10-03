@@ -13,7 +13,7 @@ from functools import partial
 import inspect
 from logging import INFO
 from pydantic import BaseModel, ValidationError
-from typing import Callable, Sequence, Literal, Union, Optional
+from typing import Callable, Sequence, Literal, Union, Optional, List, Dict
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
@@ -158,7 +158,7 @@ def _run_eval(
     evaluators: Optional[Sequence[RunEvaluator]] = None,
     # logs: typing.Sequence[dict] | None = None,
     workers: int = 5,
-) -> list[EvaluatorCheck]:
+) -> List[EvaluatorCheck]:
     """
     Evaluate your function for a given `Dataset` and set of `Evaluators`
 
@@ -207,7 +207,7 @@ def _run_eval(
     hl_dataset = client.datasets.get(id=hl_dataset.id, include_datapoints=True)
 
     # Upsert the local Evaluators; other Evaluators are just referenced by path
-    local_evaluators: list[RunEvaluator] = []
+    local_evaluators: List[RunEvaluator] = []
     if evaluators:
         for evaluator in evaluators:
             # If a callable is provided for an Evaluator, we treat it as External
@@ -364,7 +364,7 @@ def _run_eval(
     # Print Evaluation results
     logger.info(stats.report)
 
-    checks: list[EvaluatorCheck] = []
+    checks: List[EvaluatorCheck] = []
     for evaluator in evaluators:
         improvement_check, score, delta = check_evaluation_improvement(
             evaluation=evaluation,
@@ -472,7 +472,7 @@ def _progress_bar(total: int, progress: int):
 
 def get_evaluator_stats_by_path(
     stat: VersionStatsResponse, evaluation: EvaluationResponse
-) -> dict[str, Union[NumericStats, BooleanStats]]:
+) -> Dict[str, Union[NumericStats, BooleanStats]]:
     """Get the Evaluator stats by path."""
     # TODO: Update the API so this is not necessary
     evaluators_by_id = {
