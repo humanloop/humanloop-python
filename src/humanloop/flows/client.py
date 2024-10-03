@@ -2,22 +2,23 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+import datetime as dt
+from ..requests.flow_kernel_request import FlowKernelRequestParams
+from ..types.trace_status import TraceStatus
 from ..core.request_options import RequestOptions
-from ..types.flow_response import FlowResponse
-from ..core.jsonable_encoder import jsonable_encoder
+from ..types.create_flow_log_response import CreateFlowLogResponse
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.flow_response import FlowResponse
+from ..core.jsonable_encoder import jsonable_encoder
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
+from ..core.pagination import SyncPager
 from ..types.paginated_data_flow_response import PaginatedDataFlowResponse
-import datetime as dt
-from ..requests.flow_kernel_request import FlowKernelRequestParams
-from ..types.trace_status import TraceStatus
-from ..types.create_flow_log_response import CreateFlowLogResponse
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.flow_log_response import FlowLogResponse
 from ..types.version_status import VersionStatus
 from ..types.list_flows import ListFlows
@@ -29,6 +30,7 @@ from ..requests.evaluator_activation_deactivation_request_deactivate_item import
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
 from ..core.client_wrapper import AsyncClientWrapper
+from ..core.pagination import AsyncPager
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -37,388 +39,6 @@ OMIT = typing.cast(typing.Any, ...)
 class FlowsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
-
-    def get(
-        self,
-        id: str,
-        *,
-        version_id: typing.Optional[str] = None,
-        environment: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowResponse:
-        """
-        Retrieve the Flow with the given ID.
-
-        By default, the deployed version of the Flow is returned. Use the query parameters
-        `version_id` or `environment` to target a specific version of the Flow.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        version_id : typing.Optional[str]
-            A specific Version ID of the Flow to retrieve.
-
-        environment : typing.Optional[str]
-            Name of the Environment to retrieve a deployed Version from.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.get(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
-        """
-        Delete the Flow with the given ID.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.delete(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def move(
-        self,
-        id: str,
-        *,
-        path: typing.Optional[str] = OMIT,
-        name: typing.Optional[str] = OMIT,
-        directory_id: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowResponse:
-        """
-        Move the Flow to a different path or change the name.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        path : typing.Optional[str]
-            Path of the Flow including the Flow name, which is used as a unique identifier.
-
-        name : typing.Optional[str]
-            Name of the Flow.
-
-        directory_id : typing.Optional[str]
-            Unique identifier for the Directory to move Flow to. Starts with `dir_`.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.move(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-                "directory_id": directory_id,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def list(
-        self,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        name: typing.Optional[str] = None,
-        user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
-        order: typing.Optional[SortOrder] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataFlowResponse:
-        """
-        Get a list of Flows.
-
-        Parameters
-        ----------
-        page : typing.Optional[int]
-            Page number for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Flows to fetch.
-
-        name : typing.Optional[str]
-            Case-insensitive filter for Flow name.
-
-        user_filter : typing.Optional[str]
-            Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
-
-        sort_by : typing.Optional[ProjectSortBy]
-            Field to sort Flows by
-
-        order : typing.Optional[SortOrder]
-            Direction to sort by.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PaginatedDataFlowResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.list()
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "flows",
-            method="GET",
-            params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "user_filter": user_filter,
-                "sort_by": sort_by,
-                "order": order,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDataFlowResponse,
-                    construct_type(
-                        type_=PaginatedDataFlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def upsert(
-        self,
-        *,
-        attributes: typing.Dict[str, typing.Optional[typing.Any]],
-        path: typing.Optional[str] = OMIT,
-        id: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowResponse:
-        """
-        Create or update a Flow.
-
-        Flows can also be identified by the `ID` or their `path`.
-
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
-
-        Parameters
-        ----------
-        attributes : typing.Dict[str, typing.Optional[typing.Any]]
-            A key-value object identifying the Flow Version.
-
-        path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
-
-        id : typing.Optional[str]
-            ID for an existing Flow.
-
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.upsert(
-            attributes={"key": "value"},
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            "flows",
-            method="POST",
-            json={
-                "path": path,
-                "id": id,
-                "attributes": attributes,
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def log(
         self,
@@ -454,7 +74,7 @@ class FlowsClient:
         """
         Log to a Flow.
 
-        You can use query parameters `version_id`, or `environment`, to target
+        You can use query parameters version_id, or environment, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
         Parameters
@@ -469,7 +89,7 @@ class FlowsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Flow.
@@ -547,12 +167,42 @@ class FlowsClient:
 
         Examples
         --------
+        import datetime
+
         from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.flows.log()
+        client.flows.log(
+            log_id="medqa_experiment_0001",
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            flow={
+                "attributes": {
+                    "prompt": {
+                        "template": "You are a helpful assistant helping with medical anamnesis",
+                        "model": "gpt-4o",
+                        "temperature": 0.8,
+                    },
+                    "tool": {
+                        "name": "retrieval_tool_v3",
+                        "description": "Retrieval tool for MedQA.",
+                        "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
+                    },
+                }
+            },
+            inputs={
+                "question": "Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath."
+            },
+            output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
+            trace_status="incomplete",
+            start_time=datetime.datetime.fromisoformat(
+                "2024-07-08 22:40:35+00:00",
+            ),
+            end_time=datetime.datetime.fromisoformat(
+                "2024-07-08 22:40:39+00:00",
+            ),
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "flows/log",
@@ -584,7 +234,9 @@ class FlowsClient:
                 "environment": flow_log_request_environment,
                 "save": save,
                 "log_id": log_id,
-                "flow": convert_and_respect_annotation_metadata(object_=flow, annotation=FlowKernelRequestParams),
+                "flow": convert_and_respect_annotation_metadata(
+                    object_=flow, annotation=FlowKernelRequestParams, direction="write"
+                ),
                 "trace_status": trace_status,
             },
             request_options=request_options,
@@ -596,6 +248,422 @@ class FlowsClient:
                     CreateFlowLogResponse,
                     construct_type(
                         type_=CreateFlowLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def get(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Retrieve the Flow with the given ID.
+
+        By default, the deployed version of the Flow is returned. Use the query parameters
+        `version_id` or `environment` to target a specific version of the Flow.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        version_id : typing.Optional[str]
+            A specific Version ID of the Flow to retrieve.
+
+        environment : typing.Optional[str]
+            Name of the Environment to retrieve a deployed Version from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.flows.get(
+            id="fl_6o701g4jmcanPVHxdqD0O",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowResponse,
+                    construct_type(
+                        type_=FlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+        """
+        Delete the Flow with the given ID.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.flows.delete(
+            id="fl_6o701g4jmcanPVHxdqD0O",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def move(
+        self,
+        id: str,
+        *,
+        path: typing.Optional[str] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        directory_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Move the Flow to a different path or change the name.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        path : typing.Optional[str]
+            Path of the Flow including the Flow name, which is used as a unique identifier.
+
+        name : typing.Optional[str]
+            Name of the Flow.
+
+        directory_id : typing.Optional[str]
+            Unique identifier for the Directory to move Flow to. Starts with `dir_`.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.flows.move(
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            path="new directory/new name",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}",
+            method="PATCH",
+            json={
+                "path": path,
+                "name": name,
+                "directory_id": directory_id,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowResponse,
+                    construct_type(
+                        type_=FlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def list(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        name: typing.Optional[str] = None,
+        user_filter: typing.Optional[str] = None,
+        sort_by: typing.Optional[ProjectSortBy] = None,
+        order: typing.Optional[SortOrder] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> SyncPager[FlowResponse]:
+        """
+        Get a list of Flows.
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number for pagination.
+
+        size : typing.Optional[int]
+            Page size for pagination. Number of Flows to fetch.
+
+        name : typing.Optional[str]
+            Case-insensitive filter for Flow name.
+
+        user_filter : typing.Optional[str]
+            Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
+
+        sort_by : typing.Optional[ProjectSortBy]
+            Field to sort Flows by
+
+        order : typing.Optional[SortOrder]
+            Direction to sort by.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        SyncPager[FlowResponse]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        response = client.flows.list(
+            size=1,
+        )
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
+        """
+        page = page if page is not None else 1
+        _response = self._client_wrapper.httpx_client.request(
+            "flows",
+            method="GET",
+            params={
+                "page": page,
+                "size": size,
+                "name": name,
+                "user_filter": user_filter,
+                "sort_by": sort_by,
+                "order": order,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(
+                    PaginatedDataFlowResponse,
+                    construct_type(
+                        type_=PaginatedDataFlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def upsert(
+        self,
+        *,
+        attributes: typing.Dict[str, typing.Optional[typing.Any]],
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        commit_message: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Create or update a Flow.
+
+        Flows can also be identified by the `ID` or their `path`.
+
+        If you provide a commit message, then the new version will be committed;
+        otherwise it will be uncommitted. If you try to commit an already committed version,
+        an exception will be raised.
+
+        Parameters
+        ----------
+        attributes : typing.Dict[str, typing.Optional[typing.Any]]
+            A key-value object identifying the Flow Version.
+
+        path : typing.Optional[str]
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Flow.
+
+        commit_message : typing.Optional[str]
+            Message describing the changes made.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.flows.upsert(
+            path="Personal Projects/MedQA Flow",
+            attributes={
+                "prompt": {
+                    "template": "You are a helpful medical assistant helping with medical anamnesis. Answer {{question}}",
+                    "model": "gpt-4o",
+                    "temperature": 0.8,
+                },
+                "tool": {
+                    "name": "retrieval_tool_v3",
+                    "description": "Retrieval tool for MedQA.",
+                    "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
+                },
+                "commit_message": "Initial commit",
+            },
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "flows",
+            method="POST",
+            json={
+                "path": path,
+                "id": id,
+                "attributes": attributes,
+                "commit_message": commit_message,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowResponse,
+                    construct_type(
+                        type_=FlowResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -663,7 +731,11 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.update_log(
-            log_id="log_id",
+            log_id="medqa_experiment_0001",
+            inputs={
+                "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
+            },
+            output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
             trace_status="complete",
         )
         """
@@ -741,7 +813,8 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.list_versions(
-            id="id",
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            status="committed",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -812,9 +885,9 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.commit(
-            id="id",
-            version_id="version_id",
-            commit_message="commit_message",
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            version_id="flv_6o701g4jmcanPVHxdqD0O",
+            commit_message="RAG lookup tool bug fixing",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -886,9 +959,9 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.set_deployment(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            environment_id="staging",
+            version_id="flv_6o701g4jmcanPVHxdqD0O",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -955,8 +1028,8 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.remove_deployment(
-            id="id",
-            environment_id="environment_id",
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            environment_id="staging",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1009,7 +1082,7 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.list_environments(
-            id="id",
+            id="fl_6o701g4jmcanPVHxdqD0O",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1081,7 +1154,8 @@ class FlowsClient:
             api_key="YOUR_API_KEY",
         )
         client.flows.update_monitoring(
-            id="id",
+            id="fl_6o701g4jmcanPVHxdqD0O",
+            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1091,10 +1165,12 @@ class FlowsClient:
                 "activate": convert_and_respect_annotation_metadata(
                     object_=activate,
                     annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
                 ),
                 "deactivate": convert_and_respect_annotation_metadata(
                     object_=deactivate,
                     annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -1128,428 +1204,6 @@ class FlowsClient:
 class AsyncFlowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
-
-    async def get(
-        self,
-        id: str,
-        *,
-        version_id: typing.Optional[str] = None,
-        environment: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowResponse:
-        """
-        Retrieve the Flow with the given ID.
-
-        By default, the deployed version of the Flow is returned. Use the query parameters
-        `version_id` or `environment` to target a specific version of the Flow.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        version_id : typing.Optional[str]
-            A specific Version ID of the Flow to retrieve.
-
-        environment : typing.Optional[str]
-            Name of the Environment to retrieve a deployed Version from.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.get(
-                id="id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
-        """
-        Delete the Flow with the given ID.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.delete(
-                id="id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def move(
-        self,
-        id: str,
-        *,
-        path: typing.Optional[str] = OMIT,
-        name: typing.Optional[str] = OMIT,
-        directory_id: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowResponse:
-        """
-        Move the Flow to a different path or change the name.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        path : typing.Optional[str]
-            Path of the Flow including the Flow name, which is used as a unique identifier.
-
-        name : typing.Optional[str]
-            Name of the Flow.
-
-        directory_id : typing.Optional[str]
-            Unique identifier for the Directory to move Flow to. Starts with `dir_`.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.move(
-                id="id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-                "directory_id": directory_id,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def list(
-        self,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        name: typing.Optional[str] = None,
-        user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
-        order: typing.Optional[SortOrder] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataFlowResponse:
-        """
-        Get a list of Flows.
-
-        Parameters
-        ----------
-        page : typing.Optional[int]
-            Page number for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Flows to fetch.
-
-        name : typing.Optional[str]
-            Case-insensitive filter for Flow name.
-
-        user_filter : typing.Optional[str]
-            Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
-
-        sort_by : typing.Optional[ProjectSortBy]
-            Field to sort Flows by
-
-        order : typing.Optional[SortOrder]
-            Direction to sort by.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        PaginatedDataFlowResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.list()
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "flows",
-            method="GET",
-            params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "user_filter": user_filter,
-                "sort_by": sort_by,
-                "order": order,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDataFlowResponse,
-                    construct_type(
-                        type_=PaginatedDataFlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def upsert(
-        self,
-        *,
-        attributes: typing.Dict[str, typing.Optional[typing.Any]],
-        path: typing.Optional[str] = OMIT,
-        id: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowResponse:
-        """
-        Create or update a Flow.
-
-        Flows can also be identified by the `ID` or their `path`.
-
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
-
-        Parameters
-        ----------
-        attributes : typing.Dict[str, typing.Optional[typing.Any]]
-            A key-value object identifying the Flow Version.
-
-        path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
-
-        id : typing.Optional[str]
-            ID for an existing Flow.
-
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.upsert(
-                attributes={"key": "value"},
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            "flows",
-            method="POST",
-            json={
-                "path": path,
-                "id": id,
-                "attributes": attributes,
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def log(
         self,
@@ -1585,7 +1239,7 @@ class AsyncFlowsClient:
         """
         Log to a Flow.
 
-        You can use query parameters `version_id`, or `environment`, to target
+        You can use query parameters version_id, or environment, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
         Parameters
@@ -1600,7 +1254,7 @@ class AsyncFlowsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Flow.
@@ -1679,6 +1333,7 @@ class AsyncFlowsClient:
         Examples
         --------
         import asyncio
+        import datetime
 
         from humanloop import AsyncHumanloop
 
@@ -1688,7 +1343,35 @@ class AsyncFlowsClient:
 
 
         async def main() -> None:
-            await client.flows.log()
+            await client.flows.log(
+                log_id="medqa_experiment_0001",
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                flow={
+                    "attributes": {
+                        "prompt": {
+                            "template": "You are a helpful assistant helping with medical anamnesis",
+                            "model": "gpt-4o",
+                            "temperature": 0.8,
+                        },
+                        "tool": {
+                            "name": "retrieval_tool_v3",
+                            "description": "Retrieval tool for MedQA.",
+                            "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
+                        },
+                    }
+                },
+                inputs={
+                    "question": "Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath."
+                },
+                output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
+                trace_status="incomplete",
+                start_time=datetime.datetime.fromisoformat(
+                    "2024-07-08 22:40:35+00:00",
+                ),
+                end_time=datetime.datetime.fromisoformat(
+                    "2024-07-08 22:40:39+00:00",
+                ),
+            )
 
 
         asyncio.run(main())
@@ -1723,7 +1406,9 @@ class AsyncFlowsClient:
                 "environment": flow_log_request_environment,
                 "save": save,
                 "log_id": log_id,
-                "flow": convert_and_respect_annotation_metadata(object_=flow, annotation=FlowKernelRequestParams),
+                "flow": convert_and_respect_annotation_metadata(
+                    object_=flow, annotation=FlowKernelRequestParams, direction="write"
+                ),
                 "trace_status": trace_status,
             },
             request_options=request_options,
@@ -1735,6 +1420,462 @@ class AsyncFlowsClient:
                     CreateFlowLogResponse,
                     construct_type(
                         type_=CreateFlowLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Retrieve the Flow with the given ID.
+
+        By default, the deployed version of the Flow is returned. Use the query parameters
+        `version_id` or `environment` to target a specific version of the Flow.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        version_id : typing.Optional[str]
+            A specific Version ID of the Flow to retrieve.
+
+        environment : typing.Optional[str]
+            Name of the Environment to retrieve a deployed Version from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.flows.get(
+                id="fl_6o701g4jmcanPVHxdqD0O",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowResponse,
+                    construct_type(
+                        type_=FlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+        """
+        Delete the Flow with the given ID.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.flows.delete(
+                id="fl_6o701g4jmcanPVHxdqD0O",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def move(
+        self,
+        id: str,
+        *,
+        path: typing.Optional[str] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        directory_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Move the Flow to a different path or change the name.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        path : typing.Optional[str]
+            Path of the Flow including the Flow name, which is used as a unique identifier.
+
+        name : typing.Optional[str]
+            Name of the Flow.
+
+        directory_id : typing.Optional[str]
+            Unique identifier for the Directory to move Flow to. Starts with `dir_`.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.flows.move(
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                path="new directory/new name",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}",
+            method="PATCH",
+            json={
+                "path": path,
+                "name": name,
+                "directory_id": directory_id,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowResponse,
+                    construct_type(
+                        type_=FlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def list(
+        self,
+        *,
+        page: typing.Optional[int] = None,
+        size: typing.Optional[int] = None,
+        name: typing.Optional[str] = None,
+        user_filter: typing.Optional[str] = None,
+        sort_by: typing.Optional[ProjectSortBy] = None,
+        order: typing.Optional[SortOrder] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncPager[FlowResponse]:
+        """
+        Get a list of Flows.
+
+        Parameters
+        ----------
+        page : typing.Optional[int]
+            Page number for pagination.
+
+        size : typing.Optional[int]
+            Page size for pagination. Number of Flows to fetch.
+
+        name : typing.Optional[str]
+            Case-insensitive filter for Flow name.
+
+        user_filter : typing.Optional[str]
+            Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
+
+        sort_by : typing.Optional[ProjectSortBy]
+            Field to sort Flows by
+
+        order : typing.Optional[SortOrder]
+            Direction to sort by.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncPager[FlowResponse]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            response = await client.flows.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
+
+
+        asyncio.run(main())
+        """
+        page = page if page is not None else 1
+        _response = await self._client_wrapper.httpx_client.request(
+            "flows",
+            method="GET",
+            params={
+                "page": page,
+                "size": size,
+                "name": name,
+                "user_filter": user_filter,
+                "sort_by": sort_by,
+                "order": order,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(
+                    PaginatedDataFlowResponse,
+                    construct_type(
+                        type_=PaginatedDataFlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def upsert(
+        self,
+        *,
+        attributes: typing.Dict[str, typing.Optional[typing.Any]],
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        commit_message: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Create or update a Flow.
+
+        Flows can also be identified by the `ID` or their `path`.
+
+        If you provide a commit message, then the new version will be committed;
+        otherwise it will be uncommitted. If you try to commit an already committed version,
+        an exception will be raised.
+
+        Parameters
+        ----------
+        attributes : typing.Dict[str, typing.Optional[typing.Any]]
+            A key-value object identifying the Flow Version.
+
+        path : typing.Optional[str]
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Flow.
+
+        commit_message : typing.Optional[str]
+            Message describing the changes made.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.flows.upsert(
+                path="Personal Projects/MedQA Flow",
+                attributes={
+                    "prompt": {
+                        "template": "You are a helpful medical assistant helping with medical anamnesis. Answer {{question}}",
+                        "model": "gpt-4o",
+                        "temperature": 0.8,
+                    },
+                    "tool": {
+                        "name": "retrieval_tool_v3",
+                        "description": "Retrieval tool for MedQA.",
+                        "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
+                    },
+                    "commit_message": "Initial commit",
+                },
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "flows",
+            method="POST",
+            json={
+                "path": path,
+                "id": id,
+                "attributes": attributes,
+                "commit_message": commit_message,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowResponse,
+                    construct_type(
+                        type_=FlowResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1807,7 +1948,11 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.update_log(
-                log_id="log_id",
+                log_id="medqa_experiment_0001",
+                inputs={
+                    "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
+                },
+                output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
                 trace_status="complete",
             )
 
@@ -1893,7 +2038,8 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.list_versions(
-                id="id",
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                status="committed",
             )
 
 
@@ -1972,9 +2118,9 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.commit(
-                id="id",
-                version_id="version_id",
-                commit_message="commit_message",
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                version_id="flv_6o701g4jmcanPVHxdqD0O",
+                commit_message="RAG lookup tool bug fixing",
             )
 
 
@@ -2054,9 +2200,9 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.set_deployment(
-                id="id",
-                environment_id="environment_id",
-                version_id="version_id",
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                environment_id="staging",
+                version_id="flv_6o701g4jmcanPVHxdqD0O",
             )
 
 
@@ -2131,8 +2277,8 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.remove_deployment(
-                id="id",
-                environment_id="environment_id",
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                environment_id="staging",
             )
 
 
@@ -2193,7 +2339,7 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.list_environments(
-                id="id",
+                id="fl_6o701g4jmcanPVHxdqD0O",
             )
 
 
@@ -2273,7 +2419,8 @@ class AsyncFlowsClient:
 
         async def main() -> None:
             await client.flows.update_monitoring(
-                id="id",
+                id="fl_6o701g4jmcanPVHxdqD0O",
+                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
             )
 
 
@@ -2286,10 +2433,12 @@ class AsyncFlowsClient:
                 "activate": convert_and_respect_annotation_metadata(
                     object_=activate,
                     annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
                 ),
                 "deactivate": convert_and_respect_annotation_metadata(
                     object_=deactivate,
                     annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,

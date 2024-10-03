@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .evaluator_response import EvaluatorResponse
+from .flow_response import FlowResponse
+from .monitoring_evaluator_response import MonitoringEvaluatorResponse
+from .prompt_response import PromptResponse
+from .tool_response import ToolResponse
+from .version_deployment_response import VersionDeploymentResponse
+from .version_id_response import VersionIdResponse
 import typing
 import datetime as dt
 import pydantic
 from .evaluator_log_response_judgment import EvaluatorLogResponseJudgment
-from .evaluator_response import EvaluatorResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
 
@@ -161,6 +167,19 @@ class EvaluatorLogResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .flow_log_response import FlowLogResponse  # noqa: E402
+from .prompt_log_response import PromptLogResponse  # noqa: E402
+from .tool_log_response import ToolLogResponse  # noqa: E402
 from .log_response import LogResponse  # noqa: E402
 
+update_forward_refs(EvaluatorResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(FlowLogResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(FlowResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(MonitoringEvaluatorResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(PromptLogResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(PromptResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(ToolLogResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(ToolResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(VersionDeploymentResponse, EvaluatorLogResponse=EvaluatorLogResponse)
+update_forward_refs(VersionIdResponse, EvaluatorLogResponse=EvaluatorLogResponse)
 update_forward_refs(EvaluatorLogResponse)

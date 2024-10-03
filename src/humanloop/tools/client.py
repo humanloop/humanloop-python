@@ -23,13 +23,13 @@ from ..requests.tool_function import ToolFunctionParams
 from ..types.files_tool_type import FilesToolType
 from ..types.version_status import VersionStatus
 from ..types.list_tools import ListTools
+from ..types.file_environment_response import FileEnvironmentResponse
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
     EvaluatorActivationDeactivationRequestActivateItemParams,
 )
 from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
-from ..types.file_environment_response import FileEnvironmentResponse
 from ..core.client_wrapper import AsyncClientWrapper
 from ..core.pagination import AsyncPager
 
@@ -214,7 +214,9 @@ class ToolsClient:
                 "user": user,
                 "environment": tool_log_request_environment,
                 "save": save,
-                "tool": convert_and_respect_annotation_metadata(object_=tool, annotation=ToolKernelRequestParams),
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -566,7 +568,9 @@ class ToolsClient:
             json={
                 "path": path,
                 "id": id,
-                "function": convert_and_respect_annotation_metadata(object_=function, annotation=ToolFunctionParams),
+                "function": convert_and_respect_annotation_metadata(
+                    object_=function, annotation=ToolFunctionParams, direction="write"
+                ),
                 "source_code": source_code,
                 "setup_values": setup_values,
                 "attributes": attributes,
@@ -951,90 +955,6 @@ class ToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_monitoring(
-        self,
-        id: str,
-        *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
-        """
-        Activate and deactivate Evaluators for monitoring the Tool.
-
-        An activated Evaluator will automatically be run on all new Logs
-        within the Tool for monitoring purposes.
-
-        Parameters
-        ----------
-        id : str
-
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
-            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
-            Evaluators to deactivate. These will not be run on new Logs.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ToolResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.update_monitoring(
-            id="tl_789ghi",
-            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ToolResponse,
-                    construct_type(
-                        type_=ToolResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ToolResponse:
@@ -1208,6 +1128,92 @@ class ToolsClient:
                     typing.List[FileEnvironmentResponse],
                     construct_type(
                         type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ToolResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Tool.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Tool for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ToolResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.update_monitoring(
+            id="tl_789ghi",
+            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1412,7 +1418,9 @@ class AsyncToolsClient:
                 "user": user,
                 "environment": tool_log_request_environment,
                 "save": save,
-                "tool": convert_and_respect_annotation_metadata(object_=tool, annotation=ToolKernelRequestParams),
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -1791,7 +1799,9 @@ class AsyncToolsClient:
             json={
                 "path": path,
                 "id": id,
-                "function": convert_and_respect_annotation_metadata(object_=function, annotation=ToolFunctionParams),
+                "function": convert_and_respect_annotation_metadata(
+                    object_=function, annotation=ToolFunctionParams, direction="write"
+                ),
                 "source_code": source_code,
                 "setup_values": setup_values,
                 "attributes": attributes,
@@ -2216,98 +2226,6 @@ class AsyncToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_monitoring(
-        self,
-        id: str,
-        *,
-        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
-        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
-        """
-        Activate and deactivate Evaluators for monitoring the Tool.
-
-        An activated Evaluator will automatically be run on all new Logs
-        within the Tool for monitoring purposes.
-
-        Parameters
-        ----------
-        id : str
-
-        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
-            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-
-        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
-            Evaluators to deactivate. These will not be run on new Logs.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ToolResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.update_monitoring(
-                id="tl_789ghi",
-                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"tools/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ToolResponse,
-                    construct_type(
-                        type_=ToolResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> ToolResponse:
@@ -2505,6 +2423,100 @@ class AsyncToolsClient:
                     typing.List[FileEnvironmentResponse],
                     construct_type(
                         type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_monitoring(
+        self,
+        id: str,
+        *,
+        activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
+        deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ToolResponse:
+        """
+        Activate and deactivate Evaluators for monitoring the Tool.
+
+        An activated Evaluator will automatically be run on all new Logs
+        within the Tool for monitoring purposes.
+
+        Parameters
+        ----------
+        id : str
+
+        activate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]
+            Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+
+        deactivate : typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]
+            Evaluators to deactivate. These will not be run on new Logs.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ToolResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.tools.update_monitoring(
+                id="tl_789ghi",
+                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

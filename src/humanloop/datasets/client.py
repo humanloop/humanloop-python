@@ -248,7 +248,7 @@ class DatasetsClient:
                 "path": path,
                 "id": id,
                 "datapoints": convert_and_respect_annotation_metadata(
-                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
+                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams], direction="write"
                 ),
                 "action": action,
                 "attributes": attributes,
@@ -1261,7 +1261,7 @@ class AsyncDatasetsClient:
                 "path": path,
                 "id": id,
                 "datapoints": convert_and_respect_annotation_metadata(
-                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams]
+                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams], direction="write"
                 ),
                 "action": action,
                 "attributes": attributes,

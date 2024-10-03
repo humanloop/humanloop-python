@@ -48,7 +48,7 @@ class PromptResponseParams(typing_extensions.TypedDict):
 
     model: str
     """
-    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
     """
 
     endpoint: typing_extensions.NotRequired[ModelEndpoints]

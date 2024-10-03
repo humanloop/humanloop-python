@@ -15,7 +15,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class PromptKernelRequest(UncheckedBaseModel):
     model: str = pydantic.Field()
     """
-    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
     """
 
     endpoint: typing.Optional[ModelEndpoints] = pydantic.Field(default=None)

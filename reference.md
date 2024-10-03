@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-18 23:29:35.178000+00:00",
+        "2024-07-19 00:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -358,7 +358,7 @@ Controls how the model uses tools. The following options are supported:
 </dl>
 </details>
 
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update</a>(...)</code></summary>
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update_log</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -392,7 +392,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.update(
+client.prompts.update_log(
     id="id",
     log_id="log_id",
 )
@@ -751,7 +751,7 @@ for chunk in response:
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -1017,7 +1017,7 @@ client.prompts.call(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -1392,7 +1392,7 @@ client.prompts.upsert(
 <dl>
 <dd>
 
-**model:** `str` — The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/supported-models)
+**model:** `str` — The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
     
 </dd>
 </dl>
@@ -1986,100 +1986,6 @@ client.prompts.commit(
 </dl>
 </details>
 
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update_monitoring</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Activate and deactivate Evaluators for monitoring the Prompt.
-
-An activated Evaluator will automatically be run on all new Logs
-within the Prompt for monitoring purposes.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.update_monitoring(
-    id="pr_30gco7dx6JDq4200GVOHa",
-    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -2304,6 +2210,100 @@ client.prompts.list_environments(
 <dd>
 
 **id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Prompt.
+
+An activated Evaluator will automatically be run on all new Logs
+within the Prompt for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.update_monitoring(
+    id="pr_30gco7dx6JDq4200GVOHa",
+    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
+]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
+]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -3451,100 +3451,6 @@ client.tools.commit(
 </dl>
 </details>
 
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">update_monitoring</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Activate and deactivate Evaluators for monitoring the Tool.
-
-An activated Evaluator will automatically be run on all new Logs
-within the Tool for monitoring purposes.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.update_monitoring(
-    id="tl_789ghi",
-    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -3769,6 +3675,100 @@ client.tools.list_environments(
 <dd>
 
 **id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Tool.
+
+An activated Evaluator will automatically be run on all new Logs
+within the Tool for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.update_monitoring(
+    id="tl_789ghi",
+    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
+]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
+]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -4970,6 +4970,270 @@ client.datasets.list_environments(
 </details>
 
 ## Evaluators
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">log</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Submit Evaluator judgment for an existing Log.
+
+Creates a new Log. The evaluated Log will be set as the parent of the created Log.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.log(
+    parent_id="parent_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**parent_id:** `str` — Identifier of the evaluated Log. The newly created Log will have this one set as parent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — ID of the Evaluator version to log against.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — Generated output from the LLM. Only populated for LLM Evaluator Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**created_at:** `typing.Optional[dt.datetime]` — User defined timestamp for when the log was created. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — Error message if the log is an error.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_latency:** `typing.Optional[float]` — Duration of the logged event in seconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider. Only populated for LLM Evaluator Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**create_evaluator_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**spec:** `typing.Optional[CreateEvaluatorLogRequestSpecParams]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">list</a>(...)</code></summary>
 <dl>
 <dd>
@@ -5614,99 +5878,6 @@ client.evaluators.commit(
 </dl>
 </details>
 
-<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">update_monitoring</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Activate and deactivate Evaluators for monitoring the Evaluator.
-
-An activated Evaluator will automatically be run on all new Logs
-within the Evaluator for monitoring purposes.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.update_monitoring(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -5950,7 +6121,7 @@ client.evaluators.list_environments(
 </dl>
 </details>
 
-<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">log</a>(...)</code></summary>
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">update_monitoring</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -5962,9 +6133,10 @@ client.evaluators.list_environments(
 <dl>
 <dd>
 
-Submit Evaluator judgment for an existing Log.
+Activate and deactivate Evaluators for monitoring the Evaluator.
 
-Creates a new Log. The evaluated Log will be set as the parent of the created Log.
+An activated Evaluator will automatically be run on all new Logs
+within the Evaluator for monitoring purposes.
 </dd>
 </dl>
 </dd>
@@ -5984,8 +6156,8 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.evaluators.log(
-    parent_id="parent_id",
+client.evaluators.update_monitoring(
+    id="id",
 )
 
 ```
@@ -6002,7 +6174,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**parent_id:** `str` — Identifier of the evaluated Log. The newly created Log will have this one set as parent.
+**id:** `str` 
     
 </dd>
 </dl>
@@ -6010,7 +6182,9 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**version_id:** `typing.Optional[str]` — ID of the Evaluator version to log against.
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
+]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -6018,183 +6192,9 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**id:** `typing.Optional[str]` — ID for an existing Evaluator.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**output:** `typing.Optional[str]` — Generated output from the LLM. Only populated for LLM Evaluator Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**created_at:** `typing.Optional[dt.datetime]` — User defined timestamp for when the log was created. 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**error:** `typing.Optional[str]` — Error message if the log is an error.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider_latency:** `typing.Optional[float]` — Duration of the logged event in seconds.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**stdout:** `typing.Optional[str]` — Captured log and debug statements.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider. Only populated for LLM Evaluator Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider. Only populated for LLM Evaluator Logs.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**source:** `typing.Optional[str]` — Identifies where the model was called from.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**user:** `typing.Optional[str]` — End-user ID related to the Log.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**create_evaluator_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**spec:** `typing.Optional[CreateEvaluatorLogRequestSpecParams]` 
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
+]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -6215,467 +6215,6 @@ client.evaluators.log(
 </details>
 
 ## Flows
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">get</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Retrieve the Flow with the given ID.
-
-By default, the deployed version of the Flow is returned. Use the query parameters
-`version_id` or `environment` to target a specific version of the Flow.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.get(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `typing.Optional[str]` — A specific Version ID of the Flow to retrieve.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">delete</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Delete the Flow with the given ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.delete(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">move</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Move the Flow to a different path or change the name.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.move(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Flow including the Flow name, which is used as a unique identifier.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Name of the Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**directory_id:** `typing.Optional[str]` — Unique identifier for the Directory to move Flow to. Starts with `dir_`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">list</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Get a list of Flows.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.list()
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**page:** `typing.Optional[int]` — Page number for pagination.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**size:** `typing.Optional[int]` — Page size for pagination. Number of Flows to fetch.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Case-insensitive filter for Flow name.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Flows by
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**order:** `typing.Optional[SortOrder]` — Direction to sort by.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">upsert</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Create or update a Flow.
-
-Flows can also be identified by the `ID` or their `path`.
-
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.upsert(
-    attributes={"key": "value"},
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**attributes:** `typing.Dict[str, typing.Optional[typing.Any]]` — A key-value object identifying the Flow Version.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**id:** `typing.Optional[str]` — ID for an existing Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">log</a>(...)</code></summary>
 <dl>
 <dd>
@@ -6690,7 +6229,7 @@ client.flows.upsert(
 
 Log to a Flow.
 
-You can use query parameters `version_id`, or `environment`, to target
+You can use query parameters version_id, or environment, to target
 an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 </dd>
 </dl>
@@ -6706,12 +6245,42 @@ an existing version of the Flow. Otherwise, the default deployed version will be
 <dd>
 
 ```python
+import datetime
+
 from humanloop import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.flows.log()
+client.flows.log(
+    log_id="medqa_experiment_0001",
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    flow={
+        "attributes": {
+            "prompt": {
+                "template": "You are a helpful assistant helping with medical anamnesis",
+                "model": "gpt-4o",
+                "temperature": 0.8,
+            },
+            "tool": {
+                "name": "retrieval_tool_v3",
+                "description": "Retrieval tool for MedQA.",
+                "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
+            },
+        }
+    },
+    inputs={
+        "question": "Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath."
+    },
+    output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
+    trace_status="incomplete",
+    start_time=datetime.datetime.fromisoformat(
+        "2024-07-08 22:40:35+00:00",
+    ),
+    end_time=datetime.datetime.fromisoformat(
+        "2024-07-08 22:40:39+00:00",
+    ),
+)
 
 ```
 </dd>
@@ -6751,7 +6320,7 @@ client.flows.log()
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6947,6 +6516,488 @@ client.flows.log()
 </dl>
 </details>
 
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Flow with the given ID.
+
+By default, the deployed version of the Flow is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.get(
+    id="fl_6o701g4jmcanPVHxdqD0O",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Flow to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Flow with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.delete(
+    id="fl_6o701g4jmcanPVHxdqD0O",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">move</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Move the Flow to a different path or change the name.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.move(
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    path="new directory/new name",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Flow including the Flow name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**directory_id:** `typing.Optional[str]` — Unique identifier for the Directory to move Flow to. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of Flows.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.flows.list(
+    size=1,
+)
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Flows to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for Flow name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Flows by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">upsert</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create or update a Flow.
+
+Flows can also be identified by the `ID` or their `path`.
+
+If you provide a commit message, then the new version will be committed;
+otherwise it will be uncommitted. If you try to commit an already committed version,
+an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.upsert(
+    path="Personal Projects/MedQA Flow",
+    attributes={
+        "prompt": {
+            "template": "You are a helpful medical assistant helping with medical anamnesis. Answer {{question}}",
+            "model": "gpt-4o",
+            "temperature": 0.8,
+        },
+        "tool": {
+            "name": "retrieval_tool_v3",
+            "description": "Retrieval tool for MedQA.",
+            "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
+        },
+        "commit_message": "Initial commit",
+    },
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**attributes:** `typing.Dict[str, typing.Optional[typing.Any]]` — A key-value object identifying the Flow Version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_log</a>(...)</code></summary>
 <dl>
 <dd>
@@ -6983,7 +7034,11 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.update_log(
-    log_id="log_id",
+    log_id="medqa_experiment_0001",
+    inputs={
+        "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
+    },
+    output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
     trace_status="complete",
 )
 
@@ -7086,7 +7141,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.list_versions(
-    id="id",
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    status="committed",
 )
 
 ```
@@ -7174,9 +7230,9 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.commit(
-    id="id",
-    version_id="version_id",
-    commit_message="commit_message",
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    version_id="flv_6o701g4jmcanPVHxdqD0O",
+    commit_message="RAG lookup tool bug fixing",
 )
 
 ```
@@ -7265,9 +7321,9 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.set_deployment(
-    id="id",
-    environment_id="environment_id",
-    version_id="version_id",
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    environment_id="staging",
+    version_id="flv_6o701g4jmcanPVHxdqD0O",
 )
 
 ```
@@ -7356,8 +7412,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.remove_deployment(
-    id="id",
-    environment_id="environment_id",
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    environment_id="staging",
 )
 
 ```
@@ -7435,7 +7491,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.list_environments(
-    id="id",
+    id="fl_6o701g4jmcanPVHxdqD0O",
 )
 
 ```
@@ -7508,7 +7564,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.update_monitoring(
-    id="id",
+    id="fl_6o701g4jmcanPVHxdqD0O",
+    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
 )
 
 ```

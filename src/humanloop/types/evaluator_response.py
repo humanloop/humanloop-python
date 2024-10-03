@@ -106,6 +106,17 @@ class EvaluatorResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .flow_response import FlowResponse  # noqa: E402
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
+from .prompt_response import PromptResponse  # noqa: E402
+from .tool_response import ToolResponse  # noqa: E402
+from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
+from .version_id_response import VersionIdResponse  # noqa: E402
 
+update_forward_refs(FlowResponse, EvaluatorResponse=EvaluatorResponse)
+update_forward_refs(MonitoringEvaluatorResponse, EvaluatorResponse=EvaluatorResponse)
+update_forward_refs(PromptResponse, EvaluatorResponse=EvaluatorResponse)
+update_forward_refs(ToolResponse, EvaluatorResponse=EvaluatorResponse)
+update_forward_refs(VersionDeploymentResponse, EvaluatorResponse=EvaluatorResponse)
+update_forward_refs(VersionIdResponse, EvaluatorResponse=EvaluatorResponse)
 update_forward_refs(EvaluatorResponse)
