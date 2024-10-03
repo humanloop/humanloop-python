@@ -22,6 +22,9 @@ from .types import (
     DatapointResponse,
     DatapointResponseTargetValue,
     DatasetResponse,
+    DirectoryResponse,
+    DirectoryWithParentsAndChildrenResponse,
+    DirectoryWithParentsAndChildrenResponseFilesItem,
     EnvironmentResponse,
     EnvironmentTag,
     EvaluatedVersionResponse,
@@ -141,7 +144,7 @@ from .types import (
     VersionStatus,
 )
 from .errors import UnprocessableEntityError
-from . import datasets, evaluations, evaluators, files, flows, logs, prompts, tools
+from . import datasets, directories, evaluations, evaluators, files, flows, logs, prompts, tools
 from .client import AsyncHumanloop, Humanloop
 from .environment import HumanloopEnvironment
 from .evaluators import (
@@ -184,6 +187,9 @@ from .requests import (
     DatapointResponseParams,
     DatapointResponseTargetValueParams,
     DatasetResponseParams,
+    DirectoryResponseParams,
+    DirectoryWithParentsAndChildrenResponseFilesItemParams,
+    DirectoryWithParentsAndChildrenResponseParams,
     EnvironmentResponseParams,
     EvaluatedVersionResponseParams,
     EvaluateeRequestParams,
@@ -322,6 +328,12 @@ __all__ = [
     "DatapointResponseTargetValueParams",
     "DatasetResponse",
     "DatasetResponseParams",
+    "DirectoryResponse",
+    "DirectoryResponseParams",
+    "DirectoryWithParentsAndChildrenResponse",
+    "DirectoryWithParentsAndChildrenResponseFilesItem",
+    "DirectoryWithParentsAndChildrenResponseFilesItemParams",
+    "DirectoryWithParentsAndChildrenResponseParams",
     "EnvironmentResponse",
     "EnvironmentResponseParams",
     "EnvironmentTag",
@@ -549,6 +561,7 @@ __all__ = [
     "VersionStatus",
     "__version__",
     "datasets",
+    "directories",
     "evaluations",
     "evaluators",
     "files",

@@ -670,24 +670,7 @@ response = client.prompts.call_stream(
             ],
         }
     ],
-    prompt={
-        "model": "string",
-        "endpoint": "complete",
-        "template": "string",
-        "provider": "openai",
-        "max_tokens": 1,
-        "temperature": 1.1,
-        "top_p": 1.1,
-        "stop": "string",
-        "presence_penalty": 1.1,
-        "frequency_penalty": 1.1,
-        "other": {"string": {"key": "value"}},
-        "seed": 1,
-        "response_format": {"type": "json_object", "json_schema": {}},
-        "tools": [{"name": "string", "description": "string"}],
-        "linked_tools": ["string"],
-        "attributes": {"string": {"key": "value"}},
-    },
+    prompt={"model": "string"},
     inputs={"string": {"key": "value"}},
     source="string",
     metadata={"string": {"key": "value"}},
@@ -751,7 +734,7 @@ for chunk in response:
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -1017,7 +1000,7 @@ client.prompts.call(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -5046,7 +5029,7 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6229,7 +6212,7 @@ client.evaluators.update_monitoring(
 
 Log to a Flow.
 
-You can use query parameters version_id, or environment, to target
+You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 </dd>
 </dl>
@@ -6320,7 +6303,7 @@ client.flows.log(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -6962,7 +6945,7 @@ client.flows.upsert(
 <dl>
 <dd>
 
-**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+**path:** `typing.Optional[str]` — Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
     
 </dd>
 </dl>
@@ -7603,6 +7586,387 @@ client.flows.update_monitoring(
 **deactivate:** `typing.Optional[
     typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
 ]` — Evaluators to deactivate. These will not be run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Directories
+<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">list</a>()</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a list of all Directories.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.directories.list()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">create</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a Directory.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.directories.create()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the directory to create.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parent_id:** `typing.Optional[str]` — ID of the parent directory. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path to create the directory in, relative to the root directory. If the path does not exist, it will be created. Includes name, e.g. `path/to/directory`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Fetches a directory by ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.directories.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — String ID of directory. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Directory with the given ID.
+
+The Directory must be empty (i.e. contain no Directories or Files).
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.directories.delete(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Directory. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.directories.<a href="src/humanloop/directories/client.py">update</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the Directory with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.directories.update(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Directory. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name to set for the directory.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parent_id:** `typing.Optional[str]` — ID of the parent directory. Specify this to move directories. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path to move the directory to, relative to the root directory. Specify this to move directories. Includes name, e.g. `path/to/directory`.
     
 </dd>
 </dl>

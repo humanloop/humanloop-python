@@ -89,7 +89,7 @@ class EvaluatorsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Evaluator.
@@ -1118,7 +1118,7 @@ class AsyncEvaluatorsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Evaluator.
