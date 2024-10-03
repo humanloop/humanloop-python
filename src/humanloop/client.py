@@ -37,7 +37,7 @@ class Humanloop(BaseHumanloop):
             follow_redirects=follow_redirects,
             httpx_client=httpx_client,
         )
-        self.evaluations.run_local = partial(_run_eval, client=self)
+        self.evaluations.run_local = partial(_run_eval, client=self)  # type: ignore[attr-defined]
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):

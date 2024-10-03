@@ -13,7 +13,7 @@ from functools import partial
 import inspect
 from logging import INFO
 from pydantic import BaseModel, ValidationError
-from typing import Callable, Sequence, Literal, cast
+from typing import Callable, Sequence, Literal
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
