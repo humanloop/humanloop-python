@@ -17,6 +17,11 @@ from .dashboard_configuration import DashboardConfigurationParams
 from .datapoint_response import DatapointResponseParams
 from .datapoint_response_target_value import DatapointResponseTargetValueParams
 from .dataset_response import DatasetResponseParams
+from .directory_response import DirectoryResponseParams
+from .directory_with_parents_and_children_response import DirectoryWithParentsAndChildrenResponseParams
+from .directory_with_parents_and_children_response_files_item import (
+    DirectoryWithParentsAndChildrenResponseFilesItemParams,
+)
 from .environment_response import EnvironmentResponseParams
 from .evaluated_version_response import EvaluatedVersionResponseParams
 from .evaluatee_request import EvaluateeRequestParams
@@ -135,6 +140,9 @@ __all__ = [
     "DatapointResponseParams",
     "DatapointResponseTargetValueParams",
     "DatasetResponseParams",
+    "DirectoryResponseParams",
+    "DirectoryWithParentsAndChildrenResponseFilesItemParams",
+    "DirectoryWithParentsAndChildrenResponseParams",
     "EnvironmentResponseParams",
     "EvaluatedVersionResponseParams",
     "EvaluateeRequestParams",

@@ -21,6 +21,9 @@ from .dashboard_configuration import DashboardConfiguration
 from .datapoint_response import DatapointResponse
 from .datapoint_response_target_value import DatapointResponseTargetValue
 from .dataset_response import DatasetResponse
+from .directory_response import DirectoryResponse
+from .directory_with_parents_and_children_response import DirectoryWithParentsAndChildrenResponse
+from .directory_with_parents_and_children_response_files_item import DirectoryWithParentsAndChildrenResponseFilesItem
 from .environment_response import EnvironmentResponse
 from .environment_tag import EnvironmentTag
 from .evaluated_version_response import EvaluatedVersionResponse
@@ -167,6 +170,9 @@ __all__ = [
     "DatapointResponse",
     "DatapointResponseTargetValue",
     "DatasetResponse",
+    "DirectoryResponse",
+    "DirectoryWithParentsAndChildrenResponse",
+    "DirectoryWithParentsAndChildrenResponseFilesItem",
     "EnvironmentResponse",
     "EnvironmentTag",
     "EvaluatedVersionResponse",

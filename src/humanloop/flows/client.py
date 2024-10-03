@@ -74,7 +74,7 @@ class FlowsClient:
         """
         Log to a Flow.
 
-        You can use query parameters version_id, or environment, to target
+        You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
         Parameters
@@ -89,7 +89,7 @@ class FlowsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Flow.
@@ -606,7 +606,7 @@ class FlowsClient:
             A key-value object identifying the Flow Version.
 
         path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Flow.
@@ -1239,7 +1239,7 @@ class AsyncFlowsClient:
         """
         Log to a Flow.
 
-        You can use query parameters version_id, or environment, to target
+        You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
         Parameters
@@ -1254,7 +1254,7 @@ class AsyncFlowsClient:
             Unique identifier for the Evaluation Report to associate the Log to.
 
         path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Flow.
@@ -1810,7 +1810,7 @@ class AsyncFlowsClient:
             A key-value object identifying the Flow Version.
 
         path : typing.Optional[str]
-            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Flow.

@@ -557,7 +557,7 @@ class PromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -660,24 +660,7 @@ class PromptsClient:
                     ],
                 }
             ],
-            prompt={
-                "model": "string",
-                "endpoint": "complete",
-                "template": "string",
-                "provider": "openai",
-                "max_tokens": 1,
-                "temperature": 1.1,
-                "top_p": 1.1,
-                "stop": "string",
-                "presence_penalty": 1.1,
-                "frequency_penalty": 1.1,
-                "other": {"string": {"key": "value"}},
-                "seed": 1,
-                "response_format": {"type": "json_object", "json_schema": {}},
-                "tools": [{"name": "string", "description": "string"}],
-                "linked_tools": ["string"],
-                "attributes": {"string": {"key": "value"}},
-            },
+            prompt={"model": "string"},
             inputs={"string": {"key": "value"}},
             source="string",
             metadata={"string": {"key": "value"}},
@@ -835,7 +818,7 @@ class PromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -2466,7 +2449,7 @@ class AsyncPromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
@@ -2573,24 +2556,7 @@ class AsyncPromptsClient:
                         ],
                     }
                 ],
-                prompt={
-                    "model": "string",
-                    "endpoint": "complete",
-                    "template": "string",
-                    "provider": "openai",
-                    "max_tokens": 1,
-                    "temperature": 1.1,
-                    "top_p": 1.1,
-                    "stop": "string",
-                    "presence_penalty": 1.1,
-                    "frequency_penalty": 1.1,
-                    "other": {"string": {"key": "value"}},
-                    "seed": 1,
-                    "response_format": {"type": "json_object", "json_schema": {}},
-                    "tools": [{"name": "string", "description": "string"}],
-                    "linked_tools": ["string"],
-                    "attributes": {"string": {"key": "value"}},
-                },
+                prompt={"model": "string"},
                 inputs={"string": {"key": "value"}},
                 source="string",
                 metadata={"string": {"key": "value"}},
@@ -2751,7 +2717,7 @@ class AsyncPromptsClient:
             Name of the Environment identifying a deployed version to log to.
 
         path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. Example: `folder/name` or just `name`.
+            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
         id : typing.Optional[str]
             ID for an existing Prompt.
