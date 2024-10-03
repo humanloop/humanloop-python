@@ -11,9 +11,9 @@ import logging
 from datetime import datetime
 from functools import partial
 import inspect
-from logging import Logger, INFO
+from logging import INFO
 from pydantic import BaseModel, ValidationError
-from typing import Callable, Sequence, Literal
+from typing import Callable, Sequence, Literal, cast
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
@@ -185,23 +185,22 @@ def _run_eval(
         logger.warning("No type specified, defaulting to 'flow'.")
     custom_logger = file.pop("custom_logger", None)
     file_dict = {**file, **version}
-    match type_:
-        case "flow":
-            # Be more lenient with Flow versions as they are arbitrary json
-            try:
-                FlowKernel.parse_obj(version)
-            except ValidationError:
-                version = {"attributes": version}
-                file_dict = {**file, **version}
-            file = client.flows.upsert(**file_dict)
-        case "prompt":
-            file = client.prompts.upsert(**file_dict)
-        case "tool":
-            file = client.tools.upsert(**file_dict)
-        case "evaluator":
-            file = client.evaluators.upsert(**file_dict)
-        case _:
-            raise NotImplementedError(f"Unsupported File type: {type_}")
+    if type_ == "flow":
+        # Be more lenient with Flow versions as they are arbitrary json
+        try:
+            FlowKernel.parse_obj(version)
+        except ValidationError:
+            flow_version = {"attributes": version}
+            file_dict = {**file, **flow_version}
+        hl_file = client.flows.upsert(**file_dict)
+    elif type_ == "prompt":
+        hl_file = client.prompts.upsert(**file_dict)
+    elif type_ == "tool":
+        hl_file = client.tools.upsert(**file_dict)
+    elif type_ == "evaluator":
+        hl_file = client.evaluators.upsert(**file_dict)
+    else:
+        raise NotImplementedError(f"Unsupported File type: {type_}")
 
     # Upsert the Dataset
     hl_dataset = client.datasets.upsert(**dataset)
@@ -248,12 +247,12 @@ def _run_eval(
             name=name,
             dataset={"file_id": hl_dataset.id},
             evaluators=[{"path": e["path"]} for e in evaluators],
-            file={"id": file.id},
+            file={"id": hl_file.id},
         )
     except ApiError as error_:
         # If the name exists, go and get it # TODO: Update API GET to allow querying by name and file.
         if error_.status_code == 409:
-            evals = client.evaluations.list(file_id=file.id, size=50)
+            evals = client.evaluations.list(file_id=hl_file.id, size=50)
             for page in evals.iter_pages():
                 evaluation = next((e for e in page.items if e.name == name), None)
         else:
@@ -266,8 +265,8 @@ def _run_eval(
     log_func = _get_log_func(
         client=client,
         type_=type_,
-        file_id=file.id,
-        version_id=file.version_id,
+        file_id=hl_file.id,
+        version_id=hl_file.version_id,
         evaluation_id=evaluation.id,
         batch_id=batch_id
     )
@@ -338,9 +337,9 @@ def _run_eval(
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
     logger.info(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
-    logger.info(f"{CYAN}Version Id: {file.version_id}{RESET}")
+    logger.info(f"{CYAN}Version Id: {hl_file.version_id}{RESET}")
     logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
-    logger.info(f"{CYAN}\nRunning function for File {file.name} over the Dataset {hl_dataset.name}{RESET}")
+    logger.info(f"{CYAN}\nRunning function for File {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
 
     completed_tasks = 0
     with ThreadPoolExecutor(max_workers=workers) as executor:
@@ -413,30 +412,28 @@ def _get_log_func(
         "evaluation_id": evaluation_id,
         "batch_id": batch_id,
     }
-    match type_:
-        case "flow":
-            return partial(client.flows.log, **log_request, trace_status="complete")
-        case "prompt":
-            return partial(client.prompts.log, **log_request)
-        case "evaluator":
-            return partial(client.evaluators.log, **log_request)
-        case "tool":
-            return partial(client.tools.log, **log_request)
-        case _:
-            raise NotImplementedError(f"Unsupported File version: {type_}")
+    if type_ == "flow":
+        return partial(client.flows.log, **log_request, trace_status="complete")
+    elif type_ == "prompt":
+        return partial(client.prompts.log, **log_request)
+    elif type_ == "evaluator":
+        return partial(client.evaluators.log, **log_request)
+    elif type_ == "tool":
+        return partial(client.tools.log, **log_request)
+    else:
+        raise NotImplementedError(f"Unsupported File version: {type_}")
 
 
 def get_score_from_evaluator_stat(stat: NumericStats | BooleanStats) -> float | None:
     """Get the score from an Evaluator Stat."""
     score = None
-    match stat:
-        case BooleanStats():
-            if stat.total_logs:
-                score = round(stat.num_true / stat.total_logs, 2)
-        case NumericStats():
-            score = round(stat.mean, 2)
-        case _:
-            raise ValueError("Invalid Evaluator Stat type.")
+    if isinstance(stat, BooleanStats):
+        if stat.total_logs:
+            score = round(stat.num_true / stat.total_logs, 2)
+    elif isinstance(stat, NumericStats):
+        score = round(stat.mean, 2)
+    else:
+        raise ValueError("Invalid Evaluator Stat type.")
     return score
 
 
