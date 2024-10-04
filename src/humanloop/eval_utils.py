@@ -230,7 +230,7 @@ def _run_eval(
     hl_dataset = client.datasets.get(id=hl_dataset.id, include_datapoints=True)
 
     # Upsert the local Evaluators; other Evaluators are just referenced by `path` or `id`
-    local_evaluators: List[RunEvaluator] = []
+    local_evaluators: List[Evaluator] = []
     if evaluators:
         for evaluator in evaluators:
             # If a callable is provided for an Evaluator, we treat it as External
