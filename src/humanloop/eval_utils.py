@@ -35,7 +35,9 @@ from .requests import HumanEvaluatorRequestParams as HumanEvaluatorDict
 
 
 # Responses are Pydantic models
-from .types import FlowKernelRequest as FlowKernel
+from .types import FlowKernelRequest as Flow
+from .types import PromptKernelRequest as Prompt
+from .types import ToolKernelRequest as Tool
 from .types import BooleanEvaluatorStatsResponse as BooleanStats
 from .types import NumericEvaluatorStatsResponse as NumericStats
 from .types import UpdateDatesetAction as UpdateDatasetAction  # TODO: fix original type typo
@@ -103,7 +105,7 @@ class File(Identifiers, total=False):
     """
 
 
-class RunDataset(Identifiers):
+class Dataset(Identifiers):
     datapoints: Sequence[DatapointDict]
     """The datapoints to map your function over to produce the outputs required by the evaluation."""
     action: NotRequired[UpdateDatasetAction]
@@ -111,7 +113,7 @@ class RunDataset(Identifiers):
     `set` replaces the existing Datapoints and `add` appends to the existing Datapoints."""
 
 
-class RunEvaluator(Identifiers):
+class Evaluator(Identifiers):
     """The Evaluator to provide judgments for this Evaluation."""
     args_type: NotRequired[EvaluatorArgumentsType]
     """The type of arguments the Evaluator expects - only required for local Evaluators."""
@@ -152,13 +154,13 @@ def _run_eval(
     client: BaseHumanloop,
     file: File,
     name: Optional[str],
-    dataset: RunDataset,
-    evaluators: Optional[Sequence[RunEvaluator]] = None,
+    dataset: Dataset,
+    evaluators: Optional[Sequence[Evaluator]] = None,
     # logs: typing.Sequence[dict] | None = None,
     workers: int = 5,
 ) -> List[EvaluatorCheck]:
     """
-    Evaluate your function for a given `Dataset` and set of `Evaluators`
+    Evaluate your function for a given `Dataset` and set of `Evaluators`.
 
     :param client: the Humanloop API client.
     :param file: the Humanloop file being evaluated, including a function to run over the dataset.
@@ -171,40 +173,63 @@ def _run_eval(
 
     # Get or create the file on Humanloop
     version = file.pop("version", {})
+    # Raise error if one of path or id not provided
+    if not file.get("path") and not file.get("id"):
+        raise ValueError("You must provide a path or id in your `file`.")
+
     try:
         function_ = file.pop("function")
     except KeyError as _:
-        raise ValueError("You must provide a function to run your Evaluation.")
+        raise ValueError("You must provide a `function` for your `file` to run a local eval.")
+
     try:
         type_ = file.pop("type")
+        logger.info(f"{CYAN}Evaluating your {type_} function corresponding to `{file['path']}` on Humanloop{RESET} \n\n")
     except KeyError as _:
         # Default to flows if not type specified
         type_ = "flow"
-        logger.warning("No type specified, defaulting to 'flow'.")
+        logger.warning("No `file` type specified, defaulting to flow.")
+
     custom_logger = file.pop("custom_logger", None)
     file_dict = {**file, **version}
+    
     if type_ == "flow":
         # Be more lenient with Flow versions as they are arbitrary json
         try:
-            FlowKernel.parse_obj(version)
+            Flow.parse_obj(version)
         except ValidationError:
+            logger.warning("Invalid Flow `version` in your `file` request. Setting your version payload as flow `attributes`.")
             flow_version = {"attributes": version}
             file_dict = {**file, **flow_version}
         hl_file = client.flows.upsert(**file_dict)
+        
     elif type_ == "prompt":
+        try:
+            _ = Prompt.parse_obj(version)
+        except ValidationError as error_:
+            logger.error(msg=f"Invalid Prompt `version` in your `file` request. \n\nValidation error: \n)")
+            raise error_
         hl_file = client.prompts.upsert(**file_dict)
+        
     elif type_ == "tool":
+        try:
+            _ = Tool.parse_obj(version)
+        except ValidationError as error_:
+            logger.error(msg=f"Invalid Tool `version` in your `file` request. \n\nValidation error: \n)")
+            raise error_
         hl_file = client.tools.upsert(**file_dict)
+        
     elif type_ == "evaluator":
         hl_file = client.evaluators.upsert(**file_dict)
+        
     else:
         raise NotImplementedError(f"Unsupported File type: {type_}")
-
+    
     # Upsert the Dataset
     hl_dataset = client.datasets.upsert(**dataset)
     hl_dataset = client.datasets.get(id=hl_dataset.id, include_datapoints=True)
 
-    # Upsert the local Evaluators; other Evaluators are just referenced by path
+    # Upsert the local Evaluators; other Evaluators are just referenced by `path` or `id`
     local_evaluators: List[RunEvaluator] = []
     if evaluators:
         for evaluator in evaluators:
