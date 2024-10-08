@@ -369,13 +369,13 @@ def _run_eval(
 
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
-    logger.info(f"\n{CYAN}Navigate to your evals:{RESET} {evaluation.url}")
+    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}")
     logger.info(f"{CYAN}{type_} version Id: {hl_file.version_id}{RESET}")
     logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
 
     # Generate locally if a file `callable` is provided
     if function_:
-        logger.info(f"{CYAN}\nRunning `callable` for {type_} {hl_file.name} over the Dataset {hl_dataset.name}{RESET} using {workers} workers")
+        logger.info(f"{CYAN}\nRunning {hl_file.name} {type_} callable over {hl_dataset.name}{RESET} Dataset using {workers} workers")
         completed_tasks = 0
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [
