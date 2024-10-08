@@ -370,7 +370,7 @@ def _run_eval(
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
     logger.info(f"\n{CYAN}Navigate to your evals:{RESET} {evaluation.url}")
-    logger.info(f"{CYAN} {type_} version Id: {hl_file.version_id}{RESET}")
+    logger.info(f"{CYAN}{type_} version Id: {hl_file.version_id}{RESET}")
     logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
 
     # Generate locally if a file `callable` is provided
@@ -387,7 +387,7 @@ def _run_eval(
                 _progress_bar(total_datapoints, completed_tasks)
     else:
         # TODO: trigger run when updated API is available
-        logger.info(f"{CYAN}\nRunning {type_} {hl_file.name} over the Dataset {hl_dataset.name}{RESET} on Humanloop")
+        logger.info(f"{CYAN}\nRunning {type_} {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
 
     # Wait for the Evaluation to complete then print the results
     complete = False
