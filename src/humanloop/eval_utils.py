@@ -34,7 +34,7 @@ from .requests import LlmEvaluatorRequestParams as LLMEvaluatorDict
 from .requests import HumanEvaluatorRequestParams as HumanEvaluatorDict
 
 
-# Responses are Pydantic models
+# Responses are Pydantic models and we leverage them for improved request validation
 from .types import FlowKernelRequest as Flow
 from .types import PromptKernelRequest as Prompt
 from .types import ToolKernelRequest as Tool
@@ -65,7 +65,7 @@ Version = Union[FlowDict, PromptDict, ToolDict, EvaluatorDict]
 FileType = Literal["flow", "prompt", "tool", "evaluator"]
 
 
-# ANSI escape codes for colors
+# ANSI escape codes for logging colors
 YELLOW = "\033[93m"
 CYAN = "\033[96m"
 GREEN = "\033[92m"
@@ -81,23 +81,23 @@ class Identifiers(TypedDict):
     """The path of the File on Humanloop."""
 
 
-class File(Identifiers, total=False):
+class File(Identifiers):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
     type: NotRequired[FileType]
     """The type of File this function relates to on Humanloop."""
     version: NotRequired[Version]
-    """The contents uniquely define the version of the File on Humanloop"""
-    function: Callable
+    """The contents uniquely define the version of the File on Humanloop."""
+    callable: Callable
     """The function being evaluated.
-    It will be called using your Dataset `inputs` as follows: `output = function(**datapoint.inputs)`.
-    If `messages` are defined in your Dataset, then `output = function(**datapoint.inputs, messages=datapoint.messages)`.
+    It will be called using your Dataset `inputs` as follows: `output = callable(**datapoint.inputs)`.
+    If `messages` are defined in your Dataset, then `output = callable(**datapoint.inputs, messages=datapoint.messages)`.
     It should return a single string output. If not, you must provide a `custom_logger`.
     """
     custom_logger: NotRequired[Callable]
     """function that logs the output of your function to Humanloop, replacing the default logging.
     If provided, it will be called as follows:
         ```
-        output = function(**datapoint.inputs).
+        output = callable(**datapoint.inputs).
         log = custom_logger(client, output)
         ```
         Inside the custom_logger, you can use the Humanloop `client` to log the output of your function.
@@ -119,12 +119,12 @@ class Evaluator(Identifiers):
     """The type of arguments the Evaluator expects - only required for local Evaluators."""
     return_type: NotRequired[EvaluatorReturnTypeEnum]
     """The type of return value the Evaluator produces - only required for local Evaluators."""
-    function: NotRequired[Callable]
+    callable: NotRequired[Callable]
     """The function to run on the logs to produce the judgment - only required for local Evaluators."""
     custom_logger: NotRequired[Callable]
     """optional function that logs the output judgment from your Evaluator to Humanloop, if provided, it will be called as follows:
     ```
-    judgment = function(log_dict)
+    judgment = callable(log_dict)
     log = custom_logger(client, judgmemt)
     ```
     Inside the custom_logger, you can use the Humanloop `client` to log the judgment to Humanloop.
@@ -157,7 +157,7 @@ def _run_eval(
     dataset: Dataset,
     evaluators: Optional[Sequence[Evaluator]] = None,
     # logs: typing.Sequence[dict] | None = None,
-    workers: int = 5,
+    workers: int = 4,
 ) -> List[EvaluatorCheck]:
     """
     Evaluate your function for a given `Dataset` and set of `Evaluators`.
@@ -173,22 +173,29 @@ def _run_eval(
 
     # Get or create the file on Humanloop
     version = file.pop("version", {})
+
     # Raise error if one of path or id not provided
     if not file.get("path") and not file.get("id"):
         raise ValueError("You must provide a path or id in your `file`.")
 
-    try:
-        function_ = file.pop("function")
-    except KeyError as _:
-        raise ValueError("You must provide a `function` for your `file` to run a local eval.")
-
+    # Determine the `type` of the `file` to Evaluate - if not `type` provided, default to `flow`
     try:
         type_ = file.pop("type")
-        logger.info(f"{CYAN}Evaluating your {type_} function corresponding to `{file['path']}` on Humanloop{RESET} \n\n")
+        logger.info(
+            f"{CYAN}Evaluating your {type_} function corresponding to `{file['path']}` on Humanloop{RESET} \n\n")
     except KeyError as _:
-        # Default to flows if not type specified
         type_ = "flow"
         logger.warning("No `file` type specified, defaulting to flow.")
+
+    # If a `callable` is provided, Logs will be generated locally, otherwise Logs will be generated on Humanloop.
+    function_ = None
+    try:
+        function_ = file.pop("callable")
+    except KeyError as _:
+        if type_ == "flow":
+            raise ValueError("You must provide a `callable` for your Flow `file` to run a local eval.")
+        else:
+            logger.info(f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.")
 
     custom_logger = file.pop("custom_logger", None)
     file_dict = {**file, **version}
@@ -234,8 +241,11 @@ def _run_eval(
     if evaluators:
         for evaluator in evaluators:
             # If a callable is provided for an Evaluator, we treat it as External
-            eval_function = evaluator.get("function")
+            eval_function = evaluator.get("callable")
             if eval_function is not None:
+                # TODO: support the case where `file` logs generated on Humanloop but Evaluator logs generated locally
+                if function_ is None:
+                    raise ValueError(f"Local Evaluators are only supported when generating Logs locally using your {type_}'s `callable`. Please provide a `callable` for your file in order to run Evaluators locally.")
                 local_evaluators.append(evaluator)
                 spec = ExternalEvaluator(
                     arguments_type=evaluator["args_type"],
@@ -306,7 +316,7 @@ def _run_eval(
                 log = function_(client=client, output=output)
             else:
                 if not isinstance(output, str):
-                    raise ValueError("Your File function must return a string if you do not provide a custom logger.")
+                    raise ValueError(f"Your {type_}'s `callable` must return a string if you do not provide a custom logger.")
                 log = log_func(
                     inputs=datapoint.inputs,
                     output=output,
@@ -322,13 +332,13 @@ def _run_eval(
                 start_time=start_time,
                 end_time=datetime.now(),
             )
-            logger.warning(msg=f"\nFile function failed for Datapoint: {datapoint.id}. \n Error: {str(e)}")
+            logger.warning(msg=f"\nYour {type_}'s `callable` failed for Datapoint: {datapoint.id}. \n Error: {str(e)}")
 
         # Apply local Evaluators
         for local_evaluator in local_evaluators:
             try:
                 start_time = datetime.now()
-                eval_function = local_evaluator["function"]
+                eval_function = local_evaluator["callable"]
                 if local_evaluator["args_type"] == "target_required":
                     judgment = eval_function(log.dict(), datapoint.target)
                 else:
@@ -359,20 +369,25 @@ def _run_eval(
 
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
-    logger.info(f"\n{CYAN}Navigate to your Evals:{RESET} {evaluation.url}")
-    logger.info(f"{CYAN}Version Id: {hl_file.version_id}{RESET}")
+    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}")
+    logger.info(f"{CYAN}{type_} version Id: {hl_file.version_id}{RESET}")
     logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
-    logger.info(f"{CYAN}\nRunning function for File {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
 
-    completed_tasks = 0
-    with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = [
-            executor.submit(process_datapoint, datapoint)
-            for datapoint in hl_dataset.datapoints
-        ]
-        for _ in as_completed(futures):
-            completed_tasks += 1
-            _progress_bar(total_datapoints, completed_tasks)
+    # Generate locally if a file `callable` is provided
+    if function_:
+        logger.info(f"{CYAN}\nRunning {hl_file.name} {type_} callable over {hl_dataset.name}{RESET} Dataset using {workers} workers")
+        completed_tasks = 0
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [
+                executor.submit(process_datapoint, datapoint)
+                for datapoint in hl_dataset.datapoints
+            ]
+            for _ in as_completed(futures):
+                completed_tasks += 1
+                _progress_bar(total_datapoints, completed_tasks)
+    else:
+        # TODO: trigger run when updated API is available
+        logger.info(f"{CYAN}\nRunning {type_} {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
 
     # Wait for the Evaluation to complete then print the results
     complete = False
