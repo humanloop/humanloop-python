@@ -205,7 +205,6 @@ def _run_eval(
         try:
             Flow.parse_obj(version)
         except ValidationError:
-            logger.warning("Invalid Flow `version` in your `file` request. Setting your version payload as flow `attributes`.")
             flow_version = {"attributes": version}
             file_dict = {**file, **flow_version}
         hl_file = client.flows.upsert(**file_dict)
@@ -307,11 +306,12 @@ def _run_eval(
     # Define the function to execute your function in parallel and Log to Humanloop
     def process_datapoint(datapoint: Datapoint):
         start_time = datetime.now()
+        datapoint_dict = datapoint.dict()
         try:
-            if datapoint.messages:
-                output = function_(**datapoint.inputs, messages=datapoint.messages)
+            if "messages" in datapoint_dict:
+                output = function_(**datapoint_dict["inputs"], messages=datapoint_dict["messages"])
             else:
-                output = function_(**datapoint.inputs)
+                output = function_(**datapoint_dict["inputs"])
             if custom_logger:
                 log = function_(client=client, output=output)
             else:
@@ -340,7 +340,7 @@ def _run_eval(
                 start_time = datetime.now()
                 eval_function = local_evaluator["callable"]
                 if local_evaluator["args_type"] == "target_required":
-                    judgment = eval_function(log.dict(), datapoint.target)
+                    judgment = eval_function(log.dict(), datapoint_dict["target"])
                 else:
                     judgment = eval_function(log.dict())
 
@@ -375,7 +375,7 @@ def _run_eval(
 
     # Generate locally if a file `callable` is provided
     if function_:
-        logger.info(f"{CYAN}\nRunning {hl_file.name} {type_} callable over {hl_dataset.name}{RESET} Dataset using {workers} workers")
+        logger.info(f"{CYAN}\nRunning {hl_file.name} over the Dataset {hl_dataset.name} using {workers} workers{RESET} ")
         completed_tasks = 0
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [
@@ -387,7 +387,7 @@ def _run_eval(
                 _progress_bar(total_datapoints, completed_tasks)
     else:
         # TODO: trigger run when updated API is available
-        logger.info(f"{CYAN}\nRunning {type_} {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
+        logger.info(f"{CYAN}\nRunning {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
 
     # Wait for the Evaluation to complete then print the results
     complete = False
@@ -471,7 +471,7 @@ def get_score_from_evaluator_stat(stat: Union[NumericStats, BooleanStats]) -> Un
     elif isinstance(stat, NumericStats):
         score = round(stat.mean, 2)
     else:
-        raise ValueError("Invalid Evaluator Stat type.")
+        pass
     return score
 
 
