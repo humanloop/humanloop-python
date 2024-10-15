@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 import copy
-from typing import Any, TypeVar
+from typing import Any, Dict, List, TypeVar
 import logging
 
 import re
@@ -17,17 +17,17 @@ logger = logging.getLogger(__name__)
 class PromptVariablesNotFoundError(ValueError):
     """Raised when inputs do not satisfy prompt variables."""
 
-    missing_variables: list[str]
+    missing_variables: List[str]
     """Missing variables"""
 
-    def __init__(self, missing_variables: list[str]) -> None:
+    def __init__(self, missing_variables: List[str]) -> None:
         self.missing_variables = missing_variables
         super().__init__(f"Prompt requires inputs for the following " f"variables: {self.missing_variables}")
 
 
 def populate_prompt_template(
     template: str,
-    inputs: dict[str, Any] | None,
+    inputs: Dict[str, Any] | None,
 ) -> str:
     """Interpolate a string template with kwargs, where template variables
     are specified using double curly bracket syntax: {{variable}}.
@@ -46,7 +46,7 @@ def populate_prompt_template(
     raises:
         PromptVariablesNotFoundError - if any variables are missing from inputs
     """
-    template_variables: list[str] = re.findall(
+    template_variables: List[str] = re.findall(
         # Matching variables: `{{ variable_2 }}`
         r"{{\s?([a-zA-Z_\d\.\[\]]+)\s?}}",
         template,
@@ -99,8 +99,8 @@ def sanitize_prompt(prompt: str):
 
 def populate_chat_template(
     chat_template: Sequence[ChatMessageParams],
-    inputs: dict[str, str] | None = None,
-) -> list[ChatMessageParams]:
+    inputs: Dict[str, str] | None = None,
+) -> List[ChatMessageParams]:
     """Interpolate a chat template with kwargs, where template variables."""
     messages = []
     message: ChatMessageParams
@@ -136,7 +136,7 @@ def populate_chat_template(
 T = TypeVar("T", bound=PromptRequestTemplateParams)
 
 
-def populate_template(template: T, inputs: dict[str, str]) -> T:
+def populate_template(template: T, inputs: Dict[str, str]) -> T:
     """Populate a Prompt's template with the given inputs.
 
     Humanloop supports insertion of variables of the form `{{variable}}` in
