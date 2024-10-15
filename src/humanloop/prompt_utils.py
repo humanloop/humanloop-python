@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 import copy
-from typing import Any, Dict, List, TypeVar
+from typing import Any, Dict, List, Optional, TypeVar
 import logging
 
 import re
@@ -27,7 +27,7 @@ class PromptVariablesNotFoundError(ValueError):
 
 def populate_prompt_template(
     template: str,
-    inputs: Dict[str, Any] | None,
+    inputs: Optional[Dict[str, Any]],
 ) -> str:
     """Interpolate a string template with kwargs, where template variables
     are specified using double curly bracket syntax: {{variable}}.
@@ -66,7 +66,7 @@ def populate_prompt_template(
 
     # e.g. var: input_name, sig(input_name), sig(other_name), sig("string")
     for var in template_variables:
-        text: str | None = None
+        text: Optional[str] = None
 
         if var in inputs:
             text = inputs[var]
@@ -99,7 +99,7 @@ def sanitize_prompt(prompt: str):
 
 def populate_chat_template(
     chat_template: Sequence[ChatMessageParams],
-    inputs: Dict[str, str] | None = None,
+    inputs: Optional[Dict[str, str]] = None,
 ) -> List[ChatMessageParams]:
     """Interpolate a chat template with kwargs, where template variables."""
     messages = []
