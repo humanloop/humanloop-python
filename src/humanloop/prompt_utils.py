@@ -22,10 +22,7 @@ class PromptVariablesNotFoundError(ValueError):
 
     def __init__(self, missing_variables: list[str]) -> None:
         self.missing_variables = missing_variables
-        super().__init__(
-            f"Prompt requires inputs for the following "
-            f"variables: {self.missing_variables}"
-        )
+        super().__init__(f"Prompt requires inputs for the following " f"variables: {self.missing_variables}")
 
 
 def populate_prompt_template(
@@ -78,10 +75,7 @@ def populate_prompt_template(
             missing_vars.append(var)
         else:
             if not isinstance(text, str):
-                logger.info(
-                    f"Converting input value for variable '{var}' to string for prompt template: "
-                    f"{text}"
-                )
+                logger.info(f"Converting input value for variable '{var}' to string for prompt template: " f"{text}")
                 text = str(text)
             replacement = sanitize_prompt(prompt=text) if text else text
             prompt = re.sub(
@@ -143,6 +137,17 @@ T = TypeVar("T", bound=PromptRequestTemplateParams)
 
 
 def populate_template(template: T, inputs: dict[str, str]) -> T:
+    """Populate a Prompt's template with the given inputs.
+
+    Humanloop supports insertion of variables of the form `{{variable}}` in
+    Prompt templates.
+    E.g. If you provide the template `Hello {{name}}` and the input
+    `{"name": "Alice"}`, the populated template will be `Hello Alice`.
+
+    This function supports both completion and chat models. For completion
+    models, provide template as a string. For chat models, provide template
+    as a list of messages.
+    """
     if isinstance(template, str):
         return populate_prompt_template(
             template=template,
