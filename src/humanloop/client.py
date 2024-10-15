@@ -6,10 +6,12 @@ import httpx
 from .base_client import BaseHumanloop, AsyncBaseHumanloop
 from .environment import HumanloopEnvironment
 from .eval_utils import _run_eval, Dataset, File, Evaluator, EvaluatorCheck
-from .base_client import EvaluationsClient
+from .prompts.client import PromptsClient
+from .evaluations.client import EvaluationsClient
+from .prompt_utils import populate_template
+
 
 class ExtendedEvalsClient(EvaluationsClient):
-
     client: BaseHumanloop
 
     def run(
@@ -21,8 +23,8 @@ class ExtendedEvalsClient(EvaluationsClient):
         # logs: typing.Sequence[dict] | None = None,
         workers: int = 4,
     ) -> List[EvaluatorCheck]:
-        """
-        Evaluate your function for a given `Dataset` and set of `Evaluators`.
+        """Evaluate your function for a given `Dataset` and set of `Evaluators`.
+
         :param file: the Humanloop file being evaluated, including a function to run over the dataset.
         :param name: the name of the Evaluation to run. If it does not exist, a new Evaluation will be created under your File.
         :param dataset: the dataset to map your function over to produce the outputs required by the Evaluation.
@@ -41,6 +43,10 @@ class ExtendedEvalsClient(EvaluationsClient):
             evaluators=evaluators,
             workers=workers,
         )
+
+
+class ExtendedPromptsClient(PromptsClient):
+    populate_template = staticmethod(populate_template)
 
 
 class Humanloop(BaseHumanloop):
@@ -75,6 +81,7 @@ class Humanloop(BaseHumanloop):
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
+        self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):
