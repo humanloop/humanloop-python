@@ -1,6 +1,5 @@
-from collections.abc import Sequence
 import copy
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, Dict, List, Optional, TypeVar, Sequence
 import logging
 
 import re
