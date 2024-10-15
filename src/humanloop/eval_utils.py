@@ -377,9 +377,9 @@ def _run_eval(
 
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
-    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}")
-    logger.info(f"{CYAN}{type_} version Id: {hl_file.version_id}{RESET}")
-    logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
+    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}\n")
+    logger.info(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}")
+    logger.info(f"{CYAN}Run ID: {batch_id}{RESET}")
 
     # Generate locally if a file `callable` is provided
     if function_:
