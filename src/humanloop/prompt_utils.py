@@ -4,8 +4,8 @@ import logging
 
 import re
 
-from humanloop.requests.chat_message import ChatMessageParams
-from humanloop.prompts.requests.prompt_request_template import (
+from .requests.chat_message import ChatMessageParams
+from .prompts.requests.prompt_request_template import (
     PromptRequestTemplateParams,
 )
 
