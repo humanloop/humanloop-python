@@ -7,6 +7,7 @@ where you are managing the runtime of your application in your code.
 Functions in this module should be accessed via the Humanloop client. They should
 not be called directly.
 """
+
 import logging
 from datetime import datetime
 from functools import partial
@@ -47,7 +48,7 @@ from .types import (
     VersionStatsResponse,
     EvaluatorArgumentsType,
     EvaluatorReturnTypeEnum,
-    EvaluationResponse
+    EvaluationResponse,
 )
 
 # Setup logging
@@ -55,7 +56,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(level=INFO)
 console_handler = logging.StreamHandler()
 logger.setLevel(INFO)
-formatter = logging.Formatter('%(message)s')
+formatter = logging.Formatter("%(message)s")
 console_handler.setFormatter(formatter)
 if not logger.hasHandlers():
     logger.addHandler(console_handler)
@@ -75,6 +76,7 @@ RESET = "\033[0m"
 
 class Identifiers(TypedDict):
     """Common identifiers for the objects required to run an Evaluation."""
+
     id: NotRequired[str]
     """The ID of the File on Humanloop."""
     path: NotRequired[str]
@@ -83,6 +85,7 @@ class Identifiers(TypedDict):
 
 class File(Identifiers):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
+
     type: NotRequired[FileType]
     """The type of File this function relates to on Humanloop."""
     version: NotRequired[Version]
@@ -115,6 +118,7 @@ class Dataset(Identifiers):
 
 class Evaluator(Identifiers):
     """The Evaluator to provide judgments for this Evaluation."""
+
     args_type: NotRequired[EvaluatorArgumentsType]
     """The type of arguments the Evaluator expects - only required for local Evaluators."""
     return_type: NotRequired[EvaluatorReturnTypeEnum]
@@ -136,6 +140,7 @@ class Evaluator(Identifiers):
 
 class EvaluatorCheck(BaseModel):
     """Summary data for an Evaluator check."""
+
     path: str
     """The path of the Evaluator used in the check."""
     improvement_check: bool
@@ -182,7 +187,8 @@ def _run_eval(
     try:
         type_ = file.pop("type")
         logger.info(
-            f"{CYAN}Evaluating your {type_} function corresponding to `{file['path']}` on Humanloop{RESET} \n\n")
+            f"{CYAN}Evaluating your {type_} function corresponding to `{file['path']}` on Humanloop{RESET} \n\n"
+        )
     except KeyError as _:
         type_ = "flow"
         logger.warning("No `file` type specified, defaulting to flow.")
@@ -199,7 +205,7 @@ def _run_eval(
 
     custom_logger = file.pop("custom_logger", None)
     file_dict = {**file, **version}
-    
+
     if type_ == "flow":
         # Be more lenient with Flow versions as they are arbitrary json
         try:
@@ -208,7 +214,7 @@ def _run_eval(
             flow_version = {"attributes": version}
             file_dict = {**file, **flow_version}
         hl_file = client.flows.upsert(**file_dict)
-        
+
     elif type_ == "prompt":
         try:
             _ = Prompt.parse_obj(version)
@@ -216,7 +222,7 @@ def _run_eval(
             logger.error(msg=f"Invalid Prompt `version` in your `file` request. \n\nValidation error: \n)")
             raise error_
         hl_file = client.prompts.upsert(**file_dict)
-        
+
     elif type_ == "tool":
         try:
             _ = Tool.parse_obj(version)
@@ -224,13 +230,13 @@ def _run_eval(
             logger.error(msg=f"Invalid Tool `version` in your `file` request. \n\nValidation error: \n)")
             raise error_
         hl_file = client.tools.upsert(**file_dict)
-        
+
     elif type_ == "evaluator":
         hl_file = client.evaluators.upsert(**file_dict)
-        
+
     else:
         raise NotImplementedError(f"Unsupported File type: {type_}")
-    
+
     # Upsert the Dataset
     hl_dataset = client.datasets.upsert(**dataset)
     hl_dataset = client.datasets.get(id=hl_dataset.id, include_datapoints=True)
@@ -244,19 +250,17 @@ def _run_eval(
             if eval_function is not None:
                 # TODO: support the case where `file` logs generated on Humanloop but Evaluator logs generated locally
                 if function_ is None:
-                    raise ValueError(f"Local Evaluators are only supported when generating Logs locally using your {type_}'s `callable`. Please provide a `callable` for your file in order to run Evaluators locally.")
+                    raise ValueError(
+                        f"Local Evaluators are only supported when generating Logs locally using your {type_}'s `callable`. Please provide a `callable` for your file in order to run Evaluators locally."
+                    )
                 local_evaluators.append(evaluator)
                 spec = ExternalEvaluator(
                     arguments_type=evaluator["args_type"],
                     return_type=evaluator["return_type"],
                     attributes={"code": inspect.getsource(eval_function)},
-                    evaluator_type="external"
+                    evaluator_type="external",
                 )
-                _ = client.evaluators.upsert(
-                    id=evaluator.get("id"),
-                    path=evaluator.get("path"),
-                    spec=spec
-                )
+                _ = client.evaluators.upsert(id=evaluator.get("id"), path=evaluator.get("path"), spec=spec)
 
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
@@ -270,7 +274,9 @@ def _run_eval(
             if not datapoint.target:
                 missing_target += 1
         if missing_target > 0:
-            raise ValueError(f"{missing_target} Datapoints have no target. A target is required for the Evaluator: {local_evaluator['path']}")
+            raise ValueError(
+                f"{missing_target} Datapoints have no target. A target is required for the Evaluator: {local_evaluator['path']}"
+            )
 
     # Get or create the Evaluation based on the name
     evaluation = None
@@ -300,7 +306,7 @@ def _run_eval(
         file_id=hl_file.id,
         version_id=hl_file.version_id,
         evaluation_id=evaluation.id,
-        batch_id=batch_id
+        batch_id=batch_id,
     )
 
     # Define the function to execute your function in parallel and Log to Humanloop
@@ -316,7 +322,9 @@ def _run_eval(
                 log = function_(client=client, output=output)
             else:
                 if not isinstance(output, str):
-                    raise ValueError(f"Your {type_}'s `callable` must return a string if you do not provide a custom logger.")
+                    raise ValueError(
+                        f"Your {type_}'s `callable` must return a string if you do not provide a custom logger."
+                    )
                 log = log_func(
                     inputs=datapoint.inputs,
                     output=output,
@@ -369,19 +377,18 @@ def _run_eval(
 
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
-    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}")
-    logger.info(f"{CYAN}{type_} version Id: {hl_file.version_id}{RESET}")
-    logger.info(f"{CYAN}Run Id: {batch_id}{RESET}")
+    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}\n")
+    logger.info(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}")
+    logger.info(f"{CYAN}Run ID: {batch_id}{RESET}")
 
     # Generate locally if a file `callable` is provided
     if function_:
-        logger.info(f"{CYAN}\nRunning {hl_file.name} over the Dataset {hl_dataset.name} using {workers} workers{RESET} ")
+        logger.info(
+            f"{CYAN}\nRunning {hl_file.name} over the Dataset {hl_dataset.name} using {workers} workers{RESET} "
+        )
         completed_tasks = 0
         with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = [
-                executor.submit(process_datapoint, datapoint)
-                for datapoint in hl_dataset.datapoints
-            ]
+            futures = [executor.submit(process_datapoint, datapoint) for datapoint in hl_dataset.datapoints]
             for _ in as_completed(futures):
                 completed_tasks += 1
                 _progress_bar(total_datapoints, completed_tasks)
@@ -481,12 +488,12 @@ def _progress_bar(total: int, progress: int):
     if total <= 0:
         total = 1
 
-    if not hasattr(_progress_bar, 'start_time'):
+    if not hasattr(_progress_bar, "start_time"):
         _progress_bar.start_time = time.time()
 
     bar_length = 40
     block = int(round(bar_length * progress / total))
-    bar = "#" * block + '-' * (bar_length - block)
+    bar = "#" * block + "-" * (bar_length - block)
 
     percentage = (progress / total) * 100
     elapsed_time = time.time() - _progress_bar.start_time
@@ -513,9 +520,7 @@ def get_evaluator_stats_by_path(
 ) -> Dict[str, Union[NumericStats, BooleanStats]]:
     """Get the Evaluator stats by path."""
     # TODO: Update the API so this is not necessary
-    evaluators_by_id = {
-        evaluator.version.version_id: evaluator for evaluator in evaluation.evaluators
-    }
+    evaluators_by_id = {evaluator.version.version_id: evaluator for evaluator in evaluation.evaluators}
     evaluator_stats_by_path = {
         evaluators_by_id[evaluator_stat.evaluator_version_id].version.path: evaluator_stat
         for evaluator_stat in stat.evaluator_version_stats
@@ -533,8 +538,7 @@ def check_evaluation_threshold(
     """Checks if the latest version has an average Evaluator result above a threshold."""
     # TODO: Update the API so this is not necessary
     evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None),
-        evaluation=evaluation
+        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None), evaluation=evaluation
     )
     if evaluator_path in evaluator_stats_by_path:
         evaluator_stat = evaluator_stats_by_path[evaluator_path]
@@ -567,19 +571,13 @@ def check_evaluation_improvement(
     # TODO: Update the API so this is not necessary
 
     latest_evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None),
-        evaluation=evaluation
+        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None), evaluation=evaluation
     )
     if len(stats.version_stats) == 1:
-        logger.info(
-            f"{YELLOW}⚠️ No previous versions to compare with.{RESET}"
-        )
+        logger.info(f"{YELLOW}⚠️ No previous versions to compare with.{RESET}")
         return True, 0, 0
 
-    previous_evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=stats.version_stats[-2],
-        evaluation=evaluation
-    )
+    previous_evaluator_stats_by_path = get_evaluator_stats_by_path(stat=stats.version_stats[-2], evaluation=evaluation)
     if evaluator_path in latest_evaluator_stats_by_path and evaluator_path in previous_evaluator_stats_by_path:
         latest_evaluator_stat = latest_evaluator_stats_by_path[evaluator_path]
         previous_evaluator_stat = previous_evaluator_stats_by_path[evaluator_path]
@@ -587,14 +585,10 @@ def check_evaluation_improvement(
         previous_score = get_score_from_evaluator_stat(stat=previous_evaluator_stat)
         diff = round(latest_score - previous_score, 2)
         if diff >= 0:
-            logger.info(
-                f"{GREEN}✅ Improvement of [{diff}] for evaluator {evaluator_path}{RESET}"
-            )
+            logger.info(f"{GREEN}✅ Improvement of [{diff}] for evaluator {evaluator_path}{RESET}")
             return True, latest_score, diff
         else:
-            logger.info(
-                f"{RED}❌ Regression of [{diff}] for evaluator {evaluator_path}{RESET}"
-            )
+            logger.info(f"{RED}❌ Regression of [{diff}] for evaluator {evaluator_path}{RESET}")
             return False, latest_score, diff
     else:
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")

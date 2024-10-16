@@ -16,13 +16,13 @@ typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.9\""}
 
 [[package]]
 name = "anyio"
-version = "4.5.1"
+version = "4.5.2"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "anyio-4.5.1-py3-none-any.whl", hash = "sha256:474fa88d0cc1cdcbb357b1e366a74b9d762c3fb5a0acb9d4292cc42db6f884ef"},
-    {file = "anyio-4.5.1.tar.gz", hash = "sha256:d0a54cc24769e2755d34f40bcdf5b3ca64b545319bc629c6e3398397e655bc91"},
+    {file = "anyio-4.5.2-py3-none-any.whl", hash = "sha256:c011ee36bc1e8ba40e5a81cb9df91925c218fe9b778554e0b56a21e1b5d4716f"},
+    {file = "anyio-4.5.2.tar.gz", hash = "sha256:23009af4ed04ce05991845451e11ef02fc7c5ed29179ac9a420e5ad0ac7ddc5b"},
 ]
 
 [package.dependencies]
