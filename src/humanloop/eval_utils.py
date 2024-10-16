@@ -377,7 +377,7 @@ def _run_eval(
 
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
-    logger.info(f"\n{CYAN}Navigate to your evals:{RESET}\n{evaluation.url}\n")
+    logger.info(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n")
     logger.info(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}")
     logger.info(f"{CYAN}Run ID: {batch_id}{RESET}")
 
@@ -398,7 +398,7 @@ def _run_eval(
 
     # Wait for the Evaluation to complete then print the results
     complete = False
-    stats = None
+
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
         logger.info(f"\r{stats.progress}")
@@ -410,6 +410,10 @@ def _run_eval(
     logger.info(stats.report)
 
     checks: List[EvaluatorCheck] = []
+    if all(evaluator.get("threshold") is None for evaluator in evaluators) and len(stats.version_stats) == 1:
+        # Skip `check_evaluation_improvement` if no thresholds were provided and there is only one run.
+        # (Or the logs would not be helpful)
+        return checks
     for evaluator in evaluators:
         improvement_check, score, delta = check_evaluation_improvement(
             evaluation=evaluation,
@@ -437,6 +441,7 @@ def _run_eval(
                 threshold_check=threshold_check,
             )
         )
+    logger.info(f"\n{CYAN}View your Evaluation:{RESET}\n{evaluation.url}\n")
     return checks
 
 
