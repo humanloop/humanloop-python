@@ -398,7 +398,7 @@ def _run_eval(
 
     # Wait for the Evaluation to complete then print the results
     complete = False
-    stats = None
+
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
         logger.info(f"\r{stats.progress}")
@@ -410,6 +410,10 @@ def _run_eval(
     logger.info(stats.report)
 
     checks: List[EvaluatorCheck] = []
+    if all(evaluator.get("threshold") is None for evaluator in evaluators) and len(stats.version_stats) == 1:
+        # Skip `check_evaluation_improvement` if no thresholds were provided and there is only one run.
+        # (Or the logs would not be helpful)
+        return checks
     for evaluator in evaluators:
         improvement_check, score, delta = check_evaluation_improvement(
             evaluation=evaluation,
