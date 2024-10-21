@@ -87,7 +87,7 @@ class File(Identifiers):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
 
     type: NotRequired[FileType]
-    """The type of File this function relates to on Humanloop."""
+    """The type of File this callable relates to on Humanloop."""
     version: NotRequired[Version]
     """The contents uniquely define the version of the File on Humanloop."""
     callable: Callable
@@ -143,8 +143,9 @@ class EvaluatorCheck(BaseModel):
 
     path: str
     """The path of the Evaluator used in the check."""
-    improvement_check: bool
-    """Whether the latest version of your function has improved across the Dataset for a specific Evaluator."""
+    # TODO: Add number valence and improvement check
+    # improvement_check: bool
+    # """Whether the latest version of your function has improved across the Dataset for a specific Evaluator."""
     score: float
     """The score of the latest version of your function for a specific Evaluator."""
     delta: float
@@ -415,7 +416,7 @@ def _run_eval(
         # (Or the logs would not be helpful)
         return checks
     for evaluator in evaluators:
-        improvement_check, score, delta = check_evaluation_improvement(
+        _, score, delta = check_evaluation_improvement(
             evaluation=evaluation,
             stats=stats,
             evaluator_path=evaluator["path"],
@@ -434,7 +435,8 @@ def _run_eval(
         checks.append(
             EvaluatorCheck(
                 path=evaluator["path"],
-                improvement_check=improvement_check,
+                # TODO: Add back in with number valence on Evaluators
+                # improvement_check=improvement_check,
                 score=score,
                 delta=delta,
                 threshold=threshold,
@@ -590,10 +592,10 @@ def check_evaluation_improvement(
         previous_score = get_score_from_evaluator_stat(stat=previous_evaluator_stat)
         diff = round(latest_score - previous_score, 2)
         if diff >= 0:
-            logger.info(f"{GREEN}✅ Improvement of [{diff}] for evaluator {evaluator_path}{RESET}")
+            logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
             return True, latest_score, diff
         else:
-            logger.info(f"{RED}❌ Regression of [{diff}] for evaluator {evaluator_path}{RESET}")
+            logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
             return False, latest_score, diff
     else:
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")
