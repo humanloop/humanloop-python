@@ -5,3 +5,8 @@ src/humanloop/prompt_utils.py
 src/humanloop/client.py
 mypy.ini
 README.md
+
+# Directories used by SDK decorators
+
+src/humanloop/decorators/_
+src/humanloop/otel/_

@@ -2,7 +2,18 @@ import typing
 from typing import Optional, List, Sequence
 import os
 import httpx
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
 
+from .decorators.flow import flow
+from .decorators.prompt import prompt
+from .decorators.tool import tool
+from humanloop.core.client_wrapper import SyncClientWrapper
+from humanloop.flows.client import FlowsClient
+from humanloop.tools.client import ToolsClient
+from .otel.exporter import HumanloopSpanExporter
+from .otel.processor import HumanloopSpanProcessor
+from .otel import instrument_provider, set_tracer
 from .base_client import BaseHumanloop, AsyncBaseHumanloop
 from .environment import HumanloopEnvironment
 from .eval_utils import _run_eval, Dataset, File, Evaluator, EvaluatorCheck
@@ -46,7 +57,28 @@ class ExtendedEvalsClient(EvaluationsClient):
 
 
 class ExtendedPromptsClient(PromptsClient):
+    def __init__(self, client_wrapper: SyncClientWrapper):
+        super().__init__(client_wrapper=client_wrapper)
+
+    decorate = staticmethod(prompt)
+    decorate.__doc__ = prompt.__doc__
     populate_template = staticmethod(populate_template)
+
+
+class ExtendedToolsClient(ToolsClient):
+    def __init__(self, client_wrapper: SyncClientWrapper):
+        super().__init__(client_wrapper=client_wrapper)
+
+    decorate = staticmethod(tool)
+    decorate.__doc__ = tool.__doc__
+
+
+class ExtendedFlowsClient(FlowsClient):
+    def __init__(self, client_wrapper: SyncClientWrapper):
+        super().__init__(client_wrapper=client_wrapper)
+
+    decorate = staticmethod(flow)
+    decorate.__doc__ = flow.__doc__
 
 
 class Humanloop(BaseHumanloop):
@@ -78,10 +110,31 @@ class Humanloop(BaseHumanloop):
             follow_redirects=follow_redirects,
             httpx_client=httpx_client,
         )
+
+        self._tracer_provider = TracerProvider(
+            resource=Resource(
+                attributes={
+                    "instrumentor": "humanloop.sdk",
+                }
+            ),
+        )
+        instrument_provider(provider=self._tracer_provider)
+        self._tracer_provider.add_span_processor(
+            HumanloopSpanProcessor(
+                exporter=HumanloopSpanExporter(
+                    client=self,
+                )
+            ),
+        )
+        tracer = self._tracer_provider.get_tracer("humanloop.sdk")
+        set_tracer(tracer)
+
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
+        self.flows = ExtendedFlowsClient(client_wrapper=self._client_wrapper)
+        self.tools = ExtendedToolsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):
