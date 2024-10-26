@@ -1,12 +1,12 @@
 import builtins
 from typing import Any
 
-from opentelemetry.sdk.trace import Span
+from opentelemetry.sdk.trace import ReadableSpan
 
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
 
 
-def write_to_opentelemetry_span(span: Span, value: Any, key: str = "") -> None:
+def write_to_opentelemetry_span(span: ReadableSpan, value: Any, key: str = "") -> None:
     """Reverse of read_from_opentelemetry_span. Writes a Python object to the OpenTelemetry Span's attributes.
 
     See `read_from_opentelemetry_span` for more information.
@@ -17,7 +17,7 @@ def write_to_opentelemetry_span(span: Span, value: Any, key: str = "") -> None:
         key: Key prefix to write to the span attributes. The path to the values does not
             need to exist in the span attributes.
     """
-    to_write = dict()
+    to_write: dict[str, Any] = {}
     _linear_object(to_write, value)
     for k, v in to_write.items():
         # OTT
@@ -27,7 +27,7 @@ def write_to_opentelemetry_span(span: Span, value: Any, key: str = "") -> None:
     #     _cache[(span.context.span_id, key)] = value
 
 
-def read_from_opentelemetry_span(span: Span, key: str = "") -> dict | list:
+def read_from_opentelemetry_span(span: ReadableSpan, key: str = ""):
     """Read a value from the OpenTelemetry span attributes.
 
     OpenTelemetry liniarises dictionaries and lists, storing only primitive values
@@ -144,15 +144,14 @@ def _linear_object(obj: dict, current: dict | list | Any, key: str = ""):
     ```
 
     """
-    match type(current):
-        case builtins.dict:
-            for k, v in current.items():
-                _linear_object(obj, v, f"{key}.{k}" if key != "" else k)
-        case builtins.list:
-            for idx, v in enumerate(current):
-                _linear_object(obj, v, f"{key}.{idx}" if key != "" else str(idx))
-        case _:
-            obj[key] = current
+    if isinstance(current, builtins.dict):
+        for k, v in current.items():
+            _linear_object(obj, v, f"{key}.{k}" if key != "" else k)
+    elif isinstance(current, list):
+        for idx, v in enumerate(current):
+            _linear_object(obj, v, f"{key}.{idx}" if key != "" else str(idx))
+    else:
+        obj[key] = current
 
 
 def _dict_to_list(d: dict[str, Any]) -> dict | list:
@@ -171,12 +170,12 @@ def _dict_to_list(d: dict[str, Any]) -> dict | list:
     return d
 
 
-def is_llm_provider_call(span: Span) -> bool:
+def is_llm_provider_call(span: ReadableSpan) -> bool:
     """Determines if the span was created by an Instrumentor for LLM provider clients."""
     return "llm.request.type" in span.attributes
 
 
-def is_humanloop_span(span: Span) -> bool:
+def is_humanloop_span(span: ReadableSpan) -> bool:
     """Determines if the span was created by the Humanloop SDK."""
     try:
         read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)

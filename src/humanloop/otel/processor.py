@@ -3,7 +3,7 @@ import logging
 from collections import defaultdict
 
 import parse
-from opentelemetry.sdk.trace import Span
+from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
@@ -26,10 +26,10 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         self._children = defaultdict(list)
 
     # TODO: Could override on_start and process Flow spans ahead of time
-    # and PATCH the created Logs in on_end. A special type of Span could be
+    # and PATCH the created Logs in on_end. A special type of ReadableSpan could be
     # used for this
 
-    def on_end(self, span: Span) -> None:
+    def on_end(self, span: ReadableSpan) -> None:
         if is_humanloop_span(span=span):
             _process_humanloop_span(span, self._children[span.context.span_id])
             del self._children[span.context.span_id]
@@ -39,13 +39,13 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
                 self._children[span.parent.span_id].append(span)
 
 
-def _is_instrumentor_span(span: Span) -> bool:
+def _is_instrumentor_span(span: ReadableSpan) -> bool:
     # TODO: Extend in the future as needed. Spans not coming from
     # Instrumentors of interest should be dropped
     return is_llm_provider_call(span=span)
 
 
-def _process_humanloop_span(span: Span, children_spans: list[Span]):
+def _process_humanloop_span(span: ReadableSpan, children_spans: list[ReadableSpan]):
     hl_file = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
 
     if "prompt" in hl_file:
@@ -61,7 +61,7 @@ def _process_humanloop_span(span: Span, children_spans: list[Span]):
         logging.error("Invalid span type")
 
 
-def _process_prompt(prompt_span: Span, children_spans: list[Span]):
+def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan]):
     if len(children_spans) == 0:
         return
     child_span = children_spans[0]
@@ -70,7 +70,7 @@ def _process_prompt(prompt_span: Span, children_spans: list[Span]):
     _enrich_prompt_span_log(prompt_span, child_span)
 
 
-def _process_tool(tool_span: Span, children_spans: list[Span]):
+def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
     # TODO: Use children_spans in the future
     tool_log = read_from_opentelemetry_span(tool_span, key=HL_LOG_OT_KEY)
     tool_log["start_time"] = tool_span.start_time / 1e9
@@ -84,7 +84,7 @@ def _process_tool(tool_span: Span, children_spans: list[Span]):
     )
 
 
-def _process_flow(flow_span: Span, children_spans: list[Span]):
+def _process_flow(flow_span: ReadableSpan, children_spans: list[ReadableSpan]):
     # TODO: Use children_spans in the future
     flow_log = read_from_opentelemetry_span(flow_span, key=HL_LOG_OT_KEY)
     flow_log["start_time"] = flow_span.start_time / 1e9
@@ -98,7 +98,7 @@ def _process_flow(flow_span: Span, children_spans: list[Span]):
     )
 
 
-def _enrich_prompt_span_file(prompt_span: Span, llm_provider_call_span: Span):
+def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
     hl_file = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
     gen_ai_object = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
@@ -131,10 +131,10 @@ def _enrich_prompt_span_file(prompt_span: Span, llm_provider_call_span: Span):
     )
 
 
-def _enrich_prompt_span_log(prompt_span: Span, llm_provider_call_span: Span) -> Span:
+def _enrich_prompt_span_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
     hl_file = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
     hl_log = read_from_opentelemetry_span(prompt_span, key=HL_LOG_OT_KEY)
-    gen_ai_object = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
+    gen_ai_object: dict = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
 
     # TODO: Seed not added by Instrumentors in provider call
 

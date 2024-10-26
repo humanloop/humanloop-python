@@ -3,6 +3,7 @@ import inspect
 import textwrap
 import typing
 import uuid
+from typing import Callable, Union
 from functools import wraps
 
 
@@ -14,19 +15,17 @@ from .helpers import args_to_inputs
 
 
 def _type_to_schema(type_hint):
-    match type_hint:
-        case builtins.int:
-            return "number"
-        case builtins.float:
-            return "number"
-        case builtins.bool:
-            return "boolean"
-        case builtins.str:
-            return "string"
-        case builtins.dict:
-            return "object"
-        case _:
-            raise ValueError(f"Unsupported type hint: {type_hint}")
+    if isinstance(type_hint, int):
+        return "number"
+    if isinstance(type_hint, float):
+        return "number"
+    if isinstance(type_hint, bool):
+        return "boolean"
+    if isinstance(type_hint, str):
+        return "string"
+    if isinstance(type_hint, dict):
+        return "object"
+    raise ValueError(f"Unsupported type hint: {type_hint}")
 
 
 def _handle_dict_annotation(parameter: inspect.Parameter) -> dict[str, object]:
@@ -88,28 +87,27 @@ def _parse_tool_parameters_schema(func) -> dict[str, dict]:
             inspect.Parameter.VAR_KEYWORD,
         ):
             raise ValueError("Varargs and kwargs are not supported")
-        match typing.get_origin(parameter.annotation):
-            case builtins.dict:
-                param_schema = _handle_dict_annotation(parameter)
-                parameters_schema["required"].append(parameter.name)
-                required.append(parameter.name)
-            case builtins.list:
-                param_schema = _handle_list_annotation(parameter)
-                parameters_schema["required"].append(parameter.name)
-                required.append(parameter.name)
-            case typing.Union:
-                param_schema = _handle_union_annotation(parameter)
-            case None:
-                param_schema = _handle_simple_type(parameter)
-                required.append(parameter.name)
-            case _:
-                raise ValueError("Unsupported type hint ", parameter)
+        if isinstance(origin := typing.get_origin(parameter.annotation), dict):
+            param_schema = _handle_dict_annotation(parameter)
+            parameters_schema["required"].append(parameter.name)
+            required.append(parameter.name)
+        elif isinstance(origin, list):
+            param_schema = _handle_list_annotation(parameter)
+            parameters_schema["required"].append(parameter.name)
+            required.append(parameter.name)
+        elif isinstance(origin, Union):
+            param_schema = _handle_union_annotation(parameter)
+        elif origin is None:
+            param_schema = _handle_simple_type(parameter)
+            required.append(parameter.name)
+        else:
+            raise ValueError("Unsupported type hint ", parameter)
         parameters_schema["properties"][parameter.name] = param_schema
         parameters_schema["required"] = required
     return parameters_schema
 
 
-def _tool_json_schema(func: callable):
+def _tool_json_schema(func: Callable):
     tool_name = func.__name__
     description = func.__doc__
     if description is None:
@@ -121,7 +119,7 @@ def _tool_json_schema(func: callable):
     }
 
 
-def _extract_tool_kernel(func: callable) -> dict:
+def _extract_tool_kernel(func: Callable) -> dict:
     return {
         "source_code": textwrap.dedent(
             # Remove the tool decorator from source code
@@ -134,7 +132,7 @@ def _extract_tool_kernel(func: callable) -> dict:
 
 
 def tool(path: str | None = None, attributes: dict[str, typing.Any] | None = None):
-    def decorator(func: callable):
+    def decorator(func: Callable):
         func.json_schema = _tool_json_schema(func)
         decorator.__hl_file_id = uuid.uuid4()
 

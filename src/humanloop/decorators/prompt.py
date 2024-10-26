@@ -1,6 +1,6 @@
 import uuid
 from functools import wraps
-from typing import Literal
+from typing import Literal, Callable
 
 from humanloop.otel import get_trace_context, get_tracer, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
@@ -22,7 +22,7 @@ def prompt(
     presence_penalty: float | None = None,
     frequency_penalty: float | None = None,
 ):
-    def decorator(func: callable):
+    def decorator(func: Callable):
         decorator.__hl_file_id = uuid.uuid4()
 
         if temperature is not None:

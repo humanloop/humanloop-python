@@ -1,6 +1,6 @@
 import uuid
 from functools import wraps
-from typing import Any
+from typing import Any, Callable
 
 
 from humanloop.decorators.helpers import args_to_inputs
@@ -13,7 +13,7 @@ def flow(
     path: str | None = None,
     attributes: dict[str, Any] = {},
 ):
-    def decorator(func: callable):
+    def decorator(func: Callable):
         @wraps(func)
         def wrapper(*args, **kwargs):
             with get_tracer().start_as_current_span(str(uuid.uuid4())) as span:
