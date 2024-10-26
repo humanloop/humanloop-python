@@ -1,6 +1,7 @@
 import os
 import random
 import string
+import time
 from unittest.mock import patch
 
 import pytest
@@ -174,6 +175,10 @@ def test_hl_exporter_with_flow(
         assert "prompt" in read_from_opentelemetry_span(span=middle_exported_span, key=HL_FILE_OT_KEY)
         # THEN the first uploaded span is the Tool
         assert "tool" in read_from_opentelemetry_span(span=first_exported_span, key=HL_FILE_OT_KEY)
+
+        # Potentially flaky: Exporter is threaded, need
+        # to wait for them to finish
+        time.sleep(3)
 
         # THEN the first Log uploaded is the Flow
         first_log = exporter._client.flows.log.call_args_list[0][1]

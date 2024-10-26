@@ -134,21 +134,6 @@ def _extract_tool_kernel(func: callable) -> dict:
 
 
 def tool(path: str | None = None, attributes: dict[str, typing.Any] | None = None):
-    """Decorator to mark a function as a Humanloop Tool.
-
-    The decorator inspect the wrapped function signature and code to infer
-    the File kernel and JSON schema for the Tool. Any change to the decorated
-    function will create a new version of the Tool, provided that the path
-    remains the same.
-
-    Every call to the decorated function will create a Log against the Tool.
-
-    Arguments:
-        path: Optional. The path to the Tool. If not provided, the function name
-            will be used as the path and the File will be created in the root
-            of your Humanloop's organization workspace.
-    """
-
     def decorator(func: callable):
         func.json_schema = _tool_json_schema(func)
         decorator.__hl_file_id = uuid.uuid4()

@@ -1,3 +1,5 @@
+from queue import Queue
+from threading import Thread
 import typing
 from opentelemetry import trace
 from opentelemetry.sdk.trace import Span
@@ -13,18 +15,63 @@ if typing.TYPE_CHECKING:
 class HumanloopSpanExporter(SpanExporter):
     """SpanExporter that uploads OpenTelemetry spans to Humanloop Humanloop spans."""
 
+    WORK_THREADS = 8
+
     def __init__(self, client: "BaseHumanloop") -> None:
         super().__init__()
         self._client = client
         self._uploaded_log_ids = {}
-        self._upload_queue = []
+        self._upload_queue = Queue()
+        self._threads = [Thread(target=self._do_work, daemon=True) for _ in range(self.WORK_THREADS)]
+        self._shutdown = False
+        for thread in self._threads:
+            thread.start()
+
+    def export(self, spans: trace.Sequence[Span]) -> SpanExportResult:
+        for span in spans:
+            self._upload_queue.put(span)
+
+    def shutdown(self) -> None:
+        self._shutdown = True
+        for thread in self._threads:
+            thread.join()
+
+    def force_flush(self, timeout_millis: int = 3000) -> bool:
+        self._shutdown = True
+        for thread in self._threads:
+            thread.join(timeout=timeout_millis)
+        self._upload_queue.join()
+
+        return True
+
+    def _do_work(self):
+        # Do work while the Exporter was not instructed to
+        # wind down or the queue is not empty
+        while self._upload_queue.qsize() > 0 or not self._shutdown:
+            try:
+                # Don't block or the thread will never see the shutdown
+                # command and will get stuck
+                span_to_export: Span = self._upload_queue.get(block=False)
+            except Exception:
+                continue
+            try:
+                trace_metadata = read_from_opentelemetry_span(span_to_export, key=HL_TRACE_METADATA_KEY)
+            except KeyError:
+                trace_metadata = None
+            if "trace_parent_id" not in trace_metadata or trace_metadata["trace_parent_id"] in self._uploaded_log_ids:
+                # The Span is outside a Trace context or its parent has been uploaded
+                # we can safely upload it to Humanloop
+                self._export_dispatch(span_to_export)
+            else:  # The parent has not been uploaded yet
+                # Requeue the Span to be uploaded later
+                self._upload_queue.put(span_to_export)
+            self._upload_queue.task_done()
 
     def _export_prompt(self, span: Span) -> None:
         file_object = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
         log_object = read_from_opentelemetry_span(span, key=HL_LOG_OT_KEY)
         try:
             trace_metadata = read_from_opentelemetry_span(span, key=HL_TRACE_METADATA_KEY)
-
         except KeyError:
             trace_metadata = None
         if trace_metadata:
@@ -99,35 +146,3 @@ class HumanloopSpanExporter(SpanExporter):
         else:
             raise NotImplementedError(f"Unknown span type: {hl_file}")
         export_func(span=span)
-
-    def export(self, spans: trace.Sequence[Span]) -> SpanExportResult:
-        # TODO: Put this on a separate thread
-        for span in spans:
-            try:
-                flow_metadata = read_from_opentelemetry_span(span, key=HL_TRACE_METADATA_KEY)
-            except KeyError:
-                flow_metadata = None
-            if flow_metadata:
-                # Span is part of a Flow, queue up Spans for upload until the Trace Head is exported.
-                # The spans arrive at the Exporter in reverse order or creation, as they end.
-                # We insert them at the front of the queue so that they are processed in the correct order
-                self._upload_queue.insert(0, span)
-                if (
-                    flow_metadata["is_flow_log"]
-                    # The Flow might be nested in another Flow
-                    # i.e. has trace_parent_id set.
-                    # Wait until the top level Flow is exported
-                    and "trace_parent_id" not in flow_metadata
-                ):
-                    # TODO: Add threading to this: sibling Spans on the same
-                    # depth level in the Trace can be uploaded in parallel
-                    while len(self._upload_queue) > 0:
-                        span = self._upload_queue.pop(0)
-                        self._export_dispatch(span)
-            else:
-                # Span is not part of Flow, upload as singular
-                self._export_dispatch(span)
-
-    def force_flush(self, timeout_millis: int = 30000) -> bool:
-        # TODO: When implementing the multi-threaded version of export, this will need to be updated
-        return True

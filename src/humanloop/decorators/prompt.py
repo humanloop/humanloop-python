@@ -22,26 +22,6 @@ def prompt(
     presence_penalty: float | None = None,
     frequency_penalty: float | None = None,
 ):
-    """Decorator to mark a function as a Humanloop Prompt.
-
-    The decorator intercepts calls to LLM provider APIs and uses them
-    in tandem with the template provided by the user to create a Prompt
-    in Humanloop.
-
-    Arguments:
-        path: Optional. The path where the Prompt is created. If not
-            provided, the function name is used as the path and
-            the File is created in the root of your Humanloop's
-            organization workspace.
-        template: The template for the Prompt. This is the text of
-            the system message used to set the LLM prompt. The template
-            accepts template slots using the format `{slot_name}`.
-
-            The text of the system message is matched against the template
-            to extract the slot values. The extracted values will be
-            available in the Log's inputs
-    """
-
     def decorator(func: callable):
         decorator.__hl_file_id = uuid.uuid4()
 

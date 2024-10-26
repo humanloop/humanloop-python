@@ -13,23 +13,6 @@ def flow(
     path: str | None = None,
     attributes: dict[str, Any] = {},
 ):
-    """Decorator to log a Flow to the Humanloop API.
-
-    The decorator logs the inputs and outputs of the decorated function to
-    create a Log against the Flow in Humanloop.
-
-    The decorator is an entrypoint to the instrumented AI feature. Decorated
-    functions called in the context of function decorated with Flow will create
-    a Trace in Humanloop.
-
-    Arguments:
-        path: Optional. The path to the Flow. If not provided, the function name
-            will be used as the path and the File will be created in the root
-            of your Humanloop's organization workspace.
-        attributes: Optional. The attributes of the Flow. The attributes are used
-            to version the Flow.
-    """
-
     def decorator(func: callable):
         @wraps(func)
         def wrapper(*args, **kwargs):

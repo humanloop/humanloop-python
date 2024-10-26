@@ -1,16 +1,14 @@
 import typing
-from typing import Optional, List, Sequence
+from typing import Literal, Optional, List, Sequence
 import os
 import httpx
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 
-from .decorators.flow import flow
-from .decorators.prompt import prompt
-from .decorators.tool import tool
+from .decorators.flow import flow as flow_decorator
+from .decorators.prompt import prompt as prompt_decorator
+from .decorators.tool import tool as tool_decorator
 from humanloop.core.client_wrapper import SyncClientWrapper
-from humanloop.flows.client import FlowsClient
-from humanloop.tools.client import ToolsClient
 from .otel.exporter import HumanloopSpanExporter
 from .otel.processor import HumanloopSpanProcessor
 from .otel import instrument_provider, set_tracer
@@ -60,25 +58,7 @@ class ExtendedPromptsClient(PromptsClient):
     def __init__(self, client_wrapper: SyncClientWrapper):
         super().__init__(client_wrapper=client_wrapper)
 
-    decorate = staticmethod(prompt)
-    decorate.__doc__ = prompt.__doc__
     populate_template = staticmethod(populate_template)
-
-
-class ExtendedToolsClient(ToolsClient):
-    def __init__(self, client_wrapper: SyncClientWrapper):
-        super().__init__(client_wrapper=client_wrapper)
-
-    decorate = staticmethod(tool)
-    decorate.__doc__ = tool.__doc__
-
-
-class ExtendedFlowsClient(FlowsClient):
-    def __init__(self, client_wrapper: SyncClientWrapper):
-        super().__init__(client_wrapper=client_wrapper)
-
-    decorate = staticmethod(flow)
-    decorate.__doc__ = flow.__doc__
 
 
 class Humanloop(BaseHumanloop):
@@ -133,8 +113,101 @@ class Humanloop(BaseHumanloop):
         eval_client.client = self
         self.evaluations = eval_client
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
-        self.flows = ExtendedFlowsClient(client_wrapper=self._client_wrapper)
-        self.tools = ExtendedToolsClient(client_wrapper=self._client_wrapper)
+
+    def prompt(
+        self,
+        # TODO: Template can be a list of objects
+        path: str | None = None,
+        model: str | None = None,
+        endpoint: Literal["chat", "edit", "complete"] | None = None,
+        template: str | None = None,
+        provider: Literal[
+            "openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"
+        ]
+        | None = None,
+        max_tokens: int | None = None,
+        stop: str | list[str] | None = None,
+        temperature: float | None = None,
+        top_p: float | None = None,
+        presence_penalty: float | None = None,
+        frequency_penalty: float | None = None,
+    ):
+        """Decorator to mark a function as a Humanloop Prompt.
+
+        The decorator intercepts calls to LLM provider APIs and uses them
+        in tandem with the template provided by the user to create a Prompt
+        in Humanloop.
+
+        Arguments:
+            path: Optional. The path where the Prompt is created. If not
+                provided, the function name is used as the path and
+                the File is created in the root of your Humanloop's
+                organization workspace.
+            template: The template for the Prompt. This is the text of
+                the system message used to set the LLM prompt. The template
+                accepts template slots using the format `{slot_name}`.
+
+                The text of the system message is matched against the template
+                to extract the slot values. The extracted values will be
+                available in the Log's inputs
+        """
+        return prompt_decorator(
+            path=path,
+            model=model,
+            endpoint=endpoint,
+            template=template,
+            provider=provider,
+            max_tokens=max_tokens,
+            stop=stop,
+            temperature=temperature,
+            top_p=top_p,
+            presence_penalty=presence_penalty,
+            frequency_penalty=frequency_penalty,
+        )
+
+    def tool(
+        self,
+        path: str | None = None,
+        attributes: dict[str, typing.Any] | None = None,
+    ):
+        """Decorator to mark a function as a Humanloop Tool.
+
+        The decorator inspect the wrapped function signature and code to infer
+        the File kernel and JSON schema for the Tool. Any change to the decorated
+        function will create a new version of the Tool, provided that the path
+        remains the same.
+
+        Every call to the decorated function will create a Log against the Tool.
+
+        Arguments:
+            path: Optional. The path to the Tool. If not provided, the function name
+                will be used as the path and the File will be created in the root
+                of your Humanloop's organization workspace.
+        """
+        return tool_decorator(path=path, attributes=attributes)
+
+    def flow(
+        self,
+        path: str | None = None,
+        attributes: dict[str, typing.Any] = {},
+    ):
+        """Decorator to log a Flow to the Humanloop API.
+
+        The decorator logs the inputs and outputs of the decorated function to
+        create a Log against the Flow in Humanloop.
+
+        The decorator is an entrypoint to the instrumented AI feature. Decorated
+        functions called in the context of function decorated with Flow will create
+        a Trace in Humanloop.
+
+        Arguments:
+            path: Optional. The path to the Flow. If not provided, the function name
+                will be used as the path and the File will be created in the root
+                of your Humanloop's organization workspace.
+            attributes: Optional. The attributes of the Flow. The attributes are used
+                to version the Flow.
+        """
+        return flow_decorator(path=path, attributes=attributes)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):
