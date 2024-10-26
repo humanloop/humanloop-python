@@ -15,7 +15,6 @@ from .helpers import args_to_inputs
 
 
 def _type_to_schema(type_hint):
-    print("QWE", type_hint, type_hint is str)
     if type_hint is int:
         return "number"
     if type_hint is float:
