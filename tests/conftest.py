@@ -15,17 +15,6 @@ from humanloop.otel.processor import HumanloopSpanProcessor
 
 
 @pytest.fixture(scope="function")
-def test_span():
-    exporter = InMemorySpanExporter()
-    processor = SimpleSpanProcessor(exporter)
-    provider = TracerProvider()
-    provider.add_span_processor(processor)
-    trace.set_tracer_provider(provider)
-    tracer = trace.get_tracer("test")
-    return tracer.start_span("test_span")
-
-
-@pytest.fixture(scope="function")
 def opentelemetry_test_provider() -> TracerProvider:
     provider = TracerProvider(
         resource=Resource.create(
@@ -36,6 +25,15 @@ def opentelemetry_test_provider() -> TracerProvider:
         )
     )
     return provider
+
+
+@pytest.fixture(scope="function")
+def test_span(opentelemetry_test_provider: TracerProvider):
+    exporter = InMemorySpanExporter()
+    processor = SimpleSpanProcessor(exporter)
+    opentelemetry_test_provider.add_span_processor(processor)
+    tracer = opentelemetry_test_provider.get_tracer("test")
+    return tracer.start_span("test_span")
 
 
 @pytest.fixture(scope="function")

@@ -15,6 +15,7 @@ from .helpers import args_to_inputs
 
 
 def _type_to_schema(type_hint):
+    print("QWE", type_hint, type_hint is str)
     if type_hint is int:
         return "number"
     if type_hint is float:
@@ -88,7 +89,6 @@ def _parse_tool_parameters_schema(func) -> dict[str, dict]:
         ):
             raise ValueError("Varargs and kwargs are not supported")
         origin = typing.get_origin(parameter.annotation)
-        print("HEY", origin, parameter.annotation, origin is None)
         if origin is Union:
             param_schema = _handle_union_annotation(parameter)
         elif origin is None:
