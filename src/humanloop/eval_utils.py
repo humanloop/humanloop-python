@@ -154,6 +154,8 @@ class EvaluatorCheck(BaseModel):
     """The threshold to check the Evaluator against."""
     threshold_check: Optional[bool]
     """Whether the latest version has an average Evaluator result above a threshold."""
+    evaluation_id: str
+    """The ID of the corresponding Evaluation."""
 
 
 def _run_eval(
@@ -441,6 +443,7 @@ def _run_eval(
                 delta=delta,
                 threshold=threshold,
                 threshold_check=threshold_check,
+                evaluation_id=evaluation.id,
             )
         )
     logger.info(f"\n{CYAN}View your Evaluation:{RESET}\n{evaluation.url}\n")
