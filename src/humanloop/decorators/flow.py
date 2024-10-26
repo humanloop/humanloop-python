@@ -1,6 +1,6 @@
 import uuid
 from functools import wraps
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 
 from humanloop.decorators.helpers import args_to_inputs
@@ -10,7 +10,7 @@ from humanloop.otel.helpers import write_to_opentelemetry_span
 
 
 def flow(
-    path: str | None = None,
+    path: Optional[str] = None,
     attributes: dict[str, Any] = {},
 ):
     def decorator(func: Callable):

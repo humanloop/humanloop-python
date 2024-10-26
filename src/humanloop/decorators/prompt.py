@@ -1,6 +1,6 @@
 import uuid
 from functools import wraps
-from typing import Literal, Callable
+from typing import Literal, Callable, Optional, Union
 
 from humanloop.otel import get_trace_context, get_tracer, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
@@ -8,19 +8,20 @@ from humanloop.otel.helpers import write_to_opentelemetry_span
 
 
 def prompt(
-    path: str | None = None,
+    path: Optional[str] = None,
     # TODO: Template can be a list of objects
-    model: str | None = None,
-    endpoint: Literal["chat", "edit", "complete"] | None = None,
-    template: str | None = None,
-    provider: Literal["openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"]
-    | None = None,
-    max_tokens: int | None = None,
-    stop: str | list[str] | None = None,
-    temperature: float | None = None,
-    top_p: float | None = None,
-    presence_penalty: float | None = None,
-    frequency_penalty: float | None = None,
+    model: Optional[str] = None,
+    endpoint: Optional[Literal["chat", "edit", "complete"]] = None,
+    template: Optional[str] = None,
+    provider: Optional[
+        Literal["openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"]
+    ] = None,
+    max_tokens: Optional[int] = None,
+    stop: Optional[Union[str, list[str]]] = None,
+    temperature: Optional[float] = None,
+    top_p: Optional[float] = None,
+    presence_penalty: Optional[float] = None,
+    frequency_penalty: Optional[float] = None,
 ):
     def decorator(func: Callable):
         decorator.__hl_file_id = uuid.uuid4()

@@ -1,5 +1,5 @@
 import typing
-from typing import Literal, Optional, List, Sequence
+from typing import Literal, Optional, List, Sequence, Union
 import os
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -117,20 +117,19 @@ class Humanloop(BaseHumanloop):
     def prompt(
         self,
         # TODO: Template can be a list of objects
-        path: str | None = None,
-        model: str | None = None,
-        endpoint: Literal["chat", "edit", "complete"] | None = None,
-        template: str | None = None,
-        provider: Literal[
-            "openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"
-        ]
-        | None = None,
-        max_tokens: int | None = None,
-        stop: str | list[str] | None = None,
-        temperature: float | None = None,
-        top_p: float | None = None,
-        presence_penalty: float | None = None,
-        frequency_penalty: float | None = None,
+        path: Optional[str] = None,
+        model: Optional[str] = None,
+        endpoint: Optional[Literal["chat", "edit", "complete"]] = None,
+        template: Optional[str] = None,
+        provider: Optional[
+            Literal["openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"]
+        ] = None,
+        max_tokens: Optional[int] = None,
+        stop: Optional[Union[str, list[str]]] = None,
+        temperature: Optional[float] = None,
+        top_p: Optional[float] = None,
+        presence_penalty: Optional[float] = None,
+        frequency_penalty: Optional[float] = None,
     ):
         """Decorator to mark a function as a Humanloop Prompt.
 
@@ -167,8 +166,8 @@ class Humanloop(BaseHumanloop):
 
     def tool(
         self,
-        path: str | None = None,
-        attributes: dict[str, typing.Any] | None = None,
+        path: Optional[str] = None,
+        attributes: Optional[dict[str, typing.Any]] = None,
     ):
         """Decorator to mark a function as a Humanloop Tool.
 
@@ -188,7 +187,7 @@ class Humanloop(BaseHumanloop):
 
     def flow(
         self,
-        path: str | None = None,
+        path: Optional[str] = None,
         attributes: dict[str, typing.Any] = {},
     ):
         """Decorator to log a Flow to the Humanloop API.

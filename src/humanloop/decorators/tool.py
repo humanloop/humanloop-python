@@ -3,7 +3,7 @@ import inspect
 import textwrap
 import typing
 import uuid
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 from functools import wraps
 
 
@@ -131,7 +131,7 @@ def _extract_tool_kernel(func: Callable) -> dict:
     }
 
 
-def tool(path: str | None = None, attributes: dict[str, typing.Any] | None = None):
+def tool(path: Optional[str] = None, attributes: Optional[dict[str, typing.Any]] = None):
     def decorator(func: Callable):
         func.json_schema = _tool_json_schema(func)
         decorator.__hl_file_id = uuid.uuid4()

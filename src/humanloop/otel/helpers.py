@@ -1,5 +1,5 @@
 import builtins
-from typing import Any
+from typing import Any, Union
 
 from opentelemetry.sdk.trace import ReadableSpan
 
@@ -116,7 +116,7 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = ""):
     return result
 
 
-def _linear_object(obj: dict, current: dict | list | Any, key: str = ""):
+def _linear_object(obj: dict, current: Union[list, dict, Any], key: str = ""):
     """Linearise a Python object into a dictionary.
 
     Method recurses on the `current` argument, collecting all primitive values and their
@@ -154,7 +154,7 @@ def _linear_object(obj: dict, current: dict | list | Any, key: str = ""):
         obj[key] = current
 
 
-def _dict_to_list(d: dict[str, Any]) -> dict | list:
+def _dict_to_list(d: dict[str, Any]) -> Union[list, dict]:
     """Interpret number keys parsed by the read_from_opentelemetry_span function as lists.
 
     read_from_opentelemetry_span assumes all sub-keys in a path such as foo.0.bar are keys in
