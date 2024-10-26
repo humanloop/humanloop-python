@@ -15,15 +15,15 @@ from .helpers import args_to_inputs
 
 
 def _type_to_schema(type_hint):
-    if isinstance(type_hint, int):
+    if type_hint is int:
         return "number"
-    if isinstance(type_hint, float):
+    if type_hint is float:
         return "number"
-    if isinstance(type_hint, bool):
+    if type_hint is bool:
         return "boolean"
-    if isinstance(type_hint, str):
+    if type_hint is str:
         return "string"
-    if isinstance(type_hint, dict):
+    if type_hint is dict:
         return "object"
     raise ValueError(f"Unsupported type hint: {type_hint}")
 
@@ -87,18 +87,20 @@ def _parse_tool_parameters_schema(func) -> dict[str, dict]:
             inspect.Parameter.VAR_KEYWORD,
         ):
             raise ValueError("Varargs and kwargs are not supported")
-        if isinstance(origin := typing.get_origin(parameter.annotation), dict):
+        origin = typing.get_origin(parameter.annotation)
+        print("HEY", origin, parameter.annotation, origin is None)
+        if origin is Union:
+            param_schema = _handle_union_annotation(parameter)
+        elif origin is None:
+            param_schema = _handle_simple_type(parameter)
+            required.append(parameter.name)
+        elif isinstance(origin, dict):
             param_schema = _handle_dict_annotation(parameter)
             parameters_schema["required"].append(parameter.name)
             required.append(parameter.name)
         elif isinstance(origin, list):
             param_schema = _handle_list_annotation(parameter)
             parameters_schema["required"].append(parameter.name)
-            required.append(parameter.name)
-        elif isinstance(origin, Union):
-            param_schema = _handle_union_annotation(parameter)
-        elif origin is None:
-            param_schema = _handle_simple_type(parameter)
             required.append(parameter.name)
         else:
             raise ValueError("Unsupported type hint ", parameter)
