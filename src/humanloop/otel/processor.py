@@ -118,6 +118,20 @@ def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: 
         prompt_kernel["template"] = hl_file.get("prompt", {}).get("template", None)
     if "provider" not in prompt_kernel:
         prompt_kernel["provider"] = gen_ai_object.get("system", None)
+        if prompt_kernel["provider"]:
+            prompt_kernel["provider"] = prompt_kernel["provider"].lower()
+            if prompt_kernel["provider"] not in [
+                "openai",
+                "openai_azure",
+                "mock",
+                "anthropic",
+                "bedrock",
+                "cohere",
+                "replicate",
+                "google",
+                "groq",
+            ]:
+                raise ValueError("Invalid provider")
     if "temperature" not in prompt_kernel:
         prompt_kernel["temperature"] = gen_ai_object.get("request", {}).get("temperature", None)
     if "top_p" not in prompt_kernel:

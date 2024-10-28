@@ -46,7 +46,18 @@ def instrument_provider(provider: TracerProvider):
     if module_is_installed("mistralai"):
         from opentelemetry.instrumentation.mistralai import MistralAiInstrumentor
 
+        # TODO: Need to to a PR to the instrumentor to support > 1.0.0 Mistral clients
         MistralAiInstrumentor().instrument(tracer_provider=provider)
+
+    if module_is_installed("groq"):
+        from opentelemetry.instrumentation.groq import GroqInstrumentor
+
+        GroqInstrumentor().instrument(tracer_provider=provider)
+
+    if module_is_installed("replicate"):
+        from opentelemetry.instrumentation.replicate import ReplicateInstrumentor
+
+        ReplicateInstrumentor().instrument(tracer_provider=provider)
 
 
 def push_trace_context(trace_metadata: dict):

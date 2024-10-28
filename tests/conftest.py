@@ -3,6 +3,11 @@ from unittest.mock import MagicMock
 
 import pytest
 from opentelemetry.instrumentation.openai import OpenAIInstrumentor
+from opentelemetry.instrumentation.instrumentor import BaseInstrumentor  # type: ignore
+from opentelemetry.instrumentation.anthropic import AnthropicInstrumentor
+from opentelemetry.instrumentation.replicate import ReplicateInstrumentor
+from opentelemetry.instrumentation.cohere import CohereInstrumentor
+from opentelemetry.instrumentation.groq import GroqInstrumentor
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
@@ -45,15 +50,23 @@ def opentelemetry_test_configuration(
     exporter = InMemorySpanExporter()
     processor = SimpleSpanProcessor(exporter)
     opentelemetry_test_provider.add_span_processor(processor)
-    instrumentor = OpenAIInstrumentor()
-    instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
+    instrumentors: list[BaseInstrumentor] = [
+        OpenAIInstrumentor(),
+        AnthropicInstrumentor(),
+        GroqInstrumentor(),
+        CohereInstrumentor(),
+        ReplicateInstrumentor(),
+    ]
+    for instrumentor in instrumentors:
+        instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
     tracer = opentelemetry_test_provider.get_tracer("test")
     # Circumvent configuration procedure
     INTERNAL_OT._TRACER = tracer
 
     yield tracer, exporter
 
-    instrumentor.uninstrument()
+    for instrumentor in instrumentors:
+        instrumentor.uninstrument()
     INTERNAL_OT._TRACER = None
 
 
@@ -64,14 +77,22 @@ def opentelemetry_hl_test_configuration(
     exporter = InMemorySpanExporter()
     processor = HumanloopSpanProcessor(exporter=exporter)
     opentelemetry_test_provider.add_span_processor(processor)
-    instrumentor = OpenAIInstrumentor()
-    instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
+    instrumentors: list[BaseInstrumentor] = [
+        OpenAIInstrumentor(),
+        AnthropicInstrumentor(),
+        GroqInstrumentor(),
+        CohereInstrumentor(),
+        ReplicateInstrumentor(),
+    ]
+    for instrumentor in instrumentors:
+        instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
     tracer = opentelemetry_test_provider.get_tracer("test")
     INTERNAL_OT._TRACER = tracer
 
     yield tracer, exporter
 
-    instrumentor.uninstrument()
+    for instrumentor in instrumentors:
+        instrumentor.uninstrument()
     INTERNAL_OT._TRACER = None
 
 

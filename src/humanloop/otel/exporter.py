@@ -1,7 +1,7 @@
 import typing
 from queue import Queue
-from typing import Any, Optional
 from threading import Thread
+from typing import Any, Optional
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import ReadableSpan
