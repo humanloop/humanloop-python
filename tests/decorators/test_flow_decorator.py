@@ -5,16 +5,16 @@ import time
 from unittest.mock import patch
 
 import pytest
-from openai import OpenAI
-from opentelemetry.sdk.trace import Tracer
-from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
-
 from humanloop.decorators.flow import flow
+from humanloop.decorators.prompt import prompt
+from humanloop.decorators.tool import tool
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_TRACE_METADATA_KEY
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.helpers import read_from_opentelemetry_span
-from humanloop.decorators.prompt import prompt
-from humanloop.decorators.tool import tool
+from openai import OpenAI
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from opentelemetry.sdk.trace import Tracer
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 
 @tool()
@@ -26,7 +26,7 @@ def _random_string() -> str:
 
 
 @prompt(path=None, template="You are an assistant on the following topics: {topics}.")
-def _call_llm(messages: list[dict]) -> str:
+def _call_llm(messages: list[ChatCompletionMessageParam]) -> str:
     # NOTE: These tests check if instrumentors are capable of intercepting OpenAI
     # provider calls. Could not find a way to intercept them coming from a Mock.
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -157,6 +157,7 @@ def test_hl_exporter_with_flow(
     call_llm_messages: list[dict],
     opentelemetry_hl_with_exporter_test_configuration: tuple[Tracer, HumanloopSpanExporter],
 ):
+    # NOTE: type ignore comments are caused by the MagicMock used to mock _client
     # GIVEN a OpenTelemetry configuration with a mock Humanloop SDK and a spied exporter
     _, exporter = opentelemetry_hl_with_exporter_test_configuration
     with patch.object(exporter, "export", wraps=exporter.export) as mock_export_method:
@@ -167,7 +168,7 @@ def test_hl_exporter_with_flow(
         middle_exported_span = mock_export_method.call_args_list[1][0][0][0]
         last_exported_span = mock_export_method.call_args_list[2][0][0][0]
         # THEN the last uploaded span is the Flow
-        assert read_from_opentelemetry_span(span=last_exported_span, key=HL_FILE_OT_KEY)["flow"]["attributes"] == {
+        assert read_from_opentelemetry_span(span=last_exported_span, key=HL_FILE_OT_KEY)["flow"]["attributes"] == {  # type: ignore[index,call-overload]
             "foo": "bar",
             "baz": 7,
         }
@@ -181,23 +182,23 @@ def test_hl_exporter_with_flow(
         time.sleep(3)
 
         # THEN the first Log uploaded is the Flow
-        first_log = exporter._client.flows.log.call_args_list[0][1]
+        first_log = exporter._client.flows.log.call_args_list[0][1]  # type: ignore[attr-defined]
         assert "flow" in first_log
-        exporter._client.flows.log.assert_called_once()
-        flow_log_call_args = exporter._client.flows.log.call_args_list[0]
+        exporter._client.flows.log.assert_called_once()  # type: ignore[attr-defined]
+        flow_log_call_args = exporter._client.flows.log.call_args_list[0]  # type: ignore[attr-defined]
         flow_log_call_args.kwargs["flow"]["attributes"] == {"foo": "bar", "baz": 7}
-        flow_log_id = exporter._client.flows.log.return_value
+        flow_log_id = exporter._client.flows.log.return_value  # type: ignore[attr-defined]
 
         # THEN the second Log uploaded is the Prompt
-        exporter._client.prompts.log.assert_called_once()
-        prompt_log_call_args = exporter._client.prompts.log.call_args_list[0]
+        exporter._client.prompts.log.assert_called_once()  # type: ignore[attr-defined]
+        prompt_log_call_args = exporter._client.prompts.log.call_args_list[0]  # type: ignore[attr-defined]
         prompt_log_call_args.kwargs["trace_parent_id"] == flow_log_id
         prompt_log_call_args.kwargs["prompt"]["temperature"] == 0.8
-        prompt_log_id = exporter._client.prompts.log.return_value
+        prompt_log_id = exporter._client.prompts.log.return_value  # type: ignore[attr-defined]
 
         # THEN the final Log uploaded is the Tool
-        exporter._client.tools.log.assert_called_once()
-        tool_log_call_args = exporter._client.tools.log.call_args_list[0]
+        exporter._client.tools.log.assert_called_once()  # type: ignore[attr-defined]
+        tool_log_call_args = exporter._client.tools.log.call_args_list[0]  # type: ignore[attr-defined]
         tool_log_call_args.kwargs["trace_parent_id"] == prompt_log_id
 
 

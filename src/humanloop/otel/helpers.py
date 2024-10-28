@@ -2,11 +2,23 @@ import builtins
 from typing import Any, Union
 
 from opentelemetry.sdk.trace import ReadableSpan
+from opentelemetry.util.types import AttributeValue
 
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
 
+NestedDict = dict[str, Union["NestedDict", AttributeValue]]
+NestedList = list[Union["NestedList", NestedDict]]
 
-def write_to_opentelemetry_span(span: ReadableSpan, value: Any, key: str = "") -> None:
+
+def _list_to_ott(lst: NestedList) -> NestedDict:
+    return {str(idx): val if not isinstance(val, list) else _list_to_ott(val) for idx, val in enumerate(lst)}
+
+
+def write_to_opentelemetry_span(
+    span: ReadableSpan,
+    value: Union[NestedDict, NestedList],
+    key: str = "",
+) -> None:
     """Reverse of read_from_opentelemetry_span. Writes a Python object to the OpenTelemetry Span's attributes.
 
     See `read_from_opentelemetry_span` for more information.
@@ -17,17 +29,25 @@ def write_to_opentelemetry_span(span: ReadableSpan, value: Any, key: str = "") -
         key: Key prefix to write to the span attributes. The path to the values does not
             need to exist in the span attributes.
     """
-    to_write: dict[str, Any] = {}
-    _linear_object(to_write, value)
-    for k, v in to_write.items():
-        # OTT
-        if v is not None:
-            span._attributes[f"{key}.{k}" if key != "" else k] = v
-    # with _cache_lock:
-    #     _cache[(span.context.span_id, key)] = value
+    to_write_copy: Union[dict, AttributeValue]
+    if isinstance(value, list):
+        to_write_copy = _list_to_ott(value)
+    else:
+        to_write_copy = dict(value)
+    linearised_attributes: dict[str, AttributeValue] = {}
+    work_stack: list[tuple[str, Union[AttributeValue, NestedDict]]] = [(key, to_write_copy)]
+    while len(work_stack) > 0:
+        key, value = work_stack.pop()  # type: ignore
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                work_stack.append((f"{key}.{sub_key}" if key else sub_key, sub_value))
+        else:
+            linearised_attributes[key] = value  # type: ignore
+    for final_key, final_value in linearised_attributes.items():
+        span._attributes[final_key] = final_value  # type: ignore
 
 
-def read_from_opentelemetry_span(span: ReadableSpan, key: str = ""):
+def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDict:
     """Read a value from the OpenTelemetry span attributes.
 
     OpenTelemetry liniarises dictionaries and lists, storing only primitive values
@@ -80,11 +100,13 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = ""):
     [42, 43]
     ```
     """
+    if span._attributes is None:
+        raise ValueError("Span attributes are empty")
 
-    result = dict()
+    result: dict[str, Union[dict, AttributeValue]] = {}
 
-    to_process: list[tuple[str, Any]] = []
-    for span_key, span_value in span._attributes.items():
+    to_process: list[tuple[str, Union[dict, AttributeValue]]] = []
+    for span_key, span_value in span._attributes.items():  # type: ignore
         if key == "":
             # No key prefix, add to root
             to_process.append((f"{key}.{span_key}", span_value))
@@ -98,81 +120,27 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = ""):
             return result
         raise KeyError(f"Key {key} not found in span attributes")
 
-    for span_key, span_value in to_process:
+    for span_key, span_value in to_process:  # type: ignore
         parts = span_key.split(".")
         len_parts = len(parts)
-        sub_result = result
+        sub_result: dict[str, Union[dict, AttributeValue]] = result
         for idx, part in enumerate(parts):
             if idx == len_parts - 1:
                 sub_result[part] = span_value
             else:
                 if part not in sub_result:
                     sub_result[part] = dict()
-                sub_result = sub_result[part]
+                sub_result = sub_result[part]  # type: ignore
 
-    result = _dict_to_list(result)
     for part in key.split("."):
-        result = result[part]
+        result = result[part]  # type: ignore
+
     return result
-
-
-def _linear_object(obj: dict, current: Union[list, dict, Any], key: str = ""):
-    """Linearise a Python object into a dictionary.
-
-    Method recurses on the `current` argument, collecting all primitive values and their
-    path in the objects, then storing them in the `obj` dictionary in the end.
-
-    Arguments:
-        obj: Dictionary to store the linearised object
-        current: Python object to linearise. Used in recursivity when a complex
-            value is encountered.
-        key: Key prefix to store the values in the `obj` dictionary. Keys are added
-            incrementally as the function recurses.
-
-    Examples:
-    ```python
-    result = dict()
-    _linear_object(result, {'a': 1, 'b': {'c': 2, d: [4, 5]}})
-
-    # result is now:
-    {
-        'a': 1,
-        'b.c': 2,
-        'b.d.0': 4,
-        'b.d.1': 5
-    }
-    ```
-
-    """
-    if isinstance(current, builtins.dict):
-        for k, v in current.items():
-            _linear_object(obj, v, f"{key}.{k}" if key != "" else k)
-    elif isinstance(current, list):
-        for idx, v in enumerate(current):
-            _linear_object(obj, v, f"{key}.{idx}" if key != "" else str(idx))
-    else:
-        obj[key] = current
-
-
-def _dict_to_list(d: dict[str, Any]) -> Union[list, dict]:
-    """Interpret number keys parsed by the read_from_opentelemetry_span function as lists.
-
-    read_from_opentelemetry_span assumes all sub-keys in a path such as foo.0.bar are keys in
-    dictionaries. This method revisits the final result, and transforms the keys in lists where
-    appropriate.
-    """
-    is_list = all(key.isdigit() for key in d.keys())
-    if is_list:
-        return [_dict_to_list(val) if isinstance(val, dict) else val for val in d.values()]
-    for key, value in d.items():
-        if isinstance(value, dict):
-            d[key] = _dict_to_list(value)
-    return d
 
 
 def is_llm_provider_call(span: ReadableSpan) -> bool:
     """Determines if the span was created by an Instrumentor for LLM provider clients."""
-    return "llm.request.type" in span.attributes
+    return "llm.request.type" in span.attributes  # type: ignore
 
 
 def is_humanloop_span(span: ReadableSpan) -> bool:

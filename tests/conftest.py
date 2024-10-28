@@ -2,10 +2,12 @@ from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
-from opentelemetry import trace
 from opentelemetry.instrumentation.openai import OpenAIInstrumentor
 from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import Tracer, TracerProvider
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.trace import Tracer
+
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
@@ -99,7 +101,7 @@ def opentelemetry_hl_with_exporter_test_configuration(
 
 
 @pytest.fixture(scope="session")
-def call_llm_messages() -> list[dict]:
+def call_llm_messages() -> list[ChatCompletionMessageParam]:
     return [
         {
             "role": "system",

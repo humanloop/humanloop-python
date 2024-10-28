@@ -2,7 +2,6 @@ import uuid
 from functools import wraps
 from typing import Any, Callable, Optional
 
-
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.otel import get_trace_context, get_tracer, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY, OT_EMPTY_ATTRIBUTE

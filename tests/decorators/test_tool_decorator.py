@@ -1,13 +1,14 @@
+from typing import Any
+
+from humanloop.decorators.tool import tool
+from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
+from humanloop.otel.helpers import read_from_opentelemetry_span
 from opentelemetry.sdk.trace import Tracer
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
-from humanloop.otel.helpers import read_from_opentelemetry_span
-from humanloop.decorators.tool import tool
-
 
 @tool()
-def calculator(operation: str, num1: int, num2: int) -> str:
+def calculator(operation: str, num1: float, num2: float) -> float:
     """Do arithmetic operations on two numbers."""
     if operation == "add":
         return num1 + num2
@@ -18,7 +19,7 @@ def calculator(operation: str, num1: int, num2: int) -> str:
     elif operation == "divide":
         return num1 / num2
     else:
-        return "Invalid operation"
+        raise ValueError(f"Invalid operation: {operation}")
 
 
 def test_calculator_decorator(
@@ -31,8 +32,8 @@ def test_calculator_decorator(
     # THEN a single span is created and the log and file attributes are correctly set
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
-    hl_file = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)
-    hl_log = read_from_opentelemetry_span(span=spans[0], key=HL_LOG_OT_KEY)
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)
+    hl_log: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_LOG_OT_KEY)
     assert hl_log["output"] == result == 3
     assert hl_log["inputs"] == {
         "operation": "add",

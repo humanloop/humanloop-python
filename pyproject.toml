@@ -26,6 +26,9 @@ packages = [
     { include = "humanloop", from = "src"}
 ]
 
+[tool.poetry.group.dev.dependencies]
+parse-type = "^0.6.4"
+
 [project.urls]
 Repository = 'https://github.com/humanloop/humanloop-python'
 

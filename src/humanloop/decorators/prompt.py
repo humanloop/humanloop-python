@@ -1,6 +1,6 @@
 import uuid
 from functools import wraps
-from typing import Literal, Callable, Optional, Union
+from typing import Callable, Literal, Optional, Union
 
 from humanloop.otel import get_trace_context, get_tracer, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
@@ -24,8 +24,6 @@ def prompt(
     frequency_penalty: Optional[float] = None,
 ):
     def decorator(func: Callable):
-        decorator.__hl_file_id = uuid.uuid4()
-
         if temperature is not None:
             if not 0 <= temperature < 1:
                 raise ValueError(f"{func.__name__}: Temperature parameter must be between 0 and 1")

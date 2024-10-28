@@ -1,14 +1,16 @@
+from typing import Optional
+
 from opentelemetry import baggage
+from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
 from humanloop.otel.constants import HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import module_is_installed
 
-
 _TRACER = None
 
-_BAGGAGE_CONTEXT = [{}]
+_BAGGAGE_CONTEXT: list[Context] = [Context()]
 
 
 def set_tracer(tracer: Tracer):
@@ -72,7 +74,7 @@ def pop_trace_context():
     _BAGGAGE_CONTEXT.pop()
 
 
-def get_trace_context() -> dict:
+def get_trace_context() -> Optional[object]:
     """Get Trace parent metadata for Flows."""
 
     global _BAGGAGE_CONTEXT

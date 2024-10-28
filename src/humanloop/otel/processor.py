@@ -1,8 +1,10 @@
 import json
 import logging
 from collections import defaultdict
+from typing import Any
 
-import parse
+# No typing stubs for parse
+import parse  # type: ignore
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
@@ -22,8 +24,8 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
 
     def __init__(self, exporter: SpanExporter) -> None:
         super().__init__(exporter)
-        self._spans = dict()
-        self._children = defaultdict(list)
+        # Span parent to Span children map
+        self._children: dict[int, list] = defaultdict(list)
 
     # TODO: Could override on_start and process Flow spans ahead of time
     # and PATCH the created Logs in on_end. A special type of ReadableSpan could be
@@ -73,9 +75,11 @@ def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan
 def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
     # TODO: Use children_spans in the future
     tool_log = read_from_opentelemetry_span(tool_span, key=HL_LOG_OT_KEY)
-    tool_log["start_time"] = tool_span.start_time / 1e9
-    tool_log["end_time"] = tool_span.end_time / 1e9
-    tool_log["created_at"] = tool_span.end_time / 1e9
+    if tool_span.start_time:
+        tool_log["start_time"] = tool_span.start_time / 1e9
+    if tool_span.end_time:
+        tool_log["end_time"] = tool_span.end_time / 1e9
+        tool_log["created_at"] = tool_span.end_time / 1e9
 
     write_to_opentelemetry_span(
         span=tool_span,
@@ -87,9 +91,11 @@ def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
 def _process_flow(flow_span: ReadableSpan, children_spans: list[ReadableSpan]):
     # TODO: Use children_spans in the future
     flow_log = read_from_opentelemetry_span(flow_span, key=HL_LOG_OT_KEY)
-    flow_log["start_time"] = flow_span.start_time / 1e9
-    flow_log["end_time"] = flow_span.end_time / 1e9
-    flow_log["created_at"] = flow_span.end_time / 1e9
+    if flow_span.start_time:
+        flow_log["start_time"] = flow_span.start_time / 1e9
+    if flow_span.end_time:
+        flow_log["end_time"] = flow_span.end_time / 1e9
+        flow_log["created_at"] = flow_span.end_time / 1e9
 
     write_to_opentelemetry_span(
         span=flow_span,
@@ -99,11 +105,11 @@ def _process_flow(flow_span: ReadableSpan, children_spans: list[ReadableSpan]):
 
 
 def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
-    hl_file = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
-    gen_ai_object = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
-    llm_object = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
+    gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
+    llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
-    prompt_kernel = hl_file.get("prompt", {})
+    prompt_kernel: dict[str, Any] = hl_file.get("prompt", {})
     if "model" not in prompt_kernel:
         prompt_kernel["model"] = gen_ai_object.get("request", {}).get("model", None)
     if "endpoint" not in prompt_kernel:
@@ -132,25 +138,27 @@ def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: 
 
 
 def _enrich_prompt_span_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
-    hl_file = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
-    hl_log = read_from_opentelemetry_span(prompt_span, key=HL_LOG_OT_KEY)
-    gen_ai_object: dict = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
+    hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_LOG_OT_KEY)
+    gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
 
     # TODO: Seed not added by Instrumentors in provider call
 
     if "output_tokens" not in hl_log:
         hl_log["output_tokens"] = gen_ai_object.get("usage", {}).get("completion_tokens")
     if len(gen_ai_object.get("completion", [])) > 0:
-        hl_log["finish_reason"] = gen_ai_object["completion"][0].get("finish_reason")
+        hl_log["finish_reason"] = gen_ai_object.get("completion", {}).get("0", {}).get("finish_reason")
     hl_log["messages"] = gen_ai_object.get("prompt", [])
 
-    hl_log["start_time"] = prompt_span.start_time / 1e9
-    hl_log["end_time"] = prompt_span.start_time / 1e9
-    hl_log["created_at"] = prompt_span.start_time / 1e9
+    if prompt_span.start_time:
+        hl_log["start_time"] = prompt_span.start_time / 1e9
+    if prompt_span.end_time:
+        hl_log["end_time"] = prompt_span.end_time / 1e9
+        hl_log["created_at"] = prompt_span.end_time / 1e9
 
     try:
         inputs = {}
-        system_message = gen_ai_object["prompt"][0]["content"]
+        system_message = gen_ai_object["prompt"]["0"]["content"]
         template = hl_file["prompt"]["template"]
         parsed = parse.parse(template, system_message)
         for key, value in parsed.named.items():
