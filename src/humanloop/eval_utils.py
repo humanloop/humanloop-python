@@ -18,7 +18,6 @@ from typing import Callable, Sequence, Literal, Union, Optional, List, Dict, Tup
 from typing_extensions import NotRequired, TypedDict
 import time
 import sys
-import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .client import BaseHumanloop
@@ -45,7 +44,7 @@ from .types import UpdateDatesetAction as UpdateDatasetAction  # TODO: fix origi
 from .types import DatapointResponse as Datapoint
 from .types import (
     EvaluationStats,
-    VersionStatsResponse,
+    RunStatsResponse,
     EvaluatorArgumentsType,
     EvaluatorReturnTypeEnum,
     EvaluationResponse,
@@ -301,15 +300,22 @@ def _run_eval(
         if not evaluation:
             raise ValueError(f"Evaluation with name {name} not found.")
 
-    # Every run will generate a new batch of logs
-    batch_id = uuid.uuid4().hex[:10]  # ignore risk of collision
+    # Create a new Run
+    run = client.evaluations.create_run(
+        id=evaluation.id,
+        dataset={"file_id": hl_dataset.id},
+        logs="fixed",
+        orchestrated=False,
+    )
+
+    # Every Run will generate a new batch of Logs
+    run_id = run.id
     log_func = _get_log_func(
         client=client,
         type_=type_,
         file_id=hl_file.id,
         version_id=hl_file.version_id,
-        evaluation_id=evaluation.id,
-        batch_id=batch_id,
+        run_id=run_id,
     )
 
     # Define the function to execute your function in parallel and Log to Humanloop
@@ -382,7 +388,7 @@ def _run_eval(
     total_datapoints = len(hl_dataset.datapoints)
     logger.info(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n")
     logger.info(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}")
-    logger.info(f"{CYAN}Run ID: {batch_id}{RESET}")
+    logger.info(f"{CYAN}Run ID: {run_id}{RESET}")
 
     # Generate locally if a file `callable` is provided
     if function_:
@@ -413,7 +419,10 @@ def _run_eval(
     logger.info(stats.report)
 
     checks: List[EvaluatorCheck] = []
-    if all(evaluator.get("threshold") is None for evaluator in evaluators) and len(stats.version_stats) == 1:
+    if (
+        all(evaluator.get("threshold") is None for evaluator in evaluators)
+        and len(stats.run_stats) == 1
+    ):
         # Skip `check_evaluation_improvement` if no thresholds were provided and there is only one run.
         # (Or the logs would not be helpful)
         return checks
@@ -422,7 +431,7 @@ def _run_eval(
             evaluation=evaluation,
             stats=stats,
             evaluator_path=evaluator["path"],
-            batch_id=batch_id,
+            run_id=run_id,
         )
         threshold_check = None
         threshold = evaluator.get("threshold")
@@ -432,7 +441,7 @@ def _run_eval(
                 stats=stats,
                 evaluator_path=evaluator["path"],
                 threshold=threshold,
-                batch_id=batch_id,
+                run_id=run_id,
             )
         checks.append(
             EvaluatorCheck(
@@ -455,8 +464,7 @@ def _get_log_func(
     type_: FileType,
     file_id: str,
     version_id: str,
-    evaluation_id: str,
-    batch_id: str,
+    run_id: str,
 ) -> Callable:
     """Returns the appropriate log function pre-filled with common parameters."""
     log_request = {
@@ -464,8 +472,7 @@ def _get_log_func(
         #  Why are both `id` and `version_id` needed in the API?
         "id": file_id,
         "version_id": version_id,
-        "evaluation_id": evaluation_id,
-        "batch_id": batch_id,
+        "run_id": run_id,
     }
     if type_ == "flow":
         return partial(client.flows.log, **log_request, trace_status="complete")
@@ -526,14 +533,18 @@ def _progress_bar(total: int, progress: int):
 
 
 def get_evaluator_stats_by_path(
-    stat: VersionStatsResponse, evaluation: EvaluationResponse
+    stat: RunStatsResponse, evaluation: EvaluationResponse
 ) -> Dict[str, Union[NumericStats, BooleanStats]]:
     """Get the Evaluator stats by path."""
     # TODO: Update the API so this is not necessary
-    evaluators_by_id = {evaluator.version.version_id: evaluator for evaluator in evaluation.evaluators}
+    evaluators_by_id = {
+        evaluator.version.version_id: evaluator for evaluator in evaluation.evaluators
+    }
     evaluator_stats_by_path = {
-        evaluators_by_id[evaluator_stat.evaluator_version_id].version.path: evaluator_stat
-        for evaluator_stat in stat.evaluator_version_stats
+        evaluators_by_id[
+            evaluator_stat.evaluator_version_id
+        ].version.path: evaluator_stat
+        for evaluator_stat in stat.evaluator_stats
     }
     return evaluator_stats_by_path
 
@@ -543,12 +554,13 @@ def check_evaluation_threshold(
     stats: EvaluationStats,
     evaluator_path: str,
     threshold: float,
-    batch_id: str,
+    run_id: str,
 ) -> bool:
     """Checks if the latest version has an average Evaluator result above a threshold."""
     # TODO: Update the API so this is not necessary
     evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None), evaluation=evaluation
+        stat=next((stat for stat in stats.run_stats if stat.run_id == run_id), None),
+        evaluation=evaluation,
     )
     if evaluator_path in evaluator_stats_by_path:
         evaluator_stat = evaluator_stats_by_path[evaluator_path]
@@ -571,7 +583,7 @@ def check_evaluation_improvement(
     evaluation: EvaluationResponse,
     evaluator_path: str,
     stats: EvaluationStats,
-    batch_id: str,
+    run_id: str,
 ) -> Tuple[bool, float, float]:
     """
     Check the latest version has improved across for a specific Evaluator.
@@ -581,14 +593,20 @@ def check_evaluation_improvement(
     # TODO: Update the API so this is not necessary
 
     latest_evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=next((stat for stat in stats.version_stats if stat.batch_id == batch_id), None), evaluation=evaluation
+        stat=next((stat for stat in stats.run_stats if stat.run_id == run_id), None),
+        evaluation=evaluation,
     )
-    if len(stats.version_stats) == 1:
+    if len(stats.run_stats) == 1:
         logger.info(f"{YELLOW}⚠️ No previous versions to compare with.{RESET}")
         return True, 0, 0
 
-    previous_evaluator_stats_by_path = get_evaluator_stats_by_path(stat=stats.version_stats[-2], evaluation=evaluation)
-    if evaluator_path in latest_evaluator_stats_by_path and evaluator_path in previous_evaluator_stats_by_path:
+    previous_evaluator_stats_by_path = get_evaluator_stats_by_path(
+        stat=stats.run_stats[-2], evaluation=evaluation
+    )
+    if (
+        evaluator_path in latest_evaluator_stats_by_path
+        and evaluator_path in previous_evaluator_stats_by_path
+    ):
         latest_evaluator_stat = latest_evaluator_stats_by_path[evaluator_path]
         previous_evaluator_stat = previous_evaluator_stats_by_path[evaluator_path]
         latest_score = get_score_from_evaluator_stat(stat=latest_evaluator_stat)
