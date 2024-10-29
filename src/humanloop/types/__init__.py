@@ -86,6 +86,7 @@ from .list_prompts import ListPrompts
 from .list_tools import ListTools
 from .llm_evaluator_request import LlmEvaluatorRequest
 from .log_response import LogResponse
+from .logs_association_type import LogsAssociationType
 from .model_endpoints import ModelEndpoints
 from .model_providers import ModelProviders
 from .monitoring_evaluator_environment_request import MonitoringEvaluatorEnvironmentRequest
@@ -156,6 +157,7 @@ from .version_id import VersionId
 from .version_id_response import VersionIdResponse
 from .version_id_response_version import VersionIdResponseVersion
 from .version_reference_response import VersionReferenceResponse
+from .version_specification import VersionSpecification
 from .version_stats_response import VersionStatsResponse
 from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItem
 from .version_status import VersionStatus
@@ -245,6 +247,7 @@ __all__ = [
     "ListTools",
     "LlmEvaluatorRequest",
     "LogResponse",
+    "LogsAssociationType",
     "ModelEndpoints",
     "ModelProviders",
     "MonitoringEvaluatorEnvironmentRequest",
@@ -311,6 +314,7 @@ __all__ = [
     "VersionIdResponse",
     "VersionIdResponseVersion",
     "VersionReferenceResponse",
+    "VersionSpecification",
     "VersionStatsResponse",
     "VersionStatsResponseEvaluatorVersionStatsItem",
     "VersionStatus",

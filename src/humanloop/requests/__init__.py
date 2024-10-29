@@ -127,6 +127,7 @@ from .version_id import VersionIdParams
 from .version_id_response import VersionIdResponseParams
 from .version_id_response_version import VersionIdResponseVersionParams
 from .version_reference_response import VersionReferenceResponseParams
+from .version_specification import VersionSpecificationParams
 from .version_stats_response import VersionStatsResponseParams
 from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItemParams
 
@@ -248,6 +249,7 @@ __all__ = [
     "VersionIdResponseParams",
     "VersionIdResponseVersionParams",
     "VersionReferenceResponseParams",
+    "VersionSpecificationParams",
     "VersionStatsResponseEvaluatorVersionStatsItemParams",
     "VersionStatsResponseParams",
 ]
