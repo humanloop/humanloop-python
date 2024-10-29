@@ -40,7 +40,9 @@ from .types import PromptKernelRequest as Prompt
 from .types import ToolKernelRequest as Tool
 from .types import BooleanEvaluatorStatsResponse as BooleanStats
 from .types import NumericEvaluatorStatsResponse as NumericStats
-from .types import UpdateDatesetAction as UpdateDatasetAction  # TODO: fix original type typo
+from .types import (
+    UpdateDatesetAction as UpdateDatasetAction,
+)  # TODO: fix original type typo
 from .types import DatapointResponse as Datapoint
 from .types import (
     EvaluationStats,
@@ -60,7 +62,9 @@ console_handler.setFormatter(formatter)
 if not logger.hasHandlers():
     logger.addHandler(console_handler)
 
-EvaluatorDict = Union[CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator]
+EvaluatorDict = Union[
+    CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator
+]
 Version = Union[FlowDict, PromptDict, ToolDict, EvaluatorDict]
 FileType = Literal["flow", "prompt", "tool", "evaluator"]
 
@@ -201,9 +205,13 @@ def _run_eval(
         function_ = file.pop("callable")
     except KeyError as _:
         if type_ == "flow":
-            raise ValueError("You must provide a `callable` for your Flow `file` to run a local eval.")
+            raise ValueError(
+                "You must provide a `callable` for your Flow `file` to run a local eval."
+            )
         else:
-            logger.info(f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.")
+            logger.info(
+                f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop."
+            )
 
     custom_logger = file.pop("custom_logger", None)
     file_dict = {**file, **version}
@@ -221,7 +229,9 @@ def _run_eval(
         try:
             _ = Prompt.parse_obj(version)
         except ValidationError as error_:
-            logger.error(msg=f"Invalid Prompt `version` in your `file` request. \n\nValidation error: \n)")
+            logger.error(
+                msg=f"Invalid Prompt `version` in your `file` request. \n\nValidation error: \n)"
+            )
             raise error_
         hl_file = client.prompts.upsert(**file_dict)
 
@@ -229,7 +239,9 @@ def _run_eval(
         try:
             _ = Tool.parse_obj(version)
         except ValidationError as error_:
-            logger.error(msg=f"Invalid Tool `version` in your `file` request. \n\nValidation error: \n)")
+            logger.error(
+                msg=f"Invalid Tool `version` in your `file` request. \n\nValidation error: \n)"
+            )
             raise error_
         hl_file = client.tools.upsert(**file_dict)
 
@@ -262,7 +274,9 @@ def _run_eval(
                     attributes={"code": inspect.getsource(eval_function)},
                     evaluator_type="external",
                 )
-                _ = client.evaluators.upsert(id=evaluator.get("id"), path=evaluator.get("path"), spec=spec)
+                _ = client.evaluators.upsert(
+                    id=evaluator.get("id"), path=evaluator.get("path"), spec=spec
+                )
 
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
@@ -285,7 +299,6 @@ def _run_eval(
     try:
         evaluation = client.evaluations.create(
             name=name,
-            dataset={"file_id": hl_dataset.id},
             evaluators=[{"path": e["path"]} for e in evaluators],
             file={"id": hl_file.id},
         )
@@ -324,7 +337,9 @@ def _run_eval(
         datapoint_dict = datapoint.dict()
         try:
             if "messages" in datapoint_dict:
-                output = function_(**datapoint_dict["inputs"], messages=datapoint_dict["messages"])
+                output = function_(
+                    **datapoint_dict["inputs"], messages=datapoint_dict["messages"]
+                )
             else:
                 output = function_(**datapoint_dict["inputs"])
             if custom_logger:
@@ -349,7 +364,9 @@ def _run_eval(
                 start_time=start_time,
                 end_time=datetime.now(),
             )
-            logger.warning(msg=f"\nYour {type_}'s `callable` failed for Datapoint: {datapoint.id}. \n Error: {str(e)}")
+            logger.warning(
+                msg=f"\nYour {type_}'s `callable` failed for Datapoint: {datapoint.id}. \n Error: {str(e)}"
+            )
 
         # Apply local Evaluators
         for local_evaluator in local_evaluators:
@@ -382,7 +399,9 @@ def _run_eval(
                     start_time=start_time,
                     end_time=datetime.now(),
                 )
-                logger.warning(f"\nEvaluator {local_evaluator['path']} failed with error {str(e)}")
+                logger.warning(
+                    f"\nEvaluator {local_evaluator['path']} failed with error {str(e)}"
+                )
 
     # Execute the function and send the logs to Humanloop in parallel
     total_datapoints = len(hl_dataset.datapoints)
@@ -393,17 +412,22 @@ def _run_eval(
     # Generate locally if a file `callable` is provided
     if function_:
         logger.info(
-            f"{CYAN}\nRunning {hl_file.name} over the Dataset {hl_dataset.name} using {workers} workers{RESET} "
+            f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}' using {workers} workers{RESET} "
         )
         completed_tasks = 0
         with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = [executor.submit(process_datapoint, datapoint) for datapoint in hl_dataset.datapoints]
+            futures = [
+                executor.submit(process_datapoint, datapoint)
+                for datapoint in hl_dataset.datapoints
+            ]
             for _ in as_completed(futures):
                 completed_tasks += 1
                 _progress_bar(total_datapoints, completed_tasks)
     else:
         # TODO: trigger run when updated API is available
-        logger.info(f"{CYAN}\nRunning {hl_file.name} over the Dataset {hl_dataset.name}{RESET}")
+        logger.info(
+            f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}'{RESET}"
+        )
 
     # Wait for the Evaluation to complete then print the results
     complete = False
@@ -486,7 +510,9 @@ def _get_log_func(
         raise NotImplementedError(f"Unsupported File version: {type_}")
 
 
-def get_score_from_evaluator_stat(stat: Union[NumericStats, BooleanStats]) -> Union[float, None]:
+def get_score_from_evaluator_stat(
+    stat: Union[NumericStats, BooleanStats],
+) -> Union[float, None]:
     """Get the score from an Evaluator Stat."""
     score = None
     if isinstance(stat, BooleanStats):
@@ -613,10 +639,14 @@ def check_evaluation_improvement(
         previous_score = get_score_from_evaluator_stat(stat=previous_evaluator_stat)
         diff = round(latest_score - previous_score, 2)
         if diff >= 0:
-            logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
+            logger.info(
+                f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}"
+            )
             return True, latest_score, diff
         else:
-            logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
+            logger.info(
+                f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}"
+            )
             return False, latest_score, diff
     else:
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")
