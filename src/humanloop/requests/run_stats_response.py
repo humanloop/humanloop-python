@@ -3,11 +3,20 @@
 import typing_extensions
 import typing_extensions
 import typing
-from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItemParams
+from .run_stats_response_evaluator_stats_item import RunStatsResponseEvaluatorStatsItemParams
 
 
-class VersionStatsResponseParams(typing_extensions.TypedDict):
-    version_id: str
+class RunStatsResponseParams(typing_extensions.TypedDict):
+    """
+    Stats for a Run in the Evaluation.
+    """
+
+    run_id: str
+    """
+    Unique identifier for the Run.
+    """
+
+    version_id: typing_extensions.NotRequired[str]
     """
     Unique identifier for the evaluated Version.
     """
@@ -22,7 +31,7 @@ class VersionStatsResponseParams(typing_extensions.TypedDict):
     The total number of existing Logs in this Run.
     """
 
-    evaluator_version_stats: typing.Sequence[VersionStatsResponseEvaluatorVersionStatsItemParams]
+    evaluator_stats: typing.Sequence[RunStatsResponseEvaluatorStatsItemParams]
     """
     Stats for each Evaluator Version applied to this Run.
     """

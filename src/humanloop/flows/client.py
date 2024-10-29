@@ -45,7 +45,7 @@ class FlowsClient:
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
-        evaluation_id: typing.Optional[str] = OMIT,
+        run_id: typing.Optional[str] = OMIT,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
@@ -62,7 +62,6 @@ class FlowsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         flow_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -85,8 +84,8 @@ class FlowsClient:
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed version to log to.
 
-        evaluation_id : typing.Optional[str]
-            Unique identifier for the Evaluation Report to associate the Log to.
+        run_id : typing.Optional[str]
+            Unique identifier for the Run to associate the Log to.
 
         path : typing.Optional[str]
             Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
@@ -135,9 +134,6 @@ class FlowsClient:
 
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
-
-        batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -197,10 +193,10 @@ class FlowsClient:
             output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
             trace_status="incomplete",
             start_time=datetime.datetime.fromisoformat(
-                "2024-07-08 22:40:35+00:00",
+                "2024-07-08 21:40:35+00:00",
             ),
             end_time=datetime.datetime.fromisoformat(
-                "2024-07-08 22:40:39+00:00",
+                "2024-07-08 21:40:39+00:00",
             ),
         )
         """
@@ -212,7 +208,7 @@ class FlowsClient:
                 "environment": environment,
             },
             json={
-                "evaluation_id": evaluation_id,
+                "run_id": run_id,
                 "path": path,
                 "id": id,
                 "start_time": start_time,
@@ -229,7 +225,6 @@ class FlowsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batch_id": batch_id,
                 "user": user,
                 "environment": flow_log_request_environment,
                 "save": save,
@@ -1210,7 +1205,7 @@ class AsyncFlowsClient:
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
-        evaluation_id: typing.Optional[str] = OMIT,
+        run_id: typing.Optional[str] = OMIT,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
@@ -1227,7 +1222,6 @@ class AsyncFlowsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         flow_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -1250,8 +1244,8 @@ class AsyncFlowsClient:
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed version to log to.
 
-        evaluation_id : typing.Optional[str]
-            Unique identifier for the Evaluation Report to associate the Log to.
+        run_id : typing.Optional[str]
+            Unique identifier for the Run to associate the Log to.
 
         path : typing.Optional[str]
             Path of the Flow, including the name. This locates the Flow in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
@@ -1300,9 +1294,6 @@ class AsyncFlowsClient:
 
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
-
-        batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -1366,10 +1357,10 @@ class AsyncFlowsClient:
                 output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
                 trace_status="incomplete",
                 start_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 22:40:35+00:00",
+                    "2024-07-08 21:40:35+00:00",
                 ),
                 end_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 22:40:39+00:00",
+                    "2024-07-08 21:40:39+00:00",
                 ),
             )
 
@@ -1384,7 +1375,7 @@ class AsyncFlowsClient:
                 "environment": environment,
             },
             json={
-                "evaluation_id": evaluation_id,
+                "run_id": run_id,
                 "path": path,
                 "id": id,
                 "start_time": start_time,
@@ -1401,7 +1392,6 @@ class AsyncFlowsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batch_id": batch_id,
                 "user": user,
                 "environment": flow_log_request_environment,
                 "save": save,

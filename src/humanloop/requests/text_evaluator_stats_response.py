@@ -6,7 +6,7 @@ import typing_extensions
 class TextEvaluatorStatsResponseParams(typing_extensions.TypedDict):
     """
     Base attributes for stats for an Evaluator Version-Evaluated Version pair
-    in the Evaluation Report.
+    in the Evaluation.
     """
 
     evaluator_version_id: str

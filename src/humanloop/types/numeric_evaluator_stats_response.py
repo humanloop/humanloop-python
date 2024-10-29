@@ -9,7 +9,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class NumericEvaluatorStatsResponse(UncheckedBaseModel):
     """
     Base attributes for stats for an Evaluator Version-Evaluated Version pair
-    in the Evaluation Report.
+    in the Evaluation.
     """
 
     evaluator_version_id: str = pydantic.Field()

@@ -9,17 +9,17 @@ import typing
 class OverallStats(UncheckedBaseModel):
     num_datapoints: int = pydantic.Field()
     """
-    The total number of Datapoints in the Evaluation Report's Dataset Version.
+    The total number of Datapoints in the Evaluation's Dataset Version.
     """
 
     total_logs: int = pydantic.Field()
     """
-    The total number of Logs in the Evaluation Report.
+    The total number of Logs in the Evaluation.
     """
 
     total_evaluator_logs: int = pydantic.Field()
     """
-    The total number of Evaluator Logs in the Evaluation Report.
+    The total number of Evaluator Logs in the Evaluation.
     """
 
     if IS_PYDANTIC_V2:

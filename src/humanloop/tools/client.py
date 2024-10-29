@@ -62,7 +62,6 @@ class ToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -136,9 +135,6 @@ class ToolsClient:
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
 
-        batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
-
         user : typing.Optional[str]
             End-user ID related to the Log.
 
@@ -210,7 +206,6 @@ class ToolsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batch_id": batch_id,
                 "user": user,
                 "environment": tool_log_request_environment,
                 "save": save,
@@ -1258,7 +1253,6 @@ class AsyncToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
-        batch_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
@@ -1331,9 +1325,6 @@ class AsyncToolsClient:
 
         trace_parent_id : typing.Optional[str]
             The ID of the parent Log to nest this Log under in a Trace.
-
-        batch_id : typing.Optional[str]
-            Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
 
         user : typing.Optional[str]
             End-user ID related to the Log.
@@ -1414,7 +1405,6 @@ class AsyncToolsClient:
                 "metadata": metadata,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
-                "batch_id": batch_id,
                 "user": user,
                 "environment": tool_log_request_environment,
                 "save": save,

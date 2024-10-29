@@ -66,6 +66,16 @@ class FlowResponse(UncheckedBaseModel):
     The user who created the Flow.
     """
 
+    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
+    """
+    The user who committed the Flow Version.
+    """
+
+    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    The date and time the Flow Version was committed.
+    """
+
     status: VersionStatus = pydantic.Field()
     """
     The status of the Flow Version.

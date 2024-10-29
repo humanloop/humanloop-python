@@ -9,7 +9,7 @@ import typing
 class TextEvaluatorStatsResponse(UncheckedBaseModel):
     """
     Base attributes for stats for an Evaluator Version-Evaluated Version pair
-    in the Evaluation Report.
+    in the Evaluation.
     """
 
     evaluator_version_id: str = pydantic.Field()

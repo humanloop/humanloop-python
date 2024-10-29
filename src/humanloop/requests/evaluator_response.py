@@ -66,6 +66,16 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
     The user who created the Evaluator.
     """
 
+    committed_by: typing_extensions.NotRequired[UserResponse]
+    """
+    The user who committed the Evaluator Version.
+    """
+
+    committed_at: typing_extensions.NotRequired[dt.datetime]
+    """
+    The date and time the Evaluator Version was committed.
+    """
+
     status: VersionStatus
     last_used_at: dt.datetime
     version_logs_count: int

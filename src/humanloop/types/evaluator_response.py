@@ -64,6 +64,16 @@ class EvaluatorResponse(UncheckedBaseModel):
     The user who created the Evaluator.
     """
 
+    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
+    """
+    The user who committed the Evaluator Version.
+    """
+
+    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    The date and time the Evaluator Version was committed.
+    """
+
     status: VersionStatus
     last_used_at: dt.datetime
     version_logs_count: int = pydantic.Field()
