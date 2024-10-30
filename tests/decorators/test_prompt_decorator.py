@@ -21,6 +21,9 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 from opentelemetry.sdk.trace import Tracer
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
+# replicate has no typing stubs, ruff wants this import placed here
+from replicate.exceptions import ModelError as ReplicateModelError  # type: ignore
+
 _PROVIDER_AND_MODEL = [
     ("openai", "gpt-4o"),
     ("groq", "llama3-8b-8192"),
@@ -103,16 +106,20 @@ def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -
         ).text
     if provider == "replicate":
         # TODO: Instrumentor only picks up methods on module-level, not client level
+        # This should be documented somewhere or changed
         replicate.default_client._api_token = os.getenv("REPLICATE_API_KEY")
-        output = ""
-        for event in replicate.run(
-            model,
-            input={
-                "prompt": messages[0]["content"] + " " + messages[-1]["content"],
-                "temperature": 0.8,
-            },
-        ):
-            output += str(event)
+        try:
+            output = ""
+            for event in replicate.run(
+                model,
+                input={
+                    "prompt": messages[0]["content"] + " " + messages[-1]["content"],
+                    "temperature": 0.8,
+                },
+            ):
+                output += str(event)
+        except ReplicateModelError:
+            pytest.skip("Replicate not available")
         if not output:
             pytest.skip("Replicate not available")
         return output

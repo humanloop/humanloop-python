@@ -4,7 +4,6 @@ import pytest
 from humanloop.decorators.tool import tool
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
 from humanloop.otel.helpers import read_from_opentelemetry_span
-from humanloop.types.tool_kernel_request import ToolKernelRequest
 from jsonschema.protocols import Validator
 from opentelemetry.sdk.trace import Tracer
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
