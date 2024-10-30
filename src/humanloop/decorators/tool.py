@@ -4,13 +4,13 @@ import textwrap
 import typing
 import uuid
 from functools import wraps
-from typing import Any, Callable, Mapping, Optional, Sequence, TypedDict, Union
+from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
 
 from humanloop.otel import get_humanloop_sdk_tracer, get_trace_parent_metadata, pop_trace_context, push_trace_context
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
+from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
-from humanloop.types.tool_function import ToolFunction
-from humanloop.types.tool_kernel_request import ToolKernelRequest
+from humanloop.requests.tool_function import ToolFunctionParams
+from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
 from .helpers import args_to_inputs
 
@@ -30,7 +30,7 @@ def tool(
         )
 
         # Mypy complains about adding attribute on function but it's nice UX
-        func.json_schema = tool_kernel.function.model_dump()  # type: ignore
+        func.json_schema = tool_kernel["function"]  # type: ignore
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -63,7 +63,7 @@ def tool(
                     key=HL_FILE_OT_KEY,
                     value={
                         "path": path if path else func.__name__,
-                        "tool": tool_kernel.model_dump(),
+                        "tool": tool_kernel,
                     },
                 )
 
@@ -103,15 +103,16 @@ def _build_tool_kernel(
     attributes: Optional[dict[str, Optional[Any]]],
     setup_values: Optional[dict[str, Optional[Any]]],
     strict: bool,
-) -> ToolKernelRequest:
+) -> ToolKernelRequestParams:
     """Build ToolKernelRequest object from decorated function."""
-    return ToolKernelRequest(
+    return ToolKernelRequestParams(
         source_code=textwrap.dedent(
             # Remove the tool decorator from source code
             inspect.getsource(func).split("\n", maxsplit=1)[1]
         ),
-        attributes=attributes,
-        setup_values=setup_values,
+        # Note: OTel complains about falsy values in attributes, so we use OT_EMPTY_ATTRIBUTE
+        attributes=attributes or HL_OT_EMPTY_VALUE,  # type: ignore
+        setup_values=setup_values or HL_OT_EMPTY_VALUE,  # type: ignore
         function=_build_function_property(
             func=func,
             strict=strict,
@@ -119,16 +120,16 @@ def _build_tool_kernel(
     )
 
 
-def _build_function_property(func: Callable, strict: bool) -> ToolFunction:
+def _build_function_property(func: Callable, strict: bool) -> ToolFunctionParams:
     """Build `function` property inside ToolKernelRequest."""
     tool_name = func.__name__
     description = func.__doc__
     if description is None:
         description = ""
-    return ToolFunction(
+    return ToolFunctionParams(
         name=tool_name,
         description=description,
-        parameters=_build_function_parameters_property(func),
+        parameters=_build_function_parameters_property(func),  # type: ignore
         strict=strict,
     )
 
@@ -137,6 +138,7 @@ class _JSONSchemaFunctionParameters(TypedDict):
     type: str
     properties: dict[str, dict]
     required: list[str]
+    additionalProperties: Literal[False]
 
 
 def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
@@ -168,12 +170,14 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
             type="object",
             properties={},
             required=[],
+            additionalProperties=False,
         )
     return _JSONSchemaFunctionParameters(
         type="object",
         # False positive, expected tuple[str] but got tuple[str, ...]
         required=tuple(required),  # type: ignore
         properties=properties,
+        additionalProperties=False,
     )
 
 

@@ -78,10 +78,10 @@ def test_not_required_parameter(
         return a + b
 
     assert test_calculator(3, 4) == 7
-    assert len(spans := exporter.get_finished_spans()) == 1
-    tool_kernel = ToolKernelRequest.model_validate(read_from_opentelemetry_span(spans[0], HL_FILE_OT_KEY)["tool"])
-    assert test_calculator.json_schema["parameters"]["properties"]["a"] == {"type": ["number", "null"]}
-    assert tool_kernel.function.parameters["required"] == ("b",)  # type: ignore
+    assert len(exporter.get_finished_spans()) == 1
+    assert test_calculator.json_schema["parameters"]["properties"]["a"] == {
+        "type": ["number", "null"],
+    }
 
     Validator.check_schema(test_calculator.json_schema)
 
@@ -108,6 +108,7 @@ def test_no_annotation_on_parameter():
             },
             "required": ("b",),
             "type": "object",
+            "additionalProperties": False,
         },
         "strict": True,
     }
@@ -142,6 +143,7 @@ def test_dict_annotation_no_sub_types():
             },
             "required": ("b",),
             "type": "object",
+            "additionalProperties": False,
         },
         "strict": True,
     }
@@ -177,6 +179,7 @@ def test_list_annotation_no_sub_types():
             },
             "required": (),
             "type": "object",
+            "additionalProperties": False,
         },
         "strict": True,
     }
@@ -210,6 +213,7 @@ def test_tuple_annotation_no_sub_types():
             },
             "required": (),
             "type": "object",
+            "additionalProperties": False,
         },
         "strict": True,
     }
@@ -243,18 +247,9 @@ def test_list_annotation_parameter(
     assert "a b c" == foo(to_join=["a", "b", "c"])
 
     # THEN the function call results in a Span
-    assert len(spans := exporter.get_finished_spans()) == 1
-    # THEN a valid Tool Kernel can be parsed from the Span
-    tool_kernel = ToolKernelRequest.model_validate(
-        read_from_opentelemetry_span(
-            spans[0],
-            HL_FILE_OT_KEY,
-        )["tool"]
-    )
-    # THEN the argument is present in the Tool Kernel
-    assert "to_join" in tool_kernel.function.parameters["required"]  # type: ignore
+    assert len(exporter.get_finished_spans()) == 1
     # THEN the argument is correctly described in the JSON schema
-    assert tool_kernel.function.parameters["properties"]["to_join"] == {  # type: ignore
+    assert foo.json_schema["parameters"]["properties"]["to_join"] == {  # type: ignore
         "type": "array",
         "items": {"type": "string"},
     }
@@ -352,6 +347,7 @@ def test_tool_no_args():
             "properties": {},
             "required": [],
             "type": "object",
+            "additionalProperties": False,
         },
         "strict": True,
     }

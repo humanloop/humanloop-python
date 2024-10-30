@@ -8,7 +8,7 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY, OT_EMPTY_ATTRIBUTE
+from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
 from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
@@ -132,6 +132,18 @@ class HumanloopSpanExporter(SpanExporter):
             span,
             key=HL_LOG_OT_KEY,
         )
+        # NOTE: Due to Otel conventions, attributes with value of None are removed
+        # If not present, instantiate as empty dictionary
+        if "inputs" not in log_object:
+            log_object["inputs"] = {}
+        # NOTE: Due to Otel conventions, lists are read as dictionaries
+        # E.g. ["a", "b"] -> {"0": "a", "1": "b"}
+        # We must convert the dictionary back to a list
+        # See humanloop.otel.helpers._list_to_ott
+        if "messages" not in log_object:
+            log_object["messages"] = []
+        else:
+            log_object["messages"] = list(log_object["messages"].values())
         trace_metadata: Optional[dict[str, str]]
         try:
             trace_metadata = read_from_opentelemetry_span(
@@ -168,6 +180,10 @@ class HumanloopSpanExporter(SpanExporter):
         else:
             trace_parent_id = None
         tool = file_object["tool"]
+        if tool.get("attributes", HL_OT_EMPTY_VALUE) == HL_OT_EMPTY_VALUE:
+            tool["attributes"] = {}
+        if tool.get("setup_values", HL_OT_EMPTY_VALUE) == HL_OT_EMPTY_VALUE:
+            tool["setup_values"] = {}
         path: str = file_object["path"]
         response = self._client.tools.log(
             path=path,
@@ -189,11 +205,15 @@ class HumanloopSpanExporter(SpanExporter):
             trace_parent_id = self._uploaded_log_ids[trace_metadata["trace_parent_id"]]
         else:
             trace_parent_id = None
-        flow: Optional[FlowKernelRequestParams] = file_object["flow"]
-        if flow == OT_EMPTY_ATTRIBUTE:
-            flow = {
-                "attributes": {},
-            }
+        # Cannot write falsy values except None in OTel Span attributes
+        # If a None write is attempted then the attribute is removed
+        # making it impossible to distinguish between a Flow Span and
+        # Spans not created by Humanloop (see humanloop.otel.helpers.is_humanloop_span)
+        flow: FlowKernelRequestParams
+        if file_object["flow"] == HL_OT_EMPTY_VALUE:
+            flow = {"attributes": {}}
+        else:
+            flow = file_object["flow"]
         path: str = file_object["path"]
         response = self._client.flows.log(
             path=path,

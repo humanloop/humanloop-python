@@ -50,6 +50,10 @@ def write_to_opentelemetry_span(
 ) -> None:
     """Write a Python object to the OpenTelemetry Span's attributes. Reverse of :func:`read_from_opentelemetry_span`.
 
+    Note: OTel will complain about falsy values other then None, and keys with value set
+    to None will be silently dropped. Consider adding a placeholder value if the key should
+    be present in the span attributes.
+
     :param span: OpenTelemetry span to write values to
 
     :param value: Python object to write to the span attributes. Can also be a primitive value.
@@ -65,7 +69,7 @@ def write_to_opentelemetry_span(
     work_stack: list[tuple[str, Union[AttributeValue, NestedDict]]] = [(key, to_write_copy)]
     """
     Recurse through the dictionary value, building the OTel format keys in a DFS manner.
-    
+
     Example:
     ```python
     {

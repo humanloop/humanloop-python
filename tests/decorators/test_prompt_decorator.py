@@ -80,6 +80,9 @@ def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -
                 .message.content
             )
         except GroqNotFoundError:
+            # NOTE: Tests in this file are integration tests that rely on live LLM provider
+            # clients. If a test fails, it might be flaky. If this happens, consider adding
+            # a skip mechanism similar to Groq
             pytest.skip("GROQ not available")
     if provider == "cohere":
         client = cohere.Client(api_key=os.getenv("COHERE_API_KEY"))  # type: ignore

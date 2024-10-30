@@ -82,7 +82,6 @@ def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan
 
 
 def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
-    # TODO: Use children_spans in the future
     tool_log = read_from_opentelemetry_span(tool_span, key=HL_LOG_OT_KEY)
     if tool_span.start_time:
         tool_log["start_time"] = tool_span.start_time / 1e9
@@ -118,7 +117,9 @@ def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: 
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
-    prompt = hl_file.get("prompt", {})
+    prompt = hl_file.get("prompt")
+    if not prompt:
+        prompt = {}
     if not prompt.get("model"):
         prompt["model"] = gen_ai_object.get("request", {}).get("model", None)
     if not prompt.get("endpoint"):
@@ -159,7 +160,8 @@ def _enrich_prompt_span_log(prompt_span: ReadableSpan, llm_provider_call_span: R
         hl_log["output_tokens"] = gen_ai_object.get("usage", {}).get("completion_tokens")
     if len(gen_ai_object.get("completion", [])) > 0:
         hl_log["finish_reason"] = gen_ai_object.get("completion", {}).get("0", {}).get("finish_reason")
-    hl_log["messages"] = gen_ai_object.get("prompt", [])
+    # Note: read_from_opentelemetry_span returns the list as a dict due to Otel conventions
+    hl_log["messages"] = gen_ai_object.get("prompt")
 
     if prompt_span.start_time:
         hl_log["start_time"] = prompt_span.start_time / 1e9
@@ -180,7 +182,7 @@ def _enrich_prompt_span_log(prompt_span: ReadableSpan, llm_provider_call_span: R
             inputs[key] = parsed_value
     except Exception as e:
         logging.error(e)
-        inputs = {}
+        inputs = None
     finally:
         hl_log["inputs"] = inputs
 

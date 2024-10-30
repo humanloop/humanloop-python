@@ -4,7 +4,7 @@ from typing import Any, Callable, Optional
 
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.otel import get_humanloop_sdk_tracer, get_trace_parent_metadata, pop_trace_context, push_trace_context
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY, OT_EMPTY_ATTRIBUTE
+from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 
 
@@ -67,9 +67,10 @@ def flow(
                     key=HL_FILE_OT_KEY,
                     value={
                         "path": path if path else func.__name__,
-                        # OT span attributes are dropped if they are empty or null
-                        # Add 'EMPTY' token value otherwise the 'flow' key will be dropped
-                        "flow": {"attributes": attributes} if attributes else OT_EMPTY_ATTRIBUTE,
+                        # If a None write is attempted then the attribute is removed
+                        # making it impossible to distinguish between a Flow Span and
+                        # Spans not created by Humanloop (see humanloop.otel.helpers.is_humanloop_span)
+                        "flow": {"attributes": attributes} if attributes else HL_OT_EMPTY_VALUE,
                     },
                 )
 

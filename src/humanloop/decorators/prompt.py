@@ -30,21 +30,44 @@ def prompt(
     response_format: Optional[ResponseFormat] = None,
 ):
     def decorator(func: Callable):
+        prompt_kernel = {}
+
         if temperature is not None:
             if not 0 <= temperature < 1:
                 raise ValueError(f"{func.__name__}: Temperature parameter must be between 0 and 1")
+            prompt_kernel["temperature"] = temperature
 
         if top_p is not None:
             if not 0 <= top_p <= 1:
                 raise ValueError(f"{func.__name__}: Top-p parameter must be between 0 and 1")
+            prompt_kernel["top_p"] = top_p
 
         if presence_penalty is not None:
             if not -2 <= presence_penalty <= 2:
                 raise ValueError(f"{func.__name__}: Presence penalty parameter must be between -2 and 2")
+            prompt_kernel["presence_penalty"] = presence_penalty
 
         if frequency_penalty is not None:
             if not -2 <= frequency_penalty <= 2:
                 raise ValueError(f"{func.__name__}: Frequency penalty parameter must be between -2 and 2")
+            prompt_kernel["frequency_penalty"] = frequency_penalty
+
+        for attr in [model, endpoint, template, provider, max_tokens, stop, other, seed, response_format]:
+            if attr is not None:
+                prompt_kernel[attr] = attr  # type: ignore
+        for attr_name, attr_value in {
+            "model": model,
+            "endpoint": endpoint,
+            "template": template,
+            "provider": provider,
+            "max_tokens": max_tokens,
+            "stop": stop,
+            "other": other,
+            "seed": seed,
+            "response_format": response_format,
+        }.items():
+            if attr_value is not None:
+                prompt_kernel[attr_name] = attr_value  # type: ignore
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -71,7 +94,6 @@ def prompt(
                         },
                     )
 
-                # Write the Prompt Kernel to the Span on HL_FILE_OT_KEY
                 write_to_opentelemetry_span(
                     span=span,
                     key=HL_FILE_OT_KEY,
@@ -80,21 +102,7 @@ def prompt(
                         # Values not specified in the decorator will be
                         # completed with the intercepted values from the
                         # Instrumentors for LLM providers
-                        "prompt": {
-                            "template": template,
-                            "temperature": temperature,
-                            "top_p": top_p,
-                            "presence_penalty": presence_penalty,
-                            "frequency_penalty": frequency_penalty,
-                            "model": model,
-                            "endpoint": endpoint,
-                            "provider": provider,
-                            "max_tokens": max_tokens,
-                            "stop": stop,
-                            "other": other,
-                            "seed": seed,
-                            "response_format": response_format,
-                        },
+                        "prompt": prompt_kernel or None,  # noqa: F821
                     },
                 )
 
@@ -108,9 +116,7 @@ def prompt(
                     # Go back to previous trace context in Trace context
                     pop_trace_context()
 
-                prompt_log = {}
-                if output:
-                    prompt_log["output"] = output
+                prompt_log = {"output": output}
 
                 # Write the Prompt Log to the Span on HL_LOG_OT_KEY
                 write_to_opentelemetry_span(
