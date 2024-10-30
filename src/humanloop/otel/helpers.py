@@ -1,7 +1,7 @@
-import builtins
-from typing import Any, Union
+from typing import Union
 
 from opentelemetry.sdk.trace import ReadableSpan
+from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
@@ -11,6 +11,35 @@ NestedList = list[Union["NestedList", NestedDict]]
 
 
 def _list_to_ott(lst: NestedList) -> NestedDict:
+    """Transforms list of values to be written into a dictionary with index values as keys.
+
+    When writing to Otel span attributes, only primitive values or lists are allowed.
+    Nested dictionaries must be linearised. For example, writing to span attribute `foo`
+    the dictionary value {'a': 7, 'b': 'hello'} would translated in the span attributes
+    dictionary to look like:
+    ```python
+    {
+        'foo.a': 7,
+        'foo.b': 'hello'
+    }
+    ```
+
+    Calling :func:`write_to_opentelemetry_span` with a list for write value will have
+    the list transformed into a pseudo-dictionary with index values as keys.
+
+    Examples:
+    ```python
+    _list_to_ott([1, 2, 'a']) == {'0': 1, '1': 2, '2': 'a'}
+    _list_to_ott([
+        "baz",
+        {'a': 6, 'b': 'hello'}
+    ]) == {
+        '0': 'baz',
+        '1.a': 6,
+        '1.b': 'hello'
+    }
+    ```
+    """
     return {str(idx): val if not isinstance(val, list) else _list_to_ott(val) for idx, val in enumerate(lst)}
 
 
@@ -19,15 +48,13 @@ def write_to_opentelemetry_span(
     value: Union[NestedDict, NestedList],
     key: str = "",
 ) -> None:
-    """Reverse of read_from_opentelemetry_span. Writes a Python object to the OpenTelemetry Span's attributes.
+    """Write a Python object to the OpenTelemetry Span's attributes. Reverse of :func:`read_from_opentelemetry_span`.
 
-    See `read_from_opentelemetry_span` for more information.
+    :param span: OpenTelemetry span to write values to
 
-    Arguments:
-        span: OpenTelemetry span to write values to
-        value: Python object to write to the span attributes. Can also be a primitive value.
-        key: Key prefix to write to the span attributes. The path to the values does not
-            need to exist in the span attributes.
+    :param value: Python object to write to the span attributes. Can also be a primitive value.
+
+    :param key: Key prefix to write to the span attributes. The path to the values does not need to exist in the span attributes.
     """
     to_write_copy: Union[dict, AttributeValue]
     if isinstance(value, list):
@@ -36,6 +63,31 @@ def write_to_opentelemetry_span(
         to_write_copy = dict(value)
     linearised_attributes: dict[str, AttributeValue] = {}
     work_stack: list[tuple[str, Union[AttributeValue, NestedDict]]] = [(key, to_write_copy)]
+    """
+    Recurse through the dictionary value, building the OTel format keys in a DFS manner.
+    
+    Example:
+    ```python
+    {
+        'foo': {
+            'a': 7,
+            'b': 'hello'
+        },
+        "baz": [42, 43]
+    }
+
+    1. Visit foo, push ('foo.a', 7), ('foo.b', 'hello') to stack
+    2. Visit baz, push ('baz.0', 42), ('baz.1', 43) to stack
+    3. Take each primitive key-value from the stack and write to the span attributes,
+        resulting in:
+        {
+            'foo.a': 7,
+            'foo.b': 'hello',
+            'baz.0': 42,
+            'baz.1': 43
+        }
+    ```
+    """
     while len(work_stack) > 0:
         key, value = work_stack.pop()  # type: ignore
         if isinstance(value, dict):
@@ -54,12 +106,9 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
     in the span attributes. This function reconstructs the original structure from
     a key prefix.
 
-    Arguments:
-        span: OpenTelemetry span to read values from
-        key: Key prefix to read from the span attributes
+    :param span: OpenTelemetry span to read values from
+    :param key: Key prefix to read from the span attributes
 
-    Returns:
-        Python object stored in the span attributes under the key prefix.
 
     Examples:
     `span.attributes` contains the following attributes:
@@ -129,7 +178,7 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
                 sub_result[part] = span_value
             else:
                 if part not in sub_result:
-                    sub_result[part] = dict()
+                    sub_result[part] = {}
                 sub_result = sub_result[part]  # type: ignore
 
     for part in key.split("."):
@@ -140,12 +189,28 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
 
 def is_llm_provider_call(span: ReadableSpan) -> bool:
     """Determines if the span was created by an Instrumentor for LLM provider clients."""
-    return "llm.request.type" in span.attributes  # type: ignore
+    if not span.instrumentation_scope:
+        return False
+    span_instrumentor_name = span.instrumentation_scope.name
+    # Match against the prefix of the Instrumentor name since
+    # the name might be version dependent e.g.
+    # "opentelemetry.instrumentation.openai.v1"
+    return span.kind == SpanKind.CLIENT and any(
+        span_instrumentor_name.startswith(instrumentor)
+        for instrumentor in [
+            "opentelemetry.instrumentation.openai",
+            "opentelemetry.instrumentation.groq",
+            "opentelemetry.instrumentation.anthropic",
+            "opentelemetry.instrumentation.cohere",
+            "opentelemetry.instrumentation.replicate",
+        ]
+    )
 
 
 def is_humanloop_span(span: ReadableSpan) -> bool:
-    """Determines if the span was created by the Humanloop SDK."""
+    """Check if the Span was created by the Humanloop SDK."""
     try:
+        # Valid spans will have keys with the HL_FILE_OT_KEY and HL_LOG_OT_KEY prefixes present
         read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
         read_from_opentelemetry_span(span, key=HL_LOG_OT_KEY)
     except KeyError:

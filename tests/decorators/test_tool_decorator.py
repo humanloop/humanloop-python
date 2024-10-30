@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Optional, TypedDict, Union
 
 import pytest
 from humanloop.decorators.tool import tool
@@ -42,7 +42,7 @@ def test_calculator_decorator(
         "num1": 1,
         "num2": 2,
     }
-    hl_file["tool"]["function"]["description"] == "Do arithmetic operations on two numbers."
+    assert hl_file["tool"]["function"]["description"] == "Do arithmetic operations on two numbers."
     # TODO: pydantic is inconsistent by dumping either tuple or list
     assert calculator.json_schema == hl_file["tool"]["function"]
 
@@ -86,19 +86,138 @@ def test_not_required_parameter(
     Validator.check_schema(test_calculator.json_schema)
 
 
-def test_no_annotation_on_parameter_fails():
-    with pytest.raises(ValueError) as exc:
+def test_no_annotation_on_parameter():
+    # GIVEN a function annotated with @tool and without type hint on a parameter
+    @tool()
+    def calculator(a: Optional[float], b) -> float:
+        if a is None:
+            a = 0
+        return a + b
 
-        @tool()
-        def bad_tool(a: Optional[float], b) -> float:
-            if a is None:
-                a = 0
-            return a + b
+    # WHEN building the Tool kernel
+    # THEN the JSON schema is correctly built and `b` is is of `any` type
+    # NOTE: JSONSchema dropped support for 'any' type, we include all types
+    # as a workaround
+    assert calculator.json_schema == {
+        "description": "",
+        "name": "calculator",
+        "parameters": {
+            "properties": {
+                "a": {"type": ["number", "null"]},
+                "b": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
+            },
+            "required": ("b",),
+            "type": "object",
+        },
+        "strict": True,
+    }
 
-    assert exc.value.args[0] == "bad_tool: b lacks a type hint annotation"
+    Validator.check_schema(calculator.json_schema)
 
 
-def test_no_annotation_function_returns_does_not_fail():
+def test_dict_annotation_no_sub_types():
+    # GIVEN a function annotated with @tool and without type hint on a parameter
+    @tool()
+    def calculator(a: Optional[float], b: dict) -> float:
+        if a is None:
+            a = 0
+        return a + b["c"]
+
+    # WHEN building the Tool kernel
+    # THEN the JSON schema is correctly built and `b` accepts any type
+    # on both keys and values
+    assert calculator.json_schema == {
+        "description": "",
+        "name": "calculator",
+        "parameters": {
+            "properties": {
+                "a": {"type": ["number", "null"]},
+                "b": {
+                    "type": "object",
+                    "properties": {
+                        "key": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
+                        "value": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
+                    },
+                },
+            },
+            "required": ("b",),
+            "type": "object",
+        },
+        "strict": True,
+    }
+
+    Validator.check_schema(calculator.json_schema)
+
+
+def test_list_annotation_no_sub_types():
+    # GIVEN a function annotated with @tool and without type hint on a parameter
+    @tool()
+    def calculator(a: Optional[float], b: Optional[list]) -> float:
+        if a is None:
+            a = 0
+        sum = a
+        if b is None:
+            return sum
+        for val in b:
+            sum += val
+        return sum
+
+    # WHEN building the Tool kernel
+    # THEN the JSON schema is correctly built and `b` accepts any type
+    assert calculator.json_schema == {
+        "description": "",
+        "name": "calculator",
+        "parameters": {
+            "properties": {
+                "a": {"type": ["number", "null"]},
+                "b": {
+                    "type": ["array", "null"],
+                    "items": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
+                },
+            },
+            "required": (),
+            "type": "object",
+        },
+        "strict": True,
+    }
+
+
+def test_tuple_annotation_no_sub_types():
+    # GIVEN a function annotated with @tool and without type hint on a parameter
+    @tool()
+    def calculator(a: Optional[float], b: Optional[tuple]) -> float:
+        if a is None:
+            a = 0
+        sum = a
+        if b is None:
+            return sum
+        for val in b:
+            sum += val
+        return sum
+
+    # WHEN building the Tool kernel
+    # THEN the JSON schema is correctly built and `b` accepts any type
+    assert calculator.json_schema == {
+        "description": "",
+        "name": "calculator",
+        "parameters": {
+            "properties": {
+                "a": {"type": ["number", "null"]},
+                "b": {
+                    "type": ["array", "null"],
+                    "items": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
+                },
+            },
+            "required": (),
+            "type": "object",
+        },
+        "strict": True,
+    }
+
+
+def test_function_without_return_annotation():
+    # GIVEN a function annotated with @tool and without type hint on the return value
+    # WHEN building the Tool kernel
     @tool()
     def foo(a: Optional[float], b: float) -> float:
         """Add two numbers."""
@@ -106,38 +225,51 @@ def test_no_annotation_function_returns_does_not_fail():
             a = 0
         return a + b
 
+    # THEN the JSONSchema is valid
     Validator.check_schema(foo.json_schema)
 
 
 def test_list_annotation_parameter(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
+    # GIVEN an OTel configuration with HL Processor
     _, exporter = opentelemetry_hl_test_configuration
 
+    # WHEN defining a tool with a list parameter
     @tool()
     def foo(to_join: list[str]) -> str:
         return " ".join(to_join)
 
     assert "a b c" == foo(to_join=["a", "b", "c"])
 
+    # THEN the function call results in a Span
     assert len(spans := exporter.get_finished_spans()) == 1
-
-    tool_kernel = ToolKernelRequest.model_validate(read_from_opentelemetry_span(spans[0], HL_FILE_OT_KEY)["tool"])
-
+    # THEN a valid Tool Kernel can be parsed from the Span
+    tool_kernel = ToolKernelRequest.model_validate(
+        read_from_opentelemetry_span(
+            spans[0],
+            HL_FILE_OT_KEY,
+        )["tool"]
+    )
+    # THEN the argument is present in the Tool Kernel
     assert "to_join" in tool_kernel.function.parameters["required"]  # type: ignore
+    # THEN the argument is correctly described in the JSON schema
     assert tool_kernel.function.parameters["properties"]["to_join"] == {  # type: ignore
         "type": "array",
         "items": {"type": "string"},
     }
-
+    # THEN the JSONSchema is valid
     Validator.check_schema(foo.json_schema)
 
 
-def test_list_list_parameter_annotation():
+def test_list_in_list_parameter_annotation():
+    # GIVEN a tool definition with a list of lists parameter
+    # WHEN building the Tool Kernel
     @tool()
     def nested_plain_join(to_join: list[list[str]]):
         return " ".join([val for sub_list in to_join for val in sub_list])
 
+    # THEN the JSON schema is correctly built and parameter is correctly described
     assert nested_plain_join.json_schema["parameters"]["properties"]["to_join"] == {
         "type": "array",
         "items": {
@@ -146,14 +278,18 @@ def test_list_list_parameter_annotation():
         },
     }
 
+    # THEN the JSONSchema is valid
     Validator.check_schema(nested_plain_join.json_schema)
 
 
 def test_complex_dict_annotation():
+    # GIVEN a tool definition with a dictionary parameter
+    # WHEN building the Tool Kernel
     @tool()
     def foo(a: dict[Union[int, str], list[str]]):
         return a
 
+    # THEN the parameter is correctly described
     assert foo.json_schema["parameters"]["properties"]["a"] == {
         "type": "object",
         "properties": {
@@ -162,14 +298,18 @@ def test_complex_dict_annotation():
         },
     }
 
+    # THEN the JSONSchema is valid
     Validator.check_schema(foo.json_schema)
 
 
 def test_tuple_annotation():
+    # GIVEN a tool definition with a tuple parameter
+    # WHEN building the Tool Kernel
     @tool()
     def foo(a: Optional[tuple[int, Optional[str], float]]):
         return a
 
+    # THEN the parameter is correctly described
     assert foo.json_schema["parameters"]["properties"]["a"] == {
         "type": ["array", "null"],
         "items": [
@@ -179,24 +319,32 @@ def test_tuple_annotation():
         ],
     }
 
+    # THEN the JSONSchema is valid
     Validator.check_schema(foo.json_schema)
 
 
 def test_strict_false():
+    # GIVEN a tool definition with strict=False
+    # WHEN building the Tool Kernel
     @tool(strict=False)
     def foo(a: int, b: int) -> int:
         return a + b
 
+    # THEN the JSON schema is correctly built
     assert foo.json_schema["strict"] is False
 
+    # THEN the JSONSchema is valid
     Validator.check_schema(foo.json_schema)
 
 
 def test_tool_no_args():
+    # GIVEN a tool definition without arguments
+    # WHEN building the Tool Kernel
     @tool()
     def foo():
         return 42
 
+    # THEN the JSON schema is correctly built
     assert foo.json_schema == {
         "description": "",
         "name": "foo",
@@ -208,4 +356,22 @@ def test_tool_no_args():
         "strict": True,
     }
 
+    # THEN the JSONSchema is valid
     Validator.check_schema(foo.json_schema)
+
+
+def test_custom_types_throws():
+    # GIVEN a user-defined type
+    class Foo(TypedDict):
+        a: int  # type: ignore
+        b: int  # type: ignore
+
+    # WHEN defining a tool with a parameter of that type
+    with pytest.raises(ValueError) as exc:
+
+        @tool()
+        def foo_bar(foo: Foo):
+            return foo.a + foo.b  # type: ignore
+
+    # THEN a ValueError is raised
+    assert exc.value.args[0].startswith("foo_bar: Unsupported type hint")

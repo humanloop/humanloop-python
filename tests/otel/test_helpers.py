@@ -153,7 +153,7 @@ def test_write_drops_dict_all_null_values(test_span: Span):
     # THEN the value is not present in the span attributes
     assert "key" not in test_span.attributes  # type: ignore
     with pytest.raises(KeyError):
-        read_from_opentelemetry_span(test_span, "key") == {}
+        assert read_from_opentelemetry_span(test_span, "key") == {}
 
 
 def test_write_drops_null_value_from_dict(test_span: Span):
@@ -162,4 +162,4 @@ def test_write_drops_null_value_from_dict(test_span: Span):
     write_to_opentelemetry_span(test_span, {"x": 2, "y": None}, "key")  # type: ignore
     # WHEN reading the values from the span
     # THEN the value with null value is not present in the span attributes
-    read_from_opentelemetry_span(test_span, "key") == {"x": 2}
+    assert read_from_opentelemetry_span(test_span, "key") == {"x": 2}

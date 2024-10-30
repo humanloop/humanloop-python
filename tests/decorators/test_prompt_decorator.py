@@ -114,7 +114,7 @@ def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -
     raise ValueError(f"Unknown provider: {provider}")
 
 
-# prompt is a decorator, but for sake of brevity, I am using it as a higher-order function
+# NOTE: prompt is a decorator, but for brevity, it's used as a higher-order function in tests
 _call_llm = prompt(
     path=None,
     template="You are an assistant on the following topics: {topics}.",
@@ -134,7 +134,7 @@ def test_prompt_decorator(
     call_llm_messages: list[ChatCompletionMessageParam],
 ):
     provider, model = provider_model
-    # GIVEN a default OpenTelemetry configuration
+    # GIVEN an OpenTelemetry configuration without HumanloopSpanProcessor
     _, exporter = opentelemetry_test_configuration
     # WHEN using the Prompt decorator
     _call_llm(
@@ -145,8 +145,11 @@ def test_prompt_decorator(
     # THEN two spans are created: one for the OpenAI LLM provider call and one for the Prompt
     spans = exporter.get_finished_spans()
     assert len(spans) == 2
+    assert not is_humanloop_span(span=spans[0])
+    assert is_humanloop_span(span=spans[1])
     # THEN the Prompt span is not enhanced with information from the LLM provider
     assert is_humanloop_span(spans[1])
+    # THEN no information is added to the Prompt span without the HumanloopSpanProcessor
     assert spans[1].attributes.get("prompt") is None  # type: ignore
 
 
@@ -157,7 +160,7 @@ def test_prompt_decorator_with_hl_processor(
     call_llm_messages: list[ChatCompletionMessageParam],
 ):
     provider, model = provider_model
-    # GIVEN an OpenTelemetry configuration with a Humanloop Span processor
+    # GIVEN an OpenTelemetry configuration with HumanloopSpanProcessor
     _, exporter = opentelemetry_hl_test_configuration
     # WHEN using the Prompt decorator
     _call_llm(
@@ -165,18 +168,26 @@ def test_prompt_decorator_with_hl_processor(
         model=model,
         messages=call_llm_messages,
     )
-    # THEN a single span is created since the LLM provider call span is merged in the Prompt span
+    # THEN two spans are created: one for the OpenAI LLM provider call and one for the Prompt
     spans = exporter.get_finished_spans()
-    assert len(spans) == 1
-    assert is_humanloop_span(span=spans[0])
+    assert len(spans) == 2
+    assert not is_humanloop_span(span=spans[0])
+    assert is_humanloop_span(span=spans[1])
+    # THEN the Prompt span is enhanced with information and forms a correct PromptKernel
     prompt = PromptKernelRequest.model_validate(
-        read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
+        read_from_opentelemetry_span(
+            span=spans[1],
+            key=HL_FILE_OT_KEY,
+        )["prompt"]  # type: ignore
     )
-    # THEN temperature is taken from LLM provider call, but top_p is not since it is not specified
+    # THEN temperature is intercepted from LLM provider call
     assert prompt.temperature == 0.8
+    # THEN the provider intercepted from LLM provider call
     assert prompt.provider == provider
-    assert prompt.top_p is None
+    # THEN model is intercepted from LLM provider call
     assert prompt.model == model
+    # THEN top_p is not present since it's not present in the LLM provider call
+    assert prompt.top_p is None
 
 
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
@@ -186,7 +197,7 @@ def test_prompt_decorator_with_defaults(
     call_llm_messages: list[ChatCompletionMessageParam],
 ):
     provider, model = provider_model
-    # GIVEN an OpenTelemetry configuration with a Humanloop Span processor
+    # GIVEN an OpenTelemetry configuration with HumanloopSpanProcessor
     _, exporter = opentelemetry_hl_test_configuration
     # WHEN using the Prompt decorator with default values
     _call_llm_with_defaults(
@@ -194,17 +205,16 @@ def test_prompt_decorator_with_defaults(
         model=model,
         messages=call_llm_messages,
     )
-    # THEN a single span is created since the LLM provider call span is merged in the Prompt span
     spans = exporter.get_finished_spans()
-    assert len(spans) == 1
-    assert is_humanloop_span(spans[0])
+    # THEN the Prompt span is enhanced with information and forms a correct PromptKernel
     prompt = PromptKernelRequest.model_validate(
-        read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
+        read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
     )
-    # THEN temperature is taken from decorator rather than intercepted LLM provider call
+    # THEN temperature intercepted from LLM provider call is overridden by default value
     assert prompt.temperature == 0.9
-    # THEN top_p is present
+    # THEN top_p is taken from decorator default value
     assert prompt.top_p == 0.1
+    # THEN the provider intercepted from LLM provider call
     assert prompt.model == model
 
 
@@ -217,12 +227,11 @@ def test_prompt_decorator_with_defaults(
         {"frequency_penalty": 3},
     ),
 )
-def test_default_values_fails_out_of_domain(hyperparameters: dict[str, float]):
+def test_hyperparameter_values_fail_out_of_domain(hyperparameters: dict[str, float]):
     # GIVEN a Prompt decorated function
-    # WHEN using default values that are out of domain
-    # THEN an exception is raised
-    with pytest.raises(ValueError):
 
+    with pytest.raises(ValueError):
+        # WHEN using default values that are out of domain
         @prompt(path=None, template="You are an assistant on the following topics: {topics}.", **hyperparameters)  # type: ignore[arg-type]
         def _call_llm(messages: list[ChatCompletionMessageParam]) -> Optional[str]:
             load_dotenv()
@@ -236,3 +245,5 @@ def test_default_values_fails_out_of_domain(hyperparameters: dict[str, float]):
                 .choices[0]
                 .message.content
             )
+
+    # THEN an exception is raised

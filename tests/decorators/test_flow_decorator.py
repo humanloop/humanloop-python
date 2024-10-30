@@ -20,15 +20,16 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 @tool()
 def _random_string() -> str:
     """Return a random string."""
-    # NOTE: This is very basic; scope is to check if it's
-    # picked up and included in the Flow Trace
-    return "".join(random.choices(string.ascii_letters + string.digits, k=10))
+    return "".join(
+        random.choices(
+            string.ascii_letters + string.digits,
+            k=10,
+        )
+    )
 
 
 @prompt(path=None, template="You are an assistant on the following topics: {topics}.")
 def _call_llm(messages: list[ChatCompletionMessageParam]) -> str:
-    # NOTE: These tests check if instrumentors are capable of intercepting OpenAI
-    # provider calls. Could not find a way to intercept them coming from a Mock.
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     return (
         client.chat.completions.create(
@@ -39,10 +40,6 @@ def _call_llm(messages: list[ChatCompletionMessageParam]) -> str:
         .choices[0]
         .message.content
     ) + _random_string()
-
-
-def _agent_call_no_decorator(messages: list[dict]) -> str:
-    return _call_llm(messages=messages)
 
 
 @flow(attributes={"foo": "bar", "baz": 7})
@@ -74,10 +71,19 @@ def test_decorators_without_flow(
     )
     # WHEN exporting the spans
     spans = exporter.get_finished_spans()
-    # THEN 2 independent spans are exported with no relation to each other
-    assert len(spans) == 2
-    assert read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["prompt"]
+    # THEN 3 spans arrive at the exporter in the following order:
+    #   0. Intercepted OpenAI call, which is ignored by the exporter
+    #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
+    #   2. Prompt Span
+    assert len(spans) == 3
+    assert read_from_opentelemetry_span(
+        span=spans[1],
+        key=HL_FILE_OT_KEY,
+    )["tool"]
+    assert read_from_opentelemetry_span(
+        span=spans[2],
+        key=HL_FILE_OT_KEY,
+    )["prompt"]
     for span in spans:
         # THEN no metadata related to trace is present on either of them
         with pytest.raises(KeyError):
@@ -102,24 +108,28 @@ def test_decorators_with_flow_decorator(
             },
         ]
     )
-    # THEN 3 spans are created
+    # THEN 4 spans arrive at the exporter in the following order:
+    #   0. Intercepted OpenAI call, which is ignored by the exporter
+    #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
+    #   2. Prompt Span
+    #   3. Flow Span
     spans = exporter.get_finished_spans()
-    assert len(spans) == 3
+    assert len(spans) == 4
     # THEN the span are returned bottom to top
-    assert read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["prompt"]
-    assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_OT_KEY)["flow"]
-    tool_trace_metadata = read_from_opentelemetry_span(span=spans[0], key=HL_TRACE_METADATA_KEY)
-    prompt_trace_metadata = read_from_opentelemetry_span(span=spans[1], key=HL_TRACE_METADATA_KEY)
-    flow_trace_metadata = read_from_opentelemetry_span(span=spans[2], key=HL_TRACE_METADATA_KEY)
+    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["tool"]
+    assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_OT_KEY)["prompt"]
+    assert read_from_opentelemetry_span(span=spans[3], key=HL_FILE_OT_KEY)["flow"]
+    tool_trace_metadata = read_from_opentelemetry_span(span=spans[1], key=HL_TRACE_METADATA_KEY)
+    prompt_trace_metadata = read_from_opentelemetry_span(span=spans[2], key=HL_TRACE_METADATA_KEY)
+    flow_trace_metadata = read_from_opentelemetry_span(span=spans[3], key=HL_TRACE_METADATA_KEY)
     # THEN Tool span is a child of Prompt span
-    assert tool_trace_metadata["trace_parent_id"] == spans[1].context.span_id
+    assert tool_trace_metadata["trace_parent_id"] == spans[2].context.span_id
     assert tool_trace_metadata["is_flow_log"] is False
-    assert prompt_trace_metadata["trace_parent_id"] == spans[2].context.span_id
+    assert prompt_trace_metadata["trace_parent_id"] == spans[3].context.span_id
     # THEN Prompt span is a child of Flow span
     assert prompt_trace_metadata["is_flow_log"] is False
     assert flow_trace_metadata["is_flow_log"]
-    assert flow_trace_metadata["trace_id"] == spans[2].context.span_id
+    assert flow_trace_metadata["trace_id"] == spans[3].context.span_id
 
 
 def test_flow_decorator_flow_in_flow(
@@ -132,29 +142,37 @@ def test_flow_decorator_flow_in_flow(
     # WHEN Calling the _test_flow_in_flow function with specific messages
     _flow_over_flow(call_llm_messages)
 
-    # THEN Spans correctly produce a Flow Trace
+    # THEN 5 spans are arrive at the exporter in the following order:
+    #   0. Intercepted OpenAI call, which is ignored by the exporter
+    #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
+    #   2. Prompt Span
+    #   3. Nested Flow Span
+    #   4. Flow Span
     spans = exporter.get_finished_spans()
-    assert len(spans) == 4
-    assert read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["prompt"]
-    assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_OT_KEY)["flow"]
+    assert len(spans) == 5
+    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["tool"]
+    assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_OT_KEY)["prompt"]
     assert read_from_opentelemetry_span(span=spans[3], key=HL_FILE_OT_KEY)["flow"]
+    assert read_from_opentelemetry_span(span=spans[4], key=HL_FILE_OT_KEY)["flow"]
 
-    tool_trace_metadata = read_from_opentelemetry_span(span=spans[0], key=HL_TRACE_METADATA_KEY)
-    prompt_trace_metadata = read_from_opentelemetry_span(span=spans[1], key=HL_TRACE_METADATA_KEY)
-    nested_flow_trace_metadata = read_from_opentelemetry_span(span=spans[2], key=HL_TRACE_METADATA_KEY)
-    flow_trace_metadata = read_from_opentelemetry_span(span=spans[3], key=HL_TRACE_METADATA_KEY)
-    # THEN the nested flow points to the parent flow
-    assert tool_trace_metadata["trace_parent_id"] == spans[1].context.span_id
+    tool_trace_metadata = read_from_opentelemetry_span(span=spans[1], key=HL_TRACE_METADATA_KEY)
+    prompt_trace_metadata = read_from_opentelemetry_span(span=spans[2], key=HL_TRACE_METADATA_KEY)
+    nested_flow_trace_metadata = read_from_opentelemetry_span(span=spans[3], key=HL_TRACE_METADATA_KEY)
+    flow_trace_metadata = read_from_opentelemetry_span(span=spans[4], key=HL_TRACE_METADATA_KEY)
+    # THEN the parent of the Tool Log is the Prompt Log
+    assert tool_trace_metadata["trace_parent_id"] == spans[2].context.span_id
     assert tool_trace_metadata["is_flow_log"] is False
-    assert prompt_trace_metadata["trace_parent_id"] == spans[2].context.span_id
+    # THEN the parent of the Prompt Log is the Flow Log
+    assert prompt_trace_metadata["trace_parent_id"] == spans[3].context.span_id
     assert prompt_trace_metadata["is_flow_log"] is False
-    assert nested_flow_trace_metadata["trace_id"] == spans[2].context.span_id
-    # THEN the parent flow correctly points to itself
+    # THEN the nested Flow Log creates a new trace
+    assert nested_flow_trace_metadata["trace_id"] == spans[3].context.span_id
     assert nested_flow_trace_metadata["is_flow_log"]
-    assert nested_flow_trace_metadata["trace_parent_id"] == spans[3].context.span_id
+    # THEN the parent of the nested Flow Log is the upper Flow Log
+    assert nested_flow_trace_metadata["trace_parent_id"] == spans[4].context.span_id
+    # THEN the parent Flow Log correctly points to itself
+    assert flow_trace_metadata["trace_id"] == spans[4].context.span_id
     assert flow_trace_metadata["is_flow_log"]
-    assert flow_trace_metadata["trace_id"] == spans[3].context.span_id
 
 
 def test_flow_decorator_with_hl_exporter(
@@ -167,43 +185,60 @@ def test_flow_decorator_with_hl_exporter(
     with patch.object(exporter, "export", wraps=exporter.export) as mock_export_method:
         # WHEN calling the @flow decorated function
         _agent_call(call_llm_messages)
-        assert len(mock_export_method.call_args_list) == 3
-        first_exported_span = mock_export_method.call_args_list[0][0][0][0]
-        middle_exported_span = mock_export_method.call_args_list[1][0][0][0]
-        last_exported_span = mock_export_method.call_args_list[2][0][0][0]
+
+        # Exporter is threaded, need to wait threads shutdown
+        time.sleep(3)
+
+        # THEN 4 spans are arrive at the exporter in the following order:
+        #   0. Intercepted OpenAI call, which is ignored by the exporter
+        #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
+        #   2. Prompt Span
+        #   3. Flow Span
+        assert len(mock_export_method.call_args_list) == 4
+
+        tool_span = mock_export_method.call_args_list[1][0][0][0]
+        prompt_span = mock_export_method.call_args_list[2][0][0][0]
+        flow_span = mock_export_method.call_args_list[3][0][0][0]
         # THEN the last uploaded span is the Flow
-        assert read_from_opentelemetry_span(span=last_exported_span, key=HL_FILE_OT_KEY)["flow"]["attributes"] == {  # type: ignore[index,call-overload]
+        assert read_from_opentelemetry_span(
+            span=flow_span,
+            key=HL_FILE_OT_KEY,
+        )["flow"]["attributes"] == {  # type: ignore[index,call-overload]
             "foo": "bar",
             "baz": 7,
         }
         # THEN the second uploaded span is the Prompt
-        assert "prompt" in read_from_opentelemetry_span(span=middle_exported_span, key=HL_FILE_OT_KEY)
+        assert "prompt" in read_from_opentelemetry_span(
+            span=prompt_span,
+            key=HL_FILE_OT_KEY,
+        )
         # THEN the first uploaded span is the Tool
-        assert "tool" in read_from_opentelemetry_span(span=first_exported_span, key=HL_FILE_OT_KEY)
+        assert "tool" in read_from_opentelemetry_span(
+            span=tool_span,
+            key=HL_FILE_OT_KEY,
+        )
 
-        # Potentially flaky: Exporter is threaded, need
-        # to wait for them to finish
-        time.sleep(3)
+        # NOTE: The type: ignore comments are caused by the MagicMock used to mock the HTTP client
 
         # THEN the first Log uploaded is the Flow
-        first_log = exporter._client.flows.log.call_args_list[0][1]  # type: ignore[attr-defined]
+        first_log = exporter._client.flows.log.call_args_list[0][1]  # type: ignore
         assert "flow" in first_log
-        exporter._client.flows.log.assert_called_once()  # type: ignore[attr-defined]
-        flow_log_call_args = exporter._client.flows.log.call_args_list[0]  # type: ignore[attr-defined]
-        flow_log_call_args.kwargs["flow"]["attributes"] == {"foo": "bar", "baz": 7}
-        flow_log_id = exporter._client.flows.log.return_value  # type: ignore[attr-defined]
+        exporter._client.flows.log.assert_called_once()  # type: ignore
+        flow_log_call_args = exporter._client.flows.log.call_args_list[0]  # type: ignore
+        assert flow_log_call_args.kwargs["flow"]["attributes"] == {"foo": "bar", "baz": 7}
+        flow_log_id = exporter._client.flows.log.return_value.id  # type: ignore
 
         # THEN the second Log uploaded is the Prompt
-        exporter._client.prompts.log.assert_called_once()  # type: ignore[attr-defined]
-        prompt_log_call_args = exporter._client.prompts.log.call_args_list[0]  # type: ignore[attr-defined]
-        prompt_log_call_args.kwargs["trace_parent_id"] == flow_log_id
-        prompt_log_call_args.kwargs["prompt"]["temperature"] == 0.8
-        prompt_log_id = exporter._client.prompts.log.return_value  # type: ignore[attr-defined]
+        exporter._client.prompts.log.assert_called_once()  # type: ignore
+        prompt_log_call_args = exporter._client.prompts.log.call_args_list[0]  # type: ignore
+        assert prompt_log_call_args.kwargs["trace_parent_id"] == flow_log_id
+        assert prompt_log_call_args.kwargs["prompt"]["temperature"] == 0.8
+        prompt_log_id = exporter._client.prompts.log.return_value.id  # type: ignore
 
         # THEN the final Log uploaded is the Tool
-        exporter._client.tools.log.assert_called_once()  # type: ignore[attr-defined]
-        tool_log_call_args = exporter._client.tools.log.call_args_list[0]  # type: ignore[attr-defined]
-        tool_log_call_args.kwargs["trace_parent_id"] == prompt_log_id
+        exporter._client.tools.log.assert_called_once()  # type: ignore
+        tool_log_call_args = exporter._client.tools.log.call_args_list[0]  # type: ignore
+        assert tool_log_call_args.kwargs["trace_parent_id"] == prompt_log_id
 
 
 def test_flow_decorator_hl_exporter_flow_inside_flow(
@@ -215,15 +250,29 @@ def test_flow_decorator_hl_exporter_flow_inside_flow(
     with patch.object(exporter, "export", wraps=exporter.export) as mock_export_method:
         # WHEN calling the @flow decorated function
         _flow_over_flow(call_llm_messages)
-        assert len(mock_export_method.call_args_list) == 4
+
+        # Exporter is threaded, need to wait threads shutdown
+        time.sleep(3)
+
+        # THEN 5 spans are arrive at the exporter in the following order:
+        #   0. Intercepted OpenAI call, which is ignored by the exporter
+        #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
+        #   2. Prompt Span
+        #   3. Nested Flow Span
+        #   4. Flow Span
+        assert len(mock_export_method.call_args_list) == 5
         # THEN the last uploaded span is the larger Flow
         # THEN the second to last uploaded span is the nested Flow
-        last_exported_span = mock_export_method.call_args_list[3][0][0][0]
-        previous_exported_span = mock_export_method.call_args_list[2][0][0][0]
-        last_span_flow_metadata = read_from_opentelemetry_span(span=last_exported_span, key=HL_TRACE_METADATA_KEY)
-        previous_span_flow_metadata = read_from_opentelemetry_span(
-            span=previous_exported_span, key=HL_TRACE_METADATA_KEY
+        flow_span = mock_export_method.call_args_list[4][0][0][0]
+        nested_flow_span = mock_export_method.call_args_list[3][0][0][0]
+        last_span_flow_metadata = read_from_opentelemetry_span(
+            span=flow_span,
+            key=HL_TRACE_METADATA_KEY,
         )
-        assert previous_span_flow_metadata["trace_parent_id"] == last_exported_span.context.span_id
+        flow_span_flow_metadata = read_from_opentelemetry_span(
+            span=nested_flow_span,
+            key=HL_TRACE_METADATA_KEY,
+        )
+        assert flow_span_flow_metadata["trace_parent_id"] == flow_span.context.span_id
         assert last_span_flow_metadata["is_flow_log"]
-        assert previous_span_flow_metadata["is_flow_log"]
+        assert flow_span_flow_metadata["is_flow_log"]

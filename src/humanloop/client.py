@@ -4,12 +4,13 @@ import os
 import httpx
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.trace import Tracer
 
 from humanloop.types.response_format import ResponseFormat
 
-from .decorators.flow import flow as flow_decorator
-from .decorators.prompt import prompt as prompt_decorator
-from .decorators.tool import tool as tool_decorator
+from .decorators.flow import flow as flow_decorator_factory
+from .decorators.prompt import prompt as prompt_decorator_factory
+from .decorators.tool import tool as tool_decorator_factory
 from humanloop.core.client_wrapper import SyncClientWrapper
 from humanloop.types.model_endpoints import ModelEndpoints
 from humanloop.types.model_providers import ModelProviders
@@ -17,7 +18,7 @@ from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTe
 from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
 from .otel.exporter import HumanloopSpanExporter
 from .otel.processor import HumanloopSpanProcessor
-from .otel import instrument_provider, set_tracer
+from .otel import instrument_provider, set_humanloop_sdk_tracer
 from .base_client import BaseHumanloop, AsyncBaseHumanloop
 from .environment import HumanloopEnvironment
 from .eval_utils import _run_eval, Dataset, File, Evaluator, EvaluatorCheck
@@ -69,9 +70,10 @@ class ExtendedPromptsClient(PromptsClient):
 
 class Humanloop(BaseHumanloop):
     """
-    See docstring of BaseHumanloop.
+    See docstring of :class:`BaseHumanloop`.
 
-    This class extends the base client that contains the auto generated SDK functionality with custom evaluation utilities.
+    This class extends the base client with custom evaluation utilities
+    and decorators for declaring Files in code.
     """
 
     def __init__(
@@ -83,10 +85,19 @@ class Humanloop(BaseHumanloop):
         timeout: typing.Optional[float] = None,
         follow_redirects: typing.Optional[bool] = True,
         httpx_client: typing.Optional[httpx.Client] = None,
+        opentelemetry_tracer_provider: Optional[TracerProvider] = None,
+        opentelemetry_tracer: Optional[Tracer] = None,
     ):
-        """See docstring of BaseHumanloop.__init__(...)
+        """See docstring of :func:`BaseHumanloop.__init__(...)`
 
-        This method extends the base client with evaluation utilities.
+        This class extends the base client with custom evaluation utilities
+        and decorators for declaring Files in code.
+
+        The Humanloop SDK File decorators use OpenTelemetry internally. You can provide a
+        TracerProvider and a Tracer if you'd like to integrate them with your existing
+        telemetry system. Otherwise, an internal TracerProvider will be used.
+        If you provide only the `TraceProvider`, the SDK will log under a Tracer
+        named `humanloop.sdk`.
         """
         super().__init__(
             base_url=base_url,
@@ -97,13 +108,16 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
-        self._tracer_provider = TracerProvider(
-            resource=Resource(
-                attributes={
-                    "instrumentor": "humanloop.sdk",
-                }
-            ),
-        )
+        if opentelemetry_tracer_provider is not None:
+            self._tracer_provider = opentelemetry_tracer_provider
+        else:
+            self._tracer_provider = TracerProvider(
+                resource=Resource(
+                    attributes={
+                        "instrumentor": "humanloop.sdk",
+                    }
+                ),
+            )
         instrument_provider(provider=self._tracer_provider)
         self._tracer_provider.add_span_processor(
             HumanloopSpanProcessor(
@@ -112,8 +126,12 @@ class Humanloop(BaseHumanloop):
                 )
             ),
         )
-        tracer = self._tracer_provider.get_tracer("humanloop.sdk")
-        set_tracer(tracer)
+
+        if opentelemetry_tracer is not None:
+            set_humanloop_sdk_tracer(opentelemetry_tracer)
+        else:
+            tracer = self._tracer_provider.get_tracer("humanloop.sdk")
+            set_humanloop_sdk_tracer(tracer)
 
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
@@ -123,7 +141,6 @@ class Humanloop(BaseHumanloop):
     def prompt(
         self,
         *,
-        # TODO: Template can be a list of objects
         path: Optional[str] = None,
         model: Optional[str] = None,
         endpoint: Optional[ModelEndpoints] = None,
@@ -139,16 +156,66 @@ class Humanloop(BaseHumanloop):
         seed: Optional[int] = None,
         response_format: Optional[ResponseFormat] = None,
     ):
-        """Decorator to mark a function as a Humanloop Prompt.
+        """Decorator for declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code.
 
-        The decorator intercepts calls to LLM provider APIs, extracts
-        hyperparameters used in the call, and upsert a new Prompt File
-        on Humanloop based on them. If a hyperparameter is specified in the
-        `@prompt` decorator, then it overrides any inference made from inside
-        the function.
+        The decorator intercepts calls to LLM provider APIs and creates
+        a new Prompt file based on the hyperparameters used in the call.
+        If a hyperparameter is specified in the `@prompt` decorator, then
+        they override any value intercepted from the LLM provider call.
 
-        If the Prompt already exists on the specified path, a new version will
-        be inserted when the hyperparameters used in making LLM calls change.
+        If the (Prompt)[https://humanloop.com/docs/explanation/prompts] already exists
+        on the specified path, a new version will be upserted when any of the above change.
+
+        Here's an example of declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code:
+
+        ```python
+        @prompt(template="You are an assistant on the following topics: {topics}.")
+        def call_llm(messages):
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            return client.chat.completions.create(
+                model="gpt-4o",
+                temperature=0.8,
+                frequency_penalty=0.5,
+                max_tokens=200,
+                messages=messages,
+            ).choices[0].message.content
+        ```
+
+        This will create a (Prompt)[https://humanloop.com/docs/explanation/prompts] with the following attributes:
+
+        ```python
+        {
+            model: "gpt-4o",
+            endpoint: "chat",
+            template: "You are an assistant on the following topics: {topics}.",
+            provider: "openai",
+            max_tokens: 200,
+            temperature: 0.8,
+            frequency_penalty: 0.5,
+        }
+
+        Every call to the decorated function will create a Log against the Prompt. For example:
+
+        ```python
+        call_llm(messages=[
+            {"role": "system", "content": "You are an assistant on the following topics: finance."}
+            {"role": "user", "content": "What can you do?"}
+        ])
+        ```
+
+        The Prompt Log will be created with the following inputs:
+        ```python
+        {
+            "inputs": {
+                "topics": "finance"
+            },
+            messages: [
+                {"role": "system", "content": "You are an assistant on the following topics: finance."}
+                {"role": "user", "content": "What can you do?"}
+            ]
+            "output": "Hello, I'm an assistant that can help you with anything related to finance."
+        }
+        ```
 
         :param path: The path where the Prompt is created. If not
             provided, the function name is used as the path and the File
@@ -194,7 +261,7 @@ class Humanloop(BaseHumanloop):
             Only `{"type": "json_object"}` is currently supported
             for chat.
         """
-        return prompt_decorator(
+        return prompt_decorator_factory(
             path=path,
             model=model,
             endpoint=endpoint,
@@ -218,14 +285,60 @@ class Humanloop(BaseHumanloop):
         setup_values: Optional[dict[str, Optional[Any]]] = None,
         attributes: Optional[dict[str, Optional[Any]]] = None,
     ):
-        """Decorator to mark a function as a Humanloop Tool.
+        """Decorator for declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code.
 
-        The decorator inspect the wrapped function signature and code to infer
-        the File kernel and JSON schema for the Tool. Any change to the decorated
-        function will create a new version of the Tool, provided that the path
-        remains the same.
+        The decorator inspects the wrapped function's source code, name,
+        argument type hints and docstring to infer the values that define
+        the [Tool](https://humanloop.com/docs/explanation/tools).
 
-        Every call to the decorated function will create a Log against the Tool.
+        If the [Tool](https://humanloop.com/docs/explanation/tools) already exists
+        on the specified path, a new version will be upserted when any of the
+        above change.
+
+        Here's an example of declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code:
+
+        ```python
+        @tool
+        def calculator(a: int, b: Optional[int]) -> int:
+            \"\"\"Add two numbers together.\"\"\"
+            return a + b
+        ```
+
+        This will create a [Tool](https://humanloop.com/docs/explanation/tools) with the following attributes:
+        ```python
+        {
+            strict: True,
+            function: {
+                "name": "calculator",
+                "description": "Add two numbers together.",
+                "parameters": {
+                    type: "object",
+                    properties: {
+                        a: {type: "integer"},
+                        b: {type: "integer"}
+                    },
+                    required: ["a"],
+                },
+            }
+        }
+        ```
+
+        Every call to the decorated function will create a Log against the Tool. For example:
+
+        ```python
+        calculator(a=1, b=2)
+        ```
+
+        Will create the following Log:
+
+        ```python
+        {
+            "inputs": {
+                a: 1,
+                b: 2
+            },
+            "output": 3
+        }
 
         :param path: The path to the Tool. If not provided, the function name
             will be used as the path and the File will be created in the root
@@ -238,7 +351,7 @@ class Humanloop(BaseHumanloop):
             Helpful to separate Tool versions from each other
             with details on how they were created or used.
         """
-        return tool_decorator(
+        return tool_decorator_factory(
             path=path,
             setup_values=setup_values,
             attributes=attributes,
@@ -248,16 +361,39 @@ class Humanloop(BaseHumanloop):
         self,
         *,
         path: Optional[str] = None,
-        attributes: dict[str, typing.Any] = {},
+        attributes: Optional[dict[str, typing.Any]] = None,
     ):
-        """Decorator to log a Flow to the Humanloop API.
+        """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
 
-        The decorator logs the inputs and outputs of the decorated function to
-        create a Log against the Flow in Humanloop.
+        A [Flow](https://humanloop.com/docs/explanation/flows) decorator should be added
+        at the entrypoint of your LLM feature. Call other functions decorated with
+        Humanloop SDK decorators to create a Trace of Logs on Humanloop.
 
-        The decorator is an entrypoint to the instrumented AI feature. Decorated
-        functions called in the context of function decorated with Flow will create
-        a Trace in Humanloop.
+        Here's an example of declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code:
+        ```python
+        @prompt(template="You are an assistant on the following topics: {topics}.")
+        def call_llm(messages):
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            return client.chat.completions.create(
+                model="gpt-4o",
+                temperature=0.8,
+                frequency_penalty=0.5,
+                max_tokens=200,
+                messages=messages,
+            ).choices[0].message.content
+
+        @flow(attributes={"version": "v1"})
+        def entrypoint():
+            while True:
+                messages = []
+                user_input = input("You: ")
+                if user_input == "exit":
+                    break
+                messages.append({"role": "user", "content": user_input})
+                response = call_llm(messages)
+                messages.append({"role": "assistant", "content": response})
+                print(f"Assistant: {response}")
+        ```
 
         :param path: The path to the Flow. If not provided, the function name
             will be used as the path and the File will be created in the root
@@ -265,7 +401,9 @@ class Humanloop(BaseHumanloop):
 
         :param attributes: A key-value object identifying the Flow Version.
         """
-        return flow_decorator(path=path, attributes=attributes)
+        if attributes is None:
+            attributes = {}
+        return flow_decorator_factory(path=path, attributes=attributes)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):

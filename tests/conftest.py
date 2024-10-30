@@ -23,6 +23,11 @@ from humanloop.otel.processor import HumanloopSpanProcessor
 
 @pytest.fixture(scope="function")
 def opentelemetry_test_provider() -> TracerProvider:
+    """Create a test TracerProvider with a resource.
+
+    This is similar to the created TracerProvider in the
+    Humanloop class.
+    """
     provider = TracerProvider(
         resource=Resource.create(
             {
@@ -47,6 +52,11 @@ def test_span(opentelemetry_test_provider: TracerProvider):
 def opentelemetry_test_configuration(
     opentelemetry_test_provider: TracerProvider,
 ) -> Generator[tuple[Tracer, InMemorySpanExporter], None, None]:
+    """Configure OTel backend without HumanloopSpanProcessor.
+
+    Spans created by Instrumentors will not be used to enrich
+    Humanloop Spans.
+    """
     exporter = InMemorySpanExporter()
     processor = SimpleSpanProcessor(exporter)
     opentelemetry_test_provider.add_span_processor(processor)
@@ -74,6 +84,11 @@ def opentelemetry_test_configuration(
 def opentelemetry_hl_test_configuration(
     opentelemetry_test_provider: TracerProvider,
 ) -> Generator[tuple[Tracer, InMemorySpanExporter], None, None]:
+    """Configure OTel backend with HumanloopSpanProcessor.
+
+    Spans created by Instrumentors will be used to enrich
+    Humanloop Spans.
+    """
     exporter = InMemorySpanExporter()
     processor = HumanloopSpanProcessor(exporter=exporter)
     opentelemetry_test_provider.add_span_processor(processor)
@@ -99,6 +114,10 @@ def opentelemetry_hl_test_configuration(
 
 @pytest.fixture(scope="function")
 def hl_test_exporter() -> HumanloopSpanExporter:
+    """
+    Test Exporter where HTTP calls to Humanloop API
+    are mocked.
+    """
     client = MagicMock()
     exporter = HumanloopSpanExporter(client=client)
     return exporter
@@ -109,6 +128,9 @@ def opentelemetry_hl_with_exporter_test_configuration(
     hl_test_exporter: HumanloopSpanExporter,
     opentelemetry_test_provider: TracerProvider,
 ) -> Generator[tuple[Tracer, HumanloopSpanExporter], None, None]:
+    """Configure OTel backend with HumanloopSpanProcessor and
+    a HumanloopSpanExporter where HTTP calls are mocked.
+    """
     processor = HumanloopSpanProcessor(exporter=hl_test_exporter)
     opentelemetry_test_provider.add_span_processor(processor)
     instrumentor = OpenAIInstrumentor()

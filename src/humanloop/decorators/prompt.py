@@ -2,7 +2,7 @@ import uuid
 from functools import wraps
 from typing import Any, Callable, Optional
 
-from humanloop.otel import get_trace_context, get_tracer, pop_trace_context, push_trace_context
+from humanloop.otel import get_humanloop_sdk_tracer, get_trace_parent_metadata, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 from humanloop.types.model_endpoints import ModelEndpoints
@@ -48,17 +48,21 @@ def prompt(
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            with get_tracer().start_as_current_span(str(uuid.uuid4())) as span:
-                trace_metadata = get_trace_context()
+            with get_humanloop_sdk_tracer().start_as_current_span(str(uuid.uuid4())) as span:
+                trace_metadata = get_trace_parent_metadata()
 
                 if trace_metadata:
-                    # We are in a Flow context
+                    # Add Trace metadata to the Span so it can be correctly
+                    # linked to the parent Span. trace_metadata will be
+                    # non-null if the function is called by a @flow
+                    # decorated function.
                     write_to_opentelemetry_span(
                         span=span,
                         key=HL_TRACE_METADATA_KEY,
                         value={**trace_metadata, "is_flow_log": False},
                     )
-                    # Set current Prompt to act as parent for Logs nested underneath
+                    # Add Trace metadata to the context for the children
+                    # Spans to be able to link to the parent Span
                     push_trace_context(
                         {
                             **trace_metadata,
@@ -67,11 +71,15 @@ def prompt(
                         },
                     )
 
+                # Write the Prompt Kernel to the Span on HL_FILE_OT_KEY
                 write_to_opentelemetry_span(
                     span=span,
                     key=HL_FILE_OT_KEY,
                     value={
                         "path": path if path else func.__name__,
+                        # Values not specified in the decorator will be
+                        # completed with the intercepted values from the
+                        # Instrumentors for LLM providers
                         "prompt": {
                             "template": template,
                             "temperature": temperature,
@@ -90,28 +98,28 @@ def prompt(
                     },
                 )
 
-                try:
-                    output = func(*args, **kwargs)
-                except Exception as e:
-                    # TODO Some fails coming from here, they result in a fast end or duplicate
-                    # spans outputted to the Humanloop API
-                    print(e)
-                    span.record_exception(e)
-                    output = None
+                # Call the decorated function
+                output = func(*args, **kwargs)
 
+                # All children Spans have been created when the decorated function returns
+                # Remove the Trace metadata from the context so the siblings can have
+                # their children linked properly
                 if trace_metadata:
                     # Go back to previous trace context in Trace context
                     pop_trace_context()
 
-                hl_log = {}
+                prompt_log = {}
                 if output:
-                    hl_log["output"] = output
+                    prompt_log["output"] = output
+
+                # Write the Prompt Log to the Span on HL_LOG_OT_KEY
                 write_to_opentelemetry_span(
                     span=span,
                     key=HL_LOG_OT_KEY,
-                    value=hl_log,
+                    value=prompt_log,
                 )
 
+            # Return the output of the decorated function
             return output
 
         return wrapper

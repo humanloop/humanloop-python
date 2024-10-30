@@ -18,8 +18,10 @@ from humanloop.otel.helpers import (
 
 
 class HumanloopSpanProcessor(SimpleSpanProcessor):
-    """Merge information from Instrumentors used by Humanloop SDK into the
-    Spans that will be exported to Humanloop.
+    """Enrich Humanloop spans with data from their children spans.
+
+    Spans that are not created by Humanloop decorators will be passed
+    to the Exporter as they are.
     """
 
     def __init__(self, exporter: SpanExporter) -> None:
@@ -33,21 +35,28 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
 
     def on_end(self, span: ReadableSpan) -> None:
         if is_humanloop_span(span=span):
-            _process_humanloop_span(span, self._children[span.context.span_id])
+            _process_span_dispatch(span, self._children[span.context.span_id])
+            # Release the reference to the Spans as they've already
+            # been sent to the Exporter
             del self._children[span.context.span_id]
-            self.span_exporter.export([span])
         else:
             if span.parent is not None and _is_instrumentor_span(span):
+                # Copy the Span and keep it until the Humanloop Span
+                # arrives in order to enrich it
                 self._children[span.parent.span_id].append(span)
+        # Pass the Span to the Exporter
+        self.span_exporter.export([span])
 
 
 def _is_instrumentor_span(span: ReadableSpan) -> bool:
-    # TODO: Extend in the future as needed. Spans not coming from
-    # Instrumentors of interest should be dropped
+    """Determine if the Span contains information of interest for Spans created by Humanloop decorators."""
+    # At the moment we only enrich Spans created by the Prompt decorators
+    # As we add Instrumentors for other libraries, this function must
+    # be expanded
     return is_llm_provider_call(span=span)
 
 
-def _process_humanloop_span(span: ReadableSpan, children_spans: list[ReadableSpan]):
+def _process_span_dispatch(span: ReadableSpan, children_spans: list[ReadableSpan]):
     hl_file = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
 
     if "prompt" in hl_file:

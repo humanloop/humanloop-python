@@ -26,15 +26,6 @@ packages = [
     { include = "humanloop", from = "src"}
 ]
 
-[tool.poetry.group.dev.dependencies]
-parse-type = "^0.6.4"
-anthropic = "^0.37.1"
-mistralai = "<1.0.0"
-groq = "^0.11.0"
-cohere = "^5.11.2"
-replicate = "^1.0.3"
-jsonschema = "^4.23.0"
-types-jsonschema = "^4.23.0.20240813"
 
 [project.urls]
 Repository = 'https://github.com/humanloop/humanloop-python'
@@ -46,18 +37,23 @@ httpx-sse = "0.4.0"
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 typing_extensions = ">= 4.0.0"
-
+parse = "^1.20.2"
 opentelemetry-sdk = "^1.27.0"
 opentelemetry-api = "^1.27.0"
 opentelemetry-instrumentation-openai = "^0.33.3"
 opentelemetry-instrumentation-cohere = "^0.33.3"
 opentelemetry-instrumentation-anthropic = "^0.33.3"
-opentelemetry-instrumentation-mistralai = "^0.33.3"
-
-parse = "^1.20.2"
 opentelemetry-instrumentation-groq = "^0.33.3"
 opentelemetry-instrumentation-replicate = "^0.33.3"
-[tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
+parse-type = "^0.6.4"
+anthropic = "^0.37.1"
+groq = "^0.11.0"
+cohere = "^5.11.2"
+replicate = "^1.0.3"
+jsonschema = "^4.23.0"
+types-jsonschema = "^4.23.0.20240813"
 mypy = "1.0.1"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.5"
@@ -76,6 +72,33 @@ plugins = ["pydantic.mypy"]
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "DTZ", # unsafe naive datetime
+    "PL",  # pylint
+]
+ignore = [
+    "B904",    # raise without from inside except, TODO: turn back on
+    "E501",    # line too long, handled by ruff formatter
+    "UP015",   # redundant open modes
+    "B008",    # do not perform function calls in argument defaults
+    "C901",    # too complex
+    "PLR0912", # too many branches
+    "PLR0913", # too many arguments
+    "PLR0911", # too many return statements
+    "PLR0915", # too many statements,
+    "PLR2004", # magic value comparison
+    "PLR5501", # 'elif' instead of 'else' then 'if'
+    "PLE1205", # too many arguments for format string
+]
 
 
 [build-system]
