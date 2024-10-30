@@ -1,14 +1,20 @@
 import typing
-from typing import Literal, Optional, List, Sequence, Union
+from typing import Any, Optional, List, Sequence
 import os
 import httpx
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 
+from humanloop.types.response_format import ResponseFormat
+
 from .decorators.flow import flow as flow_decorator
 from .decorators.prompt import prompt as prompt_decorator
 from .decorators.tool import tool as tool_decorator
 from humanloop.core.client_wrapper import SyncClientWrapper
+from humanloop.types.model_endpoints import ModelEndpoints
+from humanloop.types.model_providers import ModelProviders
+from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
+from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
 from .otel.exporter import HumanloopSpanExporter
 from .otel.processor import HumanloopSpanProcessor
 from .otel import instrument_provider, set_tracer
@@ -116,39 +122,77 @@ class Humanloop(BaseHumanloop):
 
     def prompt(
         self,
+        *,
         # TODO: Template can be a list of objects
         path: Optional[str] = None,
         model: Optional[str] = None,
-        endpoint: Optional[Literal["chat", "edit", "complete"]] = None,
-        template: Optional[str] = None,
-        provider: Optional[
-            Literal["openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"]
-        ] = None,
+        endpoint: Optional[ModelEndpoints] = None,
+        template: Optional[PromptKernelRequestTemplate] = None,
+        provider: Optional[ModelProviders] = None,
         max_tokens: Optional[int] = None,
-        stop: Optional[Union[str, list[str]]] = None,
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
+        stop: Optional[PromptKernelRequestStop] = None,
         presence_penalty: Optional[float] = None,
         frequency_penalty: Optional[float] = None,
+        other: Optional[dict[str, Optional[Any]]] = None,
+        seed: Optional[int] = None,
+        response_format: Optional[ResponseFormat] = None,
     ):
         """Decorator to mark a function as a Humanloop Prompt.
 
-        The decorator intercepts calls to LLM provider APIs and uses them
-        in tandem with the template provided by the user to create a Prompt
-        in Humanloop.
+        The decorator intercepts calls to LLM provider APIs, extracts
+        hyperparameters used in the call, and upsert a new Prompt File
+        on Humanloop based on them. If a hyperparameter is specified in the
+        `@prompt` decorator, then it overrides any inference made from inside
+        the function.
 
-        Arguments:
-            path: Optional. The path where the Prompt is created. If not
-                provided, the function name is used as the path and
-                the File is created in the root of your Humanloop's
-                organization workspace.
-            template: The template for the Prompt. This is the text of
-                the system message used to set the LLM prompt. The template
-                accepts template slots using the format `{slot_name}`.
+        If the Prompt already exists on the specified path, a new version will
+        be inserted when the hyperparameters used in making LLM calls change.
 
-                The text of the system message is matched against the template
-                to extract the slot values. The extracted values will be
-                available in the Log's inputs
+        :param path: The path where the Prompt is created. If not
+            provided, the function name is used as the path and the File
+            is created in the root of your Humanloop's organization workspace.
+
+        :param model: Name of the model used by the Prompt.
+
+        :param endpoint: The model instance used, e.g. `gpt-4`. See
+            [supported models](https://humanloop.com/docs/reference/supported-models)
+
+        :param template: The template for the Prompt. This is the text of
+            the system message used to set the LLM prompt. The template
+            accepts template slots using the format `{slot_name}`.
+
+        :param provider: The company providing the underlying model service.
+
+        :param max_tokens: Maximum number of tokens used in generation.
+
+        :param temperature: What sampling temperature to use
+            when making a generation. Higher values means the model
+            will be more creative.
+
+        :param top_p: An alternative to sampling with temperature,
+            called nucleus sampling, where the model considers the results
+            of the tokens with top_p probability mass.
+
+        :param stop: Token or list of tokens that stop generation
+
+        :param presence_penalty: Number between -2.0 and 2.0.
+            Positive values penalize new tokens based on whether they
+            appear in the generation so far.
+
+        :param frequency_penalty: Number between -2.0 and 2.0. Positive
+            values penalize new tokens based on how frequently they
+            appear in the generation so far.
+
+        :param other: Other parameter values to be passed to the provider call.
+
+        :param seed: If specified, model will make a best effort to
+            sample deterministically, but it is not guaranteed.
+
+        :param response_format: The format of the response.
+            Only `{"type": "json_object"}` is currently supported
+            for chat.
         """
         return prompt_decorator(
             path=path,
@@ -162,12 +206,17 @@ class Humanloop(BaseHumanloop):
             top_p=top_p,
             presence_penalty=presence_penalty,
             frequency_penalty=frequency_penalty,
+            other=other,
+            seed=seed,
+            response_format=response_format,
         )
 
     def tool(
         self,
+        *,
         path: Optional[str] = None,
-        attributes: Optional[dict[str, typing.Any]] = None,
+        setup_values: Optional[dict[str, Optional[Any]]] = None,
+        attributes: Optional[dict[str, Optional[Any]]] = None,
     ):
         """Decorator to mark a function as a Humanloop Tool.
 
@@ -178,15 +227,26 @@ class Humanloop(BaseHumanloop):
 
         Every call to the decorated function will create a Log against the Tool.
 
-        Arguments:
-            path: Optional. The path to the Tool. If not provided, the function name
-                will be used as the path and the File will be created in the root
-                of your Humanloop's organization workspace.
+        :param path: The path to the Tool. If not provided, the function name
+            will be used as the path and the File will be created in the root
+            of your Humanloop's organization workspace.
+
+        :param setup_values: Values needed to setup the Tool, defined in
+            JSON Schema format: https://json-schema.org/
+
+        :param attributes: Additional fields to describe the Tool.
+            Helpful to separate Tool versions from each other
+            with details on how they were created or used.
         """
-        return tool_decorator(path=path, attributes=attributes)
+        return tool_decorator(
+            path=path,
+            setup_values=setup_values,
+            attributes=attributes,
+        )
 
     def flow(
         self,
+        *,
         path: Optional[str] = None,
         attributes: dict[str, typing.Any] = {},
     ):
@@ -199,12 +259,11 @@ class Humanloop(BaseHumanloop):
         functions called in the context of function decorated with Flow will create
         a Trace in Humanloop.
 
-        Arguments:
-            path: Optional. The path to the Flow. If not provided, the function name
-                will be used as the path and the File will be created in the root
-                of your Humanloop's organization workspace.
-            attributes: Optional. The attributes of the Flow. The attributes are used
-                to version the Flow.
+        :param path: The path to the Flow. If not provided, the function name
+            will be used as the path and the File will be created in the root
+            of your Humanloop's organization workspace.
+
+        :param attributes: A key-value object identifying the Flow Version.
         """
         return flow_decorator(path=path, attributes=attributes)
 

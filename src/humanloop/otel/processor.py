@@ -109,39 +109,27 @@ def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: 
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
-    prompt_kernel: dict[str, Any] = hl_file.get("prompt", {})
-    if "model" not in prompt_kernel:
-        prompt_kernel["model"] = gen_ai_object.get("request", {}).get("model", None)
-    if "endpoint" not in prompt_kernel:
-        prompt_kernel["endpoint"] = llm_object.get("request", {}).get("type")
-    if "template" not in prompt_kernel:
-        prompt_kernel["template"] = hl_file.get("prompt", {}).get("template", None)
-    if "provider" not in prompt_kernel:
-        prompt_kernel["provider"] = gen_ai_object.get("system", None)
-        if prompt_kernel["provider"]:
-            prompt_kernel["provider"] = prompt_kernel["provider"].lower()
-            if prompt_kernel["provider"] not in [
-                "openai",
-                "openai_azure",
-                "mock",
-                "anthropic",
-                "bedrock",
-                "cohere",
-                "replicate",
-                "google",
-                "groq",
-            ]:
-                raise ValueError("Invalid provider")
-    if "temperature" not in prompt_kernel:
-        prompt_kernel["temperature"] = gen_ai_object.get("request", {}).get("temperature", None)
-    if "top_p" not in prompt_kernel:
-        prompt_kernel["top_p"] = gen_ai_object.get("request", {}).get("top_p", None)
-    if "max_tokens" not in prompt_kernel:
-        prompt_kernel["max_tokens"] = gen_ai_object.get("request", {}).get("max_tokens", None)
-    if "presence_penalty" not in prompt_kernel:
-        prompt_kernel["presence_penalty"] = llm_object.get("presence_penalty", None)
-    if "frequency_penalty" not in prompt_kernel:
-        prompt_kernel["frequency_penalty"] = llm_object.get("frequency_penalty", None)
+    prompt = hl_file.get("prompt", {})
+    if not prompt.get("model"):
+        prompt["model"] = gen_ai_object.get("request", {}).get("model", None)
+    if not prompt.get("endpoint"):
+        prompt["endpoint"] = llm_object.get("request", {}).get("type")
+    if not prompt.get("provider"):
+        prompt["provider"] = gen_ai_object.get("system", None)
+        if prompt["provider"]:
+            prompt["provider"] = prompt["provider"].lower()
+    if not prompt.get("temperature"):
+        prompt["temperature"] = gen_ai_object.get("request", {}).get("temperature", None)
+    if not prompt.get("top_p"):
+        prompt["top_p"] = gen_ai_object.get("request", {}).get("top_p", None)
+    if not prompt.get("max_tokens"):
+        prompt["max_tokens"] = gen_ai_object.get("request", {}).get("max_tokens", None)
+    if not prompt.get("presence_penalty"):
+        prompt["presence_penalty"] = llm_object.get("presence_penalty", None)
+    if not prompt.get("frequency_penalty"):
+        prompt["frequency_penalty"] = llm_object.get("frequency_penalty", None)
+
+    hl_file["prompt"] = prompt
 
     write_to_opentelemetry_span(
         span=prompt_span,

@@ -1,27 +1,33 @@
 import uuid
 from functools import wraps
-from typing import Callable, Literal, Optional, Union
+from typing import Any, Callable, Optional
 
 from humanloop.otel import get_trace_context, get_tracer, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
+from humanloop.types.model_endpoints import ModelEndpoints
+from humanloop.types.model_providers import ModelProviders
+from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
+from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
+from humanloop.types.response_format import ResponseFormat
 
 
 def prompt(
     path: Optional[str] = None,
-    # TODO: Template can be a list of objects
+    # TODO: Template can be a list of objects?
     model: Optional[str] = None,
-    endpoint: Optional[Literal["chat", "edit", "complete"]] = None,
-    template: Optional[str] = None,
-    provider: Optional[
-        Literal["openai", "openai_azure", "mock", "anthropic", "bedrock", "cohere", "replicate", "google", "groq"]
-    ] = None,
+    endpoint: Optional[ModelEndpoints] = None,
+    template: Optional[PromptKernelRequestTemplate] = None,
+    provider: Optional[ModelProviders] = None,
     max_tokens: Optional[int] = None,
-    stop: Optional[Union[str, list[str]]] = None,
+    stop: Optional[PromptKernelRequestStop] = None,
     temperature: Optional[float] = None,
     top_p: Optional[float] = None,
     presence_penalty: Optional[float] = None,
     frequency_penalty: Optional[float] = None,
+    other: Optional[dict[str, Optional[Any]]] = None,
+    seed: Optional[int] = None,
+    response_format: Optional[ResponseFormat] = None,
 ):
     def decorator(func: Callable):
         if temperature is not None:
@@ -77,6 +83,9 @@ def prompt(
                             "provider": provider,
                             "max_tokens": max_tokens,
                             "stop": stop,
+                            "other": other,
+                            "seed": seed,
+                            "response_format": response_format,
                         },
                     },
                 )

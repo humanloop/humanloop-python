@@ -83,6 +83,7 @@ def opentelemetry_hl_test_configuration(
         GroqInstrumentor(),
         CohereInstrumentor(),
         ReplicateInstrumentor(),
+        AnthropicInstrumentor(),
     ]
     for instrumentor in instrumentors:
         instrumentor.instrument(tracer_provider=opentelemetry_test_provider)

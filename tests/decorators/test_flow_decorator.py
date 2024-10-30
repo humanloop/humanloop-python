@@ -41,6 +41,10 @@ def _call_llm(messages: list[ChatCompletionMessageParam]) -> str:
     ) + _random_string()
 
 
+def _agent_call_no_decorator(messages: list[dict]) -> str:
+    return _call_llm(messages=messages)
+
+
 @flow(attributes={"foo": "bar", "baz": 7})
 def _agent_call(messages: list[dict]) -> str:
     return _call_llm(messages=messages)
@@ -51,7 +55,7 @@ def _flow_over_flow(messages: list[dict]) -> str:
     return _agent_call(messages=messages)
 
 
-def test_no_flow(
+def test_decorators_without_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
     # GIVEN a call to @prompt annotated function that calls a @tool
@@ -80,7 +84,7 @@ def test_no_flow(
             read_from_opentelemetry_span(span=span, key=HL_TRACE_METADATA_KEY)
 
 
-def test_with_flow(
+def test_decorators_with_flow_decorator(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
     # GIVEN a @flow entrypoint to an instrumented application
@@ -118,7 +122,7 @@ def test_with_flow(
     assert flow_trace_metadata["trace_id"] == spans[2].context.span_id
 
 
-def test_flow_in_flow(
+def test_flow_decorator_flow_in_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
     call_llm_messages: list[dict],
 ):
@@ -153,7 +157,7 @@ def test_flow_in_flow(
     assert flow_trace_metadata["trace_id"] == spans[3].context.span_id
 
 
-def test_hl_exporter_with_flow(
+def test_flow_decorator_with_hl_exporter(
     call_llm_messages: list[dict],
     opentelemetry_hl_with_exporter_test_configuration: tuple[Tracer, HumanloopSpanExporter],
 ):
@@ -202,7 +206,7 @@ def test_hl_exporter_with_flow(
         tool_log_call_args.kwargs["trace_parent_id"] == prompt_log_id
 
 
-def test_nested_flow_exporting(
+def test_flow_decorator_hl_exporter_flow_inside_flow(
     call_llm_messages: list[dict],
     opentelemetry_hl_with_exporter_test_configuration: tuple[Tracer, HumanloopSpanExporter],
 ):

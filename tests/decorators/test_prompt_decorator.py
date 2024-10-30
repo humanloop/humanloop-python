@@ -1,68 +1,89 @@
 import os
-from typing import Any, Literal, Optional
-import typing
+from typing import Optional
 
 import cohere
 import pytest
 
 # replicate has no typing stubs
 import replicate  # type: ignore
+from anthropic import Anthropic
+from anthropic.types.message_param import MessageParam
 from dotenv import load_dotenv
 from groq import Groq
+from groq import NotFoundError as GroqNotFoundError
 from humanloop.decorators.prompt import prompt
 from humanloop.otel.constants import HL_FILE_OT_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
+from humanloop.types.model_providers import ModelProviders
+from humanloop.types.prompt_kernel_request import PromptKernelRequest
 from openai import OpenAI
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 from opentelemetry.sdk.trace import Tracer
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
+_PROVIDER_AND_MODEL = [
+    ("openai", "gpt-4o"),
+    ("groq", "llama3-8b-8192"),
+    ("cohere", "command"),
+    ("replicate", "meta/meta-llama-3-8b-instruct"),
+    ("anthropic", "claude-3-opus-latest"),
+]
 
-def _call_llm_base(provider: Literal["openai", "anthropic"], messages: list[dict]) -> Optional[str]:
+
+def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -> Optional[str]:
     load_dotenv()
     if provider == "openai":
         # NOTE: These tests check if instrumentors are capable of intercepting OpenAI
         # provider calls. Could not find a way to intercept them coming from a Mock.
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # type: ignore
         return (
             client.chat.completions.create(
-                model="gpt-4o",
+                model=model,
                 messages=messages,  # type: ignore
                 temperature=0.8,
             )
             .choices[0]
             .message.content
         )
-    # if provider == "anthropic":
-    #     client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-    #     return client.messages.create(
-    #         model="claude-3-opus",
-    #         messages=messages,
-    #         max_tokens=200,
-    #     ).content
-    # if provider == "mistralai":
-    #     client = MistralClient(api_key=os.getenv("MISTRAL_API_KEY"))
-    #     response = client.chat(model="mistral-small-latest", messages=messages, temperature=0.8)
-    #     return response.choices[0].message.content
-    if provider == "groq":
-        # Note GROQ might be unavailable, leading to
-        # test failure. Returns groq.NotFoundError: Not Found
-        client = Groq(
-            # This is the default and can be omitted
-            api_key=os.environ.get("GROQ_API_KEY"),
-        )
+    if provider == "anthropic":
+        client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))  # type: ignore
+        messages_anthropic_format = [
+            MessageParam(
+                content=message["content"],
+                role="user" if message["role"] in ("user", "system") else "assistant",
+            )
+            for message in messages
+        ]
         return (
-            client.chat.completions.create(
-                messages=messages,
-                model="llama3-8b-8192",
+            client.messages.create(  # type: ignore
+                model=model,
+                messages=messages_anthropic_format,
+                max_tokens=200,
                 temperature=0.8,
             )
-            .choices[0]
-            .message.content
+            .content[0]
+            .text
         )
+    if provider == "groq":
+        try:
+            client = Groq(  # type: ignore
+                # This is the default and can be omitted
+                api_key=os.environ.get("GROQ_API_KEY"),
+            )
+            return (
+                client.chat.completions.create(
+                    messages=messages,  # type: ignore
+                    model=model,
+                    temperature=0.8,
+                )
+                .choices[0]
+                .message.content
+            )
+        except GroqNotFoundError:
+            pytest.skip("GROQ not available")
     if provider == "cohere":
-        client = cohere.Client(api_key=os.getenv("COHERE_API_KEY"))
-        messages_cohere_format = []
+        client = cohere.Client(api_key=os.getenv("COHERE_API_KEY"))  # type: ignore
+        messages_cohere_format: list[cohere.Message] = []
         for message in messages:
             if message["role"] == "system":
                 messages_cohere_format.append(cohere.SystemMessage(message=message["content"]))
@@ -70,9 +91,9 @@ def _call_llm_base(provider: Literal["openai", "anthropic"], messages: list[dict
                 messages_cohere_format.append(cohere.UserMessage(message=message["content"]))
             elif message["role"] == "assistant":
                 messages_cohere_format.append(cohere.ChatbotMessage(message=message["content"]))
-        return client.chat(
+        return client.chat(  # type: ignore
             chat_history=messages_cohere_format,
-            model="command",
+            model=model,
             max_tokens=200,
             message=messages[-1]["content"],
             temperature=0.8,
@@ -82,7 +103,7 @@ def _call_llm_base(provider: Literal["openai", "anthropic"], messages: list[dict
         replicate.default_client._api_token = os.getenv("REPLICATE_API_KEY")
         output = ""
         for event in replicate.run(
-            "meta/meta-llama-3-8b-instruct",
+            model,
             input={
                 "prompt": messages[0]["content"] + " " + messages[-1]["content"],
                 "temperature": 0.8,
@@ -106,24 +127,21 @@ _call_llm_with_defaults = prompt(
 )(_call_llm_base)
 
 
-@pytest.mark.parametrize(
-    "provider",
-    (
-        "openai",
-        "groq",
-        "cohere",
-        "replicate",
-    ),
-)
-def test_prompt(
-    provider: str,
+@pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
+def test_prompt_decorator(
+    provider_model: tuple[str, str],
     opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
     call_llm_messages: list[ChatCompletionMessageParam],
 ):
+    provider, model = provider_model
     # GIVEN a default OpenTelemetry configuration
     _, exporter = opentelemetry_test_configuration
     # WHEN using the Prompt decorator
-    _call_llm(provider=provider, messages=call_llm_messages)
+    _call_llm(
+        provider=provider,
+        model=model,
+        messages=call_llm_messages,
+    )
     # THEN two spans are created: one for the OpenAI LLM provider call and one for the Prompt
     spans = exporter.get_finished_spans()
     assert len(spans) == 2
@@ -132,64 +150,62 @@ def test_prompt(
     assert spans[1].attributes.get("prompt") is None  # type: ignore
 
 
-@pytest.mark.parametrize(
-    "provider",
-    (
-        "openai",
-        "groq",
-        "cohere",
-        "replicate",
-    ),
-)
-def test_prompt_hl_processor(
-    provider: str,
+@pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
+def test_prompt_decorator_with_hl_processor(
+    provider_model: tuple[str, str],
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
     call_llm_messages: list[ChatCompletionMessageParam],
 ):
+    provider, model = provider_model
     # GIVEN an OpenTelemetry configuration with a Humanloop Span processor
     _, exporter = opentelemetry_hl_test_configuration
     # WHEN using the Prompt decorator
-    _call_llm(provider=provider, messages=call_llm_messages)
+    _call_llm(
+        provider=provider,
+        model=model,
+        messages=call_llm_messages,
+    )
     # THEN a single span is created since the LLM provider call span is merged in the Prompt span
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
     assert is_humanloop_span(span=spans[0])
-    prompt: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
-    assert prompt is not None
+    prompt = PromptKernelRequest.model_validate(
+        read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
+    )
     # THEN temperature is taken from LLM provider call, but top_p is not since it is not specified
-    assert prompt["temperature"] == 0.8
-    assert prompt["provider"] == provider
-    assert prompt.get("top_p") is None
+    assert prompt.temperature == 0.8
+    assert prompt.provider == provider
+    assert prompt.top_p is None
+    assert prompt.model == model
 
 
-@pytest.mark.parametrize(
-    "provider",
-    (
-        "openai",
-        "groq",
-        "cohere",
-        "replicate",
-    ),
-)
-def test_prompt_with_defaults(
-    provider: str,
+@pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
+def test_prompt_decorator_with_defaults(
+    provider_model: tuple[str, str],
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
     call_llm_messages: list[ChatCompletionMessageParam],
 ):
+    provider, model = provider_model
     # GIVEN an OpenTelemetry configuration with a Humanloop Span processor
     _, exporter = opentelemetry_hl_test_configuration
     # WHEN using the Prompt decorator with default values
-    _call_llm_with_defaults(provider=provider, messages=call_llm_messages)
+    _call_llm_with_defaults(
+        provider=provider,
+        model=model,
+        messages=call_llm_messages,
+    )
     # THEN a single span is created since the LLM provider call span is merged in the Prompt span
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
     assert is_humanloop_span(spans[0])
-    prompt: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
-    assert prompt is not None
+    prompt = PromptKernelRequest.model_validate(
+        read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)["prompt"]  # type: ignore
+    )
     # THEN temperature is taken from decorator rather than intercepted LLM provider call
-    assert prompt["temperature"] == 0.9
+    assert prompt.temperature == 0.9
     # THEN top_p is present
-    assert prompt["top_p"] == 0.1
+    assert prompt.top_p == 0.1
+    assert prompt.model == model
 
 
 @pytest.mark.parametrize(
