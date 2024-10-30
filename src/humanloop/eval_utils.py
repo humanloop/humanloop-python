@@ -443,42 +443,43 @@ def _run_eval(
     logger.info(stats.report)
 
     checks: List[EvaluatorCheck] = []
+
+    # Skip `check_evaluation_improvement` if no thresholds were provided and there is only one run.
+    # (Or the logs would not be helpful)
     if (
-        all(evaluator.get("threshold") is None for evaluator in evaluators)
-        and len(stats.run_stats) == 1
+        any(evaluator.get("threshold") is not None for evaluator in evaluators)
+        or len(stats.run_stats) > 1
     ):
-        # Skip `check_evaluation_improvement` if no thresholds were provided and there is only one run.
-        # (Or the logs would not be helpful)
-        return checks
-    for evaluator in evaluators:
-        _, score, delta = check_evaluation_improvement(
-            evaluation=evaluation,
-            stats=stats,
-            evaluator_path=evaluator["path"],
-            run_id=run_id,
-        )
-        threshold_check = None
-        threshold = evaluator.get("threshold")
-        if threshold is not None:
-            threshold_check = check_evaluation_threshold(
+        for evaluator in evaluators:
+            _, score, delta = check_evaluation_improvement(
                 evaluation=evaluation,
                 stats=stats,
                 evaluator_path=evaluator["path"],
-                threshold=threshold,
                 run_id=run_id,
             )
-        checks.append(
-            EvaluatorCheck(
-                path=evaluator["path"],
-                # TODO: Add back in with number valence on Evaluators
-                # improvement_check=improvement_check,
-                score=score,
-                delta=delta,
-                threshold=threshold,
-                threshold_check=threshold_check,
-                evaluation_id=evaluation.id,
+            threshold_check = None
+            threshold = evaluator.get("threshold")
+            if threshold is not None:
+                threshold_check = check_evaluation_threshold(
+                    evaluation=evaluation,
+                    stats=stats,
+                    evaluator_path=evaluator["path"],
+                    threshold=threshold,
+                    run_id=run_id,
+                )
+            checks.append(
+                EvaluatorCheck(
+                    path=evaluator["path"],
+                    # TODO: Add back in with number valence on Evaluators
+                    # improvement_check=improvement_check,
+                    score=score,
+                    delta=delta,
+                    threshold=threshold,
+                    threshold_check=threshold_check,
+                    evaluation_id=evaluation.id,
+                )
             )
-        )
+
     logger.info(f"\n{CYAN}View your Evaluation:{RESET}\n{evaluation.url}\n")
     return checks
 
