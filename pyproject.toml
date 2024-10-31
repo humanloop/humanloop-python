@@ -73,33 +73,6 @@ plugins = ["pydantic.mypy"]
 [tool.ruff]
 line-length = 120
 
-[tool.ruff.lint]
-select = [
-    "E",   # pycodestyle errors
-    "W",   # pycodestyle warnings
-    "F",   # pyflakes
-    "I",   # isort
-    "C",   # flake8-comprehensions
-    "B",   # flake8-bugbear
-    "UP",  # pyupgrade
-    "DTZ", # unsafe naive datetime
-    "PL",  # pylint
-]
-ignore = [
-    "B904",    # raise without from inside except, TODO: turn back on
-    "E501",    # line too long, handled by ruff formatter
-    "UP015",   # redundant open modes
-    "B008",    # do not perform function calls in argument defaults
-    "C901",    # too complex
-    "PLR0912", # too many branches
-    "PLR0913", # too many arguments
-    "PLR0911", # too many return statements
-    "PLR0915", # too many statements,
-    "PLR2004", # magic value comparison
-    "PLR5501", # 'elif' instead of 'else' then 'if'
-    "PLE1205", # too many arguments for format string
-]
-
 
 [build-system]
 requires = ["poetry-core"]
