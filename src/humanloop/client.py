@@ -1,30 +1,30 @@
-import typing
-from typing import Any, Optional, List, Sequence
 import os
+import typing
+from typing import Any, List, Optional, Sequence
+
 import httpx
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
+from humanloop.types.model_endpoints import ModelEndpoints
+from humanloop.types.model_providers import ModelProviders
+from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
+from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
 from humanloop.types.response_format import ResponseFormat
 
+from .base_client import AsyncBaseHumanloop, BaseHumanloop
 from .decorators.flow import flow as flow_decorator_factory
 from .decorators.prompt import prompt as prompt_decorator_factory
 from .decorators.tool import tool as tool_decorator_factory
-from humanloop.core.client_wrapper import SyncClientWrapper
-from humanloop.types.model_endpoints import ModelEndpoints
-from humanloop.types.model_providers import ModelProviders
-from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
-from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
+from .environment import HumanloopEnvironment
+from .eval_utils import Dataset, Evaluator, EvaluatorCheck, File, _run_eval
+from .evaluations.client import EvaluationsClient
+from .otel import instrument_provider, set_humanloop_sdk_tracer
 from .otel.exporter import HumanloopSpanExporter
 from .otel.processor import HumanloopSpanProcessor
-from .otel import instrument_provider, set_humanloop_sdk_tracer
-from .base_client import BaseHumanloop, AsyncBaseHumanloop
-from .environment import HumanloopEnvironment
-from .eval_utils import _run_eval, Dataset, File, Evaluator, EvaluatorCheck
-from .prompts.client import PromptsClient
-from .evaluations.client import EvaluationsClient
 from .prompt_utils import populate_template
+from .prompts.client import PromptsClient
 
 
 class ExtendedEvalsClient(EvaluationsClient):
