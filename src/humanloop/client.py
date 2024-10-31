@@ -395,6 +395,12 @@ class Humanloop(BaseHumanloop):
                 print(f"Assistant: {response}")
         ```
 
+        In this example, the Flow instruments a conversational agent where the
+        Prompt defined in `call_llm` is called multiple times in a loop. Calling
+        `entrypoint` will create a Flow Trace under which multiple Prompt Logs
+        will be nested, allowing you to track the whole conversation session
+        between the user and the assistant.
+
         :param path: The path to the Flow. If not provided, the function name
             will be used as the path and the File will be created in the root
             of your Humanloop's organization workspace.

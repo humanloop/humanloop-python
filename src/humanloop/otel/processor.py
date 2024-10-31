@@ -20,7 +20,17 @@ from humanloop.otel.helpers import (
 class HumanloopSpanProcessor(SimpleSpanProcessor):
     """Enrich Humanloop spans with data from their children spans.
 
-    Spans that are not created by Humanloop decorators will be passed
+    The decorators add Instrumentors to the OpenTelemetry TracerProvider
+    that log interactions with common LLM libraries. These Instrumentors
+    produce Spans which contain information that can be used to enrich the
+    Humanloop File Kernels.
+
+    For example, Instrumentors for LLM provider libraries intercept
+    hyperparameters used in the API call to the model to build the
+    Prompt File definition when using the @prompt decorator.
+
+    Spans created that are not created by Humanloop decorators, such as
+    those created by the Instrumentors mentioned above, will be passed
     to the Exporter as they are.
     """
 
@@ -29,7 +39,7 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         # Span parent to Span children map
         self._children: dict[int, list] = defaultdict(list)
 
-    # TODO: Could override on_start and process Flow spans ahead of time
+    # NOTE: Could override on_start and process Flow spans ahead of time
     # and PATCH the created Logs in on_end. A special type of ReadableSpan could be
     # used for this
 

@@ -136,7 +136,7 @@ def _build_function_property(func: Callable, strict: bool) -> ToolFunctionParams
 
 class _JSONSchemaFunctionParameters(TypedDict):
     type: str
-    properties: dict[str, dict]
+    properties: dict[str, dict, list]
     required: list[str]
     additionalProperties: Literal[False]
 

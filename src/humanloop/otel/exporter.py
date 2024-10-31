@@ -33,6 +33,10 @@ class HumanloopSpanExporter(SpanExporter):
         client: "BaseHumanloop",
         worker_threads: Optional[int] = None,
     ) -> None:
+        """Upload Spans created by SDK decorators to Humanloop.
+
+        Spans not created by Humanloop SDK decorators will be ignored.
+        """
         super().__init__()
         self._client = client
         self._uploaded_log_ids: dict[
