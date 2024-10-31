@@ -33,110 +33,109 @@ _PROVIDER_AND_MODEL = [
 ]
 
 
-def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -> Optional[str]:
-    load_dotenv()
-    if provider == "openai":
-        # NOTE: These tests check if instrumentors are capable of intercepting OpenAI
-        # provider calls. Could not find a way to intercept them coming from a Mock.
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # type: ignore
-        return (
-            client.chat.completions.create(
-                model=model,
-                messages=messages,  # type: ignore
-                temperature=0.8,
-            )
-            .choices[0]
-            .message.content
-        )
-    if provider == "anthropic":
-        client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))  # type: ignore
-        messages_anthropic_format = [
-            MessageParam(
-                content=message["content"],
-                role="user" if message["role"] in ("user", "system") else "assistant",
-            )
-            for message in messages
-        ]
-        return (
-            client.messages.create(  # type: ignore
-                model=model,
-                messages=messages_anthropic_format,
-                max_tokens=200,
-                temperature=0.8,
-            )
-            .content[0]
-            .text
-        )
-    if provider == "groq":
-        try:
-            client = Groq(  # type: ignore
-                # This is the default and can be omitted
-                api_key=os.environ.get("GROQ_API_KEY"),
-            )
+def _test_scenario(opentelemetry_tracer: Tracer, **kwargs):
+    """
+    Set up the function decorated with @prompt.
+
+    Normally the opentelemetry_tracer would be passed in by the Humanloop client.
+    In a test environment, the Tracer is obtained from a fixture and the test
+    call this function to setup the decorated function that is tested.
+    """
+
+    @prompt(opentelemetry_tracer=opentelemetry_tracer, **kwargs)
+    def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -> Optional[str]:
+        load_dotenv()
+        if provider == "openai":
+            # NOTE: These tests check if instrumentors are capable of intercepting OpenAI
+            # provider calls. Could not find a way to intercept them coming from a Mock.
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # type: ignore
             return (
                 client.chat.completions.create(
-                    messages=messages,  # type: ignore
                     model=model,
+                    messages=messages,  # type: ignore
                     temperature=0.8,
                 )
                 .choices[0]
                 .message.content
             )
-        except GroqNotFoundError:
-            # NOTE: Tests in this file are integration tests that rely on live LLM provider
-            # clients. If a test fails, it might be flaky. If this happens, consider adding
-            # a skip mechanism similar to Groq
-            pytest.skip("GROQ not available")
-    if provider == "cohere":
-        client = cohere.Client(api_key=os.getenv("COHERE_API_KEY"))  # type: ignore
-        messages_cohere_format: list[cohere.Message] = []
-        for message in messages:
-            if message["role"] == "system":
-                messages_cohere_format.append(cohere.SystemMessage(message=message["content"]))
-            elif message["role"] == "user":
-                messages_cohere_format.append(cohere.UserMessage(message=message["content"]))
-            elif message["role"] == "assistant":
-                messages_cohere_format.append(cohere.ChatbotMessage(message=message["content"]))
-        return client.chat(  # type: ignore
-            chat_history=messages_cohere_format,
-            model=model,
-            max_tokens=200,
-            message=messages[-1]["content"],
-            temperature=0.8,
-        ).text
-    if provider == "replicate":
-        # TODO: Instrumentor only picks up methods on module-level, not client level
-        # This should be documented somewhere or changed
-        replicate.default_client._api_token = os.getenv("REPLICATE_API_KEY")
-        try:
-            output = ""
-            for event in replicate.run(
-                model,
-                input={
-                    "prompt": messages[0]["content"] + " " + messages[-1]["content"],
-                    "temperature": 0.8,
-                },
-            ):
-                output += str(event)
-        except ReplicateModelError:
-            pytest.skip("Replicate not available")
-        if not output:
-            pytest.skip("Replicate not available")
-        return output
-    raise ValueError(f"Unknown provider: {provider}")
+        if provider == "anthropic":
+            client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))  # type: ignore
+            messages_anthropic_format = [
+                MessageParam(
+                    content=message["content"],
+                    role="user" if message["role"] in ("user", "system") else "assistant",
+                )
+                for message in messages
+            ]
+            return (
+                client.messages.create(  # type: ignore
+                    model=model,
+                    messages=messages_anthropic_format,
+                    max_tokens=200,
+                    temperature=0.8,
+                )
+                .content[0]
+                .text
+            )
+        if provider == "groq":
+            try:
+                client = Groq(  # type: ignore
+                    # This is the default and can be omitted
+                    api_key=os.environ.get("GROQ_API_KEY"),
+                )
+                return (
+                    client.chat.completions.create(
+                        messages=messages,  # type: ignore
+                        model=model,
+                        temperature=0.8,
+                    )
+                    .choices[0]
+                    .message.content
+                )
+            except GroqNotFoundError:
+                # NOTE: Tests in this file are integration tests that rely on live LLM provider
+                # clients. If a test fails, it might be flaky. If this happens, consider adding
+                # a skip mechanism similar to Groq
+                pytest.skip("GROQ not available")
+        if provider == "cohere":
+            client = cohere.Client(api_key=os.getenv("COHERE_API_KEY"))  # type: ignore
+            messages_cohere_format: list[cohere.Message] = []
+            for message in messages:
+                if message["role"] == "system":
+                    messages_cohere_format.append(cohere.SystemMessage(message=message["content"]))
+                elif message["role"] == "user":
+                    messages_cohere_format.append(cohere.UserMessage(message=message["content"]))
+                elif message["role"] == "assistant":
+                    messages_cohere_format.append(cohere.ChatbotMessage(message=message["content"]))
+            return client.chat(  # type: ignore
+                chat_history=messages_cohere_format,
+                model=model,
+                max_tokens=200,
+                message=messages[-1]["content"],
+                temperature=0.8,
+            ).text
+        if provider == "replicate":
+            # TODO: Instrumentor only picks up methods on module-level, not client level
+            # This should be documented somewhere or changed
+            replicate.default_client._api_token = os.getenv("REPLICATE_API_KEY")
+            try:
+                output = ""
+                for event in replicate.run(
+                    model,
+                    input={
+                        "prompt": messages[0]["content"] + " " + messages[-1]["content"],
+                        "temperature": 0.8,
+                    },
+                ):
+                    output += str(event)
+            except ReplicateModelError:
+                pytest.skip("Replicate not available")
+            if not output:
+                pytest.skip("Replicate not available")
+            return output
+        raise ValueError(f"Unknown provider: {provider}")
 
-
-# NOTE: prompt is a decorator, but for brevity, it's used as a higher-order function in tests
-_call_llm = prompt(
-    path=None,
-    template="You are an assistant on the following topics: {topics}.",
-)(_call_llm_base)
-_call_llm_with_defaults = prompt(
-    path=None,
-    template="You are an assistant on the following topics: {topics}.",
-    temperature=0.9,
-    top_p=0.1,
-)(_call_llm_base)
+    return _call_llm_base
 
 
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
@@ -147,9 +146,12 @@ def test_prompt_decorator(
 ):
     provider, model = provider_model
     # GIVEN an OpenTelemetry configuration without HumanloopSpanProcessor
-    _, exporter = opentelemetry_test_configuration
+    tracer, exporter = opentelemetry_test_configuration
     # WHEN using the Prompt decorator
-    _call_llm(
+
+    call_llm = _test_scenario(tracer)
+
+    call_llm(
         provider=provider,
         model=model,
         messages=call_llm_messages,
@@ -173,9 +175,12 @@ def test_prompt_decorator_with_hl_processor(
 ):
     provider, model = provider_model
     # GIVEN an OpenTelemetry configuration with HumanloopSpanProcessor
-    _, exporter = opentelemetry_hl_test_configuration
+    tracer, exporter = opentelemetry_hl_test_configuration
     # WHEN using the Prompt decorator
-    _call_llm(
+
+    call_llm = _test_scenario(opentelemetry_tracer=tracer)
+
+    call_llm(
         provider=provider,
         model=model,
         messages=call_llm_messages,
@@ -186,20 +191,20 @@ def test_prompt_decorator_with_hl_processor(
     assert not is_humanloop_span(span=spans[0])
     assert is_humanloop_span(span=spans[1])
     # THEN the Prompt span is enhanced with information and forms a correct PromptKernel
-    prompt = PromptKernelRequest.model_validate(
+    prompt_kernel = PromptKernelRequest.model_validate(
         read_from_opentelemetry_span(
             span=spans[1],
             key=HL_FILE_OT_KEY,
         )["prompt"]  # type: ignore
     )
     # THEN temperature is intercepted from LLM provider call
-    assert prompt.temperature == 0.8
+    assert prompt_kernel.temperature == 0.8
     # THEN the provider intercepted from LLM provider call
-    assert prompt.provider == provider
+    assert prompt_kernel.provider == provider
     # THEN model is intercepted from LLM provider call
-    assert prompt.model == model
+    assert prompt_kernel.model == model
     # THEN top_p is not present since it's not present in the LLM provider call
-    assert prompt.top_p is None
+    assert prompt_kernel.top_p is None
 
 
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
@@ -210,9 +215,18 @@ def test_prompt_decorator_with_defaults(
 ):
     provider, model = provider_model
     # GIVEN an OpenTelemetry configuration with HumanloopSpanProcessor
-    _, exporter = opentelemetry_hl_test_configuration
+    tracer, exporter = opentelemetry_hl_test_configuration
     # WHEN using the Prompt decorator with default values
-    _call_llm_with_defaults(
+
+    call_llm = _test_scenario(
+        opentelemetry_tracer=tracer,
+        temperature=0.9,
+        top_p=0.1,
+        template="You are an assistant on the following topics: {topics}.",
+        path=None,
+    )
+
+    call_llm(
         provider=provider,
         model=model,
         messages=call_llm_messages,
@@ -239,24 +253,22 @@ def test_prompt_decorator_with_defaults(
         {"frequency_penalty": 3},
     ),
 )
-def test_hyperparameter_values_fail_out_of_domain(hyperparameters: dict[str, float]):
+def test_hyperparameter_values_fail_out_of_domain(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+    hyperparameters: dict[str, float],
+):
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a Prompt decorated function
 
     with pytest.raises(ValueError):
-        # WHEN using default values that are out of domain
-        @prompt(path=None, template="You are an assistant on the following topics: {topics}.", **hyperparameters)  # type: ignore[arg-type]
-        def _call_llm(messages: list[ChatCompletionMessageParam]) -> Optional[str]:
-            load_dotenv()
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            return (
-                client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=messages,
-                    temperature=0.8,
-                )
-                .choices[0]
-                .message.content
-            )
+        # WHEN passing default values to the @prompt decorator that are out of domain
+
+        _test_scenario(
+            opentelemetry_tracer=tracer,
+            path=None,
+            **hyperparameters,
+        )
 
     # THEN an exception is raised
 
@@ -284,23 +296,19 @@ def test_prompt_attributes(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
     test_attributes, expected_attributes = attributes_test_expected
-    _, exporter = opentelemetry_hl_test_configuration
+    tracer, exporter = opentelemetry_hl_test_configuration
 
-    @prompt(path=None, attributes=test_attributes)
-    def call_llm(messages: list[ChatCompletionMessageParam]) -> Optional[str]:
-        load_dotenv()
-        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        return (
-            client.chat.completions.create(
-                model="gpt-4o",
-                messages=messages,
-                temperature=0.8,
-            )
-            .choices[0]
-            .message.content
-        )
+    call_llm = _test_scenario(
+        opentelemetry_tracer=tracer,
+        path=None,
+        attributes=test_attributes,
+    )
 
-    call_llm(call_llm_messages)
+    call_llm(
+        provider="openai",
+        model="gpt-4o",
+        messages=call_llm_messages,
+    )
 
     assert len(exporter.get_finished_spans()) == 2
 

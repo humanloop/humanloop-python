@@ -20,7 +20,7 @@ from .decorators.tool import tool as tool_decorator_factory
 from .environment import HumanloopEnvironment
 from .eval_utils import Dataset, Evaluator, EvaluatorCheck, File, _run_eval
 from .evaluations.client import EvaluationsClient
-from .otel import instrument_provider, set_humanloop_sdk_tracer
+from .otel import instrument_provider
 from .otel.exporter import HumanloopSpanExporter
 from .otel.processor import HumanloopSpanProcessor
 from .prompt_utils import populate_template
@@ -124,11 +124,10 @@ class Humanloop(BaseHumanloop):
             ),
         )
 
-        if opentelemetry_tracer is not None:
-            set_humanloop_sdk_tracer(opentelemetry_tracer)
+        if opentelemetry_tracer is None:
+            self._opentelemetry_tracer = self._tracer_provider.get_tracer("humanloop.sdk")
         else:
-            tracer = self._tracer_provider.get_tracer("humanloop.sdk")
-            set_humanloop_sdk_tracer(tracer)
+            self._opentelemetry_tracer = opentelemetry_tracer
 
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
@@ -260,6 +259,7 @@ class Humanloop(BaseHumanloop):
             for chat.
         """
         return prompt_decorator_factory(
+            opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
             model=model,
             attributes=attributes,
@@ -351,6 +351,7 @@ class Humanloop(BaseHumanloop):
             with details on how they were created or used.
         """
         return tool_decorator_factory(
+            opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
             setup_values=setup_values,
             attributes=attributes,
@@ -408,7 +409,11 @@ class Humanloop(BaseHumanloop):
         """
         if attributes is None:
             attributes = {}
-        return flow_decorator_factory(path=path, attributes=attributes)
+        return flow_decorator_factory(
+            opentelemetry_tracer=self._opentelemetry_tracer,
+            path=path,
+            attributes=attributes,
+        )
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):

@@ -17,46 +17,60 @@ from opentelemetry.sdk.trace import Tracer
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 
-@tool()
-def _random_string() -> str:
-    """Return a random string."""
-    return "".join(
-        random.choices(
-            string.ascii_letters + string.digits,
-            k=10,
+def _test_scenario(
+    opentelemetry_tracer: Tracer,
+):
+    @tool(opentelemetry_tracer=opentelemetry_tracer)
+    def _random_string() -> str:
+        """Return a random string."""
+        return "".join(
+            random.choices(
+                string.ascii_letters + string.digits,
+                k=10,
+            )
         )
+
+    @prompt(
+        opentelemetry_tracer=opentelemetry_tracer,
+        path=None,
+        template="You are an assistant on the following topics: {topics}.",
     )
+    def _call_llm(messages: list[ChatCompletionMessageParam]) -> str:
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        return (
+            client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0.8,
+            )
+            .choices[0]
+            .message.content
+        ) + _random_string()
 
+    @flow(
+        opentelemetry_tracer=opentelemetry_tracer,
+        attributes={"foo": "bar", "baz": 7},
+    )
+    def _agent_call(messages: list[dict]) -> str:
+        return _call_llm(messages=messages)
 
-@prompt(path=None, template="You are an assistant on the following topics: {topics}.")
-def _call_llm(messages: list[ChatCompletionMessageParam]) -> str:
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    return (
-        client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            temperature=0.8,
-        )
-        .choices[0]
-        .message.content
-    ) + _random_string()
+    @flow(
+        opentelemetry_tracer=opentelemetry_tracer,
+    )
+    def _flow_over_flow(messages: list[dict]) -> str:
+        return _agent_call(messages=messages)
 
-
-@flow(attributes={"foo": "bar", "baz": 7})
-def _agent_call(messages: list[dict]) -> str:
-    return _call_llm(messages=messages)
-
-
-@flow()
-def _flow_over_flow(messages: list[dict]) -> str:
-    return _agent_call(messages=messages)
+    return _random_string, _call_llm, _agent_call, _flow_over_flow
 
 
 def test_decorators_without_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
+    tracer, exporter = opentelemetry_hl_test_configuration
+
+    _call_llm = _test_scenario(tracer)[1]
+
     # GIVEN a call to @prompt annotated function that calls a @tool
-    _, exporter = opentelemetry_hl_test_configuration
     _call_llm(
         [
             {
@@ -94,7 +108,10 @@ def test_decorators_with_flow_decorator(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
     # GIVEN a @flow entrypoint to an instrumented application
-    _, exporter = opentelemetry_hl_test_configuration
+    tracer, exporter = opentelemetry_hl_test_configuration
+
+    _agent_call = _test_scenario(tracer)[2]
+
     # WHEN calling the Flow
     _agent_call(
         [
@@ -137,7 +154,9 @@ def test_flow_decorator_flow_in_flow(
     call_llm_messages: list[dict],
 ):
     # GIVEN A configured OpenTelemetry tracer and exporter
-    _, exporter = opentelemetry_hl_test_configuration
+    tracer, exporter = opentelemetry_hl_test_configuration
+
+    _flow_over_flow = _test_scenario(tracer)[3]
 
     # WHEN Calling the _test_flow_in_flow function with specific messages
     _flow_over_flow(call_llm_messages)
@@ -181,7 +200,10 @@ def test_flow_decorator_with_hl_exporter(
 ):
     # NOTE: type ignore comments are caused by the MagicMock used to mock _client
     # GIVEN a OpenTelemetry configuration with a mock Humanloop SDK and a spied exporter
-    _, exporter = opentelemetry_hl_with_exporter_test_configuration
+    tracer, exporter = opentelemetry_hl_with_exporter_test_configuration
+
+    _agent_call = _test_scenario(tracer)[2]
+
     with patch.object(exporter, "export", wraps=exporter.export) as mock_export_method:
         # WHEN calling the @flow decorated function
         _agent_call(call_llm_messages)
@@ -246,7 +268,10 @@ def test_flow_decorator_hl_exporter_flow_inside_flow(
     opentelemetry_hl_with_exporter_test_configuration: tuple[Tracer, HumanloopSpanExporter],
 ):
     # GIVEN a OpenTelemetry configuration with a mock Humanloop SDK and a spied exporter
-    _, exporter = opentelemetry_hl_with_exporter_test_configuration
+    tracer, exporter = opentelemetry_hl_with_exporter_test_configuration
+
+    _flow_over_flow = _test_scenario(tracer)[3]
+
     with patch.object(exporter, "export", wraps=exporter.export) as mock_export_method:
         # WHEN calling the @flow decorated function
         _flow_over_flow(call_llm_messages)

@@ -2,13 +2,16 @@ import uuid
 from functools import wraps
 from typing import Any, Callable, Optional
 
+from opentelemetry.trace import Tracer
+
 from humanloop.decorators.helpers import args_to_inputs
-from humanloop.otel import get_humanloop_sdk_tracer, get_trace_parent_metadata, pop_trace_context, push_trace_context
+from humanloop.otel import get_trace_parent_metadata, pop_trace_context, push_trace_context
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 
 
 def flow(
+    opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
     attributes: Optional[dict[str, Any]] = None,
 ):
@@ -18,7 +21,7 @@ def flow(
     def decorator(func: Callable):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            with get_humanloop_sdk_tracer().start_as_current_span(str(uuid.uuid4())) as span:
+            with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
                 trace_metadata = get_trace_parent_metadata()
 
                 if trace_metadata:

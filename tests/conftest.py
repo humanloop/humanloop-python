@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Callable, Generator
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,7 +16,9 @@ from openai.types.chat.chat_completion_message_param import ChatCompletionMessag
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
-from humanloop import otel as INTERNAL_OT
+from humanloop.decorators.flow import flow
+from humanloop.decorators.prompt import prompt
+from humanloop.decorators.tool import tool
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 
@@ -71,13 +73,11 @@ def opentelemetry_test_configuration(
         instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
     tracer = opentelemetry_test_provider.get_tracer("test")
     # Circumvent configuration procedure
-    INTERNAL_OT._TRACER = tracer
 
     yield tracer, exporter
 
     for instrumentor in instrumentors:
         instrumentor.uninstrument()
-    INTERNAL_OT._TRACER = None
 
 
 @pytest.fixture(scope="function")
@@ -101,15 +101,15 @@ def opentelemetry_hl_test_configuration(
         AnthropicInstrumentor(),
     ]
     for instrumentor in instrumentors:
-        instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
+        instrumentor.instrument(
+            tracer_provider=opentelemetry_test_provider,
+        )
     tracer = opentelemetry_test_provider.get_tracer("test")
-    INTERNAL_OT._TRACER = tracer
 
     yield tracer, exporter
 
     for instrumentor in instrumentors:
         instrumentor.uninstrument()
-    INTERNAL_OT._TRACER = None
 
 
 @pytest.fixture(scope="function")
@@ -136,12 +136,10 @@ def opentelemetry_hl_with_exporter_test_configuration(
     instrumentor = OpenAIInstrumentor()
     instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
     tracer = opentelemetry_test_provider.get_tracer("test")
-    INTERNAL_OT._TRACER = tracer
 
     yield tracer, hl_test_exporter
 
     instrumentor.uninstrument()
-    INTERNAL_OT._TRACER = None
 
 
 @pytest.fixture(scope="session")

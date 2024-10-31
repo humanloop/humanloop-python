@@ -3,19 +3,9 @@ from typing import Optional
 from opentelemetry import baggage
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.trace import Tracer
 
 from humanloop.otel.constants import HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import module_is_installed
-
-"""
-Tracer to which Humanloop decorators will write Spans.
-Humanloop SDK will instantiate one for the decorators
-if the user does not provide a Tracer in the Humanloop
-client.
-"""
-_TRACER = None
-
 
 """
 Humanloop SDK uses the Baggage concept from OTel
@@ -33,18 +23,6 @@ When the parent Span is completed, the context is popped
 off the stack.
 """
 _BAGGAGE_CONTEXT_STACK: list[Context] = [Context()]
-
-
-def set_humanloop_sdk_tracer(tracer: Tracer):
-    """Set Tracer used by Humanloop SDK to instrument the decorators."""
-    global _TRACER  # noqa: PLW0603
-    _TRACER = tracer
-
-
-def get_humanloop_sdk_tracer() -> Tracer:
-    """Get Tracer used by Humanloop SDK to instrument the decorators."""
-    assert _TRACER is not None, "Internal error: OTT Tracer should have been set in the client"
-    return _TRACER
 
 
 def instrument_provider(provider: TracerProvider):

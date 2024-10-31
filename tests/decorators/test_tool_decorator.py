@@ -10,9 +10,12 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 
 
 def test_calculator_decorator(
-    opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
-    @tool()
+    # GIVEN a test OpenTelemetry configuration
+    tracer, exporter = opentelemetry_test_configuration
+
+    @tool(opentelemetry_tracer=tracer)
     def calculator(operation: str, num1: float, num2: float) -> float:
         """Do arithmetic operations on two numbers."""
         if operation == "add":
@@ -26,8 +29,6 @@ def test_calculator_decorator(
         else:
             raise ValueError(f"Invalid operation: {operation}")
 
-    # GIVEN a test OpenTelemetry configuration
-    _, exporter = opentelemetry_hl_test_configuration
     # WHEN calling the @tool decorated function
     result = calculator(operation="add", num1=1, num2=2)
     # THEN a single span is created and the log and file attributes are correctly set
@@ -48,8 +49,10 @@ def test_calculator_decorator(
     Validator.check_schema(calculator.json_schema)
 
 
-def test_union_type():
-    @tool()
+def test_union_type(opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter]):
+    tracer, _ = opentelemetry_test_configuration
+
+    @tool(opentelemetry_tracer=tracer)
     def foo(a: Union[int, float], b: float) -> float:
         return a + b
 
@@ -66,11 +69,11 @@ def test_union_type():
 
 
 def test_not_required_parameter(
-    opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
-    _, exporter = opentelemetry_hl_test_configuration
+    tracer, exporter = opentelemetry_test_configuration
 
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def test_calculator(a: Optional[float], b: float) -> float:
         if a is None:
             a = 0
@@ -85,9 +88,14 @@ def test_not_required_parameter(
     Validator.check_schema(test_calculator.json_schema)
 
 
-def test_no_annotation_on_parameter():
+def test_no_annotation_on_parameter(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b) -> float:
         if a is None:
             a = 0
@@ -115,9 +123,14 @@ def test_no_annotation_on_parameter():
     Validator.check_schema(calculator.json_schema)
 
 
-def test_dict_annotation_no_sub_types():
+def test_dict_annotation_no_sub_types(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b: dict) -> float:
         if a is None:
             a = 0
@@ -150,9 +163,14 @@ def test_dict_annotation_no_sub_types():
     Validator.check_schema(calculator.json_schema)
 
 
-def test_list_annotation_no_sub_types():
+def test_list_annotation_no_sub_types(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b: Optional[list]) -> float:
         if a is None:
             a = 0
@@ -184,9 +202,14 @@ def test_list_annotation_no_sub_types():
     }
 
 
-def test_tuple_annotation_no_sub_types():
+def test_tuple_annotation_no_sub_types(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b: Optional[tuple]) -> float:
         if a is None:
             a = 0
@@ -218,10 +241,15 @@ def test_tuple_annotation_no_sub_types():
     }
 
 
-def test_function_without_return_annotation():
+def test_function_without_return_annotation(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a function annotated with @tool and without type hint on the return value
     # WHEN building the Tool kernel
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def foo(a: Optional[float], b: float) -> float:
         """Add two numbers."""
         if a is None:
@@ -233,13 +261,13 @@ def test_function_without_return_annotation():
 
 
 def test_list_annotation_parameter(
-    opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
-    # GIVEN an OTel configuration with HL Processor
-    _, exporter = opentelemetry_hl_test_configuration
+    # GIVEN an OTel configuration
+    tracer, exporter = opentelemetry_test_configuration
 
     # WHEN defining a tool with a list parameter
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def foo(to_join: list[str]) -> str:
         return " ".join(to_join)
 
@@ -256,10 +284,15 @@ def test_list_annotation_parameter(
     Validator.check_schema(foo.json_schema)
 
 
-def test_list_in_list_parameter_annotation():
+def test_list_in_list_parameter_annotation(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a tool definition with a list of lists parameter
     # WHEN building the Tool Kernel
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def nested_plain_join(to_join: list[list[str]]):
         return " ".join([val for sub_list in to_join for val in sub_list])
 
@@ -276,10 +309,15 @@ def test_list_in_list_parameter_annotation():
     Validator.check_schema(nested_plain_join.json_schema)
 
 
-def test_complex_dict_annotation():
+def test_complex_dict_annotation(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a tool definition with a dictionary parameter
     # WHEN building the Tool Kernel
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def foo(a: dict[Union[int, str], list[str]]):
         return a
 
@@ -296,10 +334,15 @@ def test_complex_dict_annotation():
     Validator.check_schema(foo.json_schema)
 
 
-def test_tuple_annotation():
+def test_tuple_annotation(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a tool definition with a tuple parameter
     # WHEN building the Tool Kernel
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def foo(a: Optional[tuple[int, Optional[str], float]]):
         return a
 
@@ -317,10 +360,15 @@ def test_tuple_annotation():
     Validator.check_schema(foo.json_schema)
 
 
-def test_strict_false():
+def test_strict_false(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a tool definition with strict=False
     # WHEN building the Tool Kernel
-    @tool(strict=False)
+    @tool(opentelemetry_tracer=tracer, strict=False)
     def foo(a: int, b: int) -> int:
         return a + b
 
@@ -331,10 +379,15 @@ def test_strict_false():
     Validator.check_schema(foo.json_schema)
 
 
-def test_tool_no_args():
+def test_tool_no_args(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a tool definition without arguments
     # WHEN building the Tool Kernel
-    @tool()
+    @tool(opentelemetry_tracer=tracer)
     def foo():
         return 42
 
@@ -355,7 +408,12 @@ def test_tool_no_args():
     Validator.check_schema(foo.json_schema)
 
 
-def test_custom_types_throws():
+def test_custom_types_throws(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
     # GIVEN a user-defined type
     class Foo(TypedDict):
         a: int  # type: ignore
@@ -364,7 +422,7 @@ def test_custom_types_throws():
     # WHEN defining a tool with a parameter of that type
     with pytest.raises(ValueError) as exc:
 
-        @tool()
+        @tool(opentelemetry_tracer=tracer)
         def foo_bar(foo: Foo):
             return foo.a + foo.b  # type: ignore
 
