@@ -62,9 +62,6 @@ class ExtendedEvalsClient(EvaluationsClient):
 
 
 class ExtendedPromptsClient(PromptsClient):
-    def __init__(self, client_wrapper: SyncClientWrapper):
-        super().__init__(client_wrapper=client_wrapper)
-
     populate_template = staticmethod(populate_template)
 
 
