@@ -7,6 +7,7 @@ from typing import Any
 import parse  # type: ignore
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
+from pydantic import ValidationError as PydanticValidationError
 
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
 from humanloop.otel.helpers import (
@@ -15,6 +16,10 @@ from humanloop.otel.helpers import (
     read_from_opentelemetry_span,
     write_to_opentelemetry_span,
 )
+from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
+from humanloop.types.prompt_kernel_request import PromptKernelRequest
+
+logger = logging.getLogger("humanloop.sdk")
 
 
 class HumanloopSpanProcessor(SimpleSpanProcessor):
@@ -79,16 +84,20 @@ def _process_span_dispatch(span: ReadableSpan, children_spans: list[ReadableSpan
         _process_flow(flow_span=span, children_spans=children_spans)
         return
     else:
-        logging.error("Invalid span type")
+        logger.error("Unknown Humanloop File Span %s", span)
 
 
 def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan]):
     if len(children_spans) == 0:
         return
-    child_span = children_spans[0]
-    assert is_llm_provider_call(child_span)
-    _enrich_prompt_span_file(prompt_span, child_span)
-    _enrich_prompt_span_log(prompt_span, child_span)
+    for child_span in children_spans:
+        if is_llm_provider_call(child_span):
+            _enrich_prompt_span_file(prompt_span, child_span)
+            _enrich_prompt_span_log(prompt_span, child_span)
+            # NOTE: @prompt decorator expects a single LLM provider call
+            # to happen in the function. If there are more than one, we
+            # ignore the rest
+            break
 
 
 def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
@@ -127,30 +136,56 @@ def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: 
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
-    prompt = hl_file.get("prompt")
-    if not prompt:
-        prompt = {}
-    if not prompt.get("model"):
+    prompt = PromptKernelRequestParams(
+        model=hl_file.get("prompt", {}).get("model"),
+        endpoint=hl_file.get("prompt", {}).get("endpoint"),
+        template=hl_file.get("prompt", {}).get("template"),
+        provider=hl_file.get("prompt", {}).get("provider"),
+        temperature=hl_file.get("prompt", {}).get("temperature"),
+        max_tokens=hl_file.get("prompt", {}).get("max_tokens"),
+        top_p=hl_file.get("prompt", {}).get("top_p"),
+        stop=hl_file.get("prompt", {}).get("stop"),
+        presence_penalty=hl_file.get("prompt", {}).get("presence_penalty"),
+        frequency_penalty=hl_file.get("prompt", {}).get("frequency_penalty"),
+        other=hl_file.get("prompt", {}).get("other"),
+        seed=hl_file.get("prompt", {}).get("seed"),
+        response_format=hl_file.get("prompt", {}).get("response_format"),
+        tools=[],
+        linked_tools=[],
+        attributes={},
+    )
+    # Check if the keys were set via the @prompt decorator
+    # Otherwise use the information from the intercepted LLM
+    # provider call
+    if not prompt["model"]:
         prompt["model"] = gen_ai_object.get("request", {}).get("model", None)
-    if not prompt.get("endpoint"):
+    if not prompt["endpoint"]:
         prompt["endpoint"] = llm_object.get("request", {}).get("type")
-    if not prompt.get("provider"):
+    if not prompt["provider"]:
         prompt["provider"] = gen_ai_object.get("system", None)
         if prompt["provider"]:
+            # Normalize provider name; Interceptors output the names with
+            # different capitalization e.g. OpenAI instead of openai
             prompt["provider"] = prompt["provider"].lower()
-    if not prompt.get("temperature"):
+    if not prompt["temperature"]:
         prompt["temperature"] = gen_ai_object.get("request", {}).get("temperature", None)
-    if not prompt.get("top_p"):
+    if not prompt["top_p"]:
         prompt["top_p"] = gen_ai_object.get("request", {}).get("top_p", None)
-    if not prompt.get("max_tokens"):
+    if not prompt["max_tokens"]:
         prompt["max_tokens"] = gen_ai_object.get("request", {}).get("max_tokens", None)
-    if not prompt.get("presence_penalty"):
+    if not prompt["presence_penalty"]:
         prompt["presence_penalty"] = llm_object.get("presence_penalty", None)
-    if not prompt.get("frequency_penalty"):
+    if not prompt["frequency_penalty"]:
         prompt["frequency_penalty"] = llm_object.get("frequency_penalty", None)
 
-    hl_file["prompt"] = prompt
+    try:
+        # Validate the Prompt Kernel
+        PromptKernelRequest.model_validate(obj=prompt)
+    except PydanticValidationError as e:
+        logger.error("Could not validate Prompt Kernel extracted from Span: %s", e)
 
+    # Write the enriched Prompt Kernel back to the Span
+    hl_file["prompt"] = prompt
     write_to_opentelemetry_span(
         span=prompt_span,
         key=HL_FILE_OT_KEY,
