@@ -9,6 +9,7 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
+from humanloop.core.request_options import RequestOptions
 from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
@@ -174,6 +175,7 @@ class HumanloopSpanExporter(SpanExporter):
             prompt=prompt,
             **log_object,
             trace_parent_id=trace_parent_id,
+            request_options=RequestOptions(max_retries=3),
         )
         self._uploaded_log_ids[span.context.span_id] = response.id
 
@@ -205,6 +207,7 @@ class HumanloopSpanExporter(SpanExporter):
             tool=tool,
             **log_object,
             trace_parent_id=trace_parent_id,
+            request_options=RequestOptions(max_retries=3),
         )
         self._uploaded_log_ids[span.context.span_id] = response.id
 
@@ -239,5 +242,6 @@ class HumanloopSpanExporter(SpanExporter):
             flow=flow,
             **log_object,
             trace_parent_id=trace_parent_id,
+            request_options=RequestOptions(max_retries=3),
         )
         self._uploaded_log_ids[span.context.span_id] = response.id
