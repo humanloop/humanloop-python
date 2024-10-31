@@ -9,7 +9,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 from pydantic import ValidationError as PydanticValidationError
 
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
+from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE
 from humanloop.otel.helpers import (
     is_humanloop_span,
     is_llm_provider_call,
@@ -92,8 +92,8 @@ def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan
         return
     for child_span in children_spans:
         if is_llm_provider_call(child_span):
-            _enrich_prompt_span_file(prompt_span, child_span)
-            _enrich_prompt_span_log(prompt_span, child_span)
+            _enrich_prompt_kernel(prompt_span, child_span)
+            _enrich_prompt_log(prompt_span, child_span)
             # NOTE: @prompt decorator expects a single LLM provider call
             # to happen in the function. If there are more than one, we
             # ignore the rest
@@ -131,52 +131,30 @@ def _process_flow(flow_span: ReadableSpan, children_spans: list[ReadableSpan]):
     )
 
 
-def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
+def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
     hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
-    prompt = PromptKernelRequestParams(
-        model=hl_file.get("prompt", {}).get("model"),
-        endpoint=hl_file.get("prompt", {}).get("endpoint"),
-        template=hl_file.get("prompt", {}).get("template"),
-        provider=hl_file.get("prompt", {}).get("provider"),
-        temperature=hl_file.get("prompt", {}).get("temperature"),
-        max_tokens=hl_file.get("prompt", {}).get("max_tokens"),
-        top_p=hl_file.get("prompt", {}).get("top_p"),
-        stop=hl_file.get("prompt", {}).get("stop"),
-        presence_penalty=hl_file.get("prompt", {}).get("presence_penalty"),
-        frequency_penalty=hl_file.get("prompt", {}).get("frequency_penalty"),
-        other=hl_file.get("prompt", {}).get("other"),
-        seed=hl_file.get("prompt", {}).get("seed"),
-        response_format=hl_file.get("prompt", {}).get("response_format"),
-        tools=[],
-        linked_tools=[],
-        attributes={},
-    )
-    # Check if the keys were set via the @prompt decorator
-    # Otherwise use the information from the intercepted LLM
-    # provider call
-    if not prompt["model"]:
-        prompt["model"] = gen_ai_object.get("request", {}).get("model", None)
-    if not prompt["endpoint"]:
-        prompt["endpoint"] = llm_object.get("request", {}).get("type")
-    if not prompt["provider"]:
-        prompt["provider"] = gen_ai_object.get("system", None)
-        if prompt["provider"]:
-            # Normalize provider name; Interceptors output the names with
-            # different capitalization e.g. OpenAI instead of openai
-            prompt["provider"] = prompt["provider"].lower()
-    if not prompt["temperature"]:
-        prompt["temperature"] = gen_ai_object.get("request", {}).get("temperature", None)
-    if not prompt["top_p"]:
-        prompt["top_p"] = gen_ai_object.get("request", {}).get("top_p", None)
-    if not prompt["max_tokens"]:
-        prompt["max_tokens"] = gen_ai_object.get("request", {}).get("max_tokens", None)
-    if not prompt["presence_penalty"]:
-        prompt["presence_penalty"] = llm_object.get("presence_penalty", None)
-    if not prompt["frequency_penalty"]:
-        prompt["frequency_penalty"] = llm_object.get("frequency_penalty", None)
+    prompt: dict[str, Any] = hl_file.get("prompt")  # type: ignore
+    if prompt == HL_OT_EMPTY_VALUE:
+        prompt = {}
+
+    # Check if the Prompt Kernel keys were assigned default values
+    # via the @prompt arguments. Otherwise use the information
+    # from the intercepted LLM provider call
+    prompt["model"] = prompt.get("model") or gen_ai_object.get("request", {}).get("model", None)
+    prompt["endpoint"] = prompt.get("endpoint") or llm_object.get("request", {}).get("type")
+    prompt["provider"] = prompt.get("provider") or gen_ai_object.get("system", None)
+    if prompt["provider"]:
+        # Normalize provider name; Interceptors output the names with
+        # different capitalization e.g. OpenAI instead of openai
+        prompt["provider"] = prompt["provider"].lower()
+    prompt["temperature"] = prompt.get("temperature") or gen_ai_object.get("request", {}).get("temperature", None)
+    prompt["top_p"] = prompt.get("top_p") or gen_ai_object.get("request", {}).get("top_p", None)
+    prompt["max_tokens"] = prompt.get("max_tokens") or gen_ai_object.get("request", {}).get("max_tokens", None)
+    prompt["presence_penalty"] = prompt.get("presence_penalty") or llm_object.get("presence_penalty", None)
+    prompt["frequency_penalty"] = prompt.get("frequency_penalty") or llm_object.get("frequency_penalty", None)
 
     try:
         # Validate the Prompt Kernel
@@ -194,7 +172,7 @@ def _enrich_prompt_span_file(prompt_span: ReadableSpan, llm_provider_call_span: 
     )
 
 
-def _enrich_prompt_span_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
+def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
     hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
     hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_LOG_OT_KEY)
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")

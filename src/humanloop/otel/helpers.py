@@ -92,6 +92,11 @@ def write_to_opentelemetry_span(
         }
     ```
     """
+    # Remove all keys with the prefix to avoid duplicates
+    for attribute_key in span._attributes.keys():  # type: ignore
+        if attribute_key.startswith(key):
+            del span._attributes[attribute_key]  # type: ignore
+
     while len(work_stack) > 0:
         key, value = work_stack.pop()  # type: ignore
         if isinstance(value, dict):

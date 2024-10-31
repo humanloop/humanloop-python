@@ -259,3 +259,55 @@ def test_hyperparameter_values_fail_out_of_domain(hyperparameters: dict[str, flo
             )
 
     # THEN an exception is raised
+
+
+@pytest.mark.parametrize(
+    "attributes_test_expected",
+    [
+        (
+            {"foo": "bar"},
+            {"foo": "bar"},
+        ),
+        (
+            {},
+            None,
+        ),
+        (
+            None,
+            None,
+        ),
+    ],
+)
+def test_prompt_attributes(
+    attributes_test_expected: tuple[dict[str, str], dict[str, str]],
+    call_llm_messages: list[ChatCompletionMessageParam],
+    opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    test_attributes, expected_attributes = attributes_test_expected
+    _, exporter = opentelemetry_hl_test_configuration
+
+    @prompt(path=None, attributes=test_attributes)
+    def call_llm(messages: list[ChatCompletionMessageParam]) -> Optional[str]:
+        load_dotenv()
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        return (
+            client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0.8,
+            )
+            .choices[0]
+            .message.content
+        )
+
+    call_llm(call_llm_messages)
+
+    assert len(exporter.get_finished_spans()) == 2
+
+    prompt_kernel = PromptKernelRequest.model_validate(
+        read_from_opentelemetry_span(
+            span=exporter.get_finished_spans()[1],
+            key=HL_FILE_OT_KEY,
+        )["prompt"]  # type: ignore
+    )
+    assert prompt_kernel.attributes == expected_attributes

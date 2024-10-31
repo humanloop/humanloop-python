@@ -1,3 +1,4 @@
+import json
 import logging
 import typing
 from queue import Queue
@@ -162,6 +163,12 @@ class HumanloopSpanExporter(SpanExporter):
             trace_parent_id = None
         prompt: PromptKernelRequestParams = file_object["prompt"]
         path: str = file_object["path"]
+        if not isinstance(log_object["output"], str):
+            # Output expected to be a string, if decorated function
+            # does not return one, jsonify it
+            log_object["output"] = json.dumps(log_object["output"])
+        if "attributes" not in prompt or not prompt["attributes"]:
+            prompt["attributes"] = {}
         response = self._client.prompts.log(
             path=path,
             prompt=prompt,
@@ -189,6 +196,10 @@ class HumanloopSpanExporter(SpanExporter):
         if tool.get("setup_values", HL_OT_EMPTY_VALUE) == HL_OT_EMPTY_VALUE:
             tool["setup_values"] = {}
         path: str = file_object["path"]
+        if not isinstance(log_object["output"], str):
+            # Output expected to be a string, if decorated function
+            # does not return one, jsonify it
+            log_object["output"] = json.dumps(log_object["output"])
         response = self._client.tools.log(
             path=path,
             tool=tool,
@@ -219,6 +230,10 @@ class HumanloopSpanExporter(SpanExporter):
         else:
             flow = file_object["flow"]
         path: str = file_object["path"]
+        if not isinstance(log_object["output"], str):
+            # Output expected to be a string, if decorated function
+            # does not return one, jsonify it
+            log_object["output"] = json.dumps(log_object["output"])
         response = self._client.flows.log(
             path=path,
             flow=flow,

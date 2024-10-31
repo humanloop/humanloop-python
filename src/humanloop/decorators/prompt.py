@@ -1,9 +1,10 @@
+import inspect
 import uuid
 from functools import wraps
 from typing import Any, Callable, Optional
 
 from humanloop.otel import get_humanloop_sdk_tracer, get_trace_parent_metadata, pop_trace_context, push_trace_context
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_TRACE_METADATA_KEY
+from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 from humanloop.types.model_endpoints import ModelEndpoints
 from humanloop.types.model_providers import ModelProviders
@@ -16,6 +17,7 @@ def prompt(
     path: Optional[str] = None,
     # TODO: Template can be a list of objects?
     model: Optional[str] = None,
+    attributes: Optional[dict[str, Any]] = None,
     endpoint: Optional[ModelEndpoints] = None,
     template: Optional[PromptKernelRequestTemplate] = None,
     provider: Optional[ModelProviders] = None,
@@ -52,9 +54,6 @@ def prompt(
                 raise ValueError(f"{func.__name__}: Frequency penalty parameter must be between -2 and 2")
             prompt_kernel["frequency_penalty"] = frequency_penalty
 
-        for attr in [model, endpoint, template, provider, max_tokens, stop, other, seed, response_format]:
-            if attr is not None:
-                prompt_kernel[attr] = attr  # type: ignore
         for attr_name, attr_value in {
             "model": model,
             "endpoint": endpoint,
@@ -65,6 +64,7 @@ def prompt(
             "other": other,
             "seed": seed,
             "response_format": response_format,
+            "attributes": attributes if attributes != {} else None,
         }.items():
             if attr_value is not None:
                 prompt_kernel[attr_name] = attr_value  # type: ignore
@@ -102,7 +102,7 @@ def prompt(
                         # Values not specified in the decorator will be
                         # completed with the intercepted values from the
                         # Instrumentors for LLM providers
-                        "prompt": prompt_kernel or None,  # noqa: F821
+                        "prompt": prompt_kernel or HL_OT_EMPTY_VALUE,  # noqa: F821
                     },
                 )
 

@@ -143,6 +143,7 @@ class Humanloop(BaseHumanloop):
         *,
         path: Optional[str] = None,
         model: Optional[str] = None,
+        attributes: Optional[dict[str, Any]] = None,
         endpoint: Optional[ModelEndpoints] = None,
         template: Optional[PromptKernelRequestTemplate] = None,
         provider: Optional[ModelProviders] = None,
@@ -264,6 +265,7 @@ class Humanloop(BaseHumanloop):
         return prompt_decorator_factory(
             path=path,
             model=model,
+            attributes=attributes,
             endpoint=endpoint,
             template=template,
             provider=provider,
