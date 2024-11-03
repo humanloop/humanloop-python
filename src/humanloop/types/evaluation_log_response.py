@@ -14,9 +14,9 @@ from .tool_response import ToolResponse
 from .version_deployment_response import VersionDeploymentResponse
 from .version_id_response import VersionIdResponse
 import pydantic
+import typing
 from .datapoint_response import DatapointResponse
 from .log_response import LogResponse
-import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
 
@@ -27,7 +27,7 @@ class EvaluationLogResponse(UncheckedBaseModel):
     Unique identifier for the Run.
     """
 
-    datapoint: DatapointResponse = pydantic.Field()
+    datapoint: typing.Optional[DatapointResponse] = pydantic.Field(default=None)
     """
     The Datapoint used to generate the Log
     """

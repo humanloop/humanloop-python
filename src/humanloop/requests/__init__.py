@@ -31,8 +31,6 @@ from .evaluation_response import EvaluationResponseParams
 from .evaluation_run_response import EvaluationRunResponseParams
 from .evaluation_runs_response import EvaluationRunsResponseParams
 from .evaluation_stats import EvaluationStatsParams
-from .evaluations_dataset_request import EvaluationsDatasetRequestParams
-from .evaluations_request import EvaluationsRequestParams
 from .evaluator_activation_deactivation_request import EvaluatorActivationDeactivationRequestParams
 from .evaluator_activation_deactivation_request_activate_item import (
     EvaluatorActivationDeactivationRequestActivateItemParams,
@@ -42,15 +40,20 @@ from .evaluator_activation_deactivation_request_deactivate_item import (
 )
 from .evaluator_aggregate import EvaluatorAggregateParams
 from .evaluator_config_response import EvaluatorConfigResponseParams
+from .evaluator_file_id import EvaluatorFileIdParams
+from .evaluator_file_path import EvaluatorFilePathParams
 from .evaluator_judgment_number_limit import EvaluatorJudgmentNumberLimitParams
 from .evaluator_judgment_option_response import EvaluatorJudgmentOptionResponseParams
 from .evaluator_log_response import EvaluatorLogResponseParams
 from .evaluator_log_response_judgment import EvaluatorLogResponseJudgmentParams
 from .evaluator_response import EvaluatorResponseParams
 from .evaluator_response_spec import EvaluatorResponseSpecParams
+from .evaluator_version_id import EvaluatorVersionIdParams
 from .external_evaluator_request import ExternalEvaluatorRequestParams
 from .file_environment_response import FileEnvironmentResponseParams
 from .file_environment_response_file import FileEnvironmentResponseFileParams
+from .file_id import FileIdParams
+from .file_path import FilePathParams
 from .file_request import FileRequestParams
 from .flow_kernel_request import FlowKernelRequestParams
 from .flow_log_response import FlowLogResponseParams
@@ -120,10 +123,10 @@ from .validation_error import ValidationErrorParams
 from .validation_error_loc_item import ValidationErrorLocItemParams
 from .version_deployment_response import VersionDeploymentResponseParams
 from .version_deployment_response_file import VersionDeploymentResponseFileParams
+from .version_id import VersionIdParams
 from .version_id_response import VersionIdResponseParams
 from .version_id_response_version import VersionIdResponseVersionParams
 from .version_reference_response import VersionReferenceResponseParams
-from .version_specification import VersionSpecificationParams
 from .version_stats_response import VersionStatsResponseParams
 from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItemParams
 
@@ -157,22 +160,25 @@ __all__ = [
     "EvaluationRunResponseParams",
     "EvaluationRunsResponseParams",
     "EvaluationStatsParams",
-    "EvaluationsDatasetRequestParams",
-    "EvaluationsRequestParams",
     "EvaluatorActivationDeactivationRequestActivateItemParams",
     "EvaluatorActivationDeactivationRequestDeactivateItemParams",
     "EvaluatorActivationDeactivationRequestParams",
     "EvaluatorAggregateParams",
     "EvaluatorConfigResponseParams",
+    "EvaluatorFileIdParams",
+    "EvaluatorFilePathParams",
     "EvaluatorJudgmentNumberLimitParams",
     "EvaluatorJudgmentOptionResponseParams",
     "EvaluatorLogResponseJudgmentParams",
     "EvaluatorLogResponseParams",
     "EvaluatorResponseParams",
     "EvaluatorResponseSpecParams",
+    "EvaluatorVersionIdParams",
     "ExternalEvaluatorRequestParams",
     "FileEnvironmentResponseFileParams",
     "FileEnvironmentResponseParams",
+    "FileIdParams",
+    "FilePathParams",
     "FileRequestParams",
     "FlowKernelRequestParams",
     "FlowLogResponseParams",
@@ -238,10 +244,10 @@ __all__ = [
     "ValidationErrorParams",
     "VersionDeploymentResponseFileParams",
     "VersionDeploymentResponseParams",
+    "VersionIdParams",
     "VersionIdResponseParams",
     "VersionIdResponseVersionParams",
     "VersionReferenceResponseParams",
-    "VersionSpecificationParams",
     "VersionStatsResponseEvaluatorVersionStatsItemParams",
     "VersionStatsResponseParams",
 ]

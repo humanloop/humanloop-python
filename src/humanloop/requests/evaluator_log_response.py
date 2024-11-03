@@ -118,6 +118,11 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     Evaluator assessment of the Log.
     """
 
+    marked_completed: typing_extensions.NotRequired[bool]
+    """
+    Whether the Log has been manually marked as completed by a user.
+    """
+
     id: str
     """
     Unique identifier for the Log.

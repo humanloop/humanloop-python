@@ -4,6 +4,7 @@ import typing_extensions
 import typing_extensions
 import typing
 from .run_stats_response_evaluator_stats_item import RunStatsResponseEvaluatorStatsItemParams
+from ..types.evaluation_status import EvaluationStatus
 
 
 class RunStatsResponseParams(typing_extensions.TypedDict):
@@ -34,4 +35,9 @@ class RunStatsResponseParams(typing_extensions.TypedDict):
     evaluator_stats: typing.Sequence[RunStatsResponseEvaluatorStatsItemParams]
     """
     Stats for each Evaluator Version applied to this Run.
+    """
+
+    status: EvaluationStatus
+    """
+    The current status of the Run.
     """

@@ -2,4 +2,4 @@
 
 import typing
 
-EvaluationsRequest = typing.Optional[typing.Any]
+EvaluatorsRequest = typing.Optional[typing.Any]

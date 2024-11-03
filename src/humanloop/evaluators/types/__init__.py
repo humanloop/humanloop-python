@@ -2,12 +2,6 @@
 
 from .create_evaluator_log_request_judgment import CreateEvaluatorLogRequestJudgment
 from .create_evaluator_log_request_spec import CreateEvaluatorLogRequestSpec
-from .src_external_app_models_v_5_evaluators_evaluator_request_spec import (
-    SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec,
-)
+from .evaluator_request_spec import EvaluatorRequestSpec
 
-__all__ = [
-    "CreateEvaluatorLogRequestJudgment",
-    "CreateEvaluatorLogRequestSpec",
-    "SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec",
-]
+__all__ = ["CreateEvaluatorLogRequestJudgment", "CreateEvaluatorLogRequestSpec", "EvaluatorRequestSpec"]

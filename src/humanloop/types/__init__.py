@@ -21,6 +21,7 @@ from .dashboard_configuration import DashboardConfiguration
 from .datapoint_response import DatapointResponse
 from .datapoint_response_target_value import DatapointResponseTargetValue
 from .dataset_response import DatasetResponse
+from .datasets_request import DatasetsRequest
 from .directory_response import DirectoryResponse
 from .directory_with_parents_and_children_response import DirectoryWithParentsAndChildrenResponse
 from .directory_with_parents_and_children_response_files_item import DirectoryWithParentsAndChildrenResponseFilesItem
@@ -45,6 +46,8 @@ from .evaluator_activation_deactivation_request_deactivate_item import (
 from .evaluator_aggregate import EvaluatorAggregate
 from .evaluator_arguments_type import EvaluatorArgumentsType
 from .evaluator_config_response import EvaluatorConfigResponse
+from .evaluator_file_id import EvaluatorFileId
+from .evaluator_file_path import EvaluatorFilePath
 from .evaluator_judgment_number_limit import EvaluatorJudgmentNumberLimit
 from .evaluator_judgment_option_response import EvaluatorJudgmentOptionResponse
 from .evaluator_log_response import EvaluatorLogResponse
@@ -52,10 +55,14 @@ from .evaluator_log_response_judgment import EvaluatorLogResponseJudgment
 from .evaluator_response import EvaluatorResponse
 from .evaluator_response_spec import EvaluatorResponseSpec
 from .evaluator_return_type_enum import EvaluatorReturnTypeEnum
+from .evaluator_version_id import EvaluatorVersionId
+from .evaluators_request import EvaluatorsRequest
 from .external_evaluator_request import ExternalEvaluatorRequest
 from .feedback_type import FeedbackType
 from .file_environment_response import FileEnvironmentResponse
 from .file_environment_response_file import FileEnvironmentResponseFile
+from .file_id import FileId
+from .file_path import FilePath
 from .file_request import FileRequest
 from .file_type import FileType
 from .files_tool_type import FilesToolType
@@ -79,7 +86,6 @@ from .list_prompts import ListPrompts
 from .list_tools import ListTools
 from .llm_evaluator_request import LlmEvaluatorRequest
 from .log_response import LogResponse
-from .logs_association_type import LogsAssociationType
 from .model_endpoints import ModelEndpoints
 from .model_providers import ModelProviders
 from .monitoring_evaluator_environment_request import MonitoringEvaluatorEnvironmentRequest
@@ -146,10 +152,10 @@ from .validation_error import ValidationError
 from .validation_error_loc_item import ValidationErrorLocItem
 from .version_deployment_response import VersionDeploymentResponse
 from .version_deployment_response_file import VersionDeploymentResponseFile
+from .version_id import VersionId
 from .version_id_response import VersionIdResponse
 from .version_id_response_version import VersionIdResponseVersion
 from .version_reference_response import VersionReferenceResponse
-from .version_specification import VersionSpecification
 from .version_stats_response import VersionStatsResponse
 from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItem
 from .version_status import VersionStatus
@@ -176,6 +182,7 @@ __all__ = [
     "DatapointResponse",
     "DatapointResponseTargetValue",
     "DatasetResponse",
+    "DatasetsRequest",
     "DirectoryResponse",
     "DirectoryWithParentsAndChildrenResponse",
     "DirectoryWithParentsAndChildrenResponseFilesItem",
@@ -198,6 +205,8 @@ __all__ = [
     "EvaluatorAggregate",
     "EvaluatorArgumentsType",
     "EvaluatorConfigResponse",
+    "EvaluatorFileId",
+    "EvaluatorFilePath",
     "EvaluatorJudgmentNumberLimit",
     "EvaluatorJudgmentOptionResponse",
     "EvaluatorLogResponse",
@@ -205,10 +214,14 @@ __all__ = [
     "EvaluatorResponse",
     "EvaluatorResponseSpec",
     "EvaluatorReturnTypeEnum",
+    "EvaluatorVersionId",
+    "EvaluatorsRequest",
     "ExternalEvaluatorRequest",
     "FeedbackType",
     "FileEnvironmentResponse",
     "FileEnvironmentResponseFile",
+    "FileId",
+    "FilePath",
     "FileRequest",
     "FileType",
     "FilesToolType",
@@ -232,7 +245,6 @@ __all__ = [
     "ListTools",
     "LlmEvaluatorRequest",
     "LogResponse",
-    "LogsAssociationType",
     "ModelEndpoints",
     "ModelProviders",
     "MonitoringEvaluatorEnvironmentRequest",
@@ -295,10 +307,10 @@ __all__ = [
     "ValidationErrorLocItem",
     "VersionDeploymentResponse",
     "VersionDeploymentResponseFile",
+    "VersionId",
     "VersionIdResponse",
     "VersionIdResponseVersion",
     "VersionReferenceResponse",
-    "VersionSpecification",
     "VersionStatsResponse",
     "VersionStatsResponseEvaluatorVersionStatsItem",
     "VersionStatus",

@@ -122,6 +122,11 @@ class EvaluatorLogResponse(UncheckedBaseModel):
     Evaluator assessment of the Log.
     """
 
+    marked_completed: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Whether the Log has been manually marked as completed by a user.
+    """
+
     id: str = pydantic.Field()
     """
     Unique identifier for the Log.

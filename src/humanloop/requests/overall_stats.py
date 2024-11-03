@@ -18,3 +18,13 @@ class OverallStatsParams(typing_extensions.TypedDict):
     """
     The total number of Evaluator Logs in the Evaluation.
     """
+
+    total_human_evaluator_logs: int
+    """
+    The total number of human Evaluator Logs in the Evaluation Report.
+    """
+
+    total_completed_human_evaluator_logs: int
+    """
+    The total number of non-None human Evaluator Logs in the Evaluation Report.
+    """

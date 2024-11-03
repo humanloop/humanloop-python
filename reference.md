@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-18 23:29:35.178000+00:00",
+        "2024-07-19 00:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -5164,6 +5164,14 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**marked_completed:** `typing.Optional[bool]` — Whether the Log has been manually marked as completed by a user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **spec:** `typing.Optional[CreateEvaluatorLogRequestSpecParams]` 
     
 </dd>
@@ -5362,7 +5370,7 @@ client.evaluators.upsert(
 <dl>
 <dd>
 
-**spec:** `SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams` 
+**spec:** `EvaluatorRequestSpecParams` 
     
 </dd>
 </dl>
@@ -6225,10 +6233,10 @@ client.flows.log(
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
     trace_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 21:40:35+00:00",
+        "2024-07-08 22:40:35+00:00",
     ),
     end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 21:40:39+00:00",
+        "2024-07-08 22:40:39+00:00",
     ),
 )
 
@@ -8075,9 +8083,7 @@ client.files.list()
 <dl>
 <dd>
 
-List all Evaluations for the specified `file_id`.
-
-Retrieve a list of Evaluations that evaluate versions of the specified File.
+Retrieve a list of Evaluations for the specified File.
 </dd>
 </dl>
 </dd>
@@ -8171,9 +8177,8 @@ for page in response.iter_pages():
 
 Create an Evaluation.
 
-Create an Evaluation by specifying the File to evaluate, and a name
+Create a new Evaluation by specifying the File to evaluate, and a name
 for the Evaluation.
-
 You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs` endpoint.
 </dd>
 </dl>
@@ -8195,7 +8200,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluations.create(
-    evaluators=[{}],
+    evaluators=[{"version_id": "version_id"}],
 )
 
 ```
@@ -8212,7 +8217,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
+**evaluators:** `typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]` — The Evaluators used to evaluate.
     
 </dd>
 </dl>
@@ -8262,8 +8267,7 @@ client.evaluations.create(
 
 Add Evaluators to an Evaluation.
 
-Add new Evaluators to an Evaluation. The Evaluators will be run on the Logs
-generated for the Evaluation.
+The Evaluators will be run on the Logs generated for the Evaluation.
 </dd>
 </dl>
 </dd>
@@ -8285,7 +8289,7 @@ client = Humanloop(
 )
 client.evaluations.add_evaluators(
     id="id",
-    evaluators=[{}],
+    evaluators=[{"version_id": "version_id"}],
 )
 
 ```
@@ -8310,7 +8314,7 @@ client.evaluations.add_evaluators(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators to add to this Evaluation.
+**evaluators:** `typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]` — The Evaluators to add to this Evaluation.
     
 </dd>
 </dl>
@@ -8344,8 +8348,7 @@ client.evaluations.add_evaluators(
 
 Remove an Evaluator from an Evaluation.
 
-Remove an Evaluator from an Evaluation. The Evaluator will no longer be run on the Logs
-generated for the Evaluation.
+The Evaluator will no longer be run on the Logs in the Evaluation.
 </dd>
 </dl>
 </dd>
@@ -8425,6 +8428,12 @@ client.evaluations.remove_evaluator(
 <dd>
 
 Get an Evaluation.
+
+This includes the Evaluators associated with the Evaluation and metadata about the Evaluation,
+such as its name.
+
+To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
+To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
 </dd>
 </dl>
 </dd>
@@ -8496,8 +8505,7 @@ client.evaluations.get(
 
 Delete an Evaluation.
 
-Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
-will not be deleted.
+The Runs and Evaluators in the Evaluation will not be deleted.
 </dd>
 </dl>
 </dd>
@@ -8639,20 +8647,15 @@ client.evaluations.list_runs_for_evaluation(
 
 Create an Evaluation Run.
 
-Create a new Evaluation Run. Optionally specify the Dataset and version to be
-evaluated.
+Optionally specify the Dataset and version to be evaluated.
 
 Humanloop will automatically start generating Logs and running Evaluators where
 `orchestrated=true`. If you are generating Logs yourself, you can set `orchestrated=false`
 and then generate and submit the required Logs via the API.
 
-The `logs` parameter controls which Logs are associated with the Run. Defaults to `dynamic`
-if `dataset` and `version` are provided. This means that Logs will automatically be retrieved
-if they're associated with the specified Version and has `source_datapoint_id` referencing
-a datapoint in the specified Dataset.
-If `logs` is set to `fixed`, no existing Logs will be automatically associated with the Run.
-You can then add Logs to the Run using the `POST /evaluations/{id}/runs/{run_id}/logs` endpoint,
-or by adding `run_id` to your `POST /prompts/logs` requests.
+If `dataset` and `version` are provided, you can set `use_existing_logs=True` to reuse existing Logs,
+avoiding generating new Logs unnecessarily. Logs that are associated with the specified Version and have `source_datapoint_id`
+referencing a datapoint in the specified Dataset will be associated with the Run.
 
 To keep updated on the progress of the Run, you can poll the Run using
 the `GET /evaluations/{id}/runs` endpoint and check its status.
@@ -8701,7 +8704,7 @@ client.evaluations.create_run(
 <dl>
 <dd>
 
-**dataset:** `typing.Optional[EvaluationsDatasetRequestParams]` — Dataset to use in this Run.
+**dataset:** `typing.Optional[CreateRunRequestDatasetParams]` — Dataset to use in this Run.
     
 </dd>
 </dl>
@@ -8709,7 +8712,7 @@ client.evaluations.create_run(
 <dl>
 <dd>
 
-**version:** `typing.Optional[VersionSpecificationParams]` — Version to use in this Run.
+**version:** `typing.Optional[CreateRunRequestVersionParams]` — Version to use in this Run.
     
 </dd>
 </dl>
@@ -8725,7 +8728,7 @@ client.evaluations.create_run(
 <dl>
 <dd>
 
-**logs:** `typing.Optional[LogsAssociationType]` — How the Logs are associated with the Run. If `dynamic`, the latest relevant Logs will be inferred from the Dataset and Version. If `fixed`, the Logs will be explicitly associated. You can provide a list of Log IDs to associate with the Run, or add them to the Run later. Defaults to `dynamic` if `dataset` and `version` are provided; otherwise, defaults to `fixed`.
+**use_existing_logs:** `typing.Optional[bool]` — If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
     
 </dd>
 </dl>
@@ -8757,7 +8760,10 @@ client.evaluations.create_run(
 <dl>
 <dd>
 
-Add an existing Run to an Evaluation.
+Add an existing Run to the specified Evaluation.
+
+This is useful if you want to compare the Runs in this Evaluation with an existing Run
+that exists within another Evaluation.
 </dd>
 </dl>
 </dd>
@@ -8824,7 +8830,7 @@ client.evaluations.add_existing_run(
 </dl>
 </details>
 
-<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">remove_run_from_evaluation</a>(...)</code></summary>
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">remove_run</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -8838,7 +8844,7 @@ client.evaluations.add_existing_run(
 
 Remove a Run from an Evaluation.
 
-Remove a Run from an Evaluation. The Logs and Versions used in the Run will not be deleted.
+The Logs and Versions used in the Run will not be deleted.
 If this Run is used in any other Evaluations, it will still be available in those Evaluations.
 </dd>
 </dl>
@@ -8859,7 +8865,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.evaluations.remove_run_from_evaluation(
+client.evaluations.remove_run(
     id="id",
     run_id="run_id",
 )
@@ -8920,7 +8926,8 @@ client.evaluations.remove_run_from_evaluation(
 
 Update an Evaluation Run.
 
-Update the Dataset and version to be evaluated for an existing Run.
+Specify `control=true` to use this Run as the control Run for the Evaluation.
+You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
 </dd>
 </dl>
 </dd>
@@ -8943,7 +8950,6 @@ client = Humanloop(
 client.evaluations.update_evaluation_run(
     id="id",
     run_id="run_id",
-    control=True,
 )
 
 ```
@@ -8976,7 +8982,15 @@ client.evaluations.update_evaluation_run(
 <dl>
 <dd>
 
-**control:** `bool` — If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+**control:** `typing.Optional[bool]` — If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[EvaluationStatus]` — Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
     
 </dd>
 </dl>
@@ -9008,11 +9022,7 @@ client.evaluations.update_evaluation_run(
 <dl>
 <dd>
 
-Add Logs to an Evaluation Run.
-
-This is supported only for Runs that have a fixed set of Logs.
-(Runs can either have a fixed set of Logs, or can be set to dynamically retrieve the latest Logs
-if a Dataset and Version are provided.)
+Add the specified Logs to a Run.
 </dd>
 </dl>
 </dd>
@@ -9102,9 +9112,7 @@ client.evaluations.add_logs_to_run(
 
 Get Evaluation Stats.
 
-Retrieve aggregate stats for the specified Evaluation.
-
-This includes the number of generated Logs for each Run and the
+Retrieve aggregate stats for the specified Evaluation. This includes the number of generated Logs for each Run and the
 corresponding Evaluator statistics (such as the mean and percentiles).
 </dd>
 </dl>
@@ -9176,6 +9184,8 @@ client.evaluations.get_stats(
 <dd>
 
 Get the Logs associated to a specific Evaluation.
+
+This returns the Logs associated to all Runs within with the Evaluation.
 </dd>
 </dl>
 </dd>
@@ -9387,6 +9397,14 @@ for page in response.iter_pages():
 <dd>
 
 **in_trace_filter:** `typing.Optional[typing.Union[bool, typing.Sequence[bool]]]` — If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sample_n:** `typing.Optional[int]` — If provided, only a random sample of approximately N Logs will be returned.
     
 </dd>
 </dl>

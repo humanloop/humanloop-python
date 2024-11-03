@@ -18,9 +18,7 @@ from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.evaluator_response import EvaluatorResponse
 from ..types.paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
-from .requests.src_external_app_models_v_5_evaluators_evaluator_request_spec import (
-    SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
-)
+from .requests.evaluator_request_spec import EvaluatorRequestSpecParams
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.version_status import VersionStatus
 from ..types.list_evaluators import ListEvaluators
@@ -68,6 +66,7 @@ class EvaluatorsClient:
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
+        marked_completed: typing.Optional[bool] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateEvaluatorLogResponse:
@@ -147,6 +146,9 @@ class EvaluatorsClient:
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
 
+        marked_completed : typing.Optional[bool]
+            Whether the Log has been manually marked as completed by a user.
+
         spec : typing.Optional[CreateEvaluatorLogRequestSpecParams]
 
         request_options : typing.Optional[RequestOptions]
@@ -199,6 +201,7 @@ class EvaluatorsClient:
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
                 ),
+                "marked_completed": marked_completed,
                 "spec": convert_and_respect_annotation_metadata(
                     object_=spec, annotation=CreateEvaluatorLogRequestSpecParams, direction="write"
                 ),
@@ -341,7 +344,7 @@ class EvaluatorsClient:
     def upsert(
         self,
         *,
-        spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
+        spec: EvaluatorRequestSpecParams,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
@@ -358,7 +361,7 @@ class EvaluatorsClient:
 
         Parameters
         ----------
-        spec : SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams
+        spec : EvaluatorRequestSpecParams
 
         path : typing.Optional[str]
             Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
@@ -403,9 +406,7 @@ class EvaluatorsClient:
                 "id": id,
                 "commit_message": commit_message,
                 "spec": convert_and_respect_annotation_metadata(
-                    object_=spec,
-                    annotation=SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
-                    direction="write",
+                    object_=spec, annotation=EvaluatorRequestSpecParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -1092,6 +1093,7 @@ class AsyncEvaluatorsClient:
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
+        marked_completed: typing.Optional[bool] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateEvaluatorLogResponse:
@@ -1171,6 +1173,9 @@ class AsyncEvaluatorsClient:
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
 
+        marked_completed : typing.Optional[bool]
+            Whether the Log has been manually marked as completed by a user.
+
         spec : typing.Optional[CreateEvaluatorLogRequestSpecParams]
 
         request_options : typing.Optional[RequestOptions]
@@ -1231,6 +1236,7 @@ class AsyncEvaluatorsClient:
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
                 ),
+                "marked_completed": marked_completed,
                 "spec": convert_and_respect_annotation_metadata(
                     object_=spec, annotation=CreateEvaluatorLogRequestSpecParams, direction="write"
                 ),
@@ -1381,7 +1387,7 @@ class AsyncEvaluatorsClient:
     async def upsert(
         self,
         *,
-        spec: SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
+        spec: EvaluatorRequestSpecParams,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
@@ -1398,7 +1404,7 @@ class AsyncEvaluatorsClient:
 
         Parameters
         ----------
-        spec : SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams
+        spec : EvaluatorRequestSpecParams
 
         path : typing.Optional[str]
             Path of the Evaluator, including the name. This locates the Evaluator in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
@@ -1451,9 +1457,7 @@ class AsyncEvaluatorsClient:
                 "id": id,
                 "commit_message": commit_message,
                 "spec": convert_and_respect_annotation_metadata(
-                    object_=spec,
-                    annotation=SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
-                    direction="write",
+                    object_=spec, annotation=EvaluatorRequestSpecParams, direction="write"
                 ),
             },
             request_options=request_options,

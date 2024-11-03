@@ -22,6 +22,16 @@ class OverallStats(UncheckedBaseModel):
     The total number of Evaluator Logs in the Evaluation.
     """
 
+    total_human_evaluator_logs: int = pydantic.Field()
+    """
+    The total number of human Evaluator Logs in the Evaluation Report.
+    """
+
+    total_completed_human_evaluator_logs: int = pydantic.Field()
+    """
+    The total number of non-None human Evaluator Logs in the Evaluation Report.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

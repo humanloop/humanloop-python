@@ -4,6 +4,7 @@ from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
 import typing
 from .run_stats_response_evaluator_stats_item import RunStatsResponseEvaluatorStatsItem
+from .evaluation_status import EvaluationStatus
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -35,6 +36,11 @@ class RunStatsResponse(UncheckedBaseModel):
     evaluator_stats: typing.List[RunStatsResponseEvaluatorStatsItem] = pydantic.Field()
     """
     Stats for each Evaluator Version applied to this Run.
+    """
+
+    status: EvaluationStatus = pydantic.Field()
+    """
+    The current status of the Run.
     """
 
     if IS_PYDANTIC_V2:

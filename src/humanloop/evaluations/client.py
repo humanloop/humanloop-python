@@ -11,15 +11,16 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..requests.evaluations_request import EvaluationsRequestParams
+from .requests.create_evaluation_request_evaluators_item import CreateEvaluationRequestEvaluatorsItemParams
 from ..requests.file_request import FileRequestParams
 from ..core.serialization import convert_and_respect_annotation_metadata
+from .requests.add_evaluators_request_evaluators_item import AddEvaluatorsRequestEvaluatorsItemParams
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.evaluation_runs_response import EvaluationRunsResponse
-from ..requests.evaluations_dataset_request import EvaluationsDatasetRequestParams
-from ..requests.version_specification import VersionSpecificationParams
-from ..types.logs_association_type import LogsAssociationType
+from .requests.create_run_request_dataset import CreateRunRequestDatasetParams
+from .requests.create_run_request_version import CreateRunRequestVersionParams
 from ..types.evaluation_run_response import EvaluationRunResponse
+from ..types.evaluation_status import EvaluationStatus
 from ..types.evaluation_stats import EvaluationStats
 from ..types.paginated_data_evaluation_log_response import PaginatedDataEvaluationLogResponse
 from ..core.client_wrapper import AsyncClientWrapper
@@ -42,9 +43,7 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[EvaluationResponse]:
         """
-        List all Evaluations for the specified `file_id`.
-
-        Retrieve a list of Evaluations that evaluate versions of the specified File.
+        Retrieve a list of Evaluations for the specified File.
 
         Parameters
         ----------
@@ -129,7 +128,7 @@ class EvaluationsClient:
     def create(
         self,
         *,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluators: typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
         file: typing.Optional[FileRequestParams] = OMIT,
         name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -137,14 +136,13 @@ class EvaluationsClient:
         """
         Create an Evaluation.
 
-        Create an Evaluation by specifying the File to evaluate, and a name
+        Create a new Evaluation by specifying the File to evaluate, and a name
         for the Evaluation.
-
         You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs` endpoint.
 
         Parameters
         ----------
-        evaluators : typing.Sequence[EvaluationsRequestParams]
+        evaluators : typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]
             The Evaluators used to evaluate.
 
         file : typing.Optional[FileRequestParams]
@@ -169,7 +167,7 @@ class EvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         client.evaluations.create(
-            evaluators=[{}],
+            evaluators=[{"version_id": "version_id"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -181,7 +179,9 @@ class EvaluationsClient:
                 ),
                 "name": name,
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
+                    object_=evaluators,
+                    annotation=typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -215,21 +215,20 @@ class EvaluationsClient:
         self,
         id: str,
         *,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluators: typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
         Add Evaluators to an Evaluation.
 
-        Add new Evaluators to an Evaluation. The Evaluators will be run on the Logs
-        generated for the Evaluation.
+        The Evaluators will be run on the Logs generated for the Evaluation.
 
         Parameters
         ----------
         id : str
             Unique identifier for Evaluation.
 
-        evaluators : typing.Sequence[EvaluationsRequestParams]
+        evaluators : typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]
             The Evaluators to add to this Evaluation.
 
         request_options : typing.Optional[RequestOptions]
@@ -249,7 +248,7 @@ class EvaluationsClient:
         )
         client.evaluations.add_evaluators(
             id="id",
-            evaluators=[{}],
+            evaluators=[{"version_id": "version_id"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -257,7 +256,9 @@ class EvaluationsClient:
             method="POST",
             json={
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
+                    object_=evaluators,
+                    annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -293,8 +294,7 @@ class EvaluationsClient:
         """
         Remove an Evaluator from an Evaluation.
 
-        Remove an Evaluator from an Evaluation. The Evaluator will no longer be run on the Logs
-        generated for the Evaluation.
+        The Evaluator will no longer be run on the Logs in the Evaluation.
 
         Parameters
         ----------
@@ -357,6 +357,12 @@ class EvaluationsClient:
         """
         Get an Evaluation.
 
+        This includes the Evaluators associated with the Evaluation and metadata about the Evaluation,
+        such as its name.
+
+        To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
+        To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
+
         Parameters
         ----------
         id : str
@@ -414,8 +420,7 @@ class EvaluationsClient:
         """
         Delete an Evaluation.
 
-        Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
-        will not be deleted.
+        The Runs and Evaluators in the Evaluation will not be deleted.
 
         Parameters
         ----------
@@ -526,29 +531,24 @@ class EvaluationsClient:
         self,
         id: str,
         *,
-        dataset: typing.Optional[EvaluationsDatasetRequestParams] = OMIT,
-        version: typing.Optional[VersionSpecificationParams] = OMIT,
+        dataset: typing.Optional[CreateRunRequestDatasetParams] = OMIT,
+        version: typing.Optional[CreateRunRequestVersionParams] = OMIT,
         orchestrated: typing.Optional[bool] = OMIT,
-        logs: typing.Optional[LogsAssociationType] = OMIT,
+        use_existing_logs: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationRunResponse:
         """
         Create an Evaluation Run.
 
-        Create a new Evaluation Run. Optionally specify the Dataset and version to be
-        evaluated.
+        Optionally specify the Dataset and version to be evaluated.
 
         Humanloop will automatically start generating Logs and running Evaluators where
         `orchestrated=true`. If you are generating Logs yourself, you can set `orchestrated=false`
         and then generate and submit the required Logs via the API.
 
-        The `logs` parameter controls which Logs are associated with the Run. Defaults to `dynamic`
-        if `dataset` and `version` are provided. This means that Logs will automatically be retrieved
-        if they're associated with the specified Version and has `source_datapoint_id` referencing
-        a datapoint in the specified Dataset.
-        If `logs` is set to `fixed`, no existing Logs will be automatically associated with the Run.
-        You can then add Logs to the Run using the `POST /evaluations/{id}/runs/{run_id}/logs` endpoint,
-        or by adding `run_id` to your `POST /prompts/logs` requests.
+        If `dataset` and `version` are provided, you can set `use_existing_logs=True` to reuse existing Logs,
+        avoiding generating new Logs unnecessarily. Logs that are associated with the specified Version and have `source_datapoint_id`
+        referencing a datapoint in the specified Dataset will be associated with the Run.
 
         To keep updated on the progress of the Run, you can poll the Run using
         the `GET /evaluations/{id}/runs` endpoint and check its status.
@@ -558,17 +558,17 @@ class EvaluationsClient:
         id : str
             Unique identifier for Evaluation.
 
-        dataset : typing.Optional[EvaluationsDatasetRequestParams]
+        dataset : typing.Optional[CreateRunRequestDatasetParams]
             Dataset to use in this Run.
 
-        version : typing.Optional[VersionSpecificationParams]
+        version : typing.Optional[CreateRunRequestVersionParams]
             Version to use in this Run.
 
         orchestrated : typing.Optional[bool]
             Whether the Run is orchestrated by Humanloop. If `True`, Humanloop will generate Logs for the Run; `dataset` and `version` must be provided. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
 
-        logs : typing.Optional[LogsAssociationType]
-            How the Logs are associated with the Run. If `dynamic`, the latest relevant Logs will be inferred from the Dataset and Version. If `fixed`, the Logs will be explicitly associated. You can provide a list of Log IDs to associate with the Run, or add them to the Run later. Defaults to `dynamic` if `dataset` and `version` are provided; otherwise, defaults to `fixed`.
+        use_existing_logs : typing.Optional[bool]
+            If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -594,13 +594,13 @@ class EvaluationsClient:
             method="POST",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
+                    object_=dataset, annotation=CreateRunRequestDatasetParams, direction="write"
                 ),
                 "version": convert_and_respect_annotation_metadata(
-                    object_=version, annotation=VersionSpecificationParams, direction="write"
+                    object_=version, annotation=CreateRunRequestVersionParams, direction="write"
                 ),
                 "orchestrated": orchestrated,
-                "logs": logs,
+                "use_existing_logs": use_existing_logs,
             },
             request_options=request_options,
             omit=OMIT,
@@ -633,7 +633,10 @@ class EvaluationsClient:
         self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.Optional[typing.Any]:
         """
-        Add an existing Run to an Evaluation.
+        Add an existing Run to the specified Evaluation.
+
+        This is useful if you want to compare the Runs in this Evaluation with an existing Run
+        that exists within another Evaluation.
 
         Parameters
         ----------
@@ -692,13 +695,11 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def remove_run_from_evaluation(
-        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    def remove_run(self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
         Remove a Run from an Evaluation.
 
-        Remove a Run from an Evaluation. The Logs and Versions used in the Run will not be deleted.
+        The Logs and Versions used in the Run will not be deleted.
         If this Run is used in any other Evaluations, it will still be available in those Evaluations.
 
         Parameters
@@ -723,7 +724,7 @@ class EvaluationsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluations.remove_run_from_evaluation(
+        client.evaluations.remove_run(
             id="id",
             run_id="run_id",
         )
@@ -752,12 +753,19 @@ class EvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_evaluation_run(
-        self, id: str, run_id: str, *, control: bool, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        run_id: str,
+        *,
+        control: typing.Optional[bool] = OMIT,
+        status: typing.Optional[EvaluationStatus] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationRunResponse:
         """
         Update an Evaluation Run.
 
-        Update the Dataset and version to be evaluated for an existing Run.
+        Specify `control=true` to use this Run as the control Run for the Evaluation.
+        You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
 
         Parameters
         ----------
@@ -767,8 +775,11 @@ class EvaluationsClient:
         run_id : str
             Unique identifier for Run.
 
-        control : bool
+        control : typing.Optional[bool]
             If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+
+        status : typing.Optional[EvaluationStatus]
+            Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -788,7 +799,6 @@ class EvaluationsClient:
         client.evaluations.update_evaluation_run(
             id="id",
             run_id="run_id",
-            control=True,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -796,6 +806,7 @@ class EvaluationsClient:
             method="PATCH",
             json={
                 "control": control,
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
@@ -833,11 +844,7 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationRunResponse:
         """
-        Add Logs to an Evaluation Run.
-
-        This is supported only for Runs that have a fixed set of Logs.
-        (Runs can either have a fixed set of Logs, or can be set to dynamically retrieve the latest Logs
-        if a Dataset and Version are provided.)
+        Add the specified Logs to a Run.
 
         Parameters
         ----------
@@ -908,9 +915,7 @@ class EvaluationsClient:
         """
         Get Evaluation Stats.
 
-        Retrieve aggregate stats for the specified Evaluation.
-
-        This includes the number of generated Logs for each Run and the
+        Retrieve aggregate stats for the specified Evaluation. This includes the number of generated Logs for each Run and the
         corresponding Evaluator statistics (such as the mean and percentiles).
 
         Parameters
@@ -976,6 +981,8 @@ class EvaluationsClient:
     ) -> PaginatedDataEvaluationLogResponse:
         """
         Get the Logs associated to a specific Evaluation.
+
+        This returns the Logs associated to all Runs within with the Evaluation.
 
         Parameters
         ----------
@@ -1054,9 +1061,7 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[EvaluationResponse]:
         """
-        List all Evaluations for the specified `file_id`.
-
-        Retrieve a list of Evaluations that evaluate versions of the specified File.
+        Retrieve a list of Evaluations for the specified File.
 
         Parameters
         ----------
@@ -1149,7 +1154,7 @@ class AsyncEvaluationsClient:
     async def create(
         self,
         *,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluators: typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
         file: typing.Optional[FileRequestParams] = OMIT,
         name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1157,14 +1162,13 @@ class AsyncEvaluationsClient:
         """
         Create an Evaluation.
 
-        Create an Evaluation by specifying the File to evaluate, and a name
+        Create a new Evaluation by specifying the File to evaluate, and a name
         for the Evaluation.
-
         You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs` endpoint.
 
         Parameters
         ----------
-        evaluators : typing.Sequence[EvaluationsRequestParams]
+        evaluators : typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]
             The Evaluators used to evaluate.
 
         file : typing.Optional[FileRequestParams]
@@ -1194,7 +1198,7 @@ class AsyncEvaluationsClient:
 
         async def main() -> None:
             await client.evaluations.create(
-                evaluators=[{}],
+                evaluators=[{"version_id": "version_id"}],
             )
 
 
@@ -1209,7 +1213,9 @@ class AsyncEvaluationsClient:
                 ),
                 "name": name,
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
+                    object_=evaluators,
+                    annotation=typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -1243,21 +1249,20 @@ class AsyncEvaluationsClient:
         self,
         id: str,
         *,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
+        evaluators: typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
         Add Evaluators to an Evaluation.
 
-        Add new Evaluators to an Evaluation. The Evaluators will be run on the Logs
-        generated for the Evaluation.
+        The Evaluators will be run on the Logs generated for the Evaluation.
 
         Parameters
         ----------
         id : str
             Unique identifier for Evaluation.
 
-        evaluators : typing.Sequence[EvaluationsRequestParams]
+        evaluators : typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]
             The Evaluators to add to this Evaluation.
 
         request_options : typing.Optional[RequestOptions]
@@ -1282,7 +1287,7 @@ class AsyncEvaluationsClient:
         async def main() -> None:
             await client.evaluations.add_evaluators(
                 id="id",
-                evaluators=[{}],
+                evaluators=[{"version_id": "version_id"}],
             )
 
 
@@ -1293,7 +1298,9 @@ class AsyncEvaluationsClient:
             method="POST",
             json={
                 "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
+                    object_=evaluators,
+                    annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -1329,8 +1336,7 @@ class AsyncEvaluationsClient:
         """
         Remove an Evaluator from an Evaluation.
 
-        Remove an Evaluator from an Evaluation. The Evaluator will no longer be run on the Logs
-        generated for the Evaluation.
+        The Evaluator will no longer be run on the Logs in the Evaluation.
 
         Parameters
         ----------
@@ -1401,6 +1407,12 @@ class AsyncEvaluationsClient:
         """
         Get an Evaluation.
 
+        This includes the Evaluators associated with the Evaluation and metadata about the Evaluation,
+        such as its name.
+
+        To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
+        To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
+
         Parameters
         ----------
         id : str
@@ -1466,8 +1478,7 @@ class AsyncEvaluationsClient:
         """
         Delete an Evaluation.
 
-        Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
-        will not be deleted.
+        The Runs and Evaluators in the Evaluation will not be deleted.
 
         Parameters
         ----------
@@ -1594,29 +1605,24 @@ class AsyncEvaluationsClient:
         self,
         id: str,
         *,
-        dataset: typing.Optional[EvaluationsDatasetRequestParams] = OMIT,
-        version: typing.Optional[VersionSpecificationParams] = OMIT,
+        dataset: typing.Optional[CreateRunRequestDatasetParams] = OMIT,
+        version: typing.Optional[CreateRunRequestVersionParams] = OMIT,
         orchestrated: typing.Optional[bool] = OMIT,
-        logs: typing.Optional[LogsAssociationType] = OMIT,
+        use_existing_logs: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationRunResponse:
         """
         Create an Evaluation Run.
 
-        Create a new Evaluation Run. Optionally specify the Dataset and version to be
-        evaluated.
+        Optionally specify the Dataset and version to be evaluated.
 
         Humanloop will automatically start generating Logs and running Evaluators where
         `orchestrated=true`. If you are generating Logs yourself, you can set `orchestrated=false`
         and then generate and submit the required Logs via the API.
 
-        The `logs` parameter controls which Logs are associated with the Run. Defaults to `dynamic`
-        if `dataset` and `version` are provided. This means that Logs will automatically be retrieved
-        if they're associated with the specified Version and has `source_datapoint_id` referencing
-        a datapoint in the specified Dataset.
-        If `logs` is set to `fixed`, no existing Logs will be automatically associated with the Run.
-        You can then add Logs to the Run using the `POST /evaluations/{id}/runs/{run_id}/logs` endpoint,
-        or by adding `run_id` to your `POST /prompts/logs` requests.
+        If `dataset` and `version` are provided, you can set `use_existing_logs=True` to reuse existing Logs,
+        avoiding generating new Logs unnecessarily. Logs that are associated with the specified Version and have `source_datapoint_id`
+        referencing a datapoint in the specified Dataset will be associated with the Run.
 
         To keep updated on the progress of the Run, you can poll the Run using
         the `GET /evaluations/{id}/runs` endpoint and check its status.
@@ -1626,17 +1632,17 @@ class AsyncEvaluationsClient:
         id : str
             Unique identifier for Evaluation.
 
-        dataset : typing.Optional[EvaluationsDatasetRequestParams]
+        dataset : typing.Optional[CreateRunRequestDatasetParams]
             Dataset to use in this Run.
 
-        version : typing.Optional[VersionSpecificationParams]
+        version : typing.Optional[CreateRunRequestVersionParams]
             Version to use in this Run.
 
         orchestrated : typing.Optional[bool]
             Whether the Run is orchestrated by Humanloop. If `True`, Humanloop will generate Logs for the Run; `dataset` and `version` must be provided. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
 
-        logs : typing.Optional[LogsAssociationType]
-            How the Logs are associated with the Run. If `dynamic`, the latest relevant Logs will be inferred from the Dataset and Version. If `fixed`, the Logs will be explicitly associated. You can provide a list of Log IDs to associate with the Run, or add them to the Run later. Defaults to `dynamic` if `dataset` and `version` are provided; otherwise, defaults to `fixed`.
+        use_existing_logs : typing.Optional[bool]
+            If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1670,13 +1676,13 @@ class AsyncEvaluationsClient:
             method="POST",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
+                    object_=dataset, annotation=CreateRunRequestDatasetParams, direction="write"
                 ),
                 "version": convert_and_respect_annotation_metadata(
-                    object_=version, annotation=VersionSpecificationParams, direction="write"
+                    object_=version, annotation=CreateRunRequestVersionParams, direction="write"
                 ),
                 "orchestrated": orchestrated,
-                "logs": logs,
+                "use_existing_logs": use_existing_logs,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1709,7 +1715,10 @@ class AsyncEvaluationsClient:
         self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.Optional[typing.Any]:
         """
-        Add an existing Run to an Evaluation.
+        Add an existing Run to the specified Evaluation.
+
+        This is useful if you want to compare the Runs in this Evaluation with an existing Run
+        that exists within another Evaluation.
 
         Parameters
         ----------
@@ -1776,13 +1785,13 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def remove_run_from_evaluation(
+    async def remove_run(
         self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
         Remove a Run from an Evaluation.
 
-        Remove a Run from an Evaluation. The Logs and Versions used in the Run will not be deleted.
+        The Logs and Versions used in the Run will not be deleted.
         If this Run is used in any other Evaluations, it will still be available in those Evaluations.
 
         Parameters
@@ -1812,7 +1821,7 @@ class AsyncEvaluationsClient:
 
 
         async def main() -> None:
-            await client.evaluations.remove_run_from_evaluation(
+            await client.evaluations.remove_run(
                 id="id",
                 run_id="run_id",
             )
@@ -1844,12 +1853,19 @@ class AsyncEvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_evaluation_run(
-        self, id: str, run_id: str, *, control: bool, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        run_id: str,
+        *,
+        control: typing.Optional[bool] = OMIT,
+        status: typing.Optional[EvaluationStatus] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationRunResponse:
         """
         Update an Evaluation Run.
 
-        Update the Dataset and version to be evaluated for an existing Run.
+        Specify `control=true` to use this Run as the control Run for the Evaluation.
+        You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
 
         Parameters
         ----------
@@ -1859,8 +1875,11 @@ class AsyncEvaluationsClient:
         run_id : str
             Unique identifier for Run.
 
-        control : bool
+        control : typing.Optional[bool]
             If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+
+        status : typing.Optional[EvaluationStatus]
+            Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1885,7 +1904,6 @@ class AsyncEvaluationsClient:
             await client.evaluations.update_evaluation_run(
                 id="id",
                 run_id="run_id",
-                control=True,
             )
 
 
@@ -1896,6 +1914,7 @@ class AsyncEvaluationsClient:
             method="PATCH",
             json={
                 "control": control,
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1933,11 +1952,7 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationRunResponse:
         """
-        Add Logs to an Evaluation Run.
-
-        This is supported only for Runs that have a fixed set of Logs.
-        (Runs can either have a fixed set of Logs, or can be set to dynamically retrieve the latest Logs
-        if a Dataset and Version are provided.)
+        Add the specified Logs to a Run.
 
         Parameters
         ----------
@@ -2016,9 +2031,7 @@ class AsyncEvaluationsClient:
         """
         Get Evaluation Stats.
 
-        Retrieve aggregate stats for the specified Evaluation.
-
-        This includes the number of generated Logs for each Run and the
+        Retrieve aggregate stats for the specified Evaluation. This includes the number of generated Logs for each Run and the
         corresponding Evaluator statistics (such as the mean and percentiles).
 
         Parameters
@@ -2092,6 +2105,8 @@ class AsyncEvaluationsClient:
     ) -> PaginatedDataEvaluationLogResponse:
         """
         Get the Logs associated to a specific Evaluation.
+
+        This returns the Logs associated to all Runs within with the Evaluation.
 
         Parameters
         ----------
