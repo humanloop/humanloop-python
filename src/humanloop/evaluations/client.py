@@ -30,6 +30,7 @@ from ..requests.evaluations_dataset_request import EvaluationsDatasetRequestPara
 from ..requests.version_specification import VersionSpecificationParams
 from ..types.logs_association_type import LogsAssociationType
 from ..types.evaluation_run_response import EvaluationRunResponse
+from ..types.evaluation_status import EvaluationStatus
 from ..types.evaluation_stats import EvaluationStats
 from ..types.paginated_data_evaluation_log_response import (
     PaginatedDataEvaluationLogResponse,
@@ -191,9 +192,7 @@ class EvaluationsClient:
                 "name": name,
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators,
-                    annotation=typing.Sequence[
-                        CreateEvaluationRequestEvaluatorsItemParams
-                    ],
+                    annotation=typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
                     direction="write",
                 ),
             },
@@ -270,9 +269,7 @@ class EvaluationsClient:
             json={
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators,
-                    annotation=typing.Sequence[
-                        AddEvaluatorsRequestEvaluatorsItemParams
-                    ],
+                    annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
                     direction="write",
                 ),
             },
@@ -372,9 +369,7 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluationResponse:
+    def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationResponse:
         """
         Get an Evaluation.
 
@@ -437,9 +432,7 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
         Delete an Evaluation.
 
@@ -948,9 +941,7 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_stats(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluationStats:
+    def get_stats(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationStats:
         """
         Get Evaluation Stats.
 
@@ -1253,9 +1244,7 @@ class AsyncEvaluationsClient:
                 "name": name,
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators,
-                    annotation=typing.Sequence[
-                        CreateEvaluationRequestEvaluatorsItemParams
-                    ],
+                    annotation=typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
                     direction="write",
                 ),
             },
@@ -1340,9 +1329,7 @@ class AsyncEvaluationsClient:
             json={
                 "evaluators": convert_and_respect_annotation_metadata(
                     object_=evaluators,
-                    annotation=typing.Sequence[
-                        AddEvaluatorsRequestEvaluatorsItemParams
-                    ],
+                    annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
                     direction="write",
                 ),
             },
@@ -1450,9 +1437,7 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluationResponse:
+    async def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationResponse:
         """
         Get an Evaluation.
 
@@ -1523,9 +1508,7 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
         Delete an Evaluation.
 
@@ -2090,9 +2073,7 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_stats(
-        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluationStats:
+    async def get_stats(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationStats:
         """
         Get Evaluation Stats.
 

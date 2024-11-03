@@ -59,7 +59,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-18 23:29:35.178000+00:00",
+        "2024-07-19 00:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -5216,6 +5216,11 @@ client.evaluators.log(
 <dd>
 
 **marked_completed:** `typing.Optional[bool]` — Whether the Log has been manually marked as completed by a user.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -5223,7 +5228,13 @@ client.evaluators.log(
 <dl>
 <dd>
 
+<<<<<<< HEAD
 **spec:** `typing.Optional[CreateEvaluatorLogRequestSpecParams]`
+
+=======
+**spec:** `typing.Optional[CreateEvaluatorLogRequestSpecParams]`
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -5423,7 +5434,13 @@ client.evaluators.upsert(
 <dl>
 <dd>
 
+<<<<<<< HEAD
 **spec:** `EvaluatorRequestSpecParams`
+
+=======
+**spec:** `EvaluatorRequestSpecParams`
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -6296,10 +6313,10 @@ client.flows.log(
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
     trace_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 21:40:35+00:00",
+        "2024-07-08 22:40:35+00:00",
     ),
     end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 21:40:39+00:00",
+        "2024-07-08 22:40:39+00:00",
     ),
 )
 
@@ -8168,6 +8185,11 @@ client.files.list()
 <dd>
 
 Retrieve a list of Evaluations for the specified File.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8305,6 +8327,11 @@ client.evaluations.create(
 <dd>
 
 **evaluators:** `typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]` — The Evaluators used to evaluate.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8354,6 +8381,11 @@ client.evaluations.create(
 Add Evaluators to an Evaluation.
 
 The Evaluators will be run on the Logs generated for the Evaluation.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8403,6 +8435,11 @@ client.evaluations.add_evaluators(
 <dd>
 
 **evaluators:** `typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]` — The Evaluators to add to this Evaluation.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8436,6 +8473,11 @@ client.evaluations.add_evaluators(
 Remove an Evaluator from an Evaluation.
 
 The Evaluator will no longer be run on the Logs in the Evaluation.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8522,6 +8564,11 @@ such as its name.
 
 To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
 To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8595,6 +8642,11 @@ client.evaluations.get(
 Delete an Evaluation.
 
 The Runs and Evaluators in the Evaluation will not be deleted.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8798,6 +8850,11 @@ client.evaluations.create_run(
 <dd>
 
 **dataset:** `typing.Optional[CreateRunRequestDatasetParams]` — Dataset to use in this Run.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8806,6 +8863,11 @@ client.evaluations.create_run(
 <dd>
 
 **version:** `typing.Optional[CreateRunRequestVersionParams]` — Version to use in this Run.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8822,6 +8884,11 @@ client.evaluations.create_run(
 <dd>
 
 **use_existing_logs:** `typing.Optional[bool]` — If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -8856,6 +8923,11 @@ Add an existing Run to the specified Evaluation.
 
 This is useful if you want to compare the Runs in this Evaluation with an existing Run
 that exists within another Evaluation.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -9022,6 +9094,11 @@ Update an Evaluation Run.
 
 Specify `control=true` to use this Run as the control Run for the Evaluation.
 You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -9079,6 +9156,11 @@ client.evaluations.update_evaluation_run(
 <dd>
 
 **control:** `typing.Optional[bool]` — If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -9087,6 +9169,11 @@ client.evaluations.update_evaluation_run(
 <dd>
 
 **status:** `typing.Optional[EvaluationStatus]` — Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -9118,6 +9205,11 @@ client.evaluations.update_evaluation_run(
 <dd>
 
 Add the specified Logs to a Run.
+<<<<<<< HEAD
+
+=======
+
+> > > > > > > 32f482a (Release 0.8.9a1)
 
 </dd>
 </dl>
@@ -9498,6 +9590,14 @@ for page in response.iter_pages():
 <dd>
 
 **in_trace_filter:** `typing.Optional[typing.Union[bool, typing.Sequence[bool]]]` — If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sample_n:** `typing.Optional[int]` — If provided, only a random sample of approximately N Logs will be returned.
 
 </dd>
 </dl>
