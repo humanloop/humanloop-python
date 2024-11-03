@@ -6,4 +6,4 @@ from .tool_response import ToolResponse
 from .evaluator_response import EvaluatorResponse
 from .flow_response import FlowResponse
 
-EvaluatedVersionResponse = typing.Union[PromptResponse, ToolResponse, EvaluatorResponse, FlowResponse]
+RunVersionResponse = typing.Union[PromptResponse, ToolResponse, EvaluatorResponse, FlowResponse]

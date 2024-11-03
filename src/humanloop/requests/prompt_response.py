@@ -159,6 +159,16 @@ class PromptResponseParams(typing_extensions.TypedDict):
     The user who created the Prompt.
     """
 
+    committed_by: typing_extensions.NotRequired[UserResponse]
+    """
+    The user who committed the Prompt Version.
+    """
+
+    committed_at: typing_extensions.NotRequired[dt.datetime]
+    """
+    The date and time the Prompt Version was committed.
+    """
+
     status: VersionStatus
     """
     The status of the Prompt Version.

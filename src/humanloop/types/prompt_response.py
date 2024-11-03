@@ -157,6 +157,16 @@ class PromptResponse(UncheckedBaseModel):
     The user who created the Prompt.
     """
 
+    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
+    """
+    The user who committed the Prompt Version.
+    """
+
+    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    The date and time the Prompt Version was committed.
+    """
+
     status: VersionStatus = pydantic.Field()
     """
     The status of the Prompt Version.

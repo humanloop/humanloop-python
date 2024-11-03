@@ -9,8 +9,8 @@ from .prompt_response import PromptResponse
 from .tool_response import ToolResponse
 from .version_deployment_response import VersionDeploymentResponse
 from .version_id_response import VersionIdResponse
-from .evaluated_version_response import EvaluatedVersionResponse
 import typing
+from .run_version_response import RunVersionResponse
 import pydantic
 import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -22,10 +22,10 @@ class EvaluateeResponse(UncheckedBaseModel):
     Version of the Evaluatee being evaluated.
     """
 
-    version: EvaluatedVersionResponse
+    version: typing.Optional[RunVersionResponse] = None
     batch_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Unique identifier for the batch of Logs to include in the Evaluation Report.
+    Unique identifier for the batch of Logs to include in the Evaluation.
     """
 
     orchestrated: bool = pydantic.Field()

@@ -56,6 +56,16 @@ class DatasetResponseParams(typing_extensions.TypedDict):
     The user who created the Dataset.
     """
 
+    committed_by: typing_extensions.NotRequired[UserResponse]
+    """
+    The user who committed the Dataset Version.
+    """
+
+    committed_at: typing_extensions.NotRequired[dt.datetime]
+    """
+    The date and time the Dataset Version was committed.
+    """
+
     status: VersionStatus
     """
     The status of the Dataset Version.

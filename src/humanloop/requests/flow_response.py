@@ -68,6 +68,16 @@ class FlowResponseParams(typing_extensions.TypedDict):
     The user who created the Flow.
     """
 
+    committed_by: typing_extensions.NotRequired[UserResponse]
+    """
+    The user who committed the Flow Version.
+    """
+
+    committed_at: typing_extensions.NotRequired[dt.datetime]
+    """
+    The date and time the Flow Version was committed.
+    """
+
     status: VersionStatus
     """
     The status of the Flow Version.

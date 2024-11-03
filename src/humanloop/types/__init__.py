@@ -26,12 +26,13 @@ from .directory_with_parents_and_children_response import DirectoryWithParentsAn
 from .directory_with_parents_and_children_response_files_item import DirectoryWithParentsAndChildrenResponseFilesItem
 from .environment_response import EnvironmentResponse
 from .environment_tag import EnvironmentTag
-from .evaluated_version_response import EvaluatedVersionResponse
 from .evaluatee_request import EvaluateeRequest
 from .evaluatee_response import EvaluateeResponse
 from .evaluation_evaluator_response import EvaluationEvaluatorResponse
-from .evaluation_report_log_response import EvaluationReportLogResponse
+from .evaluation_log_response import EvaluationLogResponse
 from .evaluation_response import EvaluationResponse
+from .evaluation_run_response import EvaluationRunResponse
+from .evaluation_runs_response import EvaluationRunsResponse
 from .evaluation_stats import EvaluationStats
 from .evaluation_status import EvaluationStatus
 from .evaluations_dataset_request import EvaluationsDatasetRequest
@@ -78,6 +79,7 @@ from .list_prompts import ListPrompts
 from .list_tools import ListTools
 from .llm_evaluator_request import LlmEvaluatorRequest
 from .log_response import LogResponse
+from .logs_association_type import LogsAssociationType
 from .model_endpoints import ModelEndpoints
 from .model_providers import ModelProviders
 from .monitoring_evaluator_environment_request import MonitoringEvaluatorEnvironmentRequest
@@ -87,7 +89,7 @@ from .monitoring_evaluator_version_request import MonitoringEvaluatorVersionRequ
 from .numeric_evaluator_stats_response import NumericEvaluatorStatsResponse
 from .observability_status import ObservabilityStatus
 from .overall_stats import OverallStats
-from .paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
+from .paginated_data_evaluation_log_response import PaginatedDataEvaluationLogResponse
 from .paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
 from .paginated_data_flow_response import PaginatedDataFlowResponse
 from .paginated_data_log_response import PaginatedDataLogResponse
@@ -121,6 +123,9 @@ from .prompt_response_template import PromptResponseTemplate
 from .provider_api_keys import ProviderApiKeys
 from .response_format import ResponseFormat
 from .response_format_type import ResponseFormatType
+from .run_stats_response import RunStatsResponse
+from .run_stats_response_evaluator_stats_item import RunStatsResponseEvaluatorStatsItem
+from .run_version_response import RunVersionResponse
 from .select_evaluator_stats_response import SelectEvaluatorStatsResponse
 from .sort_order import SortOrder
 from .text_chat_content import TextChatContent
@@ -144,6 +149,7 @@ from .version_deployment_response_file import VersionDeploymentResponseFile
 from .version_id_response import VersionIdResponse
 from .version_id_response_version import VersionIdResponseVersion
 from .version_reference_response import VersionReferenceResponse
+from .version_specification import VersionSpecification
 from .version_stats_response import VersionStatsResponse
 from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItem
 from .version_status import VersionStatus
@@ -175,12 +181,13 @@ __all__ = [
     "DirectoryWithParentsAndChildrenResponseFilesItem",
     "EnvironmentResponse",
     "EnvironmentTag",
-    "EvaluatedVersionResponse",
     "EvaluateeRequest",
     "EvaluateeResponse",
     "EvaluationEvaluatorResponse",
-    "EvaluationReportLogResponse",
+    "EvaluationLogResponse",
     "EvaluationResponse",
+    "EvaluationRunResponse",
+    "EvaluationRunsResponse",
     "EvaluationStats",
     "EvaluationStatus",
     "EvaluationsDatasetRequest",
@@ -225,6 +232,7 @@ __all__ = [
     "ListTools",
     "LlmEvaluatorRequest",
     "LogResponse",
+    "LogsAssociationType",
     "ModelEndpoints",
     "ModelProviders",
     "MonitoringEvaluatorEnvironmentRequest",
@@ -234,7 +242,7 @@ __all__ = [
     "NumericEvaluatorStatsResponse",
     "ObservabilityStatus",
     "OverallStats",
-    "PaginatedDataEvaluationReportLogResponse",
+    "PaginatedDataEvaluationLogResponse",
     "PaginatedDataEvaluatorResponse",
     "PaginatedDataFlowResponse",
     "PaginatedDataLogResponse",
@@ -264,6 +272,9 @@ __all__ = [
     "ProviderApiKeys",
     "ResponseFormat",
     "ResponseFormatType",
+    "RunStatsResponse",
+    "RunStatsResponseEvaluatorStatsItem",
+    "RunVersionResponse",
     "SelectEvaluatorStatsResponse",
     "SortOrder",
     "TextChatContent",
@@ -287,6 +298,7 @@ __all__ = [
     "VersionIdResponse",
     "VersionIdResponseVersion",
     "VersionReferenceResponse",
+    "VersionSpecification",
     "VersionStatsResponse",
     "VersionStatsResponseEvaluatorVersionStatsItem",
     "VersionStatus",

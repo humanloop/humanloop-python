@@ -4,7 +4,7 @@ import typing_extensions
 import typing_extensions
 
 
-class EvaluateeRequestParams(typing_extensions.TypedDict):
+class VersionSpecificationParams(typing_extensions.TypedDict):
     """
     Specification of a File version on Humanloop.
 
@@ -34,14 +34,4 @@ class EvaluateeRequestParams(typing_extensions.TypedDict):
     environment: typing_extensions.NotRequired[str]
     """
     Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
-    """
-
-    batch_id: typing_extensions.NotRequired[str]
-    """
-    Unique identifier for the batch of Logs to include in the Evaluation.
-    """
-
-    orchestrated: typing_extensions.NotRequired[bool]
-    """
-    Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
     """

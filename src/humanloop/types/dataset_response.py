@@ -57,6 +57,16 @@ class DatasetResponse(UncheckedBaseModel):
     The user who created the Dataset.
     """
 
+    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
+    """
+    The user who committed the Dataset Version.
+    """
+
+    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    The date and time the Dataset Version was committed.
+    """
+
     status: VersionStatus = pydantic.Field()
     """
     The status of the Dataset Version.

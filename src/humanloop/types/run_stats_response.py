@@ -3,12 +3,21 @@
 from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
 import typing
-from .version_stats_response_evaluator_version_stats_item import VersionStatsResponseEvaluatorVersionStatsItem
+from .run_stats_response_evaluator_stats_item import RunStatsResponseEvaluatorStatsItem
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class VersionStatsResponse(UncheckedBaseModel):
-    version_id: str = pydantic.Field()
+class RunStatsResponse(UncheckedBaseModel):
+    """
+    Stats for a Run in the Evaluation.
+    """
+
+    run_id: str = pydantic.Field()
+    """
+    Unique identifier for the Run.
+    """
+
+    version_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     Unique identifier for the evaluated Version.
     """
@@ -23,7 +32,7 @@ class VersionStatsResponse(UncheckedBaseModel):
     The total number of existing Logs in this Run.
     """
 
-    evaluator_version_stats: typing.List[VersionStatsResponseEvaluatorVersionStatsItem] = pydantic.Field()
+    evaluator_stats: typing.List[RunStatsResponseEvaluatorStatsItem] = pydantic.Field()
     """
     Stats for each Evaluator Version applied to this Run.
     """
