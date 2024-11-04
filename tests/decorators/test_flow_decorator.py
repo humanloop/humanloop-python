@@ -4,11 +4,11 @@ import string
 import time
 from unittest.mock import patch
 
-import pytest
 from humanloop.decorators.flow import flow
 from humanloop.decorators.prompt import prompt
 from humanloop.decorators.tool import tool
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_TRACE_METADATA_KEY
+from humanloop.otel import TRACE_FLOW_CONTEXT
+from humanloop.otel.constants import HL_FILE_OT_KEY
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from openai import OpenAI
@@ -100,8 +100,7 @@ def test_decorators_without_flow(
     )["prompt"]
     for span in spans:
         # THEN no metadata related to trace is present on either of them
-        with pytest.raises(KeyError):
-            read_from_opentelemetry_span(span=span, key=HL_TRACE_METADATA_KEY)
+        assert TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id) is None
 
 
 def test_decorators_with_flow_decorator(
@@ -136,9 +135,9 @@ def test_decorators_with_flow_decorator(
     assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_OT_KEY)["tool"]
     assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_OT_KEY)["prompt"]
     assert read_from_opentelemetry_span(span=spans[3], key=HL_FILE_OT_KEY)["flow"]
-    tool_trace_metadata = read_from_opentelemetry_span(span=spans[1], key=HL_TRACE_METADATA_KEY)
-    prompt_trace_metadata = read_from_opentelemetry_span(span=spans[2], key=HL_TRACE_METADATA_KEY)
-    flow_trace_metadata = read_from_opentelemetry_span(span=spans[3], key=HL_TRACE_METADATA_KEY)
+    tool_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[1].get_span_context().span_id)
+    prompt_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[2].get_span_context().span_id)
+    flow_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[3].get_span_context().span_id)
     # THEN Tool span is a child of Prompt span
     assert tool_trace_metadata["trace_parent_id"] == spans[2].context.span_id
     assert tool_trace_metadata["is_flow_log"] is False
@@ -174,10 +173,10 @@ def test_flow_decorator_flow_in_flow(
     assert read_from_opentelemetry_span(span=spans[3], key=HL_FILE_OT_KEY)["flow"]
     assert read_from_opentelemetry_span(span=spans[4], key=HL_FILE_OT_KEY)["flow"]
 
-    tool_trace_metadata = read_from_opentelemetry_span(span=spans[1], key=HL_TRACE_METADATA_KEY)
-    prompt_trace_metadata = read_from_opentelemetry_span(span=spans[2], key=HL_TRACE_METADATA_KEY)
-    nested_flow_trace_metadata = read_from_opentelemetry_span(span=spans[3], key=HL_TRACE_METADATA_KEY)
-    flow_trace_metadata = read_from_opentelemetry_span(span=spans[4], key=HL_TRACE_METADATA_KEY)
+    tool_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[1].get_span_context().span_id)
+    prompt_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[2].get_span_context().span_id)
+    nested_flow_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[3].get_span_context().span_id)
+    flow_trace_metadata = TRACE_FLOW_CONTEXT.get(spans[4].get_span_context().span_id)
     # THEN the parent of the Tool Log is the Prompt Log
     assert tool_trace_metadata["trace_parent_id"] == spans[2].context.span_id
     assert tool_trace_metadata["is_flow_log"] is False
@@ -290,14 +289,8 @@ def test_flow_decorator_hl_exporter_flow_inside_flow(
         # THEN the second to last uploaded span is the nested Flow
         flow_span = mock_export_method.call_args_list[4][0][0][0]
         nested_flow_span = mock_export_method.call_args_list[3][0][0][0]
-        last_span_flow_metadata = read_from_opentelemetry_span(
-            span=flow_span,
-            key=HL_TRACE_METADATA_KEY,
-        )
-        flow_span_flow_metadata = read_from_opentelemetry_span(
-            span=nested_flow_span,
-            key=HL_TRACE_METADATA_KEY,
-        )
+        last_span_flow_metadata = TRACE_FLOW_CONTEXT.get(flow_span.get_span_context().span_id)
+        flow_span_flow_metadata = TRACE_FLOW_CONTEXT.get(nested_flow_span.get_span_context().span_id)
         assert flow_span_flow_metadata["trace_parent_id"] == flow_span.context.span_id
         assert last_span_flow_metadata["is_flow_log"]
         assert flow_span_flow_metadata["is_flow_log"]

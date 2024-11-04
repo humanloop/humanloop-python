@@ -102,7 +102,7 @@ def test_no_annotation_on_parameter(
         return a + b
 
     # WHEN building the Tool kernel
-    # THEN the JSON schema is correctly built and `b` is is of `any` type
+    # THEN the JSON schema is correctly built and `b` is of `any` type
     # NOTE: JSONSchema dropped support for 'any' type, we include all types
     # as a workaround
     assert calculator.json_schema == {

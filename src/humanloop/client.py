@@ -1,6 +1,6 @@
 import os
 import typing
-from typing import Any, List, Optional, Sequence
+from typing import Any, Callable, List, Optional, Sequence, Union
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -18,7 +18,8 @@ from .decorators.flow import flow as flow_decorator_factory
 from .decorators.prompt import prompt as prompt_decorator_factory
 from .decorators.tool import tool as tool_decorator_factory
 from .environment import HumanloopEnvironment
-from .eval_utils import Dataset, Evaluator, EvaluatorCheck, File, _run_eval
+from humanloop.eval_utils.domain import Dataset, Evaluator, EvaluatorCheck, File
+from humanloop.eval_utils import _run_eval
 from .evaluations.client import EvaluationsClient
 from .otel import instrument_provider
 from .otel.exporter import HumanloopSpanExporter
@@ -32,7 +33,7 @@ class ExtendedEvalsClient(EvaluationsClient):
 
     def run(
         self,
-        file: File,
+        file: Union[File, Callable],
         name: Optional[str],
         dataset: Dataset,
         evaluators: Optional[Sequence[Evaluator]] = None,

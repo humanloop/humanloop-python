@@ -1,10 +1,9 @@
 from typing import Optional
 
-from opentelemetry import baggage
+from mypy.build import TypedDict
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
 
-from humanloop.otel.constants import HL_TRACE_METADATA_KEY
 from humanloop.otel.helpers import module_is_installed
 
 """
@@ -51,42 +50,16 @@ def instrument_provider(provider: TracerProvider):
 
         GroqInstrumentor().instrument(tracer_provider=provider)
 
-    # NOTE: ReplicateInstrumentor would require us to bump minimum Python version from 3.8 to 3.9
-    # TODO: Do a PR against the open-source ReplicateInstrumentor to support lower Python versions
-    # if module_is_installed("replicate"):
-    #     from opentelemetry.instrumentation.replicate import ReplicateInstrumentor
+    if module_is_installed("replicate"):
+        from opentelemetry.instrumentation.replicate import ReplicateInstrumentor
 
-    #     ReplicateInstrumentor().instrument(tracer_provider=provider)
+        ReplicateInstrumentor().instrument(tracer_provider=provider)
 
 
-def push_trace_context(trace_metadata: dict):
-    """Push Trace metadata for a parent Span.
-
-    Expected to be called when the Span is created
-    and before the wrapped function is executed.
-    Calling a wrapped function may create children
-    Spans, which will need to peek at the parent's
-    metadata.
-    """
-    new_context = baggage.set_baggage(
-        HL_TRACE_METADATA_KEY,
-        trace_metadata,
-        _BAGGAGE_CONTEXT_STACK[-1],
-    )
-    _BAGGAGE_CONTEXT_STACK.append(new_context)
+class FlowContext(TypedDict):
+    trace_id: str
+    trace_parent_id: Optional[str]
+    is_flow_log: bool
 
 
-def pop_trace_context():
-    """Clear Trace metadata for a parent Span.
-
-    Expected to be called after the wrapped function
-    is executed. This allows Spans on the same level
-    to peek at their parent Trace metadata.
-    """
-    _BAGGAGE_CONTEXT_STACK.pop()
-
-
-def get_trace_parent_metadata() -> Optional[object]:
-    """Peek at Trace metadata stack."""
-
-    return baggage.get_baggage(HL_TRACE_METADATA_KEY, _BAGGAGE_CONTEXT_STACK[-1])
+TRACE_FLOW_CONTEXT: dict[int, FlowContext] = {}

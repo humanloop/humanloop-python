@@ -45,7 +45,7 @@ def _list_to_ott(lst: NestedList) -> NestedDict:
 
 def write_to_opentelemetry_span(
     span: ReadableSpan,
-    value: Union[NestedDict, NestedList],
+    value: Union[NestedDict, NestedList, AttributeValue],
     key: str = "",
 ) -> None:
     """Write a Python object to the OpenTelemetry Span's attributes. Reverse of :func:`read_from_opentelemetry_span`.

@@ -4,12 +4,19 @@ import textwrap
 import typing
 import uuid
 from functools import wraps
+from inspect import Parameter
 from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
 
+from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import Tracer
 
-from humanloop.otel import get_trace_parent_metadata, pop_trace_context, push_trace_context
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE, HL_TRACE_METADATA_KEY
+from humanloop.eval_utils import File
+from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
+from humanloop.otel.constants import (
+    HL_FILE_OT_KEY,
+    HL_LOG_OT_KEY,
+    HL_OT_EMPTY_VALUE,
+)
 from humanloop.otel.helpers import write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
@@ -32,32 +39,24 @@ def tool(
             strict=strict,
         )
 
-        # Mypy complains about adding attribute on function but it's nice UX
+        # Mypy complains about adding attribute on function, but it's nice UX
         func.json_schema = tool_kernel["function"]  # type: ignore
 
         @wraps(func)
         def wrapper(*args, **kwargs):
+            span: ReadableSpan
             with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
-                trace_metadata = get_trace_parent_metadata()
-
-                if trace_metadata:
-                    # Add Trace metadata to the Span so it can be correctly
-                    # linked to the parent Span. trace_metadata will be
-                    # non-null if the function is called by a @flow
-                    # decorated function.
-                    write_to_opentelemetry_span(
-                        span=span,
-                        key=HL_TRACE_METADATA_KEY,
-                        value={**trace_metadata, "is_flow_log": False},
-                    )
-                    # Add Trace metadata to the context for the children
-                    # Spans to be able to link to the parent Span
-                    push_trace_context(
-                        {
-                            **trace_metadata,
-                            "trace_parent_id": span.get_span_context().span_id,
-                            "is_flow_log": False,
-                        }
+                span_id = span.get_span_context().span_id
+                if span.parent:
+                    span_parent_id = span.parent.span_id
+                else:
+                    span_parent_id = None
+                parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id)
+                if parent_trace_metadata:
+                    TRACE_FLOW_CONTEXT[span_id] = FlowContext(
+                        span_id=span_id,
+                        trace_parent_id=span_parent_id,
+                        is_flow_log=False,
                     )
 
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
@@ -72,12 +71,6 @@ def tool(
 
                 # Call the decorated function
                 output = func(*args, **kwargs)
-
-                # All children Spans have been created when the decorated function returns
-                # Remove the Trace metadata from the context so the siblings can have
-                # their children linked properly
-                if trace_metadata:
-                    pop_trace_context()
 
                 # Populate known Tool Log attributes
                 tool_log = {
@@ -95,6 +88,15 @@ def tool(
 
                 # Return the output of the decorated function
                 return output
+
+        func.file = File(  # type: ignore
+            path=path if path else func.__name__,
+            type="tool",
+            version=tool_kernel,
+            is_decorated=True,
+            id=None,
+            callable=wrapper,
+        )
 
         return wrapper
 
@@ -211,7 +213,7 @@ def _parse_annotation(annotation: typing.Type) -> Union[list, tuple]:
     the rest describing the inner types.
 
     Note that for nested types that lack inner type, e.g. list instead of
-    list[str], the inner type is set to inspect._empty. This edge case is
+    list[str], the inner type is set to Parameter.empty. This edge case is
     handled by _annotation_parse_to_json_schema.
 
     Examples:
@@ -240,8 +242,8 @@ def _parse_annotation(annotation: typing.Type) -> Union[list, tuple]:
     origin = typing.get_origin(annotation)
     if origin is None:
         # Either not a nested type or no type hint
-        # inspect._empty is used for parameters without type hints
-        if annotation not in (str, int, float, bool, inspect._empty, dict, list, tuple):
+        # Parameter.empty is used for parameters without type hints
+        if annotation not in (str, int, float, bool, Parameter.empty, dict, list, tuple):
             raise ValueError(f"Unsupported type hint: {annotation}")
         return [annotation]
     if origin is list:
@@ -305,6 +307,7 @@ def _annotation_parse_to_json_schema(arg: Union[list, tuple]) -> Mapping[str, Un
                 "items": {
                     "type": "array",
                     "items": {"type": "string"}
+                }
             }
 
         tuple[str, int, list[str]] ->
@@ -338,6 +341,7 @@ def _annotation_parse_to_json_schema(arg: Union[list, tuple]) -> Mapping[str, Un
                         "items": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]}
                     }
                 }
+            }
 
         Optional[list] ->
             {
@@ -370,10 +374,10 @@ def _annotation_parse_to_json_schema(arg: Union[list, tuple]) -> Mapping[str, Un
             # list annotation with no type hints
             if isinstance(arg, tuple):
                 # Support Optional annotation
-                arg = (list, [inspect._empty])
+                arg = (list, [Parameter.empty])
             else:
                 # Support non-Optional list annotation
-                arg = [list, [inspect._empty]]
+                arg = [list, [Parameter.empty]]
         arg_type = {
             "type": "array",
             "items": _annotation_parse_to_json_schema(arg[1]),
@@ -382,9 +386,9 @@ def _annotation_parse_to_json_schema(arg: Union[list, tuple]) -> Mapping[str, Un
         if len(arg) == 1:
             # dict annotation with no type hints
             if isinstance(arg, tuple):
-                arg = (dict, [inspect._empty], [inspect._empty])
+                arg = (dict, [Parameter.empty], [Parameter.empty])
             else:
-                arg = [dict, [inspect._empty], [inspect._empty]]
+                arg = [dict, [Parameter.empty], [Parameter.empty]]
         arg_type = {
             "type": "object",
             "properties": {
@@ -400,7 +404,7 @@ def _annotation_parse_to_json_schema(arg: Union[list, tuple]) -> Mapping[str, Un
         arg_type = {"type": "number"}
     if arg[0] is builtins.bool:
         arg_type = {"type": "boolean"}
-    if arg[0] is inspect._empty:
+    if arg[0] is Parameter.empty:
         # JSON Schema dropped support for 'any' type, we allow any type as a workaround
         arg_type = {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]}
 

@@ -16,7 +16,6 @@ from humanloop.otel.helpers import (
     read_from_opentelemetry_span,
     write_to_opentelemetry_span,
 )
-from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
 from humanloop.types.prompt_kernel_request import PromptKernelRequest
 
 logger = logging.getLogger("humanloop.sdk")
@@ -116,7 +115,7 @@ def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
 
 
 def _process_flow(flow_span: ReadableSpan, children_spans: list[ReadableSpan]):
-    # TODO: Use children_spans in the future
+    # NOTE: Use children_spans if needed
     flow_log = read_from_opentelemetry_span(flow_span, key=HL_LOG_OT_KEY)
     if flow_span.start_time:
         flow_log["start_time"] = flow_span.start_time / 1e9
@@ -141,7 +140,7 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
         prompt = {}
 
     # Check if the Prompt Kernel keys were assigned default values
-    # via the @prompt arguments. Otherwise use the information
+    # via the @prompt arguments. Otherwise, use the information
     # from the intercepted LLM provider call
     prompt["model"] = prompt.get("model") or gen_ai_object.get("request", {}).get("model", None)
     prompt["endpoint"] = prompt.get("endpoint") or llm_object.get("request", {}).get("type")
