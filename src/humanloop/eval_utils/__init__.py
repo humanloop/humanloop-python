@@ -8,14 +8,17 @@ Functions in this module should be accessed via the Humanloop client. They shoul
 not be called directly.
 """
 
+import inspect
 import logging
+import sys
 import threading
+import time
 import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from functools import partial
-import inspect
 from logging import INFO
+from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from pydantic import ValidationError
 from typing import Callable, Sequence, Literal, Union, Optional, List, Dict, Tuple
@@ -23,25 +26,28 @@ import time
 import sys
 
 
-from humanloop import PromptResponse, FlowResponse, ToolResponse, EvaluatorResponse
-from humanloop.eval_utils.domain import Dataset, Evaluator, EvaluatorCheck, File
+from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
 from humanloop.client import BaseHumanloop
 from humanloop.core.api_error import ApiError
+from humanloop.eval_utils.context import EVALUATION_CONTEXT, EvaluationContext
+from humanloop.eval_utils.domain import Dataset, Evaluator, EvaluatorCheck, File
 
 # We use TypedDicts for requests, which is consistent with the rest of the SDK
 from humanloop.eval_utils.shared import add_log_to_evaluation
-from humanloop.eval_utils.context import EvaluationContext, EVALUATION_CONTEXT
+from humanloop.requests import CodeEvaluatorRequestParams as CodeEvaluatorDict
+from humanloop.requests import ExternalEvaluatorRequestParams as ExternalEvaluator
 from humanloop.requests import FlowKernelRequestParams as FlowDict
+from humanloop.requests import HumanEvaluatorRequestParams as HumanEvaluatorDict
+from humanloop.requests import LlmEvaluatorRequestParams as LLMEvaluatorDict
 from humanloop.requests import PromptKernelRequestParams as PromptDict
 from humanloop.requests import ToolKernelRequestParams as ToolDict
-from humanloop.requests import ExternalEvaluatorRequestParams as ExternalEvaluator
-from humanloop.requests import CodeEvaluatorRequestParams as CodeEvaluatorDict
-from humanloop.requests import LlmEvaluatorRequestParams as LLMEvaluatorDict
-from humanloop.requests import HumanEvaluatorRequestParams as HumanEvaluatorDict
-
+from humanloop.types import BooleanEvaluatorStatsResponse as BooleanStats
+from humanloop.types import DatapointResponse as Datapoint
+from humanloop.types import EvaluationResponse, EvaluationStats, VersionStatsResponse
 
 # Responses are Pydantic models and we leverage them for improved request validation
 from humanloop.types import FlowKernelRequest as Flow
+from humanloop.types import NumericEvaluatorStatsResponse as NumericStats
 from humanloop.types import PromptKernelRequest as Prompt
 from humanloop.types import ToolKernelRequest as Tool
 from humanloop.types import BooleanEvaluatorStatsResponse as BooleanStats
@@ -100,7 +106,7 @@ def _run_eval(
         # Decorated function
         file_: File = file.file  # type: ignore
     else:
-        file_ = file
+        file_ = file  # type: ignore
 
     is_decorated = file_.pop("is_decorated", False)
 
@@ -140,7 +146,7 @@ def _run_eval(
         except ValidationError:
             flow_version = {"attributes": version}
             file_dict = {**file_, **flow_version}
-        hl_file = client.flows.upsert(**file_dict)
+        hl_file = client.flows.upsert(**file_dict)  # type: ignore
 
     elif type_ == "prompt":
         try:
@@ -148,7 +154,7 @@ def _run_eval(
         except ValidationError as error_:
             logger.error(msg="Invalid Prompt `version` in your `file` request. \n\nValidation error: \n)")
             raise error_
-        hl_file = client.prompts.upsert(**file_dict)
+        hl_file = client.prompts.upsert(**file_dict)  # type: ignore
 
     elif type_ == "tool":
         try:
@@ -156,10 +162,10 @@ def _run_eval(
         except ValidationError as error_:
             logger.error(msg="Invalid Tool `version` in your `file` request. \n\nValidation error: \n)")
             raise error_
-        hl_file = client.tools.upsert(**file_dict)
+        hl_file = client.tools.upsert(**file_dict)  # type: ignore
 
     elif type_ == "evaluator":
-        hl_file = client.evaluators.upsert(**file_dict)
+        hl_file = client.evaluators.upsert(**file_dict)  # type: ignore
 
     else:
         raise NotImplementedError(f"Unsupported File type: {type_}")
@@ -197,6 +203,7 @@ def _run_eval(
                     path=evaluator.get("path"),
                     spec=spec,
                 )
+    function_ = typing.cast(Callable, function_)
 
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
@@ -206,7 +213,7 @@ def _run_eval(
             break
     if requires_target:
         missing_target = 0
-        for datapoint in hl_dataset.datapoints:
+        for datapoint in hl_dataset.datapoints:  # type: ignore
             if not datapoint.target:
                 missing_target += 1
         if missing_target > 0:
@@ -250,7 +257,7 @@ def _run_eval(
             if "messages" in datapoint_dict and datapoint_dict["messages"] is not None:
                 output = function_(**datapoint_dict["inputs"], messages=datapoint_dict["messages"])
             else:
-                function_(datapoint_dict["inputs"])
+                function_(datapoint_dict["inputs"])  # type: ignore
 
     else:
         # Define the function to execute your function in parallel and Log to Humanloop
@@ -267,14 +274,16 @@ def _run_eval(
             datapoint_dict = dp.dict()
             try:
                 if "messages" in datapoint_dict:
-                    output = function_(
+                    output = function_(  # type: ignore
                         **datapoint_dict["inputs"],
                         messages=datapoint_dict["messages"],
                     )
                 else:
-                    output = function_(**datapoint_dict["inputs"])
+                    # function_ is not None at this point
+                    output = function_(**datapoint_dict["inputs"])  # type: ignore
                 if custom_logger:
-                    log = function_(client=client, output=output)
+                    # function_ is not None at this point
+                    log = function_(client=client, output=output)  # type: ignore
                 else:
                     if not isinstance(output, str):
                         raise ValueError(
@@ -311,7 +320,7 @@ def _run_eval(
     logger.info(f"{CYAN}Run ID: {run_id}{RESET}")
 
     # Generate locally if a file `callable` is provided
-    if function_:
+    if function_:  # type: ignore
         logger.info(
             f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}' using {workers} workers{RESET} "
         )
@@ -421,8 +430,8 @@ def get_score_from_evaluator_stat(
     elif isinstance(stat, NumericStats):
         score = round(stat.mean, 2)
     else:
-        pass
-    return score
+        raise ValueError(f"Unsupported Evaluator Stat type: {type(stat)}")
+    return score  # type: ignore
 
 
 class _SimpleProgressBar:
@@ -478,7 +487,7 @@ def get_evaluator_stats_by_path(
         evaluators_by_id[evaluator_stat.evaluator_version_id].version.path: evaluator_stat
         for evaluator_stat in stat.evaluator_stats
     }
-    return evaluator_stats_by_path
+    return evaluator_stats_by_path  # type: ignore
 
 
 def check_evaluation_threshold(

@@ -7,16 +7,11 @@ from functools import wraps
 from inspect import Parameter
 from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
 
-from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import Tracer
 
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import (
-    HL_FILE_OT_KEY,
-    HL_LOG_OT_KEY,
-    HL_OT_EMPTY_VALUE,
-)
+from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
@@ -44,7 +39,6 @@ def tool(
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            span: ReadableSpan
             with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
                 span_id = span.get_span_context().span_id
                 if span.parent:
@@ -60,14 +54,14 @@ def tool(
                     )
 
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,
-                    key=HL_FILE_OT_KEY,
-                    value={
-                        "path": path if path else func.__name__,
-                        "tool": tool_kernel,
-                    },
-                )
+                span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
+                span.set_attribute(HL_FILE_TYPE_KEY, "tool")
+                if tool_kernel:
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=f"{HL_FILE_KEY}.tool",
+                        value=tool_kernel,
+                    )
 
                 # Call the decorated function
                 output = func(*args, **kwargs)
@@ -80,11 +74,12 @@ def tool(
                     tool_log["output"] = output
 
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,
-                    key=HL_LOG_OT_KEY,
-                    value=tool_log,
-                )
+                if tool_log:
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=HL_LOG_KEY,
+                        value=tool_log,
+                    )
 
                 # Return the output of the decorated function
                 return output
@@ -94,7 +89,6 @@ def tool(
             type="tool",
             version=tool_kernel,
             is_decorated=True,
-            id=None,
             callable=wrapper,
         )
 
@@ -110,19 +104,22 @@ def _build_tool_kernel(
     strict: bool,
 ) -> ToolKernelRequestParams:
     """Build ToolKernelRequest object from decorated function."""
-    return ToolKernelRequestParams(
+    kernel = ToolKernelRequestParams(
         source_code=textwrap.dedent(
             # Remove the tool decorator from source code
             inspect.getsource(func).split("\n", maxsplit=1)[1]
         ),
         # Note: OTel complains about falsy values in attributes, so we use OT_EMPTY_ATTRIBUTE
-        attributes=attributes or HL_OT_EMPTY_VALUE,  # type: ignore
-        setup_values=setup_values or HL_OT_EMPTY_VALUE,  # type: ignore
         function=_build_function_property(
             func=func,
             strict=strict,
         ),
     )
+    if attributes:
+        kernel["attributes"] = attributes
+    if setup_values:
+        kernel["setup_values"] = setup_values
+    return kernel
 
 
 def _build_function_property(func: Callable, strict: bool) -> ToolFunctionParams:

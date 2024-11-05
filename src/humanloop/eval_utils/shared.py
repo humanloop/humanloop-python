@@ -1,11 +1,10 @@
-from datetime import datetime
 import logging
 import typing
+from datetime import datetime
 
 from humanloop.base_client import BaseHumanloop
 from humanloop.eval_utils.domain import Evaluator
 from humanloop.types.datapoint_response_target_value import DatapointResponseTargetValue
-
 
 logger = logging.getLogger("humanloop.sdk")
 

@@ -1,7 +1,8 @@
 import json
 import logging
 import typing
-from queue import Queue, Empty as EmptyQueue
+from queue import Empty as EmptyQueue
+from queue import Queue
 from threading import Thread
 from typing import Any, Optional
 
@@ -12,7 +13,7 @@ from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 from humanloop.core.request_options import RequestOptions
 from humanloop.eval_utils import EVALUATION_CONTEXT, EvaluationContext
 from humanloop.otel import TRACE_FLOW_CONTEXT
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE
+from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
 from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
@@ -64,7 +65,7 @@ class HumanloopSpanExporter(SpanExporter):
                         evaluation_context = EVALUATION_CONTEXT.get()
                     except LookupError:
                         # Decorators are not used in a client.evaluations.run() context
-                        evaluation_context = {}
+                        evaluation_context = {}  # type: ignore
                     self._upload_queue.put((span, evaluation_context))
             return SpanExportResult.SUCCESS
         else:
@@ -123,13 +124,14 @@ class HumanloopSpanExporter(SpanExporter):
             self._upload_queue.task_done()
 
     def _export_span_dispatch(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
-        hl_file = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
+        hl_file = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
+        file_type = span.attributes.get(HL_FILE_TYPE_KEY)
 
-        if "prompt" in hl_file:
+        if file_type == "prompt":
             export_func = self._export_prompt
-        elif "tool" in hl_file:
+        elif file_type == "tool":
             export_func = self._export_tool
-        elif "flow" in hl_file:
+        elif file_type == "flow":
             export_func = self._export_flow
         else:
             raise NotImplementedError(f"Unknown span type: {hl_file}")
@@ -138,11 +140,11 @@ class HumanloopSpanExporter(SpanExporter):
     def _export_prompt(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(
             span,
-            key=HL_FILE_OT_KEY,
+            key=HL_FILE_KEY,
         )
         log_object: dict[str, Any] = read_from_opentelemetry_span(
             span,
-            key=HL_LOG_OT_KEY,
+            key=HL_LOG_KEY,
         )
         # NOTE: Due to OTel conventions, attributes with value of None are removed
         # If not present, instantiate as empty dictionary
@@ -156,10 +158,11 @@ class HumanloopSpanExporter(SpanExporter):
             log_object["messages"] = []
         else:
             log_object["messages"] = list(log_object["messages"].values())
-        trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
-        trace_parent_id = self._span_id_to_uploaded_log_id.get(
-            trace_metadata.get("trace_parent_id"),
-        )
+        trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id)
+        if trace_metadata and "trace_parent_id" in trace_metadata:
+            trace_parent_id = self._span_id_to_uploaded_log_id[trace_metadata["trace_parent_id"]]
+        else:
+            trace_parent_id = None
         prompt: PromptKernelRequestParams = file_object["prompt"]
         path: str = file_object["path"]
         if not isinstance(log_object["output"], str):
@@ -183,16 +186,17 @@ class HumanloopSpanExporter(SpanExporter):
         self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
 
     def _export_tool(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
-        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
-        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_OT_KEY)
+        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
+        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_KEY)
         trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
-        trace_parent_id = self._span_id_to_uploaded_log_id.get(
-            trace_metadata.get("trace_parent_id"),
-        )
+        if "trace_parent_id" in trace_metadata:
+            trace_parent_id = self._span_id_to_uploaded_log_id.get(
+                trace_metadata["trace_parent_id"],
+            )
         tool = file_object["tool"]
-        if tool.get("attributes", HL_OT_EMPTY_VALUE) == HL_OT_EMPTY_VALUE:
+        if not tool.get("attributes"):
             tool["attributes"] = {}
-        if tool.get("setup_values", HL_OT_EMPTY_VALUE) == HL_OT_EMPTY_VALUE:
+        if not tool.get("setup_values"):
             tool["setup_values"] = {}
         path: str = file_object["path"]
         if not isinstance(log_object["output"], str):
@@ -212,18 +216,19 @@ class HumanloopSpanExporter(SpanExporter):
         self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
 
     def _export_flow(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
-        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
-        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_OT_KEY)
+        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
+        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_KEY)
         trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
-        trace_parent_id = self._span_id_to_uploaded_log_id.get(
-            trace_metadata.get("trace_parent_id"),
-        )
+        if "trace_parent_id" in trace_metadata:
+            trace_parent_id = self._span_id_to_uploaded_log_id.get(
+                trace_metadata["trace_parent_id"],
+            )
         # Cannot write falsy values except None in OTel Span attributes
         # If a None write is attempted then the attribute is removed
         # making it impossible to distinguish between a Flow Span and
         # Spans not created by Humanloop (see humanloop.otel.helpers.is_humanloop_span)
         flow: FlowKernelRequestParams
-        if file_object["flow"] == HL_OT_EMPTY_VALUE:
+        if not file_object.get("flow"):
             flow = {"attributes": {}}
         else:
             flow = file_object["flow"]

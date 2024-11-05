@@ -51,7 +51,11 @@ def test_nested_object(test_span: Span):
 
 
 def test_list(test_span: Span):
-    write_to_opentelemetry_span(test_span, [{"x": 7, "y": "foo"}, {"z": "bar"}], "key")
+    write_to_opentelemetry_span(
+        test_span,
+        [{"x": 7, "y": "foo"}, {"z": "bar"}],
+        "key",
+    )  # type: ignore
     # NOTE: attributes cannot be None at this point
     assert dict(test_span.attributes) == {  # type: ignore
         "key.0.x": 7,
@@ -65,7 +69,10 @@ def test_list(test_span: Span):
 
 
 def test_list_no_prefix(test_span: Span):
-    write_to_opentelemetry_span(test_span, [{"x": 7, "y": "foo"}, {"z": "bar"}])
+    write_to_opentelemetry_span(
+        test_span,
+        [{"x": 7, "y": "foo"}, {"z": "bar"}],  # type: ignore
+    )
     # NOTE: attributes cannot be None at this point
     assert dict(test_span.attributes) == {  # type: ignore
         "0.x": 7,
@@ -84,7 +91,7 @@ def test_multiple_nestings(test_span: Span):
         [
             {"x": 7, "y": "foo"},
             [{"z": "bar"}, {"a": 42}],
-        ],
+        ],  # type: ignore
         "key",
     )
     # NOTE: attributes cannot be None at this point

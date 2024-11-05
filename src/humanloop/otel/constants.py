@@ -1,7 +1,6 @@
 # Attribute name prefix on Humanloop spans for file-related attributes + path
-HL_FILE_OT_KEY = "humanloop.file"
+HL_FILE_KEY = "humanloop.file"
 # Attribute name prefix on Humanloop spans for log-related attributes
-HL_LOG_OT_KEY = "humanloop.log"
-# OTel does not allow falsy values for top-level attributes e.g. foo
-# and None only on nested attributes e.g. foo.bar
-HL_OT_EMPTY_VALUE = "EMPTY"
+HL_LOG_KEY = "humanloop.log"
+HL_FILE_TYPE_KEY = "humanloop.file.type"
+HL_PATH_KEY = "humanloop.file.path"

@@ -2,7 +2,7 @@ from typing import Any, Optional, TypedDict, Union
 
 import pytest
 from humanloop.decorators.tool import tool
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
+from humanloop.otel.constants import HL_FILE_KEY, HL_LOG_KEY
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from jsonschema.protocols import Validator
 from opentelemetry.sdk.trace import Tracer
@@ -34,8 +34,8 @@ def test_calculator_decorator(
     # THEN a single span is created and the log and file attributes are correctly set
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
-    hl_file: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_OT_KEY)
-    hl_log: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_LOG_OT_KEY)
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_KEY)
+    hl_log: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_LOG_KEY)
     assert hl_log["output"] == result == 3
     assert hl_log["inputs"] == {
         "operation": "add",

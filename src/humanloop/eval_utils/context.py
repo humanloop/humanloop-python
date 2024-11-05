@@ -1,6 +1,6 @@
-from typing import TypedDict, Callable
 import typing
 from contextvars import ContextVar
+from typing import Callable, TypedDict
 
 
 class EvaluationContext(TypedDict):

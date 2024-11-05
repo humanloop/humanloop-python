@@ -1,17 +1,13 @@
 import uuid
 from functools import wraps
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Mapping, Optional, Sequence
 
+from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-
-from humanloop.otel.constants import (
-    HL_FILE_OT_KEY,
-    HL_LOG_OT_KEY,
-    HL_OT_EMPTY_VALUE,
-)
+from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 from humanloop.types.model_endpoints import ModelEndpoints
 from humanloop.types.model_providers import ModelProviders
@@ -78,7 +74,8 @@ def prompt(
                 prompt_kernel[attr_name] = attr_value  # type: ignore
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
+            span: Span
             with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
                 span_id = span.get_span_context().span_id
                 if span.parent:
@@ -88,34 +85,28 @@ def prompt(
                 parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id, {})
                 if parent_trace_metadata:
                     TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                        trace_id=parent_trace_metadata['trace_id'],
-                        trace_parent_id=span_parent_id,
-                        is_flow_log=False
+                        trace_id=parent_trace_metadata["trace_id"], trace_parent_id=span_parent_id, is_flow_log=False
                     )
 
-                write_to_opentelemetry_span(
-                    span=span,
-                    key=HL_FILE_OT_KEY,
-                    value={
-                        "path": path if path else func.__name__,
-                        # Values not specified in the decorator will be
-                        # completed with the intercepted values from the
-                        # Instrumentors for LLM providers
-                        "prompt": prompt_kernel or HL_OT_EMPTY_VALUE,  # noqa: F821
-                    },
-                )
+                span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
+                span.set_attribute(HL_FILE_TYPE_KEY, "prompt")
+                if prompt_kernel:
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=f"{HL_FILE_KEY}.prompt",
+                        value=prompt_kernel,
+                    )
 
                 # Call the decorated function
                 output = func(*args, **kwargs)
 
-                prompt_log = {"output": output}
-
-                # Write the Prompt Log to the Span on HL_LOG_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,
-                    key=HL_LOG_OT_KEY,
-                    value=prompt_log,
-                )
+                if output:
+                    prompt_log = {"output": output}
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=HL_LOG_KEY,
+                        value=prompt_log,
+                    )
 
             # Return the output of the decorated function
             return output
@@ -123,9 +114,8 @@ def prompt(
         wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="prompt",
-            version=prompt_kernel,
+            version=prompt_kernel,  # type: ignore
             is_decorated=True,
-            id=None,
             callable=wrapper,
         )
 

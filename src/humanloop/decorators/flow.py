@@ -1,19 +1,16 @@
 import uuid
 from functools import wraps
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Mapping, Optional, Sequence
 
+from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
-from opentelemetry.sdk.trace import ReadableSpan
 
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import (
-    HL_FILE_OT_KEY,
-    HL_LOG_OT_KEY,
-    HL_OT_EMPTY_VALUE,
-)
+from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
+from humanloop.requests import FlowKernelRequestParams as FlowDict
 
 
 def flow(
@@ -26,8 +23,8 @@ def flow(
 
     def decorator(func: Callable):
         @wraps(func)
-        def wrapper(*args, **kwargs):
-            span: ReadableSpan
+        def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
+            span: Span
             with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
                 span_id = span.get_span_context().span_id
                 if span.parent:
@@ -50,40 +47,40 @@ def flow(
                         is_flow_log=True,
                     )
 
-                # Write the Flow Kernel to the Span on HL_FILE_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,
-                    key=HL_FILE_OT_KEY,
-                    value={
-                        "path": path if path else func.__name__,
-                        # If a None write is attempted then the attribute is removed
-                        # making it impossible to distinguish between a Flow Span and
-                        # Spans not created by Humanloop (see humanloop.otel.helpers.is_humanloop_span)
-                        "flow": {"attributes": attributes} if attributes else HL_OT_EMPTY_VALUE,
-                    },
-                )
+                span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
+                span.set_attribute(HL_FILE_TYPE_KEY, "flow")
+                if attributes:
+                    print("HOWDIE", attributes)
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=f"{HL_FILE_KEY}.flow.attributes",
+                        value=attributes,
+                    )
 
                 # Call the decorated function
                 output = func(*args, **kwargs)
+                inputs = args_to_inputs(func, args, kwargs)
+                flow_log = {}
+                if inputs:
+                    flow_log["inputs"] = inputs
+                if output:
+                    flow_log["output"] = output
 
                 # Write the Flow Log to the Span on HL_LOG_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,
-                    key=HL_LOG_OT_KEY,
-                    value={
-                        "inputs": args_to_inputs(func, args, kwargs),
-                        "output": output,
-                    },
-                )
+                if flow_log:
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=HL_LOG_KEY,
+                        value=flow_log,
+                    )
 
             # Return the output of the decorated function
             return output
 
         func.file = File(  # type: ignore
-            id=None,
             path=path if path else func.__name__,
             type="flow",
-            version=attributes,
+            version=FlowDict(attributes=attributes),
             is_decorated=True,
             callable=wrapper,
         )

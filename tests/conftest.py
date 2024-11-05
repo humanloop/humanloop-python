@@ -2,25 +2,23 @@ from typing import Callable, Generator
 from unittest.mock import MagicMock
 
 import pytest
-from opentelemetry.instrumentation.openai import OpenAIInstrumentor
-from opentelemetry.instrumentation.instrumentor import BaseInstrumentor  # type: ignore
-from opentelemetry.instrumentation.anthropic import AnthropicInstrumentor
-from opentelemetry.instrumentation.replicate import ReplicateInstrumentor
-from opentelemetry.instrumentation.cohere import CohereInstrumentor
-from opentelemetry.instrumentation.groq import GroqInstrumentor
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.trace import Tracer
-
-from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
-
 from humanloop.decorators.flow import flow
 from humanloop.decorators.prompt import prompt
 from humanloop.decorators.tool import tool
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from opentelemetry.instrumentation.anthropic import AnthropicInstrumentor
+from opentelemetry.instrumentation.cohere import CohereInstrumentor
+from opentelemetry.instrumentation.groq import GroqInstrumentor
+from opentelemetry.instrumentation.instrumentor import BaseInstrumentor  # type: ignore
+from opentelemetry.instrumentation.openai import OpenAIInstrumentor
+from opentelemetry.instrumentation.replicate import ReplicateInstrumentor
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+from opentelemetry.trace import Tracer
 
 
 @pytest.fixture(scope="function")

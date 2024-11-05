@@ -4,7 +4,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY
+from humanloop.otel.constants import HL_FILE_KEY, HL_LOG_KEY
 
 NestedDict = dict[str, Union["NestedDict", AttributeValue]]
 NestedList = list[Union["NestedList", NestedDict]]
@@ -220,8 +220,8 @@ def is_humanloop_span(span: ReadableSpan) -> bool:
     """Check if the Span was created by the Humanloop SDK."""
     try:
         # Valid spans will have keys with the HL_FILE_OT_KEY and HL_LOG_OT_KEY prefixes present
-        read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
-        read_from_opentelemetry_span(span, key=HL_LOG_OT_KEY)
+        read_from_opentelemetry_span(span, key=HL_FILE_KEY)
+        read_from_opentelemetry_span(span, key=HL_LOG_KEY)
     except KeyError:
         return False
     return True

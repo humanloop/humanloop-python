@@ -9,7 +9,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 from pydantic import ValidationError as PydanticValidationError
 
-from humanloop.otel.constants import HL_FILE_OT_KEY, HL_LOG_OT_KEY, HL_OT_EMPTY_VALUE
+from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY
 from humanloop.otel.helpers import (
     is_humanloop_span,
     is_llm_provider_call,
@@ -71,17 +71,23 @@ def _is_instrumentor_span(span: ReadableSpan) -> bool:
 
 
 def _process_span_dispatch(span: ReadableSpan, children_spans: list[ReadableSpan]):
-    hl_file = read_from_opentelemetry_span(span, key=HL_FILE_OT_KEY)
+    file_type = span.attributes[HL_FILE_TYPE_KEY]
 
-    if "prompt" in hl_file:
+    # Processing common to all Humanloop File types
+    if span.start_time:
+        span._attributes[f"{HL_LOG_KEY}.start_time"] = span.start_time / 1e9
+    if span.end_time:
+        span._attributes[f"{HL_LOG_KEY}.end_time"] = span.end_time / 1e9
+        span._attributes[f"{HL_LOG_KEY}.created_at"] = span.end_time / 1e9
+
+    # Processing specific to each Humanloop File type
+    if file_type == "prompt":
         _process_prompt(prompt_span=span, children_spans=children_spans)
         return
-    elif "tool" in hl_file:
-        _process_tool(tool_span=span, children_spans=children_spans)
-        return
-    elif "flow" in hl_file:
-        _process_flow(flow_span=span, children_spans=children_spans)
-        return
+    elif file_type == "tool":
+        pass
+    elif file_type == "flow":
+        pass
     else:
         logger.error("Unknown Humanloop File Span %s", span)
 
@@ -99,45 +105,12 @@ def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan
             break
 
 
-def _process_tool(tool_span: ReadableSpan, children_spans: list[ReadableSpan]):
-    tool_log = read_from_opentelemetry_span(tool_span, key=HL_LOG_OT_KEY)
-    if tool_span.start_time:
-        tool_log["start_time"] = tool_span.start_time / 1e9
-    if tool_span.end_time:
-        tool_log["end_time"] = tool_span.end_time / 1e9
-        tool_log["created_at"] = tool_span.end_time / 1e9
-
-    write_to_opentelemetry_span(
-        span=tool_span,
-        key=HL_LOG_OT_KEY,
-        value=tool_log,
-    )
-
-
-def _process_flow(flow_span: ReadableSpan, children_spans: list[ReadableSpan]):
-    # NOTE: Use children_spans if needed
-    flow_log = read_from_opentelemetry_span(flow_span, key=HL_LOG_OT_KEY)
-    if flow_span.start_time:
-        flow_log["start_time"] = flow_span.start_time / 1e9
-    if flow_span.end_time:
-        flow_log["end_time"] = flow_span.end_time / 1e9
-        flow_log["created_at"] = flow_span.end_time / 1e9
-
-    write_to_opentelemetry_span(
-        span=flow_span,
-        key=HL_LOG_OT_KEY,
-        value=flow_log,
-    )
-
-
 def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
-    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_KEY)
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
-    prompt: dict[str, Any] = hl_file.get("prompt")  # type: ignore
-    if prompt == HL_OT_EMPTY_VALUE:
-        prompt = {}
+    prompt: dict[str, Any] = hl_file.get("prompt", {})  # type: ignore
 
     # Check if the Prompt Kernel keys were assigned default values
     # via the @prompt arguments. Otherwise, use the information
@@ -165,15 +138,18 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
     hl_file["prompt"] = prompt
     write_to_opentelemetry_span(
         span=prompt_span,
-        key=HL_FILE_OT_KEY,
+        key=HL_FILE_KEY,
         # hl_file was modified in place via prompt_kernel reference
         value=hl_file,
     )
 
 
 def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
-    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_OT_KEY)
-    hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_LOG_OT_KEY)
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_KEY)
+    try:
+        hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_LOG_KEY)
+    except KeyError:
+        hl_log = {}
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
 
     # TODO: Seed not added by Instrumentors in provider call
@@ -184,12 +160,6 @@ def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: Readab
         hl_log["finish_reason"] = gen_ai_object.get("completion", {}).get("0", {}).get("finish_reason")
     # Note: read_from_opentelemetry_span returns the list as a dict due to Otel conventions
     hl_log["messages"] = gen_ai_object.get("prompt")
-
-    if prompt_span.start_time:
-        hl_log["start_time"] = prompt_span.start_time / 1e9
-    if prompt_span.end_time:
-        hl_log["end_time"] = prompt_span.end_time / 1e9
-        hl_log["created_at"] = prompt_span.end_time / 1e9
 
     try:
         inputs = {}
@@ -210,7 +180,7 @@ def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: Readab
 
     write_to_opentelemetry_span(
         span=prompt_span,
-        key=HL_LOG_OT_KEY,
+        key=HL_LOG_KEY,
         # hl_log was modified in place
         value=hl_log,
     )
