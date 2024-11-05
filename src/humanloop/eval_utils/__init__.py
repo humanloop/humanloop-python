@@ -314,6 +314,9 @@ def run_eval(
             if "messages" in datapoint_dict and datapoint_dict["messages"] is not None:
                 output = function_(**datapoint_dict["inputs"], messages=datapoint_dict["messages"])
             else:
+                # function_ is decorated by Humanloop, the OTel Exporter will
+                # handle the logging, which will call the upload_callback
+                # function above when it's done
                 function_(datapoint_dict["inputs"])  # type: ignore
 
     else:
