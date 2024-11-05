@@ -12,7 +12,7 @@ from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
 from humanloop.core.request_options import RequestOptions
 from humanloop.eval_utils import EVALUATION_CONTEXT, EvaluationContext
-from humanloop.otel import TRACE_FLOW_CONTEXT
+from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
@@ -44,10 +44,11 @@ class HumanloopSpanExporter(SpanExporter):
         """
         super().__init__()
         self._client = client
-        self._span_id_to_uploaded_log_id: dict[
-            str, str
-        ] = {}  # Uploaded spans translate to a Log on Humanloop. The IDs are required to link Logs in a Flow Trace
-        self._upload_queue: Queue = Queue()  # Work queue for the threads uploading the spans
+        # Uploaded spans translate to a Log on Humanloop. The IDs are required to link Logs in a Flow Trace
+        self._span_id_to_uploaded_log_id: dict[int, str] = {}
+        # Work queue for the threads uploading the spans
+        self._upload_queue: Queue = Queue()
+        # Worker threads to export the spans
         self._threads: list[Thread] = [
             Thread(target=self._do_work, daemon=True) for _ in range(worker_threads or self.DEFAULT_NUMBER_THREADS)
         ]
@@ -125,7 +126,7 @@ class HumanloopSpanExporter(SpanExporter):
 
     def _export_span_dispatch(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
         hl_file = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
-        file_type = span.attributes.get(HL_FILE_TYPE_KEY)
+        file_type = span._attributes.get(HL_FILE_TYPE_KEY)  # type: ignore
 
         if file_type == "prompt":
             export_func = self._export_prompt
@@ -159,7 +160,7 @@ class HumanloopSpanExporter(SpanExporter):
         else:
             log_object["messages"] = list(log_object["messages"].values())
         trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id)
-        if trace_metadata and "trace_parent_id" in trace_metadata:
+        if trace_metadata and "trace_parent_id" in trace_metadata and trace_metadata["trace_parent_id"]:
             trace_parent_id = self._span_id_to_uploaded_log_id[trace_metadata["trace_parent_id"]]
         else:
             trace_parent_id = None
@@ -188,8 +189,8 @@ class HumanloopSpanExporter(SpanExporter):
     def _export_tool(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
         log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_KEY)
-        trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
-        if "trace_parent_id" in trace_metadata:
+        trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
+        if "trace_parent_id" in trace_metadata and trace_metadata["trace_parent_id"]:
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
                 trace_metadata["trace_parent_id"],
             )
@@ -218,10 +219,13 @@ class HumanloopSpanExporter(SpanExporter):
     def _export_flow(self, span: ReadableSpan, evaluation_context: EvaluationContext) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
         log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_KEY)
-        trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
+        trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(
+            span.get_span_context().span_id,
+            {},
+        )
         if "trace_parent_id" in trace_metadata:
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
-                trace_metadata["trace_parent_id"],
+                trace_metadata["trace_parent_id"],  # type: ignore
             )
         # Cannot write falsy values except None in OTel Span attributes
         # If a None write is attempted then the attribute is removed

@@ -53,7 +53,7 @@ def test_nested_object(test_span: Span):
 def test_list(test_span: Span):
     write_to_opentelemetry_span(
         test_span,
-        [{"x": 7, "y": "foo"}, {"z": "bar"}],
+        [{"x": 7, "y": "foo"}, {"z": "bar"}],  # type: ignore
         "key",
     )  # type: ignore
     # NOTE: attributes cannot be None at this point

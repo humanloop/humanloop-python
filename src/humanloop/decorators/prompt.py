@@ -80,13 +80,13 @@ def prompt(
                 span_id = span.get_span_context().span_id
                 if span.parent:
                     span_parent_id = span.parent.span_id
-                else:
-                    span_parent_id = None
-                parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id, {})
-                if parent_trace_metadata:
-                    TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                        trace_id=parent_trace_metadata["trace_id"], trace_parent_id=span_parent_id, is_flow_log=False
-                    )
+                    parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id, {})
+                    if parent_trace_metadata:
+                        TRACE_FLOW_CONTEXT[span_id] = FlowContext(
+                            trace_id=parent_trace_metadata["trace_id"],
+                            trace_parent_id=span_parent_id,
+                            is_flow_log=False,
+                        )
 
                 span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HL_FILE_TYPE_KEY, "prompt")
@@ -94,7 +94,7 @@ def prompt(
                     write_to_opentelemetry_span(
                         span=span,
                         key=f"{HL_FILE_KEY}.prompt",
-                        value=prompt_kernel,
+                        value=prompt_kernel,  # type: ignore
                     )
 
                 # Call the decorated function

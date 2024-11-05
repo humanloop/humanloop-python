@@ -4,6 +4,7 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
+from opentelemetry.util.types import AttributeValue
 
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils import File
@@ -16,10 +17,11 @@ from humanloop.requests import FlowKernelRequestParams as FlowDict
 def flow(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
-    attributes: Optional[dict[str, Any]] = None,
+    attributes: Optional[dict[str, AttributeValue]] = None,
 ):
     if attributes is None:
         attributes = {}
+    attributes = {k: v for k, v in attributes.items() if v is not None}
 
     def decorator(func: Callable):
         @wraps(func)
@@ -29,15 +31,14 @@ def flow(
                 span_id = span.get_span_context().span_id
                 if span.parent:
                     span_parent_id = span.parent.span_id
-                else:
-                    span_parent_id = None
-                parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id)
-                if parent_trace_metadata:
-                    TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                        trace_id=span_id,
-                        trace_parent_id=span_parent_id,
-                        is_flow_log=True,
-                    )
+                    parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id)
+                    if parent_trace_metadata:
+                        TRACE_FLOW_CONTEXT[span_id] = FlowContext(
+                            trace_id=span_id,
+                            trace_parent_id=span_parent_id,
+                            is_flow_log=True,
+                        )
+
                 else:
                     # The Flow Log is not nested under another Flow Log
                     # Set the trace_id to the current span_id
@@ -50,11 +51,10 @@ def flow(
                 span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HL_FILE_TYPE_KEY, "flow")
                 if attributes:
-                    print("HOWDIE", attributes)
                     write_to_opentelemetry_span(
                         span=span,
                         key=f"{HL_FILE_KEY}.flow.attributes",
-                        value=attributes,
+                        value=attributes,  # type: ignore
                     )
 
                 # Call the decorated function
@@ -71,7 +71,7 @@ def flow(
                     write_to_opentelemetry_span(
                         span=span,
                         key=HL_LOG_KEY,
-                        value=flow_log,
+                        value=flow_log,  # type: ignore
                     )
 
             # Return the output of the decorated function
@@ -80,7 +80,7 @@ def flow(
         func.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="flow",
-            version=FlowDict(attributes=attributes),
+            version=FlowDict(attributes=attributes),  # type: ignore
             is_decorated=True,
             callable=wrapper,
         )

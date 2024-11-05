@@ -72,14 +72,19 @@ class Dataset(Identifiers):
 class Evaluator(Identifiers):
     """The Evaluator to provide judgments for this Evaluation."""
 
-    args_type: NotRequired[EvaluatorArgumentsType]
-    """The type of arguments the Evaluator expects - only required for local Evaluators."""
-    return_type: NotRequired[EvaluatorReturnTypeEnum]
-    """The type of return value the Evaluator produces - only required for local Evaluators."""
-    callable: NotRequired[Callable]
-    """The function to run on the logs to produce the judgment - only required for local Evaluators."""
     custom_logger: NotRequired[Callable]
+
+    """The type of arguments the Evaluator expects - only required for local Evaluators."""
+    args_type: NotRequired[EvaluatorArgumentsType]
+
+    """The type of return value the Evaluator produces - only required for local Evaluators."""
+    return_type: NotRequired[EvaluatorReturnTypeEnum]
+
+    """The function to run on the logs to produce the judgment - only required for local Evaluators."""
+    callable: NotRequired[Callable]
+
     """optional function that logs the output judgment from your Evaluator to Humanloop, if provided, it will be called as follows:
+    custom_logger: NotRequired[Callable]
     ```
     judgment = callable(log_dict)
     log = custom_logger(client, judgment)

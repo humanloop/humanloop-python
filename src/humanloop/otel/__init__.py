@@ -3,6 +3,7 @@ from typing import Optional
 from mypy.build import TypedDict
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import TracerProvider
+from typing_extensions import NotRequired
 
 from humanloop.otel.helpers import module_is_installed
 
@@ -57,9 +58,9 @@ def instrument_provider(provider: TracerProvider):
 
 
 class FlowContext(TypedDict):
-    trace_id: str
-    trace_parent_id: Optional[str]
-    is_flow_log: bool
+    trace_id: NotRequired[str]
+    trace_parent_id: NotRequired[Optional[int]]
+    is_flow_log: NotRequired[bool]
 
 
 TRACE_FLOW_CONTEXT: dict[int, FlowContext] = {}

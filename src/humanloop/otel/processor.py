@@ -71,14 +71,14 @@ def _is_instrumentor_span(span: ReadableSpan) -> bool:
 
 
 def _process_span_dispatch(span: ReadableSpan, children_spans: list[ReadableSpan]):
-    file_type = span.attributes[HL_FILE_TYPE_KEY]
+    file_type = span.attributes[HL_FILE_TYPE_KEY]  # type: ignore
 
     # Processing common to all Humanloop File types
     if span.start_time:
-        span._attributes[f"{HL_LOG_KEY}.start_time"] = span.start_time / 1e9
+        span._attributes[f"{HL_LOG_KEY}.start_time"] = int(span.start_time / 1e9)  # type: ignore
     if span.end_time:
-        span._attributes[f"{HL_LOG_KEY}.end_time"] = span.end_time / 1e9
-        span._attributes[f"{HL_LOG_KEY}.created_at"] = span.end_time / 1e9
+        span._attributes[f"{HL_LOG_KEY}.end_time"] = int(span.end_time / 1e9)  # type: ignore
+        span._attributes[f"{HL_LOG_KEY}.created_at"] = int(span.end_time / 1e9)  # type: ignore
 
     # Processing specific to each Humanloop File type
     if file_type == "prompt":

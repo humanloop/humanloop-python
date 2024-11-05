@@ -198,7 +198,7 @@ def _run_eval(
                     attributes={"code": inspect.getsource(eval_function)},
                     evaluator_type="external",
                 )
-                _ = client.evaluators.upsert(
+                client.evaluators.upsert(
                     id=evaluator.get("id"),
                     path=evaluator.get("path"),
                     spec=spec,
@@ -226,7 +226,8 @@ def _run_eval(
     try:
         evaluation = client.evaluations.create(
             name=name,
-            evaluators=[{"path": e["path"]} for e in evaluators],
+            dataset={"file_id": hl_dataset.id},
+            evaluators=[{"path": e["path"]} for e in evaluators],  # type: ignore
             file={"id": hl_file.id},
         )
     except ApiError as error_:
@@ -234,7 +235,7 @@ def _run_eval(
         if error_.status_code == 409:
             evals = client.evaluations.list(file_id=hl_file.id, size=50)
             for page in evals.iter_pages():
-                evaluation = next((e for e in page.items if e.name == name), None)
+                evaluation = next((e for e in page.items if e.name == name), None)  # type: ignore
         else:
             raise error_
         if not evaluation:
@@ -428,7 +429,7 @@ def get_score_from_evaluator_stat(
         if stat.total_logs:
             score = round(stat.num_true / stat.total_logs, 2)
     elif isinstance(stat, NumericStats):
-        score = round(stat.mean, 2)
+        score = round(stat.mean, 2)  # type: ignore
     else:
         raise ValueError(f"Unsupported Evaluator Stat type: {type(stat)}")
     return score  # type: ignore

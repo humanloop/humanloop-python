@@ -64,7 +64,7 @@ def write_to_opentelemetry_span(
     if isinstance(value, list):
         to_write_copy = _list_to_ott(value)
     else:
-        to_write_copy = dict(value)
+        to_write_copy = dict(value)  # type: ignore
     linearised_attributes: dict[str, AttributeValue] = {}
     work_stack: list[tuple[str, Union[AttributeValue, NestedDict]]] = [(key, to_write_copy)]
     """
