@@ -13,6 +13,9 @@ from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
 from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
 from humanloop.types.response_format import ResponseFormat
 
+if typing.TYPE_CHECKING:
+    from . import ToolFunctionParams
+
 from .base_client import AsyncBaseHumanloop, BaseHumanloop
 from .decorators.flow import flow as flow_decorator_factory
 from .decorators.prompt import prompt as prompt_decorator_factory
@@ -153,6 +156,7 @@ class Humanloop(BaseHumanloop):
         other: Optional[dict[str, Optional[Any]]] = None,
         seed: Optional[int] = None,
         response_format: Optional[ResponseFormat] = None,
+        tools: Optional[Sequence["ToolFunctionParams"]] = None,
     ):
         """Decorator for declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code.
 
@@ -262,6 +266,9 @@ class Humanloop(BaseHumanloop):
         :param attributes: Additional fields to describe the Prompt. Helpful to
             separate Prompt versions from each other with details on how they
             were created or used.
+
+        :param tools: The tool specification that the model can choose to call if Tool
+            calling is supported.
         """
         return prompt_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
@@ -280,6 +287,7 @@ class Humanloop(BaseHumanloop):
             other=other,
             seed=seed,
             response_format=response_format,
+            tools=tools,
         )
 
     def tool(

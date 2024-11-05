@@ -10,10 +10,11 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
+from humanloop.core import ApiError as HumanloopApiError
 from humanloop.core.request_options import RequestOptions
 from humanloop.eval_utils import EVALUATION_CONTEXT, EvaluationContext
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY
+from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
 from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
@@ -45,7 +46,7 @@ class HumanloopSpanExporter(SpanExporter):
         super().__init__()
         self._client = client
         # Uploaded spans translate to a Log on Humanloop. The IDs are required to link Logs in a Flow Trace
-        self._span_id_to_uploaded_log_id: dict[int, str] = {}
+        self._span_id_to_uploaded_log_id: dict[int, Optional[str]] = {}
         # Work queue for the threads uploading the spans
         self._upload_queue: Queue = Queue()
         # Worker threads to export the spans
@@ -170,6 +171,10 @@ class HumanloopSpanExporter(SpanExporter):
         trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id)
         if trace_metadata and "trace_parent_id" in trace_metadata and trace_metadata["trace_parent_id"]:
             trace_parent_id = self._span_id_to_uploaded_log_id[trace_metadata["trace_parent_id"]]
+            if trace_parent_id is None:
+                # Parent Log in Trace upload failed
+                file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
+                logger.error(f"Skipping log for {file_path}: parent Log upload failed")
         else:
             trace_parent_id = None
         prompt: PromptKernelRequestParams = file_object["prompt"]
@@ -180,20 +185,24 @@ class HumanloopSpanExporter(SpanExporter):
             log_object["output"] = json.dumps(log_object["output"])
         if "attributes" not in prompt or not prompt["attributes"]:
             prompt["attributes"] = {}
-        log_response = self._client.prompts.log(
-            path=path,
-            prompt=prompt,
-            **log_object,
-            trace_parent_id=trace_parent_id,
-            source_datapoint_id=evaluation_context.get("source_datapoint_id"),
-            run_id=evaluation_context.get("run_id"),
-            request_options=RequestOptions(max_retries=3),
-        )
-        if evaluation_context and log_response.prompt_id == evaluation_context["evaluated_file_id"]:
-            # Multiple Logs could be triggered by the Evaluation of a single File
-            log_object["id"] = log_response.id
-            evaluation_context["upload_callback"](log_object)
-        self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
+        try:
+            log_response = self._client.prompts.log(
+                path=path,
+                prompt=prompt,
+                **log_object,
+                trace_parent_id=trace_parent_id,
+                source_datapoint_id=evaluation_context.get("source_datapoint_id"),
+                run_id=evaluation_context.get("run_id"),
+                request_options=RequestOptions(max_retries=3),
+            )
+            if evaluation_context and log_response.prompt_id == evaluation_context["evaluated_file_id"]:
+                # Multiple Logs could be triggered by the Evaluation of a single File
+                log_object["id"] = log_response.id
+                evaluation_context["upload_callback"](log_object)
+            self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
+        except HumanloopApiError as e:
+            logger.error(str(e))
+            self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_tool(
         self,
@@ -207,6 +216,10 @@ class HumanloopSpanExporter(SpanExporter):
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
                 trace_metadata["trace_parent_id"],
             )
+            if trace_parent_id is None:
+                # Parent Log in Trace upload failed
+                file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
+                logger.error(f"Skipping log for {file_path}: parent Log upload failed")
         else:
             trace_parent_id = None
         tool = file_object["tool"]
@@ -219,18 +232,22 @@ class HumanloopSpanExporter(SpanExporter):
             # Output expected to be a string, if decorated function
             # does not return one, jsonify it
             log_object["output"] = json.dumps(log_object["output"])
-        log_response = self._client.tools.log(
-            path=path,
-            tool=tool,
-            **log_object,
-            trace_parent_id=trace_parent_id,
-            request_options=RequestOptions(max_retries=3),
-        )
-        if evaluation_context and log_response.tool_id == evaluation_context["evaluated_file_id"]:
-            # Multiple Logs could be triggered by the Evaluation of a single File
-            log_object["id"] = log_response.id
-            evaluation_context["upload_callback"](log_object)
-        self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
+        try:
+            log_response = self._client.tools.log(
+                path=path,
+                tool=tool,
+                **log_object,
+                trace_parent_id=trace_parent_id,
+                request_options=RequestOptions(max_retries=3),
+            )
+            if evaluation_context and log_response.tool_id == evaluation_context["evaluated_file_id"]:
+                # Multiple Logs could be triggered by the Evaluation of a single File
+                log_object["id"] = log_response.id
+                evaluation_context["upload_callback"](log_object)
+            self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
+        except HumanloopApiError as e:
+            logger.error(str(e))
+            self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_flow(
         self,
@@ -247,6 +264,12 @@ class HumanloopSpanExporter(SpanExporter):
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
                 trace_metadata["trace_parent_id"],  # type: ignore
             )
+            if trace_parent_id is None:
+                # Parent Log in Trace upload failed
+                file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
+                logger.error(f"Skipping log for {file_path}: parent Log upload failed")
+        else:
+            trace_parent_id = None
         flow: FlowKernelRequestParams
         if not file_object.get("flow"):
             flow = {"attributes": {}}
@@ -257,16 +280,20 @@ class HumanloopSpanExporter(SpanExporter):
             # Output expected to be a string, if decorated function
             # does not return one, jsonify it
             log_object["output"] = json.dumps(log_object["output"])
-        log_response = self._client.flows.log(
-            path=path,
-            flow=flow,
-            **log_object,
-            trace_parent_id=trace_parent_id,
-            source_datapoint_id=evaluation_context.get("source_datapoint_id"),
-            run_id=evaluation_context.get("run_id"),
-            request_options=RequestOptions(max_retries=3),
-        )
-        if evaluation_context and log_response.flow_id == evaluation_context["evaluated_file_id"]:
-            # Multiple Logs could be triggered by the Evaluation of a single File
-            evaluation_context["upload_callback"](log_object)
-        self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = log_response.id
+        try:
+            log_response = self._client.flows.log(
+                path=path,
+                flow=flow,
+                **log_object,
+                trace_parent_id=trace_parent_id,
+                source_datapoint_id=evaluation_context.get("source_datapoint_id"),
+                run_id=evaluation_context.get("run_id"),
+                request_options=RequestOptions(max_retries=3),
+            )
+            if evaluation_context and log_response.flow_id == evaluation_context["evaluated_file_id"]:
+                # Multiple Logs could be triggered by the Evaluation of a single File
+                evaluation_context["upload_callback"](log_object)
+            self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = log_response.id
+        except HumanloopApiError as e:
+            logger.error(str(e))
+            self._span_id_to_uploaded_log_id[span.context.span_id] = None

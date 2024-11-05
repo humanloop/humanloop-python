@@ -1,6 +1,5 @@
-from typing import Optional
+from typing import Optional, TypedDict
 
-from typing import TypedDict
 from opentelemetry.sdk.trace import TracerProvider
 from typing_extensions import NotRequired
 

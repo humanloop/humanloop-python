@@ -1,5 +1,6 @@
 import builtins
 import inspect
+import logging
 import textwrap
 import typing
 import uuid
@@ -17,6 +18,8 @@ from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
 from .helpers import args_to_inputs
+
+logger = logging.getLogger("humanloop.sdk")
 
 
 def tool(
@@ -64,14 +67,20 @@ def tool(
                     )
 
                 # Call the decorated function
-                output = func(*args, **kwargs)
+                try:
+                    output = func(*args, **kwargs)
+                    error = None
+                except Exception as e:
+                    logger.error(str(e))
+                    output = None
+                    error = str(e)
 
                 # Populate known Tool Log attributes
                 tool_log = {
                     "inputs": args_to_inputs(func, args, kwargs),
+                    "output": output,
+                    "error": error,
                 }
-                if output:
-                    tool_log["output"] = output
 
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
                 if tool_log:

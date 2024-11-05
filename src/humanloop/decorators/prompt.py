@@ -1,3 +1,5 @@
+import logging
+import typing
 import uuid
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
@@ -5,6 +7,8 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 
+if typing.TYPE_CHECKING:
+    from humanloop import ToolFunctionParams
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
@@ -14,6 +18,8 @@ from humanloop.types.model_providers import ModelProviders
 from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
 from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
 from humanloop.types.response_format import ResponseFormat
+
+logger = logging.getLogger("humanloop.sdk")
 
 
 def prompt(
@@ -34,6 +40,7 @@ def prompt(
     other: Optional[dict[str, Optional[Any]]] = None,
     seed: Optional[int] = None,
     response_format: Optional[ResponseFormat] = None,
+    tools: Optional[Sequence["ToolFunctionParams"]] = None,
 ):
     def decorator(func: Callable):
         prompt_kernel = {}
@@ -68,10 +75,10 @@ def prompt(
             "other": other,
             "seed": seed,
             "response_format": response_format,
-            "attributes": attributes if attributes != {} else None,
+            "attributes": attributes or None,
+            "tools": tools or None,
         }.items():
-            if attr_value is not None:
-                prompt_kernel[attr_name] = attr_value  # type: ignore
+            prompt_kernel[attr_name] = attr_value  # type: ignore
 
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
@@ -90,6 +97,8 @@ def prompt(
 
                 span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HL_FILE_TYPE_KEY, "prompt")
+
+                # Avoid writing falsy values to OTel, otherwise a
                 if prompt_kernel:
                     write_to_opentelemetry_span(
                         span=span,
@@ -98,15 +107,23 @@ def prompt(
                     )
 
                 # Call the decorated function
-                output = func(*args, **kwargs)
+                try:
+                    output = func(*args, **kwargs)
+                    error = None
+                except Exception as e:
+                    logger.error(str(e))
+                    output = None
+                    error = str(e)
 
-                if output:
-                    prompt_log = {"output": output}
-                    write_to_opentelemetry_span(
-                        span=span,
-                        key=HL_LOG_KEY,
-                        value=prompt_log,
-                    )
+                prompt_log = {
+                    "output": output,
+                    "error": error,
+                }
+                write_to_opentelemetry_span(
+                    span=span,
+                    key=HL_LOG_KEY,
+                    value=prompt_log,
+                )
 
             # Return the output of the decorated function
             return output

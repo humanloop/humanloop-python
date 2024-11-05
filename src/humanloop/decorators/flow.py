@@ -1,3 +1,4 @@
+import logging
 import uuid
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
@@ -12,6 +13,8 @@ from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
 from humanloop.requests import FlowKernelRequestParams as FlowDict
+
+logger = logging.getLogger("humanloop.sdk")
 
 
 def flow(
@@ -57,10 +60,22 @@ def flow(
                         value=attributes,  # type: ignore
                     )
 
-                # Call the decorated function
-                output = func(*args, **kwargs)
                 inputs = args_to_inputs(func, args, kwargs)
-                flow_log = {}
+
+                # Call the decorated function
+                try:
+                    output = func(*args, **kwargs)
+                    error = None
+                except Exception as e:
+                    logger.error(str(e))
+                    output = None
+                    error = str(e)
+
+                flow_log = {
+                    "inputs": inputs,
+                    "output": output,
+                    "error": error,
+                }
                 if inputs:
                     flow_log["inputs"] = inputs
                 if output:
