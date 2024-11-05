@@ -18,8 +18,8 @@ from .decorators.flow import flow as flow_decorator_factory
 from .decorators.prompt import prompt as prompt_decorator_factory
 from .decorators.tool import tool as tool_decorator_factory
 from .environment import HumanloopEnvironment
-from humanloop.eval_utils.domain import Dataset, Evaluator, EvaluatorCheck, File
-from humanloop.eval_utils import _run_eval
+from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
+from humanloop.eval_utils import run_eval
 from .evaluations.client import EvaluationsClient
 from .otel import instrument_provider
 from .otel.exporter import HumanloopSpanExporter
@@ -52,7 +52,7 @@ class ExtendedEvalsClient(EvaluationsClient):
         if self.client is None:
             raise ValueError("Need Humanloop client defined to run evals")
 
-        return _run_eval(
+        return run_eval(
             client=self.client,
             file=file,
             name=name,
@@ -217,7 +217,7 @@ class Humanloop(BaseHumanloop):
 
         :param path: The path where the Prompt is created. If not
             provided, the function name is used as the path and the File
-            is created in the root of your Humanloop's organization workspace.
+            is created in the root of your Humanloop organization workspace.
 
         :param model: Name of the model used by the Prompt.
 
@@ -258,6 +258,10 @@ class Humanloop(BaseHumanloop):
         :param response_format: The format of the response.
             Only `{"type": "json_object"}` is currently supported
             for chat.
+
+        :param attributes: Additional fields to describe the Prompt. Helpful to
+            separate Prompt versions from each other with details on how they
+            were created or used.
         """
         return prompt_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
@@ -342,7 +346,7 @@ class Humanloop(BaseHumanloop):
 
         :param path: The path to the Tool. If not provided, the function name
             will be used as the path and the File will be created in the root
-            of your Humanloop's organization workspace.
+            of your organization's workspace.
 
         :param setup_values: Values needed to setup the Tool, defined in
             JSON Schema format: https://json-schema.org/
@@ -404,7 +408,7 @@ class Humanloop(BaseHumanloop):
 
         :param path: The path to the Flow. If not provided, the function name
             will be used as the path and the File will be created in the root
-            of your Humanloop's organization workspace.
+            of your organization workspace.
 
         :param attributes: A key-value object identifying the Flow Version.
         """

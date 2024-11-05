@@ -1,28 +1,10 @@
 from typing import Optional
 
-from mypy.build import TypedDict
-from opentelemetry.context import Context
+from typing import TypedDict
 from opentelemetry.sdk.trace import TracerProvider
 from typing_extensions import NotRequired
 
 from humanloop.otel.helpers import module_is_installed
-
-"""
-Humanloop SDK uses the Baggage concept from OTel
-to store the Trace metadata. Read more here:
-https://opentelemetry.io/docs/concepts/signals/baggage/
-
-The top of the stack contains the Trace information of
-the parent Span.
-
-When a Span is created by a decorator, the metadata of
-that Span is pushed to the stack so the children can
-peek at it and determine its parent in a Flow Trace.
-
-When the parent Span is completed, the context is popped
-off the stack.
-"""
-_BAGGAGE_CONTEXT_STACK: list[Context] = [Context()]
 
 
 def instrument_provider(provider: TracerProvider):

@@ -105,7 +105,8 @@ def write_to_opentelemetry_span(
         else:
             linearised_attributes[key] = value  # type: ignore
     for final_key, final_value in linearised_attributes.items():
-        span._attributes[final_key] = final_value  # type: ignore
+        if final_value is not None:
+            span._attributes[final_key] = final_value  # type: ignore
 
 
 def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDict:

@@ -30,10 +30,9 @@ from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolRespo
 from humanloop.client import BaseHumanloop
 from humanloop.core.api_error import ApiError
 from humanloop.eval_utils.context import EVALUATION_CONTEXT, EvaluationContext
-from humanloop.eval_utils.domain import Dataset, Evaluator, EvaluatorCheck, File
+from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
 # We use TypedDicts for requests, which is consistent with the rest of the SDK
-from humanloop.eval_utils.shared import add_log_to_evaluation
 from humanloop.requests import CodeEvaluatorRequestParams as CodeEvaluatorDict
 from humanloop.requests import ExternalEvaluatorRequestParams as ExternalEvaluator
 from humanloop.requests import FlowKernelRequestParams as FlowDict
@@ -44,6 +43,7 @@ from humanloop.requests import ToolKernelRequestParams as ToolDict
 from humanloop.types import BooleanEvaluatorStatsResponse as BooleanStats
 from humanloop.types import DatapointResponse as Datapoint
 from humanloop.types import EvaluationResponse, EvaluationStats, VersionStatsResponse
+from humanloop.types.datapoint_response_target_value import DatapointResponseTargetValue
 
 # Responses are Pydantic models and we leverage them for improved request validation
 from humanloop.types import FlowKernelRequest as Flow
@@ -80,7 +80,53 @@ RED = "\033[91m"
 RESET = "\033[0m"
 
 
-def _run_eval(
+class _SimpleProgressBar:
+    """Thread-safe progress bar for the console."""
+
+    def __init__(self, total: int):
+        if total <= 0:
+            self._total = 1
+        else:
+            self._total = total
+        self._progress = 0
+        self._lock = threading.Lock()
+        self._start_time = None
+
+    def increment(self):
+        """Increment the progress bar by one finished task."""
+        with self._lock:
+            self._progress += 1
+            if self._start_time is None:
+                self._start_time = time.time()
+
+            bar_length = 40
+            block = int(round(bar_length * self._progress / self._total))
+            bar = "#" * block + "-" * (bar_length - block)
+
+            percentage = (self._progress / self._total) * 100
+            elapsed_time = time.time() - self._start_time
+            time_per_item = elapsed_time / self._progress if self._progress > 0 else 0
+            eta = (self._total - self._progress) * time_per_item
+
+            progress_display = f"\r[{bar}] {self._progress}/{self._total}"
+            progress_display += f" ({percentage:.2f}%)"
+
+            if self._progress < self._total:
+                progress_display += f" | ETA: {int(eta)}s"
+            else:
+                progress_display += " | DONE"
+
+            sys.stderr.write(progress_display)
+
+            if self._progress >= self._total:
+                sys.stderr.write("\n")
+
+
+# Module-level so it can be shared by threads.
+_PROGRESS_BAR: Optional[_SimpleProgressBar] = None
+
+
+def run_eval(
     client: BaseHumanloop,
     file: Union[File, Callable],
     name: Optional[str],
@@ -205,6 +251,16 @@ def _run_eval(
                 )
     function_ = typing.cast(Callable, function_)
 
+    # Validate signature of the called function
+    function_signature = inspect.signature(function_)
+    parameter_names = list(function_signature.parameters.keys())
+    if parameter_names != ["inputs", "messages"] and parameter_names != ["inputs"]:
+        raise ValueError(
+            f"Your {type_}'s `callable` must have the signature `def "
+            "function(inputs: dict, messages: Optional[dict] = None):` "
+            "or `def function(inputs: dict):`"
+        )
+
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
     for local_evaluator in local_evaluators:
@@ -280,11 +336,9 @@ def _run_eval(
                         messages=datapoint_dict["messages"],
                     )
                 else:
-                    # function_ is not None at this point
                     output = function_(**datapoint_dict["inputs"])  # type: ignore
                 if custom_logger:
-                    # function_ is not None at this point
-                    log = function_(client=client, output=output)  # type: ignore
+                    log = custom_logger(client=client, output=output)  # type: ignore
                 else:
                     if not isinstance(output, str):
                         raise ValueError(
@@ -307,7 +361,7 @@ def _run_eval(
                 )
                 logger.warning(msg=f"\nYour {type_}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}")
 
-            add_log_to_evaluation(
+            _add_log_to_evaluation(
                 client=client,
                 log=log,
                 datapoint_target=dp.target,
@@ -491,7 +545,7 @@ def get_evaluator_stats_by_path(
     return evaluator_stats_by_path  # type: ignore
 
 
-def check_evaluation_threshold(
+def _check_evaluation_threshold(
     evaluation: EvaluationResponse,
     stats: EvaluationStats,
     evaluator_path: str,
@@ -521,7 +575,7 @@ def check_evaluation_threshold(
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")
 
 
-def check_evaluation_improvement(
+def _check_evaluation_improvement(
     evaluation: EvaluationResponse,
     evaluator_path: str,
     stats: EvaluationStats,
@@ -562,3 +616,44 @@ def check_evaluation_improvement(
             return False, latest_score, diff
     else:
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")
+
+
+def _add_log_to_evaluation(
+    client: BaseHumanloop,
+    log: dict,
+    datapoint_target: typing.Optional[typing.Dict[str, DatapointResponseTargetValue]],
+    local_evaluators: list[Evaluator],
+):
+    for local_evaluator in local_evaluators:
+        start_time = datetime.now()
+        try:
+            eval_function = local_evaluator["callable"]
+            if local_evaluator["args_type"] == "target_required":
+                judgement = eval_function(
+                    log,
+                    datapoint_target,
+                )
+            else:
+                judgement = eval_function(log)
+
+            if local_evaluator.get("custom_logger", None):
+                local_evaluator["custom_logger"](judgement, start_time, datetime.now())
+            else:
+                _ = client.evaluators.log(
+                    parent_id=log["id"],
+                    judgment=judgement,
+                    id=local_evaluator.get("id"),
+                    path=local_evaluator.get("path"),
+                    start_time=start_time,
+                    end_time=datetime.now(),
+                )
+        except Exception as e:
+            _ = client.evaluators.log(
+                parent_id=log["id"],
+                path=local_evaluator.get("path"),
+                id=local_evaluator.get("id"),
+                error=str(e),
+                start_time=start_time,
+                end_time=datetime.now(),
+            )
+            logger.warning(f"\nEvaluator {local_evaluator['path']} failed with error {str(e)}")
