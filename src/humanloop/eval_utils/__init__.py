@@ -367,7 +367,7 @@ def run_eval(
                 datapoint_target=dp.target,
                 local_evaluators=local_evaluators,
             )
-            _PROGRESS_BAR.increment()
+            _PROGRESS_BAR.increment()  # type: ignore
 
     # Execute the function and send the logs to Humanloop in parallel
     logger.info(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n")
