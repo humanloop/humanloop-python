@@ -175,6 +175,7 @@ class HumanloopSpanExporter(SpanExporter):
                 # Parent Log in Trace upload failed
                 file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
                 logger.error(f"Skipping log for {file_path}: parent Log upload failed")
+                return
         else:
             trace_parent_id = None
         prompt: PromptKernelRequestParams = file_object["prompt"]
@@ -220,6 +221,7 @@ class HumanloopSpanExporter(SpanExporter):
                 # Parent Log in Trace upload failed
                 file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
                 logger.error(f"Skipping log for {file_path}: parent Log upload failed")
+                return
         else:
             trace_parent_id = None
         tool = file_object["tool"]
@@ -268,6 +270,7 @@ class HumanloopSpanExporter(SpanExporter):
                 # Parent Log in Trace upload failed
                 file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
                 logger.error(f"Skipping log for {file_path}: parent Log upload failed")
+                return
         else:
             trace_parent_id = None
         flow: FlowKernelRequestParams
