@@ -4,3 +4,4 @@ src/humanloop/eval_utils.py
 src/humanloop/prompt_utils.py
 src/humanloop/client.py
 mypy.ini
+README.md
