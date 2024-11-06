@@ -92,6 +92,16 @@ class ToolResponse(UncheckedBaseModel):
     The user who created the Tool.
     """
 
+    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
+    """
+    The user who committed the Tool Version.
+    """
+
+    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
+    """
+    The date and time the Tool Version was committed.
+    """
+
     status: VersionStatus = pydantic.Field()
     """
     The status of the Tool Version.

@@ -6,6 +6,6 @@ from ...types.code_evaluator_request import CodeEvaluatorRequest
 from ...types.human_evaluator_request import HumanEvaluatorRequest
 from ...types.external_evaluator_request import ExternalEvaluatorRequest
 
-SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpec = typing.Union[
+EvaluatorRequestSpec = typing.Union[
     LlmEvaluatorRequest, CodeEvaluatorRequest, HumanEvaluatorRequest, ExternalEvaluatorRequest
 ]

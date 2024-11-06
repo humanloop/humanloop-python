@@ -40,7 +40,7 @@ class EvaluateeRequest(UncheckedBaseModel):
 
     batch_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Unique identifier for the batch of Logs to include in the Evaluation Report.
+    Unique identifier for the batch of Logs to include in the Evaluation.
     """
 
     orchestrated: typing.Optional[bool] = pydantic.Field(default=None)

@@ -11,15 +11,18 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..requests.evaluations_dataset_request import EvaluationsDatasetRequestParams
-from ..requests.evaluations_request import EvaluationsRequestParams
-from ..requests.evaluatee_request import EvaluateeRequestParams
+from .requests.create_evaluation_request_evaluators_item import CreateEvaluationRequestEvaluatorsItemParams
 from ..requests.file_request import FileRequestParams
 from ..core.serialization import convert_and_respect_annotation_metadata
+from .requests.add_evaluators_request_evaluators_item import AddEvaluatorsRequestEvaluatorsItemParams
 from ..core.jsonable_encoder import jsonable_encoder
+from ..types.evaluation_runs_response import EvaluationRunsResponse
+from .requests.create_run_request_dataset import CreateRunRequestDatasetParams
+from .requests.create_run_request_version import CreateRunRequestVersionParams
+from ..types.evaluation_run_response import EvaluationRunResponse
 from ..types.evaluation_status import EvaluationStatus
 from ..types.evaluation_stats import EvaluationStats
-from ..types.paginated_data_evaluation_report_log_response import PaginatedDataEvaluationReportLogResponse
+from ..types.paginated_data_evaluation_log_response import PaginatedDataEvaluationLogResponse
 from ..core.client_wrapper import AsyncClientWrapper
 from ..core.pagination import AsyncPager
 
@@ -40,9 +43,7 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[EvaluationResponse]:
         """
-        List all Evaluations for the specified `file_id`.
-
-        Retrieve a list of Evaluations that evaluate versions of the specified File.
+        Retrieve a list of Evaluations for the specified File.
 
         Parameters
         ----------
@@ -127,43 +128,28 @@ class EvaluationsClient:
     def create(
         self,
         *,
-        dataset: EvaluationsDatasetRequestParams,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
-        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
-        name: typing.Optional[str] = OMIT,
+        evaluators: typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
         file: typing.Optional[FileRequestParams] = OMIT,
+        name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
         Create an Evaluation.
 
-        Create a new Evaluation by specifying the Dataset, versions to be
-        evaluated (Evaluatees), and which Evaluators to provide judgments.
-
-        Humanloop will automatically start generating Logs and running Evaluators where
-        `orchestrated=true`. If you own the runtime for the Evaluatee or Evaluator, you
-        can set `orchestrated=false` and then generate and submit the required logs using
-        your runtime.
-
-        To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-        the `GET /evaluations/:id` endpoint and check its status.
+        Create a new Evaluation by specifying the File to evaluate, and a name
+        for the Evaluation.
+        You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs` endpoint.
 
         Parameters
         ----------
-        dataset : EvaluationsDatasetRequestParams
-            Dataset to use in this Evaluation.
-
-        evaluators : typing.Sequence[EvaluationsRequestParams]
+        evaluators : typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]
             The Evaluators used to evaluate.
 
-        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add Evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+        file : typing.Optional[FileRequestParams]
+            The File to associate with the Evaluation. This File contains the Logs you're evaluating.
 
         name : typing.Optional[str]
             Name of the Evaluation to help identify it. Must be unique within the associated File.
-
-        file : typing.Optional[FileRequestParams]
-            The File to associate with the Evaluation.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -181,29 +167,21 @@ class EvaluationsClient:
             api_key="YOUR_API_KEY",
         )
         client.evaluations.create(
-            dataset={"version_id": "dsv_6L78pqrdFi2xa"},
-            evaluatees=[
-                {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
-            ],
-            evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+            evaluators=[{"version_id": "version_id"}],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             "evaluations",
             method="POST",
             json={
-                "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
-                ),
-                "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
-                ),
-                "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
-                ),
-                "name": name,
                 "file": convert_and_respect_annotation_metadata(
                     object_=file, annotation=FileRequestParams, direction="write"
+                ),
+                "name": name,
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators,
+                    annotation=typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -233,9 +211,157 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def add_evaluators(
+        self,
+        id: str,
+        *,
+        evaluators: typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationResponse:
+        """
+        Add Evaluators to an Evaluation.
+
+        The Evaluators will be run on the Logs generated for the Evaluation.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        evaluators : typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]
+            The Evaluators to add to this Evaluation.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.add_evaluators(
+            id="id",
+            evaluators=[{"version_id": "version_id"}],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators,
+                    annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationResponse,
+                    construct_type(
+                        type_=EvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_evaluator(
+        self, id: str, evaluator_version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> EvaluationResponse:
+        """
+        Remove an Evaluator from an Evaluation.
+
+        The Evaluator will no longer be run on the Logs in the Evaluation.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        evaluator_version_id : str
+            Unique identifier for Evaluator Version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.remove_evaluator(
+            id="id",
+            evaluator_version_id="evaluator_version_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/evaluators/{jsonable_encoder(evaluator_version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationResponse,
+                    construct_type(
+                        type_=EvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationResponse:
         """
         Get an Evaluation.
+
+        This includes the Evaluators associated with the Evaluation and metadata about the Evaluation,
+        such as its name.
+
+        To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
+        To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
 
         Parameters
         ----------
@@ -294,8 +420,7 @@ class EvaluationsClient:
         """
         Delete an Evaluation.
 
-        Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
-        will not be deleted.
+        The Runs and Evaluators in the Evaluation will not be deleted.
 
         Parameters
         ----------
@@ -343,49 +468,23 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_setup(
-        self,
-        id: str,
-        *,
-        dataset: typing.Optional[EvaluationsDatasetRequestParams] = OMIT,
-        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
-        evaluators: typing.Optional[typing.Sequence[EvaluationsRequestParams]] = OMIT,
-        name: typing.Optional[str] = OMIT,
-        file: typing.Optional[FileRequestParams] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationResponse:
+    def list_runs_for_evaluation(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> EvaluationRunsResponse:
         """
-        Update an Evaluation.
-
-        Update the setup of an Evaluation by specifying the Dataset, versions to be
-        evaluated (Evaluatees), and which Evaluators to provide judgments.
+        List all Runs for an Evaluation.
 
         Parameters
         ----------
         id : str
             Unique identifier for Evaluation.
 
-        dataset : typing.Optional[EvaluationsDatasetRequestParams]
-            Dataset to use in this Evaluation.
-
-        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
-
-        evaluators : typing.Optional[typing.Sequence[EvaluationsRequestParams]]
-            The Evaluators used to evaluate.
-
-        name : typing.Optional[str]
-            Name of the Evaluation to help identify it. Must be unique within the associated File.
-
-        file : typing.Optional[FileRequestParams]
-            The File to associate with the Evaluation.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        EvaluationResponse
+        EvaluationRunsResponse
             Successful Response
 
         Examples
@@ -395,42 +494,21 @@ class EvaluationsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluations.update_setup(
-            id="ev_567yza",
-            dataset={"version_id": "dsv_6L78pqrdFi2xa"},
-            evaluatees=[
-                {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
-            ],
-            evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+        client.evaluations.list_runs_for_evaluation(
+            id="id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
-                ),
-                "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
-                ),
-                "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
-                ),
-                "name": name,
-                "file": convert_and_respect_annotation_metadata(
-                    object_=file, annotation=FileRequestParams, direction="write"
-                ),
-            },
+            f"evaluations/{jsonable_encoder(id)}/runs",
+            method="GET",
             request_options=request_options,
-            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationResponse,
+                    EvaluationRunsResponse,
                     construct_type(
-                        type_=EvaluationResponse,  # type: ignore
+                        type_=EvaluationRunsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -449,28 +527,55 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_status(
-        self, id: str, *, status: EvaluationStatus, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluationResponse:
+    def create_run(
+        self,
+        id: str,
+        *,
+        dataset: typing.Optional[CreateRunRequestDatasetParams] = OMIT,
+        version: typing.Optional[CreateRunRequestVersionParams] = OMIT,
+        orchestrated: typing.Optional[bool] = OMIT,
+        use_existing_logs: typing.Optional[bool] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationRunResponse:
         """
-        Update the status of an Evaluation.
+        Create an Evaluation Run.
 
-        Can be used to cancel a running Evaluation, or mark an Evaluation that uses
-        external or human evaluators as completed.
+        Optionally specify the Dataset and version to be evaluated.
+
+        Humanloop will automatically start generating Logs and running Evaluators where
+        `orchestrated=true`. If you are generating Logs yourself, you can set `orchestrated=false`
+        and then generate and submit the required Logs via the API.
+
+        If `dataset` and `version` are provided, you can set `use_existing_logs=True` to reuse existing Logs,
+        avoiding generating new Logs unnecessarily. Logs that are associated with the specified Version and have `source_datapoint_id`
+        referencing a datapoint in the specified Dataset will be associated with the Run.
+
+        To keep updated on the progress of the Run, you can poll the Run using
+        the `GET /evaluations/{id}/runs` endpoint and check its status.
 
         Parameters
         ----------
         id : str
             Unique identifier for Evaluation.
 
-        status : EvaluationStatus
+        dataset : typing.Optional[CreateRunRequestDatasetParams]
+            Dataset to use in this Run.
+
+        version : typing.Optional[CreateRunRequestVersionParams]
+            Version to use in this Run.
+
+        orchestrated : typing.Optional[bool]
+            Whether the Run is orchestrated by Humanloop. If `True`, Humanloop will generate Logs for the Run; `dataset` and `version` must be provided. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+
+        use_existing_logs : typing.Optional[bool]
+            If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        EvaluationResponse
+        EvaluationRunResponse
             Successful Response
 
         Examples
@@ -480,15 +585,227 @@ class EvaluationsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.evaluations.update_status(
+        client.evaluations.create_run(
             id="id",
-            status="pending",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}/status",
+            f"evaluations/{jsonable_encoder(id)}/runs",
+            method="POST",
+            json={
+                "dataset": convert_and_respect_annotation_metadata(
+                    object_=dataset, annotation=CreateRunRequestDatasetParams, direction="write"
+                ),
+                "version": convert_and_respect_annotation_metadata(
+                    object_=version, annotation=CreateRunRequestVersionParams, direction="write"
+                ),
+                "orchestrated": orchestrated,
+                "use_existing_logs": use_existing_logs,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationRunResponse,
+                    construct_type(
+                        type_=EvaluationRunResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def add_existing_run(
+        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Optional[typing.Any]:
+        """
+        Add an existing Run to the specified Evaluation.
+
+        This is useful if you want to compare the Runs in this Evaluation with an existing Run
+        that exists within another Evaluation.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Optional[typing.Any]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.add_existing_run(
+            id="id",
+            run_id="run_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}",
+            method="POST",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.Optional[typing.Any],
+                    construct_type(
+                        type_=typing.Optional[typing.Any],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def remove_run(self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+        """
+        Remove a Run from an Evaluation.
+
+        The Logs and Versions used in the Run will not be deleted.
+        If this Run is used in any other Evaluations, it will still be available in those Evaluations.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.remove_run(
+            id="id",
+            run_id="run_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_evaluation_run(
+        self,
+        id: str,
+        run_id: str,
+        *,
+        control: typing.Optional[bool] = OMIT,
+        status: typing.Optional[EvaluationStatus] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationRunResponse:
+        """
+        Update an Evaluation Run.
+
+        Specify `control=true` to use this Run as the control Run for the Evaluation.
+        You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        control : typing.Optional[bool]
+            If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+
+        status : typing.Optional[EvaluationStatus]
+            Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationRunResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.update_evaluation_run(
+            id="id",
+            run_id="run_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}",
             method="PATCH",
             json={
+                "control": control,
                 "status": status,
             },
             request_options=request_options,
@@ -497,9 +814,85 @@ class EvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationResponse,
+                    EvaluationRunResponse,
                     construct_type(
-                        type_=EvaluationResponse,  # type: ignore
+                        type_=EvaluationRunResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def add_logs_to_run(
+        self,
+        id: str,
+        run_id: str,
+        *,
+        log_ids: typing.Sequence[str],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationRunResponse:
+        """
+        Add the specified Logs to a Run.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        log_ids : typing.Sequence[str]
+            The IDs of the Logs to add to the Run.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationRunResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.evaluations.add_logs_to_run(
+            id="id",
+            run_id="run_id",
+            log_ids=["log_ids"],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}/logs",
+            method="POST",
+            json={
+                "log_ids": log_ids,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationRunResponse,
+                    construct_type(
+                        type_=EvaluationRunResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -522,8 +915,7 @@ class EvaluationsClient:
         """
         Get Evaluation Stats.
 
-        Retrieve aggregate stats for the specified Evaluation.
-        This includes the number of generated Logs for each evaluated version and the
+        Retrieve aggregate stats for the specified Evaluation. This includes the number of generated Logs for each Run and the
         corresponding Evaluator statistics (such as the mean and percentiles).
 
         Parameters
@@ -586,12 +978,11 @@ class EvaluationsClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataEvaluationReportLogResponse:
+    ) -> PaginatedDataEvaluationLogResponse:
         """
         Get the Logs associated to a specific Evaluation.
 
-        Each Datapoint in your Dataset will have a corresponding Log for each File version evaluated.
-        e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will be 100 Logs associated with the Evaluation.
+        This returns the Logs associated to all Runs within with the Evaluation.
 
         Parameters
         ----------
@@ -609,7 +1000,7 @@ class EvaluationsClient:
 
         Returns
         -------
-        PaginatedDataEvaluationReportLogResponse
+        PaginatedDataEvaluationLogResponse
             Successful Response
 
         Examples
@@ -635,107 +1026,9 @@ class EvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    PaginatedDataEvaluationReportLogResponse,
+                    PaginatedDataEvaluationLogResponse,
                     construct_type(
-                        type_=PaginatedDataEvaluationReportLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def pin_evaluatee(
-        self,
-        id: str,
-        *,
-        version_id: typing.Optional[str] = OMIT,
-        path: typing.Optional[str] = OMIT,
-        file_id: typing.Optional[str] = OMIT,
-        environment: typing.Optional[str] = OMIT,
-        batch_id: typing.Optional[str] = OMIT,
-        orchestrated: typing.Optional[bool] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationResponse:
-        """
-        Pin the specified Evaluatee.
-
-        Pinned Evaluatees are always displayed in the Evaluation Overview,
-        and serve as the baseline for comparison with other Evaluatees.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Evaluation.
-
-        version_id : typing.Optional[str]
-            Unique identifier for the File Version. If provided, none of the other fields should be specified.
-
-        path : typing.Optional[str]
-            Path identifying a File. Provide either this or `file_id` if you want to specify a File.
-
-        file_id : typing.Optional[str]
-            Unique identifier for the File. Provide either this or `path` if you want to specify a File.
-
-        environment : typing.Optional[str]
-            Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
-
-        batch_id : typing.Optional[str]
-            Unique identifier for the batch of Logs to include in the Evaluation Report.
-
-        orchestrated : typing.Optional[bool]
-            Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EvaluationResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.evaluations.pin_evaluatee(
-            id="id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}/pin-evaluatee",
-            method="POST",
-            json={
-                "version_id": version_id,
-                "path": path,
-                "file_id": file_id,
-                "environment": environment,
-                "batch_id": batch_id,
-                "orchestrated": orchestrated,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluationResponse,
-                    construct_type(
-                        type_=EvaluationResponse,  # type: ignore
+                        type_=PaginatedDataEvaluationLogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -768,9 +1061,7 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[EvaluationResponse]:
         """
-        List all Evaluations for the specified `file_id`.
-
-        Retrieve a list of Evaluations that evaluate versions of the specified File.
+        Retrieve a list of Evaluations for the specified File.
 
         Parameters
         ----------
@@ -863,43 +1154,28 @@ class AsyncEvaluationsClient:
     async def create(
         self,
         *,
-        dataset: EvaluationsDatasetRequestParams,
-        evaluators: typing.Sequence[EvaluationsRequestParams],
-        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
-        name: typing.Optional[str] = OMIT,
+        evaluators: typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
         file: typing.Optional[FileRequestParams] = OMIT,
+        name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
         Create an Evaluation.
 
-        Create a new Evaluation by specifying the Dataset, versions to be
-        evaluated (Evaluatees), and which Evaluators to provide judgments.
-
-        Humanloop will automatically start generating Logs and running Evaluators where
-        `orchestrated=true`. If you own the runtime for the Evaluatee or Evaluator, you
-        can set `orchestrated=false` and then generate and submit the required logs using
-        your runtime.
-
-        To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-        the `GET /evaluations/:id` endpoint and check its status.
+        Create a new Evaluation by specifying the File to evaluate, and a name
+        for the Evaluation.
+        You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs` endpoint.
 
         Parameters
         ----------
-        dataset : EvaluationsDatasetRequestParams
-            Dataset to use in this Evaluation.
-
-        evaluators : typing.Sequence[EvaluationsRequestParams]
+        evaluators : typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]
             The Evaluators used to evaluate.
 
-        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add Evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+        file : typing.Optional[FileRequestParams]
+            The File to associate with the Evaluation. This File contains the Logs you're evaluating.
 
         name : typing.Optional[str]
             Name of the Evaluation to help identify it. Must be unique within the associated File.
-
-        file : typing.Optional[FileRequestParams]
-            The File to associate with the Evaluation.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -922,11 +1198,7 @@ class AsyncEvaluationsClient:
 
         async def main() -> None:
             await client.evaluations.create(
-                dataset={"version_id": "dsv_6L78pqrdFi2xa"},
-                evaluatees=[
-                    {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
-                ],
-                evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+                evaluators=[{"version_id": "version_id"}],
             )
 
 
@@ -936,18 +1208,14 @@ class AsyncEvaluationsClient:
             "evaluations",
             method="POST",
             json={
-                "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
-                ),
-                "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
-                ),
-                "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
-                ),
-                "name": name,
                 "file": convert_and_respect_annotation_metadata(
                     object_=file, annotation=FileRequestParams, direction="write"
+                ),
+                "name": name,
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators,
+                    annotation=typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams],
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -977,9 +1245,173 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def add_evaluators(
+        self,
+        id: str,
+        *,
+        evaluators: typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationResponse:
+        """
+        Add Evaluators to an Evaluation.
+
+        The Evaluators will be run on the Logs generated for the Evaluation.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        evaluators : typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]
+            The Evaluators to add to this Evaluation.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.add_evaluators(
+                id="id",
+                evaluators=[{"version_id": "version_id"}],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "evaluators": convert_and_respect_annotation_metadata(
+                    object_=evaluators,
+                    annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationResponse,
+                    construct_type(
+                        type_=EvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def remove_evaluator(
+        self, id: str, evaluator_version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> EvaluationResponse:
+        """
+        Remove an Evaluator from an Evaluation.
+
+        The Evaluator will no longer be run on the Logs in the Evaluation.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        evaluator_version_id : str
+            Unique identifier for Evaluator Version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.remove_evaluator(
+                id="id",
+                evaluator_version_id="evaluator_version_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/evaluators/{jsonable_encoder(evaluator_version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationResponse,
+                    construct_type(
+                        type_=EvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def get(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> EvaluationResponse:
         """
         Get an Evaluation.
+
+        This includes the Evaluators associated with the Evaluation and metadata about the Evaluation,
+        such as its name.
+
+        To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
+        To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
 
         Parameters
         ----------
@@ -1046,8 +1478,7 @@ class AsyncEvaluationsClient:
         """
         Delete an Evaluation.
 
-        Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
-        will not be deleted.
+        The Runs and Evaluators in the Evaluation will not be deleted.
 
         Parameters
         ----------
@@ -1103,49 +1534,23 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_setup(
-        self,
-        id: str,
-        *,
-        dataset: typing.Optional[EvaluationsDatasetRequestParams] = OMIT,
-        evaluatees: typing.Optional[typing.Sequence[EvaluateeRequestParams]] = OMIT,
-        evaluators: typing.Optional[typing.Sequence[EvaluationsRequestParams]] = OMIT,
-        name: typing.Optional[str] = OMIT,
-        file: typing.Optional[FileRequestParams] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationResponse:
+    async def list_runs_for_evaluation(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> EvaluationRunsResponse:
         """
-        Update an Evaluation.
-
-        Update the setup of an Evaluation by specifying the Dataset, versions to be
-        evaluated (Evaluatees), and which Evaluators to provide judgments.
+        List all Runs for an Evaluation.
 
         Parameters
         ----------
         id : str
             Unique identifier for Evaluation.
 
-        dataset : typing.Optional[EvaluationsDatasetRequestParams]
-            Dataset to use in this Evaluation.
-
-        evaluatees : typing.Optional[typing.Sequence[EvaluateeRequestParams]]
-            Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
-
-        evaluators : typing.Optional[typing.Sequence[EvaluationsRequestParams]]
-            The Evaluators used to evaluate.
-
-        name : typing.Optional[str]
-            Name of the Evaluation to help identify it. Must be unique within the associated File.
-
-        file : typing.Optional[FileRequestParams]
-            The File to associate with the Evaluation.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        EvaluationResponse
+        EvaluationRunsResponse
             Successful Response
 
         Examples
@@ -1160,45 +1565,24 @@ class AsyncEvaluationsClient:
 
 
         async def main() -> None:
-            await client.evaluations.update_setup(
-                id="ev_567yza",
-                dataset={"version_id": "dsv_6L78pqrdFi2xa"},
-                evaluatees=[
-                    {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
-                ],
-                evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+            await client.evaluations.list_runs_for_evaluation(
+                id="id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=EvaluationsDatasetRequestParams, direction="write"
-                ),
-                "evaluatees": convert_and_respect_annotation_metadata(
-                    object_=evaluatees, annotation=typing.Sequence[EvaluateeRequestParams], direction="write"
-                ),
-                "evaluators": convert_and_respect_annotation_metadata(
-                    object_=evaluators, annotation=typing.Sequence[EvaluationsRequestParams], direction="write"
-                ),
-                "name": name,
-                "file": convert_and_respect_annotation_metadata(
-                    object_=file, annotation=FileRequestParams, direction="write"
-                ),
-            },
+            f"evaluations/{jsonable_encoder(id)}/runs",
+            method="GET",
             request_options=request_options,
-            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationResponse,
+                    EvaluationRunsResponse,
                     construct_type(
-                        type_=EvaluationResponse,  # type: ignore
+                        type_=EvaluationRunsResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1217,28 +1601,55 @@ class AsyncEvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_status(
-        self, id: str, *, status: EvaluationStatus, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluationResponse:
+    async def create_run(
+        self,
+        id: str,
+        *,
+        dataset: typing.Optional[CreateRunRequestDatasetParams] = OMIT,
+        version: typing.Optional[CreateRunRequestVersionParams] = OMIT,
+        orchestrated: typing.Optional[bool] = OMIT,
+        use_existing_logs: typing.Optional[bool] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationRunResponse:
         """
-        Update the status of an Evaluation.
+        Create an Evaluation Run.
 
-        Can be used to cancel a running Evaluation, or mark an Evaluation that uses
-        external or human evaluators as completed.
+        Optionally specify the Dataset and version to be evaluated.
+
+        Humanloop will automatically start generating Logs and running Evaluators where
+        `orchestrated=true`. If you are generating Logs yourself, you can set `orchestrated=false`
+        and then generate and submit the required Logs via the API.
+
+        If `dataset` and `version` are provided, you can set `use_existing_logs=True` to reuse existing Logs,
+        avoiding generating new Logs unnecessarily. Logs that are associated with the specified Version and have `source_datapoint_id`
+        referencing a datapoint in the specified Dataset will be associated with the Run.
+
+        To keep updated on the progress of the Run, you can poll the Run using
+        the `GET /evaluations/{id}/runs` endpoint and check its status.
 
         Parameters
         ----------
         id : str
             Unique identifier for Evaluation.
 
-        status : EvaluationStatus
+        dataset : typing.Optional[CreateRunRequestDatasetParams]
+            Dataset to use in this Run.
+
+        version : typing.Optional[CreateRunRequestVersionParams]
+            Version to use in this Run.
+
+        orchestrated : typing.Optional[bool]
+            Whether the Run is orchestrated by Humanloop. If `True`, Humanloop will generate Logs for the Run; `dataset` and `version` must be provided. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+
+        use_existing_logs : typing.Optional[bool]
+            If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        EvaluationResponse
+        EvaluationRunResponse
             Successful Response
 
         Examples
@@ -1253,18 +1664,256 @@ class AsyncEvaluationsClient:
 
 
         async def main() -> None:
-            await client.evaluations.update_status(
+            await client.evaluations.create_run(
                 id="id",
-                status="pending",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}/status",
+            f"evaluations/{jsonable_encoder(id)}/runs",
+            method="POST",
+            json={
+                "dataset": convert_and_respect_annotation_metadata(
+                    object_=dataset, annotation=CreateRunRequestDatasetParams, direction="write"
+                ),
+                "version": convert_and_respect_annotation_metadata(
+                    object_=version, annotation=CreateRunRequestVersionParams, direction="write"
+                ),
+                "orchestrated": orchestrated,
+                "use_existing_logs": use_existing_logs,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationRunResponse,
+                    construct_type(
+                        type_=EvaluationRunResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def add_existing_run(
+        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Optional[typing.Any]:
+        """
+        Add an existing Run to the specified Evaluation.
+
+        This is useful if you want to compare the Runs in this Evaluation with an existing Run
+        that exists within another Evaluation.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Optional[typing.Any]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.add_existing_run(
+                id="id",
+                run_id="run_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}",
+            method="POST",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.Optional[typing.Any],
+                    construct_type(
+                        type_=typing.Optional[typing.Any],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def remove_run(
+        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Remove a Run from an Evaluation.
+
+        The Logs and Versions used in the Run will not be deleted.
+        If this Run is used in any other Evaluations, it will still be available in those Evaluations.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.remove_run(
+                id="id",
+                run_id="run_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_evaluation_run(
+        self,
+        id: str,
+        run_id: str,
+        *,
+        control: typing.Optional[bool] = OMIT,
+        status: typing.Optional[EvaluationStatus] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationRunResponse:
+        """
+        Update an Evaluation Run.
+
+        Specify `control=true` to use this Run as the control Run for the Evaluation.
+        You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        control : typing.Optional[bool]
+            If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+
+        status : typing.Optional[EvaluationStatus]
+            Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationRunResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.update_evaluation_run(
+                id="id",
+                run_id="run_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}",
             method="PATCH",
             json={
+                "control": control,
                 "status": status,
             },
             request_options=request_options,
@@ -1273,9 +1922,93 @@ class AsyncEvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationResponse,
+                    EvaluationRunResponse,
                     construct_type(
-                        type_=EvaluationResponse,  # type: ignore
+                        type_=EvaluationRunResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def add_logs_to_run(
+        self,
+        id: str,
+        run_id: str,
+        *,
+        log_ids: typing.Sequence[str],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluationRunResponse:
+        """
+        Add the specified Logs to a Run.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluation.
+
+        run_id : str
+            Unique identifier for Run.
+
+        log_ids : typing.Sequence[str]
+            The IDs of the Logs to add to the Run.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluationRunResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.evaluations.add_logs_to_run(
+                id="id",
+                run_id="run_id",
+                log_ids=["log_ids"],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"evaluations/{jsonable_encoder(id)}/runs/{jsonable_encoder(run_id)}/logs",
+            method="POST",
+            json={
+                "log_ids": log_ids,
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    EvaluationRunResponse,
+                    construct_type(
+                        type_=EvaluationRunResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1298,8 +2031,7 @@ class AsyncEvaluationsClient:
         """
         Get Evaluation Stats.
 
-        Retrieve aggregate stats for the specified Evaluation.
-        This includes the number of generated Logs for each evaluated version and the
+        Retrieve aggregate stats for the specified Evaluation. This includes the number of generated Logs for each Run and the
         corresponding Evaluator statistics (such as the mean and percentiles).
 
         Parameters
@@ -1370,12 +2102,11 @@ class AsyncEvaluationsClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataEvaluationReportLogResponse:
+    ) -> PaginatedDataEvaluationLogResponse:
         """
         Get the Logs associated to a specific Evaluation.
 
-        Each Datapoint in your Dataset will have a corresponding Log for each File version evaluated.
-        e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will be 100 Logs associated with the Evaluation.
+        This returns the Logs associated to all Runs within with the Evaluation.
 
         Parameters
         ----------
@@ -1393,7 +2124,7 @@ class AsyncEvaluationsClient:
 
         Returns
         -------
-        PaginatedDataEvaluationReportLogResponse
+        PaginatedDataEvaluationLogResponse
             Successful Response
 
         Examples
@@ -1427,115 +2158,9 @@ class AsyncEvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    PaginatedDataEvaluationReportLogResponse,
+                    PaginatedDataEvaluationLogResponse,
                     construct_type(
-                        type_=PaginatedDataEvaluationReportLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def pin_evaluatee(
-        self,
-        id: str,
-        *,
-        version_id: typing.Optional[str] = OMIT,
-        path: typing.Optional[str] = OMIT,
-        file_id: typing.Optional[str] = OMIT,
-        environment: typing.Optional[str] = OMIT,
-        batch_id: typing.Optional[str] = OMIT,
-        orchestrated: typing.Optional[bool] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationResponse:
-        """
-        Pin the specified Evaluatee.
-
-        Pinned Evaluatees are always displayed in the Evaluation Overview,
-        and serve as the baseline for comparison with other Evaluatees.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Evaluation.
-
-        version_id : typing.Optional[str]
-            Unique identifier for the File Version. If provided, none of the other fields should be specified.
-
-        path : typing.Optional[str]
-            Path identifying a File. Provide either this or `file_id` if you want to specify a File.
-
-        file_id : typing.Optional[str]
-            Unique identifier for the File. Provide either this or `path` if you want to specify a File.
-
-        environment : typing.Optional[str]
-            Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
-
-        batch_id : typing.Optional[str]
-            Unique identifier for the batch of Logs to include in the Evaluation Report.
-
-        orchestrated : typing.Optional[bool]
-            Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EvaluationResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.evaluations.pin_evaluatee(
-                id="id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluations/{jsonable_encoder(id)}/pin-evaluatee",
-            method="POST",
-            json={
-                "version_id": version_id,
-                "path": path,
-                "file_id": file_id,
-                "environment": environment,
-                "batch_id": batch_id,
-                "orchestrated": orchestrated,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluationResponse,
-                    construct_type(
-                        type_=EvaluationResponse,  # type: ignore
+                        type_=PaginatedDataEvaluationLogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

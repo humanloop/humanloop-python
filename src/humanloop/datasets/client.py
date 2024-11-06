@@ -602,6 +602,7 @@ class DatasetsClient:
         id: str,
         *,
         status: typing.Optional[VersionStatus] = None,
+        include_datapoints: typing.Optional[typing.Literal["latest_committed"]] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasets:
         """
@@ -614,6 +615,9 @@ class DatasetsClient:
 
         status : typing.Optional[VersionStatus]
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+
+        include_datapoints : typing.Optional[typing.Literal["latest_committed"]]
+            If set to 'latest_committed', include the Datapoints for the latest committed version. Defaults to `None`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -640,6 +644,7 @@ class DatasetsClient:
             method="GET",
             params={
                 "status": status,
+                "include_datapoints": include_datapoints,
             },
             request_options=request_options,
         )
@@ -1647,6 +1652,7 @@ class AsyncDatasetsClient:
         id: str,
         *,
         status: typing.Optional[VersionStatus] = None,
+        include_datapoints: typing.Optional[typing.Literal["latest_committed"]] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasets:
         """
@@ -1659,6 +1665,9 @@ class AsyncDatasetsClient:
 
         status : typing.Optional[VersionStatus]
             Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+
+        include_datapoints : typing.Optional[typing.Literal["latest_committed"]]
+            If set to 'latest_committed', include the Datapoints for the latest committed version. Defaults to `None`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1693,6 +1702,7 @@ class AsyncDatasetsClient:
             method="GET",
             params={
                 "status": status,
+                "include_datapoints": include_datapoints,
             },
             request_options=request_options,
         )

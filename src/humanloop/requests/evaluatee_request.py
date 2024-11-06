@@ -38,7 +38,7 @@ class EvaluateeRequestParams(typing_extensions.TypedDict):
 
     batch_id: typing_extensions.NotRequired[str]
     """
-    Unique identifier for the batch of Logs to include in the Evaluation Report.
+    Unique identifier for the batch of Logs to include in the Evaluation.
     """
 
     orchestrated: typing_extensions.NotRequired[bool]

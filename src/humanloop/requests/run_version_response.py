@@ -6,6 +6,6 @@ from .tool_response import ToolResponseParams
 from .evaluator_response import EvaluatorResponseParams
 from .flow_response import FlowResponseParams
 
-EvaluatedVersionResponseParams = typing.Union[
+RunVersionResponseParams = typing.Union[
     PromptResponseParams, ToolResponseParams, EvaluatorResponseParams, FlowResponseParams
 ]

@@ -6,6 +6,6 @@ from ...requests.code_evaluator_request import CodeEvaluatorRequestParams
 from ...requests.human_evaluator_request import HumanEvaluatorRequestParams
 from ...requests.external_evaluator_request import ExternalEvaluatorRequestParams
 
-SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams = typing.Union[
+EvaluatorRequestSpecParams = typing.Union[
     LlmEvaluatorRequestParams, CodeEvaluatorRequestParams, HumanEvaluatorRequestParams, ExternalEvaluatorRequestParams
 ]

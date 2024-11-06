@@ -2,12 +2,10 @@
 
 from .create_evaluator_log_request_judgment import CreateEvaluatorLogRequestJudgmentParams
 from .create_evaluator_log_request_spec import CreateEvaluatorLogRequestSpecParams
-from .src_external_app_models_v_5_evaluators_evaluator_request_spec import (
-    SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams,
-)
+from .evaluator_request_spec import EvaluatorRequestSpecParams
 
 __all__ = [
     "CreateEvaluatorLogRequestJudgmentParams",
     "CreateEvaluatorLogRequestSpecParams",
-    "SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams",
+    "EvaluatorRequestSpecParams",
 ]

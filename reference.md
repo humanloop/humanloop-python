@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-19 00:29:35.178000+00:00",
+        "2024-07-18 23:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -100,7 +100,7 @@ client.prompts.log(
 <dl>
 <dd>
 
-**evaluation_id:** `typing.Optional[str]` — Unique identifier for the Evaluation Report to associate the Log to.
+**run_id:** `typing.Optional[str]` — Unique identifier for the Run to associate the Log to.
     
 </dd>
 </dl>
@@ -307,14 +307,6 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -682,7 +674,6 @@ response = client.prompts.call_stream(
     ),
     source_datapoint_id="string",
     trace_parent_id="string",
-    batch_id="string",
     user="string",
     prompts_call_stream_request_environment="string",
     save=True,
@@ -829,14 +820,6 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -1095,14 +1078,6 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -2518,14 +2493,6 @@ client.tools.log(
 <dd>
 
 **trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -4497,6 +4464,14 @@ client.datasets.list_versions(
 <dl>
 <dd>
 
+**include_datapoints:** `typing.Optional[typing.Literal["latest_committed"]]` — If set to 'latest_committed', include the Datapoints for the latest committed version. Defaults to `None`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -5157,14 +5132,6 @@ client.evaluators.log(
 <dl>
 <dd>
 
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **user:** `typing.Optional[str]` — End-user ID related to the Log.
     
 </dd>
@@ -5190,6 +5157,14 @@ client.evaluators.log(
 <dd>
 
 **judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**marked_completed:** `typing.Optional[bool]` — Whether the Log has been manually marked as completed by a user.
     
 </dd>
 </dl>
@@ -5395,7 +5370,7 @@ client.evaluators.upsert(
 <dl>
 <dd>
 
-**spec:** `SrcExternalAppModelsV5EvaluatorsEvaluatorRequestSpecParams` 
+**spec:** `EvaluatorRequestSpecParams` 
     
 </dd>
 </dl>
@@ -6258,10 +6233,10 @@ client.flows.log(
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
     trace_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:35+00:00",
+        "2024-07-08 21:40:35+00:00",
     ),
     end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:39+00:00",
+        "2024-07-08 21:40:39+00:00",
     ),
 )
 
@@ -6295,7 +6270,7 @@ client.flows.log(
 <dl>
 <dd>
 
-**evaluation_id:** `typing.Optional[str]` — Unique identifier for the Evaluation Report to associate the Log to.
+**run_id:** `typing.Optional[str]` — Unique identifier for the Run to associate the Log to.
     
 </dd>
 </dl>
@@ -6424,14 +6399,6 @@ client.flows.log(
 <dd>
 
 **trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the Batch to add this Batch to. Batches are used to group Logs together for Evaluations. A Batch will be created if one with the given ID does not exist.
     
 </dd>
 </dl>
@@ -8116,9 +8083,7 @@ client.files.list()
 <dl>
 <dd>
 
-List all Evaluations for the specified `file_id`.
-
-Retrieve a list of Evaluations that evaluate versions of the specified File.
+Retrieve a list of Evaluations for the specified File.
 </dd>
 </dl>
 </dd>
@@ -8212,16 +8177,9 @@ for page in response.iter_pages():
 
 Create an Evaluation.
 
-Create a new Evaluation by specifying the Dataset, versions to be
-evaluated (Evaluatees), and which Evaluators to provide judgments.
-
-Humanloop will automatically start generating Logs and running Evaluators where
-`orchestrated=true`. If you own the runtime for the Evaluatee or Evaluator, you
-can set `orchestrated=false` and then generate and submit the required logs using
-your runtime.
-
-To keep updated on the progress of the Evaluation, you can poll the Evaluation using
-the `GET /evaluations/:id` endpoint and check its status.
+Create a new Evaluation by specifying the File to evaluate, and a name
+for the Evaluation.
+You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs` endpoint.
 </dd>
 </dl>
 </dd>
@@ -8242,11 +8200,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.evaluations.create(
-    dataset={"version_id": "dsv_6L78pqrdFi2xa"},
-    evaluatees=[
-        {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
-    ],
-    evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+    evaluators=[{"version_id": "version_id"}],
 )
 
 ```
@@ -8263,7 +8217,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**dataset:** `EvaluationsDatasetRequestParams` — Dataset to use in this Evaluation.
+**evaluators:** `typing.Sequence[CreateEvaluationRequestEvaluatorsItemParams]` — The Evaluators used to evaluate.
     
 </dd>
 </dl>
@@ -8271,15 +8225,7 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**evaluators:** `typing.Sequence[EvaluationsRequestParams]` — The Evaluators used to evaluate.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add Evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
+**file:** `typing.Optional[FileRequestParams]` — The File to associate with the Evaluation. This File contains the Logs you're evaluating.
     
 </dd>
 </dl>
@@ -8295,7 +8241,161 @@ client.evaluations.create(
 <dl>
 <dd>
 
-**file:** `typing.Optional[FileRequestParams]` — The File to associate with the Evaluation.
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">add_evaluators</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add Evaluators to an Evaluation.
+
+The Evaluators will be run on the Logs generated for the Evaluation.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.add_evaluators(
+    id="id",
+    evaluators=[{"version_id": "version_id"}],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluators:** `typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams]` — The Evaluators to add to this Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">remove_evaluator</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove an Evaluator from an Evaluation.
+
+The Evaluator will no longer be run on the Logs in the Evaluation.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.remove_evaluator(
+    id="id",
+    evaluator_version_id="evaluator_version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_version_id:** `str` — Unique identifier for Evaluator Version.
     
 </dd>
 </dl>
@@ -8328,6 +8428,12 @@ client.evaluations.create(
 <dd>
 
 Get an Evaluation.
+
+This includes the Evaluators associated with the Evaluation and metadata about the Evaluation,
+such as its name.
+
+To get the Runs associated with the Evaluation, use the `GET /evaluations/{id}/runs` endpoint.
+To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endpoint.
 </dd>
 </dl>
 </dd>
@@ -8399,8 +8505,7 @@ client.evaluations.get(
 
 Delete an Evaluation.
 
-Remove an Evaluation from Humanloop. The Logs and Versions used in the Evaluation
-will not be deleted.
+The Runs and Evaluators in the Evaluation will not be deleted.
 </dd>
 </dl>
 </dd>
@@ -8458,7 +8563,7 @@ client.evaluations.delete(
 </dl>
 </details>
 
-<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update_setup</a>(...)</code></summary>
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">list_runs_for_evaluation</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -8470,10 +8575,7 @@ client.evaluations.delete(
 <dl>
 <dd>
 
-Update an Evaluation.
-
-Update the setup of an Evaluation by specifying the Dataset, versions to be
-evaluated (Evaluatees), and which Evaluators to provide judgments.
+List all Runs for an Evaluation.
 </dd>
 </dl>
 </dd>
@@ -8493,13 +8595,8 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.evaluations.update_setup(
-    id="ev_567yza",
-    dataset={"version_id": "dsv_6L78pqrdFi2xa"},
-    evaluatees=[
-        {"version_id": "prv_7ZlQREDScH0xkhUwtXruN", "orchestrated": False}
-    ],
-    evaluators=[{"version_id": "evv_012def", "orchestrated": False}],
+client.evaluations.list_runs_for_evaluation(
+    id="id",
 )
 
 ```
@@ -8517,46 +8614,6 @@ client.evaluations.update_setup(
 <dd>
 
 **id:** `str` — Unique identifier for Evaluation.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**dataset:** `typing.Optional[EvaluationsDatasetRequestParams]` — Dataset to use in this Evaluation.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluatees:** `typing.Optional[typing.Sequence[EvaluateeRequestParams]]` — Unique identifiers for the Prompt/Tool Versions to include in the Evaluation. Can be left unpopulated if you wish to add evaluatees to this Evaluation by specifying `evaluation_id` in Log calls.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**evaluators:** `typing.Optional[typing.Sequence[EvaluationsRequestParams]]` — The Evaluators used to evaluate.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**name:** `typing.Optional[str]` — Name of the Evaluation to help identify it. Must be unique within the associated File.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**file:** `typing.Optional[FileRequestParams]` — The File to associate with the Evaluation.
     
 </dd>
 </dl>
@@ -8576,7 +8633,7 @@ client.evaluations.update_setup(
 </dl>
 </details>
 
-<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update_status</a>(...)</code></summary>
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">create_run</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -8588,10 +8645,20 @@ client.evaluations.update_setup(
 <dl>
 <dd>
 
-Update the status of an Evaluation.
+Create an Evaluation Run.
 
-Can be used to cancel a running Evaluation, or mark an Evaluation that uses
-external or human evaluators as completed.
+Optionally specify the Dataset and version to be evaluated.
+
+Humanloop will automatically start generating Logs and running Evaluators where
+`orchestrated=true`. If you are generating Logs yourself, you can set `orchestrated=false`
+and then generate and submit the required Logs via the API.
+
+If `dataset` and `version` are provided, you can set `use_existing_logs=True` to reuse existing Logs,
+avoiding generating new Logs unnecessarily. Logs that are associated with the specified Version and have `source_datapoint_id`
+referencing a datapoint in the specified Dataset will be associated with the Run.
+
+To keep updated on the progress of the Run, you can poll the Run using
+the `GET /evaluations/{id}/runs` endpoint and check its status.
 </dd>
 </dl>
 </dd>
@@ -8611,9 +8678,8 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.evaluations.update_status(
+client.evaluations.create_run(
     id="id",
-    status="pending",
 )
 
 ```
@@ -8638,7 +8704,381 @@ client.evaluations.update_status(
 <dl>
 <dd>
 
-**status:** `EvaluationStatus` 
+**dataset:** `typing.Optional[CreateRunRequestDatasetParams]` — Dataset to use in this Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version:** `typing.Optional[CreateRunRequestVersionParams]` — Version to use in this Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**orchestrated:** `typing.Optional[bool]` — Whether the Run is orchestrated by Humanloop. If `True`, Humanloop will generate Logs for the Run; `dataset` and `version` must be provided. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**use_existing_logs:** `typing.Optional[bool]` — If `True`, the Run will be initialized with existing Logs associated with the Dataset and Version. If `False`, the Run will be initialized with no Logs. Can only be set to `True` when both `dataset` and `version` are provided.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">add_existing_run</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add an existing Run to the specified Evaluation.
+
+This is useful if you want to compare the Runs in this Evaluation with an existing Run
+that exists within another Evaluation.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.add_existing_run(
+    id="id",
+    run_id="run_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**run_id:** `str` — Unique identifier for Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">remove_run</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove a Run from an Evaluation.
+
+The Logs and Versions used in the Run will not be deleted.
+If this Run is used in any other Evaluations, it will still be available in those Evaluations.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.remove_run(
+    id="id",
+    run_id="run_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**run_id:** `str` — Unique identifier for Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">update_evaluation_run</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update an Evaluation Run.
+
+Specify `control=true` to use this Run as the control Run for the Evaluation.
+You can cancel a running/pending Run, or mark a Run that uses external or human Evaluators as completed.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.update_evaluation_run(
+    id="id",
+    run_id="run_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**run_id:** `str` — Unique identifier for Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**control:** `typing.Optional[bool]` — If `True`, this Run will be used as the control in the Evaluation. Stats for other Runs will be compared to this Run. This will replace any existing control Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[EvaluationStatus]` — Used to set the Run to `cancelled` or `completed`. Can only be used if the Run is currently `pending` or `running`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">add_logs_to_run</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add the specified Logs to a Run.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluations.add_logs_to_run(
+    id="id",
+    run_id="run_id",
+    log_ids=["log_ids"],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluation.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**run_id:** `str` — Unique identifier for Run.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_ids:** `typing.Sequence[str]` — The IDs of the Logs to add to the Run.
     
 </dd>
 </dl>
@@ -8672,8 +9112,7 @@ client.evaluations.update_status(
 
 Get Evaluation Stats.
 
-Retrieve aggregate stats for the specified Evaluation.
-This includes the number of generated Logs for each evaluated version and the
+Retrieve aggregate stats for the specified Evaluation. This includes the number of generated Logs for each Run and the
 corresponding Evaluator statistics (such as the mean and percentiles).
 </dd>
 </dl>
@@ -8746,8 +9185,7 @@ client.evaluations.get_stats(
 
 Get the Logs associated to a specific Evaluation.
 
-Each Datapoint in your Dataset will have a corresponding Log for each File version evaluated.
-e.g. If you have 50 Datapoints and are evaluating 2 Prompts, there will be 100 Logs associated with the Evaluation.
+This returns the Logs associated to all Runs within with the Evaluation.
 </dd>
 </dl>
 </dd>
@@ -8802,127 +9240,6 @@ client.evaluations.get_logs(
 <dd>
 
 **size:** `typing.Optional[int]` — Page size for pagination. Number of Logs to fetch.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.evaluations.<a href="src/humanloop/evaluations/client.py">pin_evaluatee</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Pin the specified Evaluatee.
-
-Pinned Evaluatees are always displayed in the Evaluation Overview,
-and serve as the baseline for comparison with other Evaluatees.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.pin_evaluatee(
-    id="id",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Evaluation.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `typing.Optional[str]` — Unique identifier for the File Version. If provided, none of the other fields should be specified.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**path:** `typing.Optional[str]` — Path identifying a File. Provide either this or `file_id` if you want to specify a File.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**file_id:** `typing.Optional[str]` — Unique identifier for the File. Provide either this or `path` if you want to specify a File.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**environment:** `typing.Optional[str]` — Name of the Environment a Version is deployed to. Only provide this when specifying a File. If not provided (and a File is specified), the default Environment is used.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**batch_id:** `typing.Optional[str]` — Unique identifier for the batch of Logs to include in the Evaluation Report.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**orchestrated:** `typing.Optional[bool]` — Whether the Prompt/Tool is orchestrated by Humanloop. Default is `True`. If `False`, a log for the Prompt/Tool should be submitted by the user via the API.
     
 </dd>
 </dl>

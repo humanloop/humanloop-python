@@ -10,11 +10,8 @@ from .tool_response import ToolResponse
 from .version_deployment_response import VersionDeploymentResponse
 from .version_id_response import VersionIdResponse
 import pydantic
-from .dataset_response import DatasetResponse
 import typing
-from .evaluatee_response import EvaluateeResponse
 from .evaluation_evaluator_response import EvaluationEvaluatorResponse
-from .evaluation_status import EvaluationStatus
 import datetime as dt
 from .user_response import UserResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -27,29 +24,14 @@ class EvaluationResponse(UncheckedBaseModel):
     Unique identifier for the Evaluation. Starts with `evr`.
     """
 
-    dataset: DatasetResponse = pydantic.Field()
+    runs_count: int = pydantic.Field()
     """
-    The Dataset used in the Evaluation.
-    """
-
-    evaluatees: typing.List[EvaluateeResponse] = pydantic.Field()
-    """
-    The Prompt/Tool Versions included in the Evaluation.
+    The total number of Runs in the Evaluation.
     """
 
     evaluators: typing.List[EvaluationEvaluatorResponse] = pydantic.Field()
     """
     The Evaluator Versions used to evaluate.
-    """
-
-    status: EvaluationStatus = pydantic.Field()
-    """
-    The current status of the Evaluation.
-    
-    - `"pending"`: The Evaluation has been created but is not actively being worked on by Humanloop.
-    - `"running"`: Humanloop is checking for any missing Logs and Evaluator Logs, and will generate them where appropriate.
-    - `"completed"`: All Logs an Evaluator Logs have been generated.
-    - `"cancelled"`: The Evaluation has been cancelled by the user. Humanloop will stop generating Logs and Evaluator Logs.
     """
 
     name: typing.Optional[str] = pydantic.Field(default=None)

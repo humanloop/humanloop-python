@@ -94,6 +94,16 @@ class ToolResponseParams(typing_extensions.TypedDict):
     The user who created the Tool.
     """
 
+    committed_by: typing_extensions.NotRequired[UserResponse]
+    """
+    The user who committed the Tool Version.
+    """
+
+    committed_at: typing_extensions.NotRequired[dt.datetime]
+    """
+    The date and time the Tool Version was committed.
+    """
+
     status: VersionStatus
     """
     The status of the Tool Version.
