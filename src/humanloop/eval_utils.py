@@ -316,8 +316,7 @@ def _run_eval(
     # Create a new Run
     run = client.evaluations.create_run(
         id=evaluation.id,
-        dataset={"file_id": hl_dataset.id},
-        logs="fixed",
+        dataset={"version_id": hl_dataset.version_id},
         orchestrated=False,
     )
 
