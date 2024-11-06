@@ -13,7 +13,7 @@ pip install humanloop
 
 ## Reference
 
-A full reference for this library is available [here](./reference.md).
+A full reference for this library is available [here](https://github.com/humanloop/humanloop-python/blob/master/reference.md).
 
 ## Usage
 
