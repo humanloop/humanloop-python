@@ -1,4 +1,5 @@
 import logging
+import traceback
 import uuid
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
@@ -67,7 +68,8 @@ def flow(
                     output = func(*args, **kwargs)
                     error = None
                 except Exception as e:
-                    logger.error(f"{func.__name__}: {e}")
+                    # print error, line of code, and function name
+                    logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
                     error = str(e)
 

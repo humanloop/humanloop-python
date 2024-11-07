@@ -125,7 +125,7 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
     prompt["max_tokens"] = prompt.get("max_tokens") or gen_ai_object.get("request", {}).get("max_tokens", None)
     prompt["presence_penalty"] = prompt.get("presence_penalty") or llm_object.get("presence_penalty", None)
     prompt["frequency_penalty"] = prompt.get("frequency_penalty") or llm_object.get("frequency_penalty", None)
-    prompt["tools"] = list(prompt.get("tools", {}).values())
+    prompt["tools"] = prompt.get("tools", [])
 
     try:
         # Validate the Prompt Kernel

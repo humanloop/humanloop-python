@@ -71,7 +71,7 @@ def tool(
                     output = func(*args, **kwargs)
                     error = None
                 except Exception as e:
-                    logger.error(f"{func.__name__}: {e}")
+                    logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
                     error = str(e)
 

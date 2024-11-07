@@ -31,7 +31,7 @@ class HumanloopSpanExporter(SpanExporter):
     Spans not created by Humanloop SDK decorators will be ignored.
     """
 
-    DEFAULT_NUMBER_THREADS = 1
+    DEFAULT_NUMBER_THREADS = 4
 
     def __init__(
         self,
@@ -257,10 +257,8 @@ class HumanloopSpanExporter(SpanExporter):
         else:
             flow = file_object["flow"]
         path: str = file_object["path"]
-        if not isinstance(log_object["output"], str):
-            # Output expected to be a string, if decorated function
-            # does not return one, jsonify it
-            log_object["output"] = json.dumps(log_object["output"])
+        if "output" not in log_object:
+            log_object["output"] = None
         try:
             log_response = self._client.flows.log(
                 path=path,
