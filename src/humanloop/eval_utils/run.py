@@ -9,7 +9,9 @@ not be called directly.
 """
 
 import inspect
+import json
 import logging
+import copy
 import sys
 import threading
 import time
@@ -245,7 +247,7 @@ def run_eval(
 
     if isinstance(file, Callable):  # type: ignore
         # Decorated function
-        file_: File = file.file  # type: ignore
+        file_: File = copy.deepcopy(file.file)  # type: ignore
     else:
         file_ = file  # type: ignore
 
@@ -276,7 +278,6 @@ def run_eval(
         else:
             logger.info(f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.")
 
-    custom_logger = file_.pop("custom_logger", None)
     file_dict = {**file_, **version}
     hl_file: Union[PromptResponse, FlowResponse, ToolResponse, EvaluatorResponse]
 
@@ -316,8 +317,20 @@ def run_eval(
         raise NotImplementedError(f"Unsupported File type: {type_}")
 
     # Upsert the Dataset
-    hl_dataset = client.datasets.upsert(**dataset)
-    hl_dataset = client.datasets.get(id=hl_dataset.id, include_datapoints=True)
+    if "action" not in dataset:
+        dataset["action"] = "set"
+    if "datapoints" not in dataset:
+        dataset["datapoints"] = []
+        # Use `upsert` to get existing dataset ID if no datapoints provided, given we can't `get` on path.
+        dataset["action"] = "add"
+    hl_dataset = client.datasets.upsert(
+        **dataset,
+    )
+    hl_dataset = client.datasets.get(
+        id=hl_dataset.id,
+        version_id=hl_dataset.version_id,
+        include_datapoints=True,
+    )
 
     # Upsert the local Evaluators; other Evaluators are just referenced by `path` or `id`
     local_evaluators: List[Evaluator] = []
@@ -329,7 +342,9 @@ def run_eval(
                 # TODO: support the case where `file` logs generated on Humanloop but Evaluator logs generated locally
                 if function_ is None:
                     raise ValueError(
-                        f"Local Evaluators are only supported when generating Logs locally using your {type_}'s `callable`. Please provide a `callable` for your file in order to run Evaluators locally."
+                        "Local Evaluators are only supported when generating Logs locally using your "
+                        f"{type_}'s `callable`. Please provide a `callable` for your file in order "
+                        "to run Evaluators locally."
                     )
                 local_evaluators.append(evaluator)
                 spec = ExternalEvaluator(
@@ -345,16 +360,6 @@ def run_eval(
                 )
     function_ = typing.cast(Callable, function_)
 
-    # Validate signature of the called function
-    function_signature = inspect.signature(function_)
-    parameter_names = list(function_signature.parameters.keys())
-    if parameter_names != ["inputs", "messages"] and parameter_names != ["inputs"]:
-        raise ValueError(
-            f"Your {type_}'s `callable` must have the signature `def "
-            "function(inputs: dict, messages: Optional[dict] = None):` "
-            "or `def function(inputs: dict):`"
-        )
-
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
     for local_evaluator in local_evaluators:
@@ -368,7 +373,8 @@ def run_eval(
                 missing_target += 1
         if missing_target > 0:
             raise ValueError(
-                f"{missing_target} Datapoints have no target. A target is required for the Evaluator: {local_evaluator['path']}"
+                f"{missing_target} Datapoints have no target. A target "
+                f"is required for the Evaluator: {local_evaluator['path']}"
             )
 
     # Get or create the Evaluation based on the name
@@ -431,14 +437,14 @@ def run_eval(
                 # handle the logging, which will call the upload_callback
                 # function above when it's done
                 function_(  # type: ignore
-                    datapoint_dict["inputs"],
+                    **datapoint_dict["inputs"],
                     messages=datapoint_dict["messages"],
                 )
             else:
                 # function_ is decorated by Humanloop, the OTel Exporter will
                 # handle the logging, which will call the upload_callback
                 # function above when it's done
-                function_(datapoint_dict["inputs"])  # type: ignore
+                function_(**datapoint_dict["inputs"])  # type: ignore
 
     else:
         # Define the function to execute your function in parallel and Log to Humanloop
@@ -461,20 +467,21 @@ def run_eval(
                     )
                 else:
                     output = function_(**datapoint_dict["inputs"])  # type: ignore
-                if custom_logger:
-                    log = custom_logger(client=client, output=output)  # type: ignore
-                else:
-                    if not isinstance(output, str):
+                if not isinstance(output, str):
+                    try:
+                        output = json.dumps(output)
+                        # throw error if it fails to serialize
+                    except Exception as _:
                         raise ValueError(
-                            f"Your {type_}'s `callable` must return a string if you do not provide a custom logger."
+                            f"Your {type_}'s `callable` must return a string or a JSON serializable object."
                         )
-                    log = log_func(
-                        inputs=dp.inputs,
-                        output=output,
-                        source_datapoint_id=dp.id,
-                        start_time=start_time,
-                        end_time=datetime.now(),
-                    )
+                log = log_func(
+                    inputs=datapoint.inputs,
+                    output=output,
+                    source_datapoint_id=datapoint.id,
+                    start_time=start_time,
+                    end_time=datetime.now(),
+                )
             except Exception as e:
                 log = log_func(
                     inputs=dp.inputs,
@@ -522,7 +529,11 @@ def run_eval(
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
         logger.info(f"\r{stats.progress}")
-        complete = stats.status == "completed"
+        run_stats = next(
+            (run_stats for run_stats in stats.run_stats if run_stats.run_id == run_id),
+            None,
+        )
+        complete = run_stats is not None and run_stats.status == "completed"
         if not complete:
             time.sleep(5)
 
@@ -681,12 +692,17 @@ def _check_evaluation_improvement(
         logger.info(f"{YELLOW}⚠️ No previous versions to compare with.{RESET}")
         return True, 0, 0
 
-    previous_evaluator_stats_by_path = _get_evaluator_stats_by_path(stat=stats.run_stats[-2], evaluation=evaluation)
+    previous_evaluator_stats_by_path = _get_evaluator_stats_by_path(
+        stat=stats.run_stats[1],
+        evaluation=evaluation,
+    )
     if evaluator_path in latest_evaluator_stats_by_path and evaluator_path in previous_evaluator_stats_by_path:
         latest_evaluator_stat = latest_evaluator_stats_by_path[evaluator_path]
         previous_evaluator_stat = previous_evaluator_stats_by_path[evaluator_path]
         latest_score = _get_score_from_evaluator_stat(stat=latest_evaluator_stat)
         previous_score = _get_score_from_evaluator_stat(stat=previous_evaluator_stat)
+        if latest_score is None or previous_score is None:
+            raise ValueError(f"Could not find score for Evaluator {evaluator_path}.")
         diff = round(latest_score - previous_score, 2)  # type: ignore
         if diff >= 0:
             logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
@@ -716,17 +732,14 @@ def _add_log_to_evaluation(
             else:
                 judgement = eval_function(log)
 
-            if local_evaluator.get("custom_logger", None):
-                local_evaluator["custom_logger"](judgement, start_time, datetime.now())
-            else:
-                _ = client.evaluators.log(
-                    parent_id=log["id"],
-                    judgment=judgement,
-                    id=local_evaluator.get("id"),
-                    path=local_evaluator.get("path"),
-                    start_time=start_time,
-                    end_time=datetime.now(),
-                )
+            _ = client.evaluators.log(
+                parent_id=log["id"],
+                judgment=judgement,
+                id=local_evaluator.get("id"),
+                path=local_evaluator.get("path"),
+                start_time=start_time,
+                end_time=datetime.now(),
+            )
         except Exception as e:
             _ = client.evaluators.log(
                 parent_id=log["id"],

@@ -46,23 +46,13 @@ class File(Identifiers):
     """The function being evaluated.
     It will be called using your Dataset `inputs` as follows: `output = callable(**datapoint.inputs)`.
     If `messages` are defined in your Dataset, then `output = callable(**datapoint.inputs, messages=datapoint.messages)`.
-    It should return a single string output. If not, you must provide a `custom_logger`.
+    It should return a string or json serializable output.
     """
-    custom_logger: NotRequired[Callable]
-    """function that logs the output of your function to Humanloop, replacing the default logging.
-    If provided, it will be called as follows:
-        ```
-        output = callable(**datapoint.inputs).
-        log = custom_logger(client, output)
-        ```
-        Inside the custom_logger, you can use the Humanloop `client` to log the output of your function.
-        If not provided your pipeline must return a single string.
-    """
-    is_decorated: NotRequired[Literal[True]]
+    is_decorated: NotRequired[bool]
 
 
 class Dataset(Identifiers):
-    datapoints: Sequence[DatapointDict]
+    datapoints: NotRequired[Sequence[DatapointDict]]
     """The datapoints to map your function over to produce the outputs required by the evaluation."""
     action: NotRequired[UpdateDatasetAction]
     """How to update the Dataset given the provided Datapoints; 
@@ -72,26 +62,12 @@ class Dataset(Identifiers):
 class Evaluator(Identifiers):
     """The Evaluator to provide judgments for this Evaluation."""
 
-    custom_logger: NotRequired[Callable]
-
-    """The type of arguments the Evaluator expects - only required for local Evaluators."""
     args_type: NotRequired[EvaluatorArgumentsType]
-
-    """The type of return value the Evaluator produces - only required for local Evaluators."""
+    """The type of arguments the Evaluator expects - only required for local Evaluators."""
     return_type: NotRequired[EvaluatorReturnTypeEnum]
-
-    """The function to run on the logs to produce the judgment - only required for local Evaluators."""
+    """The type of return value the Evaluator produces - only required for local Evaluators."""
     callable: NotRequired[Callable]
-
-    """optional function that logs the output judgment from your Evaluator to Humanloop, if provided, it will be called as follows:
-    custom_logger: NotRequired[Callable]
-    ```
-    judgment = callable(log_dict)
-    log = custom_logger(client, judgment)
-    ```
-    Inside the custom_logger, you can use the Humanloop `client` to log the judgment to Humanloop.
-    If not provided your function must return a single string and by default the code will be used to inform the version of the external Evaluator on Humanloop.
-    """
+    """The function to run on the logs to produce the judgment - only required for local Evaluators."""
     threshold: NotRequired[float]
     """The threshold to check the Evaluator against. If the aggregate value of the Evaluator is below this threshold, the check will fail."""
 
