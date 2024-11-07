@@ -127,6 +127,7 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
     prompt["max_tokens"] = prompt.get("max_tokens") or gen_ai_object.get("request", {}).get("max_tokens", None)
     prompt["presence_penalty"] = prompt.get("presence_penalty") or llm_object.get("presence_penalty", None)
     prompt["frequency_penalty"] = prompt.get("frequency_penalty") or llm_object.get("frequency_penalty", None)
+    prompt["tools"] = list(prompt.get("tools", {}).values())
 
     try:
         # Validate the Prompt Kernel
@@ -157,13 +158,12 @@ def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: Readab
     if "output_tokens" not in hl_log:
         hl_log["output_tokens"] = gen_ai_object.get("usage", {}).get("completion_tokens")
     if len(gen_ai_object.get("completion", [])) > 0:
-        hl_log["finish_reason"] = gen_ai_object.get("completion", {}).get("0", {}).get("finish_reason")
-    # Note: read_from_opentelemetry_span returns the list as a dict due to Otel conventions
+        hl_log["finish_reason"] = gen_ai_object["completion"][0].get("finish_reason")
     hl_log["messages"] = gen_ai_object.get("prompt")
 
     try:
         inputs = {}
-        system_message = gen_ai_object["prompt"]["0"]["content"]
+        system_message = gen_ai_object["prompt"][0]["content"]
         template = hl_file["prompt"]["template"]
         parsed = parse.parse(template, system_message)
         for key, value in parsed.named.items():

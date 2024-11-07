@@ -62,10 +62,10 @@ def test_list(test_span: Span):
         "key.0.y": "foo",
         "key.1.z": "bar",
     }
-    assert read_from_opentelemetry_span(test_span, "key") == {
-        "0": {"x": 7, "y": "foo"},
-        "1": {"z": "bar"},
-    }
+    assert read_from_opentelemetry_span(test_span, "key") == [
+        {"z": "bar"},
+        {"x": 7, "y": "foo"},
+    ]
 
 
 def test_list_no_prefix(test_span: Span):
@@ -79,10 +79,10 @@ def test_list_no_prefix(test_span: Span):
         "0.y": "foo",
         "1.z": "bar",
     }
-    assert read_from_opentelemetry_span(test_span) == {
-        "0": {"x": 7, "y": "foo"},
-        "1": {"z": "bar"},
-    }
+    assert read_from_opentelemetry_span(test_span) == [
+        {"z": "bar"},
+        {"x": 7, "y": "foo"},
+    ]
 
 
 def test_multiple_nestings(test_span: Span):
@@ -94,20 +94,19 @@ def test_multiple_nestings(test_span: Span):
         ],  # type: ignore
         "key",
     )
-    # NOTE: attributes cannot be None at this point
     assert dict(test_span.attributes) == {  # type: ignore
         "key.0.x": 7,
         "key.0.y": "foo",
         "key.1.0.z": "bar",
         "key.1.1.a": 42,
     }
-    assert read_from_opentelemetry_span(test_span, "key") == {
-        "0": {"x": 7, "y": "foo"},
-        "1": {
-            "0": {"z": "bar"},
-            "1": {"a": 42},
-        },
-    }
+    assert read_from_opentelemetry_span(test_span, "key") == [
+        [
+            {"a": 42},
+            {"z": "bar"},
+        ],
+        {"x": 7, "y": "foo"},
+    ]
 
 
 def test_read_mixed_numeric_string_keys(test_span: Span):

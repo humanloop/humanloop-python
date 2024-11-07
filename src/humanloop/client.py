@@ -1,3 +1,4 @@
+import logging
 import os
 import typing
 from typing import Any, Callable, List, Optional, Sequence, Union
@@ -16,13 +17,14 @@ from humanloop.types.response_format import ResponseFormat
 if typing.TYPE_CHECKING:
     from . import ToolFunctionParams
 
+from humanloop.eval_utils import log_with_evaluation_context, run_eval
+from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
+
 from .base_client import AsyncBaseHumanloop, BaseHumanloop
 from .decorators.flow import flow as flow_decorator_factory
 from .decorators.prompt import prompt as prompt_decorator_factory
 from .decorators.tool import tool as tool_decorator_factory
 from .environment import HumanloopEnvironment
-from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
-from humanloop.eval_utils import run_eval
 from .evaluations.client import EvaluationsClient
 from .otel import instrument_provider
 from .otel.exporter import HumanloopSpanExporter
@@ -109,6 +111,19 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
+        eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
+        eval_client.client = self
+        self.evaluations = eval_client
+        self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
+
+        # Overload the .log method of the clients to be aware of Evaluation Context
+        # TODO: Overload the log for Evaluators and Tools once run_id is added
+        # to them.
+        self.prompts = log_with_evaluation_context(client=self.prompts)
+        # self.evaluators = log_with_evaluation_context(client=self.evaluators)
+        # self.tools = log_with_evaluation_context(client=self.tools)
+        self.flows = log_with_evaluation_context(client=self.flows)
+
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider
         else:
@@ -132,11 +147,6 @@ class Humanloop(BaseHumanloop):
             self._opentelemetry_tracer = self._tracer_provider.get_tracer("humanloop.sdk")
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
-
-        eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
-        eval_client.client = self
-        self.evaluations = eval_client
-        self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
 
     def prompt(
         self,

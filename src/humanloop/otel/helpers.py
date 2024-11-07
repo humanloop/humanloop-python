@@ -54,22 +54,6 @@ def write_to_opentelemetry_span(
     to None will be silently dropped. Consider adding a placeholder value if the key should
     be present in the span attributes.
 
-    :param span: OpenTelemetry span to write values to
-
-    :param value: Python object to write to the span attributes. Can also be a primitive value.
-
-    :param key: Key prefix to write to the span attributes. The path to the values does not need to exist in the span attributes.
-    """
-    to_write_copy: Union[dict, AttributeValue]
-    if isinstance(value, list):
-        to_write_copy = _list_to_ott(value)
-    else:
-        to_write_copy = dict(value)  # type: ignore
-    linearised_attributes: dict[str, AttributeValue] = {}
-    work_stack: list[tuple[str, Union[AttributeValue, NestedDict]]] = [(key, to_write_copy)]
-    """
-    Recurse through the dictionary value, building the OTel format keys in a DFS manner.
-
     Example:
     ```python
     {
@@ -90,8 +74,23 @@ def write_to_opentelemetry_span(
             'baz.0': 42,
             'baz.1': 43
         }
+
+    :param span: OpenTelemetry span to write values to
+
+    :param value: Python object to write to the span attributes. Can also be a primitive value.
+
+    :param key: Key prefix to write to the span attributes. The path to the values does not need to exist in the span attributes.
     ```
     """
+
+    to_write_copy: Union[dict, AttributeValue]
+    if isinstance(value, list):
+        to_write_copy = _list_to_ott(value)
+    else:
+        to_write_copy = dict(value)  # type: ignore
+    linearised_attributes: dict[str, AttributeValue] = {}
+    work_stack: list[tuple[str, Union[AttributeValue, NestedDict]]] = [(key, to_write_copy)]
+
     # Remove all keys with the prefix to avoid duplicates
     for attribute_key in span._attributes.keys():  # type: ignore
         if attribute_key.startswith(key):
@@ -102,6 +101,11 @@ def write_to_opentelemetry_span(
         if isinstance(value, dict):
             for sub_key, sub_value in value.items():
                 work_stack.append((f"{key}.{sub_key}" if key else sub_key, sub_value))
+        elif isinstance(value, list):
+            # OTel does not allow lists of complex objects, so we linearise them
+            # by mapping each dict to an index key and recursing into the dict
+            for idx, list_value in enumerate(value):
+                work_stack.append((f"{key}.{idx}" if key else idx, list_value))
         else:
             linearised_attributes[key] = value  # type: ignore
     for final_key, final_value in linearised_attributes.items():
@@ -184,14 +188,55 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
         len_parts = len(parts)
         sub_result: dict[str, Union[dict, AttributeValue]] = result
         for idx, part in enumerate(parts):
+            # For each section of the key formatted like 'foo.bar.baz'
+            # allocate the final value 'baz' to the final dict
             if idx == len_parts - 1:
+                # Final part of the key
                 sub_result[part] = span_value
             else:
                 if part not in sub_result:
+                    # New dict since
                     sub_result[part] = {}
                 sub_result = sub_result[part]  # type: ignore
 
+    def pseudo_to_list(sub_dict):
+        """Convert pseudo-dictionary to list if all keys are numeric.
+
+        Conversion happens bottom up.
+
+        Example:
+        ```python
+        {
+            '0': 'a',
+            '1': 'b',
+            '2': 'c'
+        }
+
+        ->
+
+        ['a', 'b', 'c']
+        ```
+        """
+        if not isinstance(sub_dict, dict):
+            # Primitive value
+            return sub_dict
+        if isinstance(sub_dict, dict):
+            for key, value in sub_dict.items():
+                # Recurse into keys
+                sub_dict[key] = pseudo_to_list(value)
+            if all(str.isnumeric(key) for key in sub_dict.keys()):
+                # If all keys are numeric, convert to list
+                return list(sub_dict.values())
+        return sub_dict
+
+    result = pseudo_to_list(result)
+    if "" in result:
+        # User read the root of attributes
+        return result[""]
+
     for part in key.split("."):
+        if str.isnumeric(part):
+            part = int(part)
         result = result[part]  # type: ignore
 
     return result

@@ -76,7 +76,6 @@ def prompt(
             "seed": seed,
             "response_format": response_format,
             "attributes": attributes or None,
-            "tools": tools or None,
         }.items():
             prompt_kernel[attr_name] = attr_value  # type: ignore
 
@@ -98,7 +97,6 @@ def prompt(
                 span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HL_FILE_TYPE_KEY, "prompt")
 
-                # Avoid writing falsy values to OTel, otherwise a
                 if prompt_kernel:
                     write_to_opentelemetry_span(
                         span=span,
@@ -111,7 +109,7 @@ def prompt(
                     output = func(*args, **kwargs)
                     error = None
                 except Exception as e:
-                    logger.error(str(e))
+                    logger.error(f"{func.__name__}: {e}")
                     output = None
                     error = str(e)
 
@@ -128,10 +126,16 @@ def prompt(
             # Return the output of the decorated function
             return output
 
+        prompt_kernel_file = {**prompt_kernel}
+        if prompt_kernel_file.get("provider") is None:
+            prompt_kernel_file["provider"] = "openai"  # type: ignore
+        if prompt_kernel_file.get("endpoint") is None:
+            prompt_kernel_file["endpoint"] = "chat"  # type: ignore
+
         wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="prompt",
-            version=prompt_kernel,  # type: ignore
+            version={**prompt_kernel_file},  # type: ignore
             is_decorated=True,
             callable=wrapper,
         )

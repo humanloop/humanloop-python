@@ -1,10 +1,7 @@
-from typing import Callable, Generator
+from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
-from humanloop.decorators.flow import flow
-from humanloop.decorators.prompt import prompt
-from humanloop.decorators.tool import tool
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam

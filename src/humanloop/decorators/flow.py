@@ -8,7 +8,7 @@ from opentelemetry.trace import Tracer
 from opentelemetry.util.types import AttributeValue
 
 from humanloop.decorators.helpers import args_to_inputs
-from humanloop.eval_utils import File
+from humanloop.eval_utils.types import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
 from humanloop.otel.helpers import write_to_opentelemetry_span
@@ -67,7 +67,7 @@ def flow(
                     output = func(*args, **kwargs)
                     error = None
                 except Exception as e:
-                    logger.error(str(e))
+                    logger.error(f"{func.__name__}: {str(e)}")
                     output = None
                     error = str(e)
 

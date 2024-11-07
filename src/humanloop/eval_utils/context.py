@@ -4,27 +4,27 @@ from typing import Callable, TypedDict
 
 
 class EvaluationContext(TypedDict):
-    """Context required by the Exporter when uploading a Log to Humanloop.
+    """Context Log to Humanloop.
 
-    When using the evaluation run utility on decorated functions, the utility
-    has does not control the Log upload - the Exporter does. This context class
-    propagates the required information to the exporter and allows it to notify
-    the utility via a callback.
+    Global state that is set when an Evaluation is ran.
     """
 
-    """Required for uploading the Log in the Exporter."""
+    """Required for associating a Log with the Evaluation Run."""
     source_datapoint_id: str
 
     """Exporter calls this so the eval_utils are notified to evaluate an uploaded Log."""
     upload_callback: Callable[[dict], None]
 
-    """Logs of multiple Files can be uploaded by the Exporter while
-    evaluating a single one of them. This identifies the File that
-    owns Logs that are part of the Evaluation."""
-    evaluated_file_id: str
+    """ID of the evaluated File."""
+    file_id: str
 
-    """Required for uploading the Log in the Exporter."""
+    """Path of the evaluated File."""
+    path: str
+
+    """Required for associating a Log with the Evaluation Run."""
     run_id: str
 
 
-EVALUATION_CONTEXT: ContextVar[typing.Optional[EvaluationContext]] = ContextVar("__EVALUATION_CONTEXT")
+EVALUATION_CONTEXT_VAR_NAME = "__EVALUATION_CONTEXT"
+
+EVALUATION_CONTEXT: ContextVar[typing.Optional[EvaluationContext]] = ContextVar(EVALUATION_CONTEXT_VAR_NAME)
