@@ -67,7 +67,7 @@ def flow(
                     output = func(*args, **kwargs)
                     error = None
                 except Exception as e:
-                    logger.error(f"{func.__name__}: {str(e)}")
+                    logger.error(f"{func.__name__}: {e}")
                     output = None
                     error = str(e)
 

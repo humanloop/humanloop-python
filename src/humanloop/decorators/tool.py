@@ -83,12 +83,11 @@ def tool(
                 }
 
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
-                if tool_log:
-                    write_to_opentelemetry_span(
-                        span=span,
-                        key=HL_LOG_KEY,
-                        value=tool_log,
-                    )
+                write_to_opentelemetry_span(
+                    span=span,
+                    key=HL_LOG_KEY,
+                    value=tool_log,
+                )
 
                 # Return the output of the decorated function
                 return output

@@ -181,7 +181,7 @@ class Humanloop(BaseHumanloop):
         Here's an example of declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code:
 
         ```python
-        @prompt(template="You are an assistant on the following topics: {topics}.")
+        @prompt(template="You are an assistant on the following topics: {{topics}}.")
         def call_llm(messages):
             client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
             return client.chat.completions.create(
@@ -199,7 +199,7 @@ class Humanloop(BaseHumanloop):
         {
             model: "gpt-4o",
             endpoint: "chat",
-            template: "You are an assistant on the following topics: {topics}.",
+            template: "You are an assistant on the following topics: {{topics}}.",
             provider: "openai",
             max_tokens: 200,
             temperature: 0.8,
@@ -240,7 +240,7 @@ class Humanloop(BaseHumanloop):
 
         :param template: The template for the Prompt. This is the text of
             the system message used to set the LLM prompt. The template
-            accepts template slots using the format `{slot_name}`.
+            accepts template slots using the format `{{slot_name}}`.
 
         :param provider: The company providing the underlying model service.
 
@@ -394,7 +394,7 @@ class Humanloop(BaseHumanloop):
 
         Here's an example of declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code:
         ```python
-        @prompt(template="You are an assistant on the following topics: {topics}.")
+        @prompt(template="You are an assistant on the following topics: {{topics}}.")
         def call_llm(messages):
             client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
             return client.chat.completions.create(

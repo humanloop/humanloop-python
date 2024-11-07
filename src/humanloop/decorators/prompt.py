@@ -9,6 +9,7 @@ from opentelemetry.trace import Tracer
 
 if typing.TYPE_CHECKING:
     from humanloop import ToolFunctionParams
+from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
@@ -75,7 +76,9 @@ def prompt(
             "other": other,
             "seed": seed,
             "response_format": response_format,
+            # {} -> None
             "attributes": attributes or None,
+            "tools": tools,
         }.items():
             prompt_kernel[attr_name] = attr_value  # type: ignore
 
@@ -114,6 +117,7 @@ def prompt(
                     error = str(e)
 
                 prompt_log = {
+                    "inputs": args_to_inputs(func, args, kwargs),
                     "output": output,
                     "error": error,
                 }

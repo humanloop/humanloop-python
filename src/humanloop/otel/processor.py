@@ -1,10 +1,8 @@
-import json
 import logging
 from collections import defaultdict
 from typing import Any
 
 # No typing stubs for parse
-import parse  # type: ignore
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 from pydantic import ValidationError as PydanticValidationError
@@ -146,7 +144,6 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
 
 
 def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
-    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_KEY)
     try:
         hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_LOG_KEY)
     except KeyError:
@@ -160,23 +157,6 @@ def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: Readab
     if len(gen_ai_object.get("completion", [])) > 0:
         hl_log["finish_reason"] = gen_ai_object["completion"][0].get("finish_reason")
     hl_log["messages"] = gen_ai_object.get("prompt")
-
-    try:
-        inputs = {}
-        system_message = gen_ai_object["prompt"][0]["content"]
-        template = hl_file["prompt"]["template"]
-        parsed = parse.parse(template, system_message)
-        for key, value in parsed.named.items():
-            try:
-                parsed_value = json.loads(value.replace("'", '"'))
-            except json.JSONDecodeError:
-                parsed_value = value
-            inputs[key] = parsed_value
-    except Exception as e:
-        logging.error(e)
-        inputs = None
-    finally:
-        hl_log["inputs"] = inputs
 
     write_to_opentelemetry_span(
         span=prompt_span,

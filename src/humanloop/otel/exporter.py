@@ -31,7 +31,7 @@ class HumanloopSpanExporter(SpanExporter):
     Spans not created by Humanloop SDK decorators will be ignored.
     """
 
-    DEFAULT_NUMBER_THREADS = 4
+    DEFAULT_NUMBER_THREADS = 1
 
     def __init__(
         self,
@@ -193,7 +193,6 @@ class HumanloopSpanExporter(SpanExporter):
             )
             self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
         except HumanloopApiError as e:
-            logger.error(f"TOO {e}")
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_tool(self, span: ReadableSpan) -> None:
@@ -230,7 +229,6 @@ class HumanloopSpanExporter(SpanExporter):
             )
             self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
         except HumanloopApiError as e:
-            logger.error(f"FOO {e}")
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_flow(self, span: ReadableSpan) -> None:
@@ -272,5 +270,5 @@ class HumanloopSpanExporter(SpanExporter):
             )
             self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = log_response.id
         except HumanloopApiError as e:
-            logger.error(f"BAZ {e}")
+            logger.error(str(e))
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
