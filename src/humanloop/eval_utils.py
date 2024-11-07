@@ -422,7 +422,11 @@ def _run_eval(
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
         logger.info(f"\r{stats.progress}")
-        complete = stats.status == "completed"
+        run_stats = next(
+            (run_stats for run_stats in stats.run_stats if run_stats.run_id == run_id),
+            None,
+        )
+        complete = run_stats is not None and run_stats.status == "completed"
         if not complete:
             time.sleep(5)
 
