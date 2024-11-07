@@ -98,7 +98,7 @@ class File(Identifiers):
     """The function being evaluated.
     It will be called using your Dataset `inputs` as follows: `output = callable(**datapoint.inputs)`.
     If `messages` are defined in your Dataset, then `output = callable(**datapoint.inputs, messages=datapoint.messages)`.
-    It should return a single string or json output.
+    It should return a string or json serializable output.
     """
 
 
