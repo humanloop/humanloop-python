@@ -168,7 +168,6 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
                     **kwargs,
                 }
             )
-            # Log has been added to evaluation, reset the context for current Thread
 
         return response
 
@@ -412,7 +411,7 @@ def run_eval(
         def process_datapoint(dp: Datapoint, file_id: str, file_path: str, run_id: str):
             def upload_callback(log: dict):
                 # OTel exporter will call this after the Log is uploaded
-                _add_log_to_evaluation(
+                _run_local_evaluators(
                     client=client,
                     log=log,
                     datapoint_target=dp.target,
@@ -492,7 +491,7 @@ def run_eval(
                 )
                 logger.warning(msg=f"\nYour {type_}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}")
 
-            _add_log_to_evaluation(
+            _run_local_evaluators(
                 client=client,
                 log=log,
                 datapoint_target=dp.target,
@@ -714,7 +713,7 @@ def _check_evaluation_improvement(
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")
 
 
-def _add_log_to_evaluation(
+def _run_local_evaluators(
     client: "BaseHumanloop",
     log: dict,
     datapoint_target: typing.Optional[typing.Dict[str, DatapointResponseTargetValue]],
