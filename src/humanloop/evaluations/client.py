@@ -14,7 +14,6 @@ from ..core.api_error import ApiError
 from .requests.create_evaluation_request_evaluators_item import (
     CreateEvaluationRequestEvaluatorsItemParams,
 )
-from ..requests.evaluations_request import EvaluationsRequestParams
 from ..requests.file_request import FileRequestParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from .requests.add_evaluators_request_evaluators_item import (
@@ -24,11 +23,6 @@ from ..core.jsonable_encoder import jsonable_encoder
 from ..types.evaluation_runs_response import EvaluationRunsResponse
 from .requests.create_run_request_dataset import CreateRunRequestDatasetParams
 from .requests.create_run_request_version import CreateRunRequestVersionParams
-from ..types.evaluation_run_response import EvaluationRunResponse
-from ..types.evaluation_status import EvaluationStatus
-from ..requests.evaluations_dataset_request import EvaluationsDatasetRequestParams
-from ..requests.version_specification import VersionSpecificationParams
-from ..types.logs_association_type import LogsAssociationType
 from ..types.evaluation_run_response import EvaluationRunResponse
 from ..types.evaluation_status import EvaluationStatus
 from ..types.evaluation_stats import EvaluationStats

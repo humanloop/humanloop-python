@@ -106,12 +106,14 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
         The user of the .log API can refer to the File that owns that Log either by
         ID or Path. This function matches against any of them in EvaluationContext.
         """
+        if evaluation_context == {}:
+            return False
         return evaluation_context.get("file_id") == log_args.get(file_id_attribute) or evaluation_context.get(
             "path"
         ) == log_args.get("path")
 
     # Copy the original log method in a hidden attribute
-    client._log = client.log
+    client._log = client.log  # type: ignore
 
     def _overloaded_log(
         self,

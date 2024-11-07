@@ -105,7 +105,7 @@ def write_to_opentelemetry_span(
             # OTel does not allow lists of complex objects, so we linearise them
             # by mapping each dict to an index key and recursing into the dict
             for idx, list_value in enumerate(value):
-                work_stack.append((f"{key}.{idx}" if key else idx, list_value))
+                work_stack.append((f"{key}.{idx}" if key else idx, list_value))  # type: ignore
         else:
             linearised_attributes[key] = value  # type: ignore
     for final_key, final_value in linearised_attributes.items():
@@ -232,12 +232,13 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
     result = pseudo_to_list(result)
     if "" in result:
         # User read the root of attributes
-        return result[""]
+        return result[""]  # type: ignore
 
     for part in key.split("."):
         if str.isnumeric(part):
-            part = int(part)
-        result = result[part]  # type: ignore
+            result = result[int(part)]  # type: ignore
+        else:
+            result = result[part]  # type: ignore
 
     return result
 
