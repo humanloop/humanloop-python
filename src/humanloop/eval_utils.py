@@ -233,16 +233,16 @@ def _run_eval(
         raise NotImplementedError(f"Unsupported File type: {type_}")
 
     # Upsert the Dataset
-    action = dataset.get("action", "set")  # set is the server default - None not allowed.
+    action = dataset.get(
+        "action", "set"
+    )  # set is the server default - None not allowed.
     if "datapoints" not in dataset:
         dataset["datapoints"] = []
         # Use `upsert` to get existing dataset ID if no datapoints provided, given we can't `get` on path.
         action = "add"
     hl_dataset = client.datasets.upsert(**dataset, action=action)
     hl_dataset = client.datasets.get(
-        id=hl_dataset.id,
-        version_id=hl_dataset.version_id,
-        include_datapoints=True
+        id=hl_dataset.id, version_id=hl_dataset.version_id, include_datapoints=True
     )
 
     # Upsert the local Evaluators; other Evaluators are just referenced by `path` or `id`
@@ -615,7 +615,8 @@ def check_evaluation_improvement(
         return True, 0, 0
 
     previous_evaluator_stats_by_path = get_evaluator_stats_by_path(
-        stat=stats.run_stats[-2], evaluation=evaluation
+        stat=stats.run_stats[1],  # Latest Run is at index 0; previous Run is at index 1
+        evaluation=evaluation,
     )
     if (
         evaluator_path in latest_evaluator_stats_by_path
@@ -625,6 +626,8 @@ def check_evaluation_improvement(
         previous_evaluator_stat = previous_evaluator_stats_by_path[evaluator_path]
         latest_score = get_score_from_evaluator_stat(stat=latest_evaluator_stat)
         previous_score = get_score_from_evaluator_stat(stat=previous_evaluator_stat)
+        if latest_score is None or previous_score is None:
+            raise ValueError(f"Could not find score for Evaluator {evaluator_path}.")
         diff = round(latest_score - previous_score, 2)
         if diff >= 0:
             logger.info(
