@@ -325,7 +325,7 @@ def _run_eval(
         start_time = datetime.now()
         datapoint_dict = datapoint.dict()
         try:
-            if "messages" in datapoint_dict:
+            if "messages" in datapoint_dict and datapoint_dict["messages"] is not None:
                 output = function_(
                     **datapoint_dict["inputs"], messages=datapoint_dict["messages"]
                 )
