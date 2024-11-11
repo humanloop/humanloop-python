@@ -6,7 +6,6 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 
-
 if typing.TYPE_CHECKING:
     from humanloop import ToolFunctionParams
 from humanloop.decorators.helpers import args_to_inputs

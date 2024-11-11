@@ -1,6 +1,7 @@
-import copy
+import contextvars
 import json
 import logging
+import threading
 import typing
 from queue import Empty as EmptyQueue
 from queue import Queue
@@ -62,6 +63,7 @@ class HumanloopSpanExporter(SpanExporter):
         self._shutdown: bool = False
         for thread in self._threads:
             thread.start()
+            logger.debug("Exporter Thread %s started", thread.ident)
 
     def export(self, spans: trace.Sequence[ReadableSpan]) -> SpanExportResult:
         def is_evaluated_file(
@@ -89,8 +91,13 @@ class HumanloopSpanExporter(SpanExporter):
                     self._upload_queue.put(
                         (
                             span,
-                            copy.deepcopy(evaluation_context),
-                        )
+                            contextvars.copy_context()[self._client.evaluation_context_variable],
+                        ),
+                    )
+                    logger.debug(
+                        "Span %s with EvaluationContext %s added to upload queue",
+                        span.attributes,
+                        contextvars.copy_context()[self._client.evaluation_context_variable],
                     )
             # Reset the EvaluationContext so run eval does not
             # create a duplicate Log
@@ -98,6 +105,11 @@ class HumanloopSpanExporter(SpanExporter):
                 spans[0],
                 evaluation_context,
             ):
+                logger.debug(
+                    "EvaluationContext %s marked as exhausted for Log in Span %s",
+                    evaluation_context,
+                    spans[0].attributes,
+                )
                 # Mark the EvaluationContext as used
                 self._client.evaluation_context_variable.set(None)
             return SpanExportResult.SUCCESS
@@ -109,6 +121,7 @@ class HumanloopSpanExporter(SpanExporter):
         self._shutdown = True
         for thread in self._threads:
             thread.join()
+            logger.debug("Exporter Thread %s joined", thread.ident)
 
     def force_flush(self, timeout_millis: int = 3000) -> bool:
         self._shutdown = True
@@ -146,21 +159,37 @@ class HumanloopSpanExporter(SpanExporter):
                 # Set the EvaluationContext for the thread so the .log action works as expected
                 # NOTE: Expecting the evaluation thread to send a single span so we are
                 #   not resetting the EvaluationContext in the scope of the export thread
-                self._client.evaluation_context_variable.set(
-                    copy.deepcopy(evaluation_context),
-                )
+                self._client.evaluation_context_variable.set(evaluation_context)
             except EmptyQueue:
                 continue
             trace_metadata = TRACE_FLOW_CONTEXT.get(span_to_export.get_span_context().span_id)
             if trace_metadata is None:
                 # Span is not part of a Flow Log
                 self._export_span_dispatch(span_to_export)
+                logger.debug(
+                    "_do_work on Thread %s: Dispatched span %s with FlowContext %s which is not part of a Flow",
+                    threading.get_ident(),
+                    span_to_export.attributes,
+                    trace_metadata,
+                )
             elif trace_metadata["trace_parent_id"] is None:
                 # Span is the head of a Flow Trace
                 self._export_span_dispatch(span_to_export)
+                logger.debug(
+                    "Dispatched span %s which is a Flow Log with FlowContext %s",
+                    span_to_export.attributes,
+                    trace_metadata,
+                )
             elif trace_metadata["trace_parent_id"] in self._span_id_to_uploaded_log_id:
                 # Span is part of a Flow and its parent has been uploaded
                 self._export_span_dispatch(span_to_export)
+                logger.debug(
+                    "_do_work on Thread %s: Dispatched span %s after its parent %s with FlowContext %s",
+                    threading.get_ident(),
+                    span_to_export.attributes,
+                    trace_metadata["trace_parent_id"],
+                    trace_metadata,
+                )
             else:
                 # Requeue the Span to be uploaded later
                 self._upload_queue.put((span_to_export, evaluation_context))

@@ -196,7 +196,7 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
                 sub_result[part] = span_value
             else:
                 if part not in sub_result:
-                    # New dict since
+                    # Create new dict for a previously unseen part of the key
                     sub_result[part] = {}
                 sub_result = sub_result[part]  # type: ignore
 

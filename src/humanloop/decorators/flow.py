@@ -1,7 +1,7 @@
 import logging
-from functools import wraps
 import os
 import sys
+from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.sdk.trace import Span

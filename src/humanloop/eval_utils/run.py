@@ -8,7 +8,6 @@ Functions in this module should be accessed via the Humanloop client. They shoul
 not be called directly.
 """
 
-from contextvars import ContextVar
 import copy
 import inspect
 import json
@@ -19,6 +18,7 @@ import time
 import types
 import typing
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import ContextVar
 from datetime import datetime
 from functools import partial
 from logging import INFO
@@ -144,6 +144,12 @@ def log_with_evaluation_context(
                     kwargs[attribute] = evaluation_context[attribute]  # type: ignore
 
         # Call the original .log method
+        logger.debug(
+            "Logging %s inside _overloaded_log on Thread %s",
+            kwargs,
+            evaluation_context,
+            threading.get_ident(),
+        )
         response = self._log(**kwargs)
 
         # Call the callback so the Evaluation can be updated
@@ -174,6 +180,7 @@ def log_with_evaluation_context(
     # Replace the original log method with the overloaded one
     client.log = types.MethodType(_overloaded_log, client)  # type: ignore
     # Return the client with the overloaded log method
+    logger.debug("Overloaded the .log method of %s", client)
     return client
 
 
@@ -246,7 +253,7 @@ def run_eval(
     global _PROGRESS_BAR
 
     if hasattr(file["callable"], "file"):
-        # When the decorator inside `file`` is a decorated function,
+        # When the decorator inside `file` is a decorated function,
         # we need to validate that the other parameters of `file`
         # match the attributes of the decorator
         inner_file: File = file["callable"].file
@@ -429,6 +436,12 @@ def run_eval(
     def process_datapoint(dp: Datapoint, file_id: str, file_path: str, run_id: str):
         def upload_callback(log: dict):
             """Logic ran after the Log has been created."""
+            logger.debug(
+                "upload_callback on Thread %s: log %s datapoint_target %s",
+                threading.get_ident(),
+                log,
+                dp.target,
+            )
             _run_local_evaluators(
                 client=client,
                 log=log,
@@ -447,6 +460,12 @@ def run_eval(
                 run_id=run_id,
                 path=file_path,
             )
+        )
+        logger.debug(
+            "process_datapoint on Thread %s: evaluating Datapoint %s with EvaluationContext %s",
+            threading.get_ident(),
+            datapoint_dict,
+            evaluation_context_variable.get(),
         )
         log_func = _get_log_func(
             client=client,
@@ -482,6 +501,11 @@ def run_eval(
             if context_variable is not None:
                 # Evaluation Context has not been consumed
                 # function_ is a plain callable so we need to create a Log
+                logger.debug(
+                    "process_datapoint on Thread %s: function_ %s is a simple callable, context was not consumed",
+                    threading.get_ident(),
+                    function_.__name__,
+                )
                 log_func(
                     inputs=datapoint.inputs,
                     output=output,
