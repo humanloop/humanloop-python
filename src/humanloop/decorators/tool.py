@@ -9,7 +9,9 @@ from inspect import Parameter
 from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
 
 from opentelemetry.trace import Tracer
+from typing_extensions import Unpack
 
+from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import (
@@ -22,28 +24,24 @@ from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
-from humanloop.decorators.helpers import args_to_inputs
-
 logger = logging.getLogger("humanloop.sdk")
 
 
 def tool(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
-    setup_values: Optional[dict[str, Optional[Any]]] = None,
-    attributes: Optional[dict[str, typing.Any]] = None,
-    strict: bool = True,
+    **tool_kernel: Unpack[ToolKernelRequestParams],
 ):
     def decorator(func: Callable):
-        tool_kernel = _build_tool_kernel(
+        enhanced_tool_kernel = _build_tool_kernel(
             func=func,
-            attributes=attributes,
-            setup_values=setup_values,
-            strict=strict,
+            attributes=tool_kernel.get("attributes"),
+            setup_values=tool_kernel.get("setup_values"),
+            strict=True,
         )
 
         # Mypy complains about adding attribute on function, but it's nice UX
-        func.json_schema = tool_kernel["function"]  # type: ignore
+        func.json_schema = enhanced_tool_kernel["function"]  # type: ignore
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -64,11 +62,11 @@ def tool(
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
                 span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "tool")
-                if tool_kernel:
+                if enhanced_tool_kernel:
                     write_to_opentelemetry_span(
                         span=span,
                         key=f"{HUMANLOOP_FILE_KEY}.tool",
-                        value=tool_kernel,
+                        value=enhanced_tool_kernel,
                     )
 
                 # Call the decorated function
@@ -100,7 +98,7 @@ def tool(
         wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="tool",
-            version=tool_kernel,
+            version=enhanced_tool_kernel,
             callable=wrapper,
         )
 

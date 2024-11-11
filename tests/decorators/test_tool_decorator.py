@@ -360,25 +360,6 @@ def test_tuple_annotation(
     Validator.check_schema(foo.json_schema)
 
 
-def test_strict_false(
-    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
-):
-    # GIVEN an OTel configuration
-    tracer, _ = opentelemetry_test_configuration
-
-    # GIVEN a tool definition with strict=False
-    # WHEN building the Tool Kernel
-    @tool(opentelemetry_tracer=tracer, strict=False)
-    def foo(a: int, b: int) -> int:
-        return a + b
-
-    # THEN the JSON schema is correctly built
-    assert foo.json_schema["strict"] is False
-
-    # THEN the JSONSchema is valid
-    Validator.check_schema(foo.json_schema)
-
-
 def test_tool_no_args(
     opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):

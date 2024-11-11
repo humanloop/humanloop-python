@@ -1,12 +1,10 @@
 import logging
-import os
-import sys
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
-from opentelemetry.util.types import AttributeValue
+from typing_extensions import Unpack
 
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils.types import File
@@ -14,6 +12,7 @@ from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
 from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
 from humanloop.requests import FlowKernelRequestParams as FlowDict
+from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -21,11 +20,9 @@ logger = logging.getLogger("humanloop.sdk")
 def flow(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
-    attributes: Optional[dict[str, AttributeValue]] = None,
+    **flow_kernel: Unpack[FlowKernelRequestParams],
 ):
-    if attributes is None:
-        attributes = {}
-    attributes = {k: v for k, v in attributes.items() if v is not None}
+    flow_kernel["attributes"] = {k: v for k, v in flow_kernel.get("attributes", {}).items() if v is not None}
 
     def decorator(func: Callable):
         @wraps(func)
@@ -54,11 +51,11 @@ def flow(
 
                 span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "flow")
-                if attributes:
+                if flow_kernel:
                     write_to_opentelemetry_span(
                         span=span,
-                        key=f"{HUMANLOOP_FILE_KEY}.flow.attributes",
-                        value=attributes,  # type: ignore
+                        key=f"{HUMANLOOP_FILE_KEY}.flow",
+                        value=flow_kernel,  # type: ignore
                     )
 
                 inputs = args_to_inputs(func, args, kwargs)
@@ -96,7 +93,7 @@ def flow(
         wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="flow",
-            version=FlowDict(attributes=attributes),  # type: ignore
+            version=FlowDict(**flow_kernel),  # type: ignore
             callable=wrapper,
         )
 

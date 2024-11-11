@@ -1,9 +1,9 @@
 import contextvars
+import copy
 import json
 import logging
 import threading
 import typing
-import copy
 from queue import Empty as EmptyQueue
 from queue import Queue
 from threading import Thread

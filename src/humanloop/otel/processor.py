@@ -114,6 +114,8 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
     # via the @prompt arguments. Otherwise, use the information
     # from the intercepted LLM provider call
     prompt["model"] = prompt.get("model") or gen_ai_object.get("request", {}).get("model", None)
+    if prompt["model"] is None:
+        raise ValueError("Could not infer required parameter `model`. Please provide it in the @prompt decorator.")
     prompt["endpoint"] = prompt.get("endpoint") or llm_object.get("request", {}).get("type")
     prompt["provider"] = prompt.get("provider") or gen_ai_object.get("system", None)
     if prompt["provider"]:

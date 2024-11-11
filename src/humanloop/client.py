@@ -1,7 +1,8 @@
 from contextvars import ContextVar
 import os
 import typing
-from typing import Any, List, Optional, Sequence
+from typing import List, Optional, Sequence
+from typing_extensions import Unpack
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -9,15 +10,8 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
+from humanloop.decorators.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils.context import EVALUATION_CONTEXT_VARIABLE_NAME, EvaluationContext
-from humanloop.types.model_endpoints import ModelEndpoints
-from humanloop.types.model_providers import ModelProviders
-from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
-from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
-from humanloop.types.response_format import ResponseFormat
-
-if typing.TYPE_CHECKING:
-    from humanloop import ToolFunctionParams
 
 from humanloop.eval_utils import log_with_evaluation_context, run_eval
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
@@ -33,6 +27,8 @@ from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
+from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
+from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -177,21 +173,7 @@ class Humanloop(BaseHumanloop):
         self,
         *,
         path: Optional[str] = None,
-        model: Optional[str] = None,
-        attributes: Optional[dict[str, Any]] = None,
-        endpoint: Optional[ModelEndpoints] = None,
-        template: Optional[PromptKernelRequestTemplate] = None,
-        provider: Optional[ModelProviders] = None,
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None,
-        top_p: Optional[float] = None,
-        stop: Optional[PromptKernelRequestStop] = None,
-        presence_penalty: Optional[float] = None,
-        frequency_penalty: Optional[float] = None,
-        other: Optional[dict[str, Optional[Any]]] = None,
-        seed: Optional[int] = None,
-        response_format: Optional[ResponseFormat] = None,
-        tools: Optional[Sequence["ToolFunctionParams"]] = None,
+        **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],
     ):
         """Decorator for declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code.
 
@@ -258,79 +240,19 @@ class Humanloop(BaseHumanloop):
             provided, the function name is used as the path and the File
             is created in the root of your Humanloop organization workspace.
 
-        :param model: Name of the model used by the Prompt.
-
-        :param endpoint: The model instance used, e.g. `gpt-4`. See
-            [supported models](https://humanloop.com/docs/reference/supported-models)
-
-        :param template: The template for the Prompt. This is the text of
-            the system message used to set the LLM prompt. The template
-            accepts template slots using the format `{{slot_name}}`.
-
-        :param provider: The company providing the underlying model service.
-
-        :param max_tokens: Maximum number of tokens used in generation.
-
-        :param temperature: What sampling temperature to use
-            when making a generation. Higher values means the model
-            will be more creative.
-
-        :param top_p: An alternative to sampling with temperature,
-            called nucleus sampling, where the model considers the results
-            of the tokens with top_p probability mass.
-
-        :param stop: Token or list of tokens that stop generation
-
-        :param presence_penalty: Number between -2.0 and 2.0.
-            Positive values penalize new tokens based on whether they
-            appear in the generation so far.
-
-        :param frequency_penalty: Number between -2.0 and 2.0. Positive
-            values penalize new tokens based on how frequently they
-            appear in the generation so far.
-
-        :param other: Other parameter values to be passed to the provider call.
-
-        :param seed: If specified, model will make a best effort to
-            sample deterministically, but it is not guaranteed.
-
-        :param response_format: The format of the response.
-            Only `{"type": "json_object"}` is currently supported
-            for chat.
-
-        :param attributes: Additional fields to describe the Prompt. Helpful to
-            separate Prompt versions from each other with details on how they
-            were created or used.
-
-        :param tools: The tool specification that the model can choose to call if Tool
-            calling is supported.
+        :param prompt_kernel: Attributes that define the Prompt. See `class:DecoratorPromptKernelRequestParams`
         """
         return prompt_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            model=model,
-            attributes=attributes,
-            endpoint=endpoint,
-            template=template,
-            provider=provider,
-            max_tokens=max_tokens,
-            stop=stop,
-            temperature=temperature,
-            top_p=top_p,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-            other=other,
-            seed=seed,
-            response_format=response_format,
-            tools=tools,
+            **prompt_kernel,
         )
 
     def tool(
         self,
         *,
         path: Optional[str] = None,
-        setup_values: Optional[dict[str, Optional[Any]]] = None,
-        attributes: Optional[dict[str, Optional[Any]]] = None,
+        **tool_kernel: Unpack[ToolKernelRequestParams],
     ):
         """Decorator for declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code.
 
@@ -391,25 +313,19 @@ class Humanloop(BaseHumanloop):
             will be used as the path and the File will be created in the root
             of your organization's workspace.
 
-        :param setup_values: Values needed to setup the Tool, defined in
-            JSON Schema format: https://json-schema.org/
-
-        :param attributes: Additional fields to describe the Tool.
-            Helpful to separate Tool versions from each other
-            with details on how they were created or used.
+        :param tool_kernel: Attributes that define the Tool. See `class:ToolKernelRequestParams`
         """
         return tool_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            setup_values=setup_values,
-            attributes=attributes,
+            **tool_kernel,
         )
 
     def flow(
         self,
         *,
         path: Optional[str] = None,
-        attributes: Optional[dict[str, typing.Any]] = None,
+        **flow_kernel: Unpack[FlowKernelRequestParams],
     ):
         """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
 
@@ -453,14 +369,12 @@ class Humanloop(BaseHumanloop):
             will be used as the path and the File will be created in the root
             of your organization workspace.
 
-        :param attributes: A key-value object identifying the Flow Version.
+        :param flow_kernel: Attributes that define the Flow. See `class:ToolKernelRequestParams`
         """
-        if attributes is None:
-            attributes = {}
         return flow_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            attributes=attributes,
+            **flow_kernel,
         )
 
 

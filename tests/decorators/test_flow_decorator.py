@@ -31,7 +31,7 @@ def _test_scenario(
             )
         )
 
-    @prompt(
+    @prompt(  # type: ignore
         opentelemetry_tracer=opentelemetry_tracer,
         path=None,
         template="You are an assistant on the following topics: {topics}.",
@@ -55,7 +55,7 @@ def _test_scenario(
     def _agent_call(messages: list[dict]) -> str:
         return _call_llm(messages=messages)
 
-    @flow(
+    @flow(  # type: ignore
         opentelemetry_tracer=opentelemetry_tracer,
     )
     def _flow_over_flow(messages: list[dict]) -> str:

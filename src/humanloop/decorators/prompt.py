@@ -1,23 +1,17 @@
 import logging
-import typing
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
+from typing_extensions import Unpack
 
-if typing.TYPE_CHECKING:
-    from humanloop import ToolFunctionParams
 from humanloop.decorators.helpers import args_to_inputs
+from humanloop.decorators.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
 from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
-from humanloop.types.model_endpoints import ModelEndpoints
-from humanloop.types.model_providers import ModelProviders
-from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
-from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTemplate
-from humanloop.types.response_format import ResponseFormat
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -26,43 +20,9 @@ def prompt(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
     # TODO: Template can be a list of objects?
-    model: Optional[str] = None,
-    attributes: Optional[dict[str, Any]] = None,
-    endpoint: Optional[ModelEndpoints] = None,
-    template: Optional[PromptKernelRequestTemplate] = None,
-    provider: Optional[ModelProviders] = None,
-    max_tokens: Optional[int] = None,
-    stop: Optional[PromptKernelRequestStop] = None,
-    temperature: Optional[float] = None,
-    top_p: Optional[float] = None,
-    presence_penalty: Optional[float] = None,
-    frequency_penalty: Optional[float] = None,
-    other: Optional[dict[str, Optional[Any]]] = None,
-    seed: Optional[int] = None,
-    response_format: Optional[ResponseFormat] = None,
-    tools: Optional[Sequence["ToolFunctionParams"]] = None,
+    **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],
 ):
     def decorator(func: Callable):
-        prompt_kernel = {}
-        for attr_name, attr_value in {
-            "model": model,
-            "endpoint": endpoint,
-            "template": template,
-            "provider": provider,
-            "max_tokens": max_tokens,
-            "stop": stop,
-            "other": other,
-            "seed": seed,
-            "response_format": response_format,
-            "attributes": attributes or None,
-            "tools": tools,
-            "temperature": temperature,
-            "top_p": top_p,
-            "presence_penalty": presence_penalty,
-            "frequency_penalty": frequency_penalty,
-        }.items():
-            prompt_kernel[attr_name] = attr_value  # type: ignore
-
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
             span: Span
@@ -85,7 +45,10 @@ def prompt(
                     write_to_opentelemetry_span(
                         span=span,
                         key=f"{HUMANLOOP_FILE_KEY}.prompt",
-                        value=prompt_kernel,  # type: ignore
+                        value={
+                            **prompt_kernel,  # type: ignore
+                            "attributes": prompt_kernel.get("attributes") or None,  # type: ignore
+                        },  # type: ignore
                     )
 
                 # Call the decorated function
