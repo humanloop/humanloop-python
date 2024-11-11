@@ -116,7 +116,13 @@ def _build_tool_kernel(
     strict: bool,
 ) -> ToolKernelRequestParams:
     """Build ToolKernelRequest object from decorated function."""
-    source_code = textwrap.dedent(inspect.getsource(func))
+    try:
+        source_code = textwrap.dedent(inspect.getsource(func))
+    except TypeError as e:
+        raise TypeError(
+            f"Cannot extract source code for function {func.__name__}. "
+            "Try decorating a plain function instead of a partial for example."
+        ) from e
     # Remove decorator from source code by finding first 'def'
     # This makes the source_code extraction idempotent whether
     # the decorator is applied directly or used as a higher-order
