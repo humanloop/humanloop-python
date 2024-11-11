@@ -1,5 +1,4 @@
-import typing
-from contextvars import ContextVar
+from contextvars import ContextVar, Token
 from typing import Callable, TypedDict
 
 
@@ -25,6 +24,4 @@ class EvaluationContext(TypedDict):
     run_id: str
 
 
-EVALUATION_CONTEXT_VAR_NAME = "__EVALUATION_CONTEXT"
-
-EVALUATION_CONTEXT: ContextVar[typing.Optional[EvaluationContext]] = ContextVar(EVALUATION_CONTEXT_VAR_NAME)
+EVALUATION_CONTEXT_VARIABLE_NAME = "__EVALUATION_CONTEXT"

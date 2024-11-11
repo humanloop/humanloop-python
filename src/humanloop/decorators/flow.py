@@ -1,7 +1,7 @@
 import logging
-import traceback
-import uuid
 from functools import wraps
+import os
+import sys
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.sdk.trace import Span
@@ -11,8 +11,8 @@ from opentelemetry.util.types import AttributeValue
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils.types import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
-from humanloop.otel.helpers import write_to_opentelemetry_span
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
+from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
 from humanloop.requests import FlowKernelRequestParams as FlowDict
 
 logger = logging.getLogger("humanloop.sdk")
@@ -31,7 +31,7 @@ def flow(
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
             span: Span
-            with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
+            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:
                 span_id = span.get_span_context().span_id
                 if span.parent:
                     span_parent_id = span.parent.span_id
@@ -52,12 +52,12 @@ def flow(
                         is_flow_log=True,
                     )
 
-                span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
-                span.set_attribute(HL_FILE_TYPE_KEY, "flow")
+                span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "flow")
                 if attributes:
                     write_to_opentelemetry_span(
                         span=span,
-                        key=f"{HL_FILE_KEY}.flow.attributes",
+                        key=f"{HUMANLOOP_FILE_KEY}.flow.attributes",
                         value=attributes,  # type: ignore
                     )
 
@@ -68,7 +68,6 @@ def flow(
                     output = func(*args, **kwargs)
                     error = None
                 except Exception as e:
-                    # print error, line of code, and function name
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
                     error = str(e)
@@ -87,18 +86,17 @@ def flow(
                 if flow_log:
                     write_to_opentelemetry_span(
                         span=span,
-                        key=HL_LOG_KEY,
+                        key=HUMANLOOP_LOG_KEY,
                         value=flow_log,  # type: ignore
                     )
 
             # Return the output of the decorated function
             return output
 
-        func.file = File(  # type: ignore
+        wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="flow",
             version=FlowDict(attributes=attributes),  # type: ignore
-            is_decorated=True,
             callable=wrapper,
         )
 

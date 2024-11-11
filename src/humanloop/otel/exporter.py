@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import typing
@@ -11,15 +12,15 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
 from humanloop.core import ApiError as HumanloopApiError
-from humanloop.eval_utils.context import EVALUATION_CONTEXT, EvaluationContext
+from humanloop.eval_utils.context import EvaluationContext
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
 from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
 
 if typing.TYPE_CHECKING:
-    from humanloop.base_client import BaseHumanloop
+    from humanloop.client import Humanloop
 
 
 logger = logging.getLogger("humanloop.sdk")
@@ -35,7 +36,7 @@ class HumanloopSpanExporter(SpanExporter):
 
     def __init__(
         self,
-        client: "BaseHumanloop",
+        client: "Humanloop",
         worker_threads: Optional[int] = None,
     ) -> None:
         """Upload Spans created by SDK decorators to Humanloop.
@@ -63,9 +64,22 @@ class HumanloopSpanExporter(SpanExporter):
             thread.start()
 
     def export(self, spans: trace.Sequence[ReadableSpan]) -> SpanExportResult:
+        def is_evaluated_file(
+            span: ReadableSpan,
+            evaluation_context: Optional[EvaluationContext],
+        ) -> bool:
+            if evaluation_context is None:
+                return False
+
+            return span.attributes.get(HUMANLOOP_PATH_KEY) == evaluation_context["path"]  # type: ignore
+
         if not self._shutdown:
             try:
-                evaluation_context = EVALUATION_CONTEXT.get()
+                evaluation_context = self._client.evaluation_context_variable.get()
+                if len(spans) > 1:
+                    raise RuntimeError("HumanloopSpanExporter expected a single span when running an evaluation")
+                if not is_evaluated_file(spans[0], evaluation_context):
+                    evaluation_context = None
             except LookupError:
                 evaluation_context = None
             for span in spans:
@@ -74,7 +88,20 @@ class HumanloopSpanExporter(SpanExporter):
                     # thread spawned by eval_utils.run.run_eval. Need
                     # to pass the EvaluationContext to the thread doing
                     # the logging
-                    self._upload_queue.put((span, evaluation_context))
+                    self._upload_queue.put(
+                        (
+                            span,
+                            copy.deepcopy(evaluation_context),
+                        )
+                    )
+            # Reset the EvaluationContext so run eval does not
+            # create a duplicate Log
+            if evaluation_context is not None and is_evaluated_file(
+                spans[0],
+                evaluation_context,
+            ):
+                # Mark the EvaluationContext as used
+                self._client.evaluation_context_variable.set(None)
             return SpanExportResult.SUCCESS
         else:
             logger.warning("HumanloopSpanExporter is shutting down, not accepting new spans")
@@ -107,16 +134,23 @@ class HumanloopSpanExporter(SpanExporter):
         bottoms-up, while the upload of a Trace happens top-down. If a Span did not
         have its span uploaded yet, it will be re-queued to be uploaded later.
         """
+
         # Do work while the Exporter was not instructed to
         # wind down or the queue is not empty
         while self._upload_queue.qsize() > 0 or not self._shutdown:
             try:
+                thread_args: tuple[ReadableSpan, EvaluationContext]  # type: ignore
                 # Don't block or the thread will never be notified of the shutdown
-                thread_args: tuple[ReadableSpan, EvaluationContext] = self._upload_queue.get(block=False)  # type: ignore
+                thread_args = self._upload_queue.get(
+                    block=False,
+                )  # type: ignore
                 span_to_export, evaluation_context = thread_args
-                # Set the EvaluationContext for the thread so the .log action
-                # works as expected
-                EVALUATION_CONTEXT.set(evaluation_context)
+                # Set the EvaluationContext for the thread so the .log action works as expected
+                # NOTE: Expecting the evaluation thread to send a single span so we are
+                #   not resetting the EvaluationContext in the scope of the export thread
+                self._client.evaluation_context_variable.set(
+                    copy.deepcopy(evaluation_context),
+                )
             except EmptyQueue:
                 continue
             trace_metadata = TRACE_FLOW_CONTEXT.get(span_to_export.get_span_context().span_id)
@@ -135,8 +169,8 @@ class HumanloopSpanExporter(SpanExporter):
             self._upload_queue.task_done()
 
     def _export_span_dispatch(self, span: ReadableSpan) -> None:
-        hl_file = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
-        file_type = span._attributes.get(HL_FILE_TYPE_KEY)  # type: ignore
+        hl_file = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
+        file_type = span._attributes.get(HUMANLOOP_FILE_TYPE_KEY)  # type: ignore
 
         if file_type == "prompt":
             export_func = self._export_prompt
@@ -151,11 +185,11 @@ class HumanloopSpanExporter(SpanExporter):
     def _export_prompt(self, span: ReadableSpan) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(
             span,
-            key=HL_FILE_KEY,
+            key=HUMANLOOP_FILE_KEY,
         )
         log_object: dict[str, Any] = read_from_opentelemetry_span(
             span,
-            key=HL_LOG_KEY,
+            key=HUMANLOOP_LOG_KEY,
         )
         # NOTE: Due to OTel conventions, attributes with value of None are removed
         # If not present, instantiate as empty dictionary
@@ -171,17 +205,18 @@ class HumanloopSpanExporter(SpanExporter):
             trace_parent_id = self._span_id_to_uploaded_log_id[trace_metadata["trace_parent_id"]]
             if trace_parent_id is None:
                 # Parent Log in Trace upload failed
-                file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
+                file_path = read_from_opentelemetry_span(span, key=HUMANLOOP_PATH_KEY)
                 logger.error(f"Skipping log for {file_path}: parent Log upload failed")
                 return
         else:
             trace_parent_id = None
         prompt: PromptKernelRequestParams = file_object["prompt"]
         path: str = file_object["path"]
-        if not isinstance(log_object["output"], str):
-            # Output expected to be a string, if decorated function
-            # does not return one, jsonify it
-            log_object["output"] = json.dumps(log_object["output"])
+        if "output" in log_object:
+            if not isinstance(log_object["output"], str):
+                # Output expected to be a string, if decorated function
+                # does not return one, jsonify it
+                log_object["output"] = json.dumps(log_object["output"])
         if "attributes" not in prompt or not prompt["attributes"]:
             prompt["attributes"] = {}
         try:
@@ -192,12 +227,12 @@ class HumanloopSpanExporter(SpanExporter):
                 trace_parent_id=trace_parent_id,
             )
             self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
-        except HumanloopApiError as e:
+        except HumanloopApiError:
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_tool(self, span: ReadableSpan) -> None:
-        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
-        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_KEY)
+        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
+        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_LOG_KEY)
         trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
         if "trace_parent_id" in trace_metadata and trace_metadata["trace_parent_id"]:
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
@@ -205,7 +240,7 @@ class HumanloopSpanExporter(SpanExporter):
             )
             if trace_parent_id is None:
                 # Parent Log in Trace upload failed
-                file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
+                file_path = read_from_opentelemetry_span(span, key=HUMANLOOP_PATH_KEY)
                 logger.error(f"Skipping log for {file_path}: parent Log upload failed")
                 return
         else:
@@ -228,12 +263,12 @@ class HumanloopSpanExporter(SpanExporter):
                 trace_parent_id=trace_parent_id,
             )
             self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
-        except HumanloopApiError as e:
+        except HumanloopApiError:
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_flow(self, span: ReadableSpan) -> None:
-        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_FILE_KEY)
-        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HL_LOG_KEY)
+        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
+        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_LOG_KEY)
         trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(
             span.get_span_context().span_id,
             {},
@@ -246,7 +281,7 @@ class HumanloopSpanExporter(SpanExporter):
                 # Parent Log in Trace upload failed
                 # NOTE: Check if the trace_id metadata field points to the
                 # span itself. This signifies the span is the head of the Trace
-                file_path = read_from_opentelemetry_span(span, key=HL_PATH_KEY)
+                file_path = read_from_opentelemetry_span(span, key=HUMANLOOP_PATH_KEY)
                 logger.error(f"Skipping log for {file_path}: parent Log upload failed")
                 return
         else:

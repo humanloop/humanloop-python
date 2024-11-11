@@ -9,7 +9,7 @@ from humanloop.decorators.flow import flow
 from humanloop.decorators.prompt import prompt
 from humanloop.decorators.tool import tool
 from humanloop.otel import TRACE_FLOW_CONTEXT
-from humanloop.otel.constants import HL_FILE_KEY
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from openai import OpenAI
@@ -93,11 +93,11 @@ def test_decorators_without_flow(
     assert len(spans) == 3
     assert read_from_opentelemetry_span(
         span=spans[1],
-        key=HL_FILE_KEY,
+        key=HUMANLOOP_FILE_KEY,
     )["tool"]
     assert read_from_opentelemetry_span(
         span=spans[2],
-        key=HL_FILE_KEY,
+        key=HUMANLOOP_FILE_KEY,
     )["prompt"]
     for span in spans:
         # THEN no metadata related to trace is present on either of them
@@ -133,8 +133,8 @@ def test_decorators_with_flow_decorator(
     spans = exporter.get_finished_spans()
     assert len(spans) == 4
     # THEN the span are returned bottom to top
-    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_KEY)["prompt"]
+    assert read_from_opentelemetry_span(span=spans[1], key=HUMANLOOP_FILE_KEY)["tool"]
+    assert read_from_opentelemetry_span(span=spans[2], key=HUMANLOOP_FILE_KEY)["prompt"]
     # assert read_from_opentelemetry_span(span=spans[3], key=HL_FILE_OT_KEY)["flow"]
     assert (tool_trace_metadata := TRACE_FLOW_CONTEXT.get(spans[1].get_span_context().span_id))
     assert (prompt_trace_metadata := TRACE_FLOW_CONTEXT.get(spans[2].get_span_context().span_id))
@@ -169,11 +169,11 @@ def test_flow_decorator_flow_in_flow(
     #   4. Flow Span
     spans = exporter.get_finished_spans()
     assert len(spans) == 5
-    assert read_from_opentelemetry_span(span=spans[1], key=HL_FILE_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[2], key=HL_FILE_KEY)["prompt"]
-    assert read_from_opentelemetry_span(span=spans[3], key=HL_FILE_KEY)["flow"] != {}
+    assert read_from_opentelemetry_span(span=spans[1], key=HUMANLOOP_FILE_KEY)["tool"]
+    assert read_from_opentelemetry_span(span=spans[2], key=HUMANLOOP_FILE_KEY)["prompt"]
+    assert read_from_opentelemetry_span(span=spans[3], key=HUMANLOOP_FILE_KEY)["flow"] != {}
     with pytest.raises(KeyError):
-        read_from_opentelemetry_span(span=spans[4], key=HL_FILE_KEY)["flow"] != {}
+        read_from_opentelemetry_span(span=spans[4], key=HUMANLOOP_FILE_KEY)["flow"] != {}
 
     assert (tool_trace_metadata := TRACE_FLOW_CONTEXT.get(spans[1].get_span_context().span_id))
     assert (prompt_trace_metadata := TRACE_FLOW_CONTEXT.get(spans[2].get_span_context().span_id))
@@ -225,7 +225,7 @@ def test_flow_decorator_with_hl_exporter(
         # THEN the last uploaded span is the Flow
         assert read_from_opentelemetry_span(
             span=flow_span,
-            key=HL_FILE_KEY,
+            key=HUMANLOOP_FILE_KEY,
         )["flow"]["attributes"] == {  # type: ignore[index,call-overload]
             "foo": "bar",
             "baz": 7,
@@ -233,12 +233,12 @@ def test_flow_decorator_with_hl_exporter(
         # THEN the second uploaded span is the Prompt
         assert "prompt" in read_from_opentelemetry_span(
             span=prompt_span,
-            key=HL_FILE_KEY,
+            key=HUMANLOOP_FILE_KEY,
         )
         # THEN the first uploaded span is the Tool
         assert "tool" in read_from_opentelemetry_span(
             span=tool_span,
-            key=HL_FILE_KEY,
+            key=HUMANLOOP_FILE_KEY,
         )
 
         # NOTE: The type: ignore comments are caused by the MagicMock used to mock the HTTP client

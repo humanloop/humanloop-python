@@ -48,7 +48,6 @@ class File(Identifiers):
     If `messages` are defined in your Dataset, then `output = callable(**datapoint.inputs, messages=datapoint.messages)`.
     It should return a string or json serializable output.
     """
-    is_decorated: NotRequired[bool]
 
 
 class Dataset(Identifiers):

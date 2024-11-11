@@ -8,10 +8,11 @@ Functions in this module should be accessed via the Humanloop client. They shoul
 not be called directly.
 """
 
+from contextvars import ContextVar
+import copy
 import inspect
 import json
 import logging
-import copy
 import sys
 import threading
 import time
@@ -25,17 +26,15 @@ from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Typ
 
 from pydantic import ValidationError
 
-
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
-
-from humanloop.prompts.client import PromptsClient
 from humanloop.core.api_error import ApiError
-from humanloop.eval_utils.context import EVALUATION_CONTEXT, EvaluationContext
+from humanloop.eval_utils.context import EvaluationContext
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
 # We use TypedDicts for requests, which is consistent with the rest of the SDK
 from humanloop.evaluators.client import EvaluatorsClient
 from humanloop.flows.client import FlowsClient
+from humanloop.prompts.client import PromptsClient
 from humanloop.requests import CodeEvaluatorRequestParams as CodeEvaluatorDict
 from humanloop.requests import ExternalEvaluatorRequestParams as ExternalEvaluator
 from humanloop.requests import FlowKernelRequestParams as FlowDict
@@ -47,17 +46,17 @@ from humanloop.tools.client import ToolsClient
 from humanloop.types import BooleanEvaluatorStatsResponse as BooleanStats
 from humanloop.types import DatapointResponse as Datapoint
 from humanloop.types import EvaluationResponse, EvaluationStats
-from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
-from humanloop.types.create_flow_log_response import CreateFlowLogResponse
-from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
-from humanloop.types.create_tool_log_response import CreateToolLogResponse
-from humanloop.types.datapoint_response_target_value import DatapointResponseTargetValue
 
 # Responses are Pydantic models and we leverage them for improved request validation
 from humanloop.types import FlowKernelRequest as Flow
 from humanloop.types import NumericEvaluatorStatsResponse as NumericStats
 from humanloop.types import PromptKernelRequest as Prompt
 from humanloop.types import ToolKernelRequest as Tool
+from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
+from humanloop.types.create_flow_log_response import CreateFlowLogResponse
+from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
+from humanloop.types.create_tool_log_response import CreateToolLogResponse
+from humanloop.types.datapoint_response_target_value import DatapointResponseTargetValue
 from humanloop.types.evaluation_run_response import EvaluationRunResponse
 from humanloop.types.run_stats_response import RunStatsResponse
 
@@ -90,7 +89,10 @@ RESET = "\033[0m"
 CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, ToolsClient, FlowsClient, EvaluatorsClient)
 
 
-def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
+def log_with_evaluation_context(
+    client: CLIENT_TYPE,
+    evaluation_context_variable: ContextVar[Optional[EvaluationContext]],
+) -> CLIENT_TYPE:
     """
     Wrap the `log` method of the provided Humanloop client to use EVALUATION_CONTEXT.
 
@@ -108,7 +110,7 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
         The user of the .log API can refer to the File that owns that Log either by
         ID or Path. This function matches against any of them in EvaluationContext.
         """
-        if evaluation_context == {}:
+        if evaluation_context is None:
             return False
         return evaluation_context.get("file_id") == log_args.get(file_id_attribute) or evaluation_context.get(
             "path"
@@ -126,11 +128,7 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
         CreateFlowLogResponse,
         CreateEvaluatorLogResponse,
     ]:
-        evaluation_context: EvaluationContext
-        try:
-            evaluation_context = EVALUATION_CONTEXT.get() or {}  # type: ignore
-        except LookupError:
-            evaluation_context = {}  # type: ignore
+        evaluation_context = evaluation_context_variable.get()
 
         if isinstance(client, PromptsClient):
             file_id_attribute = "prompt_id"
@@ -148,9 +146,13 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
         ):
             # If the .log API user does not provide the source_datapoint_id or run_id,
             # override them with the values from the EvaluationContext
+            evaluation_context = typing.cast(
+                EvaluationContext,
+                evaluation_context,
+            )
             for attribute in ["source_datapoint_id", "run_id"]:
                 if attribute not in kwargs or kwargs[attribute] is None:
-                    kwargs[attribute] = evaluation_context.get(attribute)
+                    kwargs[attribute] = evaluation_context[attribute]  # type: ignore
 
         # Call the original .log method
         response = self._log(**kwargs)
@@ -162,12 +164,20 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
             file_id_attribute=file_id_attribute,
         ):
             # Notify that the Log has been added to the Evaluation
-            evaluation_context["upload_callback"](
+            # evaluation_context cannot be None
+            evaluation_context = typing.cast(
+                EvaluationContext,
+                evaluation_context,
+            )
+            evaluation_context["upload_callback"](  # type: ignore
                 {
                     "id": response.id,
                     **kwargs,
                 }
             )
+
+            # Mark the Evaluation Context as consumed
+            evaluation_context_variable.set(None)
 
         return response
 
@@ -225,9 +235,10 @@ _PROGRESS_BAR: Optional[_SimpleProgressBar] = None
 
 def run_eval(
     client: "BaseHumanloop",
-    file: Union[File, Callable],
+    file: File,
     name: Optional[str],
     dataset: Dataset,
+    evaluation_context_variable: ContextVar[Optional[EvaluationContext]],
     evaluators: Optional[Sequence[Evaluator]] = None,
     workers: int = 4,
 ) -> List[EvaluatorCheck]:
@@ -244,13 +255,30 @@ def run_eval(
     """
     global _PROGRESS_BAR
 
-    if isinstance(file, Callable):  # type: ignore
-        # Decorated function
-        file_: File = copy.deepcopy(file.file)  # type: ignore
+    if hasattr(file["callable"], "file"):
+        # When the decorator inside `file`` is a decorated function,
+        # we need to validate that the other parameters of `file`
+        # match the attributes of the decorator
+        inner_file: File = file["callable"].file
+        if "path" in file and inner_file["path"] != file["path"]:
+            raise ValueError(
+                "`path` attribute specified in the `file` does not match the File path of the decorated function."
+            )
+        if "version" in file and inner_file["version"] != file["version"]:
+            raise ValueError(
+                "`version` attribute in the `file` does not match the File version of the decorated function."
+            )
+        if "type" in file and inner_file["type"] != file["type"]:
+            raise ValueError(
+                "`type` attribute of `file` argument does not match the File type of the decorated function."
+            )
+        if "id" in file:
+            raise ValueError("Do not specify an `id` attribute in `file` argument when using a decorated function.")
+        # file on decorated function holds at least
+        # or more information than the `file` argument
+        file_ = copy.deepcopy(inner_file)
     else:
-        file_ = file  # type: ignore
-
-    is_decorated = file_.pop("is_decorated", False)
+        file_ = file
 
     # Get or create the file on Humanloop
     version = file_.pop("version", {})
@@ -357,6 +385,7 @@ def run_eval(
                     path=evaluator.get("path"),
                     spec=spec,
                 )
+    # function_ cannot be None, cast it for type checking
     function_ = typing.cast(Callable, function_)
 
     # Validate upfront that the local Evaluators and Dataset fit
@@ -406,91 +435,10 @@ def run_eval(
 
     _PROGRESS_BAR = _SimpleProgressBar(len(hl_dataset.datapoints))  # type: ignore
 
-    if is_decorated:
-
-        def process_datapoint(dp: Datapoint, file_id: str, file_path: str, run_id: str):
-            def upload_callback(log: dict):
-                # OTel exporter will call this after the Log is uploaded
-                _run_local_evaluators(
-                    client=client,
-                    log=log,
-                    datapoint_target=dp.target,
-                    local_evaluators=local_evaluators,
-                )
-                _PROGRESS_BAR.increment()  # type: ignore
-
-            datapoint_dict = dp.dict()
-            # Set the Evaluation Context for the Exporter
-            # Each thread will have its own context
-            EVALUATION_CONTEXT.set(
-                EvaluationContext(
-                    source_datapoint_id=dp.id,
-                    upload_callback=upload_callback,
-                    file_id=file_id,
-                    run_id=run_id,
-                    path=file_path,
-                )
-            )
-            if datapoint_dict.get("messages"):
-                # function_ is decorated by Humanloop, the OTel Exporter will
-                # handle the logging, which will call the upload_callback
-                # function above when it's done
-                function_(  # type: ignore
-                    **datapoint_dict["inputs"],
-                    messages=datapoint_dict["messages"],
-                )
-            else:
-                # function_ is decorated by Humanloop, the OTel Exporter will
-                # handle the logging, which will call the upload_callback
-                # function above when it's done
-                function_(**datapoint_dict["inputs"])  # type: ignore
-
-    else:
-        # Define the function to execute your function in parallel and Log to Humanloop
-        def process_datapoint(dp: Datapoint, file_id: str, file_path: str, run_id: str):
-            log_func = _get_log_func(
-                client=client,
-                file_type=type_,
-                file_id=hl_file.id,
-                version_id=hl_file.version_id,
-                run_id=run_id,
-            )
-
-            start_time = datetime.now()
-            datapoint_dict = dp.dict()
-            try:
-                if "messages" in datapoint_dict:
-                    output = function_(  # type: ignore
-                        **datapoint_dict["inputs"],
-                        messages=datapoint_dict["messages"],
-                    )
-                else:
-                    output = function_(**datapoint_dict["inputs"])  # type: ignore
-                if not isinstance(output, str):
-                    try:
-                        output = json.dumps(output)
-                        # throw error if it fails to serialize
-                    except Exception as _:
-                        raise ValueError(
-                            f"Your {type_}'s `callable` must return a string or a JSON serializable object."
-                        )
-                log = log_func(
-                    inputs=datapoint.inputs,
-                    output=output,
-                    source_datapoint_id=datapoint.id,
-                    start_time=start_time,
-                    end_time=datetime.now(),
-                )
-            except Exception as e:
-                log = log_func(
-                    inputs=dp.inputs,
-                    error=str(e),
-                    source_datapoint_id=dp.id,
-                    start_time=start_time,
-                    end_time=datetime.now(),
-                )
-                logger.warning(msg=f"\nYour {type_}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}")
-
+    # Define the function to execute the `callable` in parallel and Log to Humanloop
+    def process_datapoint(dp: Datapoint, file_id: str, file_path: str, run_id: str):
+        def upload_callback(log: dict):
+            """Logic ran after the Log has been created."""
             _run_local_evaluators(
                 client=client,
                 log=log,
@@ -498,6 +446,68 @@ def run_eval(
                 local_evaluators=local_evaluators,
             )
             _PROGRESS_BAR.increment()  # type: ignore
+
+        datapoint_dict = dp.dict()
+        # Set the Evaluation Context for current datapoint
+        evaluation_context_variable.set(
+            EvaluationContext(
+                source_datapoint_id=dp.id,
+                upload_callback=upload_callback,
+                file_id=file_id,
+                run_id=run_id,
+                path=file_path,
+            )
+        )
+        log_func = _get_log_func(
+            client=client,
+            file_type=type_,
+            file_id=hl_file.id,
+            version_id=hl_file.version_id,
+            run_id=run_id,
+        )
+        start_time = datetime.now()
+        try:
+            if datapoint_dict.get("messages"):
+                # function_ is decorated by Humanloop, the OTel Exporter will
+                # handle the logging, which will call the upload_callback
+                # function above when it's done
+                output = function_(  # type: ignore
+                    **datapoint_dict["inputs"],
+                    messages=datapoint_dict["messages"],
+                )
+            else:
+                # function_ is decorated by Humanloop, the OTel Exporter will
+                # handle the logging, which will call the upload_callback
+                # function above when it's done
+                output = function_(**datapoint_dict["inputs"])  # type: ignore
+
+            if not isinstance(output, str):
+                try:
+                    output = json.dumps(output)
+                except Exception:
+                    # throw error if it fails to serialize
+                    raise ValueError(f"Your {type_}'s `callable` must return a string or a JSON serializable object.")
+
+            context_variable = evaluation_context_variable.get()
+            if context_variable is not None:
+                # Evaluation Context has not been consumed
+                # function_ is a plain callable so we need to create a Log
+                log_func(
+                    inputs=datapoint.inputs,
+                    output=output,
+                    start_time=start_time,
+                    end_time=datetime.now(),
+                )
+        except Exception as e:
+            log_func(
+                inputs=dp.inputs,
+                error=str(e),
+                source_datapoint_id=dp.id,
+                run_id=run_id,
+                start_time=start_time,
+                end_time=datetime.now(),
+            )
+            logger.warning(msg=f"\nYour {type_}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}")
 
     # Execute the function and send the logs to Humanloop in parallel
     logger.info(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n")

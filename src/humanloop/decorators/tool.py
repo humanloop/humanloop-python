@@ -1,9 +1,11 @@
 import builtins
 import inspect
 import logging
+import os
+import sys
 import textwrap
 import typing
-import uuid
+from dataclasses import dataclass
 from functools import wraps
 from inspect import Parameter
 from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
@@ -12,8 +14,8 @@ from opentelemetry.trace import Tracer
 
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
-from humanloop.otel.helpers import write_to_opentelemetry_span
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
+from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
@@ -42,7 +44,7 @@ def tool(
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
+            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:
                 span_id = span.get_span_context().span_id
                 if span.parent:
                     span_parent_id = span.parent.span_id
@@ -57,12 +59,12 @@ def tool(
                     )
 
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
-                span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
-                span.set_attribute(HL_FILE_TYPE_KEY, "tool")
+                span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "tool")
                 if tool_kernel:
                     write_to_opentelemetry_span(
                         span=span,
-                        key=f"{HL_FILE_KEY}.tool",
+                        key=f"{HUMANLOOP_FILE_KEY}.tool",
                         value=tool_kernel,
                     )
 
@@ -85,18 +87,17 @@ def tool(
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
                 write_to_opentelemetry_span(
                     span=span,
-                    key=HL_LOG_KEY,
+                    key=HUMANLOOP_LOG_KEY,
                     value=tool_log,
                 )
 
                 # Return the output of the decorated function
                 return output
 
-        func.file = File(  # type: ignore
+        wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="tool",
             version=tool_kernel,
-            is_decorated=True,
             callable=wrapper,
         )
 
@@ -112,12 +113,14 @@ def _build_tool_kernel(
     strict: bool,
 ) -> ToolKernelRequestParams:
     """Build ToolKernelRequest object from decorated function."""
+    source_code = textwrap.dedent(inspect.getsource(func))
+    # Remove decorator from source code by finding first 'def'
+    # This makes the source_code extraction idempotent whether
+    # the decorator is applied directly or used as a higher-order
+    # function
+    source_code = source_code[source_code.find("def") :]
     kernel = ToolKernelRequestParams(
-        source_code=textwrap.dedent(
-            # Remove the tool decorator from source code
-            inspect.getsource(func).split("\n", maxsplit=1)[1]
-        ),
-        # Note: OTel complains about falsy values in attributes, so we use OT_EMPTY_ATTRIBUTE
+        source_code=source_code,
         function=_build_function_property(
             func=func,
             strict=strict,
@@ -162,7 +165,7 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
             inspect.Parameter.VAR_POSITIONAL,
             inspect.Parameter.VAR_KEYWORD,
         ):
-            raise ValueError(f"{func.__name__}: Varargs and kwargs are not supported by the @tool decorator")
+            raise ValueError(f"{func.__name__}: *args and **kwargs are not supported by the @tool decorator")
 
     for parameter in signature.parameters.values():
         try:
@@ -191,58 +194,76 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
     )
 
 
-def _parse_annotation(annotation: typing.Type) -> Union[list, tuple]:
+_PRIMITIVE_TYPES = Union[
+    str,
+    int,
+    float,
+    bool,
+    Parameter.empty,  # type: ignore
+]
+
+
+@dataclass
+class _ParsedAnnotation:
+    def no_type_hint(self) -> bool:
+        """Check if the annotation has no type hint.
+
+        Examples:
+            str -> False
+            list -> True
+            list[str] -> False
+        """
+        raise NotImplementedError
+
+
+@dataclass
+class _ParsedPrimitiveAnnotation(_ParsedAnnotation):
+    annotation: _PRIMITIVE_TYPES
+
+    def no_type_hint(self) -> bool:
+        return self.annotation is Parameter.empty
+
+
+@dataclass
+class _ParsedDictAnnotation(_ParsedAnnotation):
+    # Both are null if no type hint e.g. dict vs dict[str, int]
+    key_annotation: Optional[_ParsedAnnotation]
+    value_annotation: Optional[_ParsedAnnotation]
+
+    def no_type_hint(self) -> bool:
+        return self.key_annotation is None and self.value_annotation is None
+
+
+@dataclass
+class _ParsedTupleAnnotation(_ParsedAnnotation):
+    # Null if no type hint e.g. tuple vs tuple[str, int]
+    annotation: Optional[list[_ParsedAnnotation]]
+
+    def no_type_hint(self) -> bool:
+        return self.annotation is None
+
+
+@dataclass
+class _ParsedUnionAnnotation(_ParsedAnnotation):
+    annotation: list[_ParsedAnnotation]
+
+
+@dataclass
+class _ParsedListAnnotation(_ParsedAnnotation):
+    # Null if no type hint e.g. list vs list[str]
+    annotation: Optional[_ParsedAnnotation]
+
+
+@dataclass
+class _ParsedOptionalAnnotation(_ParsedAnnotation):
+    annotation: _ParsedAnnotation
+
+
+def _parse_annotation(annotation: typing.Type) -> _ParsedAnnotation:
     """Parse constituent parts of a potentially nested type hint.
 
     Custom types are not supported, only built-in types and typing module types.
 
-
-    Method returns potentially nested lists, with each list describing a
-    level of type nesting. For a nested type, the function recursively calls
-    itself to parse the inner type.
-
-    When the annotation is optional, a tuple is returned with the inner type
-    to signify that the parameter is nullable.
-
-    For lists, a list with two elements is returned, where the first element
-    is the list type and the second element is the inner type.
-
-    For dictionaries, a list with three elements is returned, where the first
-    element is the dict type, the second element is the key type, and the
-    third element is the value type.
-
-    For tuples, a list where the fist element is the tuple type and the rest
-    describes the inner types.
-
-    For Union types, a list with the first element being the Union type and
-    the rest describing the inner types.
-
-    Note that for nested types that lack inner type, e.g. list instead of
-    list[str], the inner type is set to Parameter.empty. This edge case is
-    handled by _annotation_parse_to_json_schema.
-
-    Examples:
-        str -> [str]
-        Optional[str] -> (str)
-        str | None -> (str)
-
-        list[str] -> [list, [str]]
-        Optional[list[str]] -> (list, [str])
-
-        dict[str, int] -> [dict, [str], [int]]
-        Optional[dict[str, int]] -> (dict, [str], [int])
-
-        list[list[str]] -> [list, [list, str]]
-        list[Optional[list[str]]] -> [list, (list, [str])]
-
-        dict[str, Optional[int]] -> [dict, [str], (int)]
-
-        Union[str, int] -> [Union, [str], [int]]
-
-        tuple[str, int, list[str]] -> [tuple, [str], [int], [list, str]]
-        tuple[Optional[str], int, Optional[list[str]]] -> (str, [int], (list, str))
-
-        list -> [list]
     """
     origin = typing.get_origin(annotation)
     if origin is None:
@@ -250,182 +271,192 @@ def _parse_annotation(annotation: typing.Type) -> Union[list, tuple]:
         # Parameter.empty is used for parameters without type hints
         if annotation not in (str, int, float, bool, Parameter.empty, dict, list, tuple):
             raise ValueError(f"Unsupported type hint: {annotation}")
-        return [annotation]
+
+        # Check if it's a complex type with no inner type
+        if annotation == builtins.dict:
+            return _ParsedDictAnnotation(
+                value_annotation=None,
+                key_annotation=None,
+            )
+        if annotation == builtins.list:
+            return _ParsedListAnnotation(
+                annotation=None,
+            )
+        if annotation == builtins.tuple:
+            return _ParsedTupleAnnotation(
+                annotation=None,
+            )
+
+        # Is a primitive type
+        return _ParsedPrimitiveAnnotation(
+            annotation=annotation,
+        )
+
     if origin is list:
-        inner_type = _parse_annotation(typing.get_args(annotation)[0])
-        return [origin, inner_type]
+        inner_annotation = _parse_annotation(typing.get_args(annotation)[0])
+        return _ParsedListAnnotation(
+            annotation=inner_annotation,
+        )
+
     if origin is dict:
         key_type = _parse_annotation(typing.get_args(annotation)[0])
         value_type = _parse_annotation(typing.get_args(annotation)[1])
-        return [origin, key_type, value_type]
+        return _ParsedDictAnnotation(
+            key_annotation=key_type,
+            value_annotation=value_type,
+        )
+
     if origin is tuple:
-        return [
-            origin,
-            *[_parse_annotation(arg) for arg in typing.get_args(annotation)],
-        ]
+        return _ParsedTupleAnnotation(
+            annotation=[_parse_annotation(arg) for arg in typing.get_args(annotation)],
+        )
+
     if origin is typing.Union:
         sub_types = typing.get_args(annotation)
         if sub_types[-1] is type(None):
-            # Union is an Optional type
+            # type(None) in sub_types indicates Optional type
             if len(sub_types) == 2:
-                return tuple(_parse_annotation(sub_types[0]))
-            return (
-                origin,
-                *[_parse_annotation(sub_type) for sub_type in sub_types[:-1]],
+                # Union is an Optional type only
+                return _ParsedOptionalAnnotation(
+                    annotation=_parse_annotation(sub_types[0]),
+                )
+            # Union has sub_types and is Optional
+            return _ParsedOptionalAnnotation(
+                annotation=_ParsedUnionAnnotation(
+                    annotation=[_parse_annotation(sub_type) for sub_type in sub_types[:-1]],
+                )
             )
-        # Union type
-        return [
-            origin,
-            *[_parse_annotation(sub_type) for sub_type in sub_types],
-        ]
+        # Union type that is not Optional
+        return _ParsedUnionAnnotation(
+            annotation=[_parse_annotation(sub_type) for sub_type in sub_types],
+        )
 
     raise ValueError(f"Unsupported origin: {origin}")
 
 
-def _annotation_parse_to_json_schema(arg: Union[list, tuple]) -> Mapping[str, Union[str, Mapping, Sequence]]:
+_JSON_SCHEMA_ANY = ["string", "integer", "number", "boolean", "object", "array", "null"]
+
+
+def _annotation_parse_to_json_schema(
+    arg: _ParsedAnnotation,
+) -> Mapping[str, Union[str, Mapping, Sequence]]:
     """
     Convert parse result from _parse_annotation to JSON Schema for a parameter.
 
     The function recursively converts the nested type hints to a JSON Schema.
 
     Note that 'any' is not supported by JSON Schema, so we allow any type as a workaround.
-
-    Examples:
-        [str] -> {"type": "string"}
-        (str) -> {"type": ["string", "null"]}
-
-        [list, [str]] -> {"type": "array", "items": {"type": "string"}}
-        (list, [str]) -> {"type": ["array", "null"], "items": {"type": "string"}}
-
-        [dict, [str], [int]] ->
-            {
-                "type": "object",
-                "properties": {
-                    "key": {"type": "string"},
-                    "value": {"type": "integer"}
-                }
-            }
-
-        [list, [list, str]] ->
-            {
-                "type": "array",
-                "items": {
-                    "type": "array",
-                    "items": {"type": "string"}
-                }
-            }
-
-        tuple[str, int, list[str]] ->
-            {
-                type: "array",
-                items: [
-                    {"type": "string"},
-                    {"type": "integer"},
-                    {
-                        "type": "array",
-                        "items": {"type": "string"}
-                    }
-                ]
-            }
-
-        Union[str, int] ->
-            {
-                "anyOf": [
-                    {"type": "string"},
-                    {"type": "integer"}
-                ]
-            }
-
-        dict[int, list] ->
-            {
-                "type": "object",
-                "properties": {
-                    "key": {"type": "integer"},
-                    "value": {
-                        "type": "array",
-                        "items": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]}
-                    }
-                }
-            }
-
-        Optional[list] ->
-            {
-                "type": ["array", "null"],
-                "items": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
-            }
     """
-    is_nullable = isinstance(arg, tuple)
     arg_type: Mapping[str, Union[str, Mapping, Sequence]]
-    if arg[0] is typing.Union:
+
+    if isinstance(arg, _ParsedOptionalAnnotation):
+        is_optional = True
+        arg = arg.annotation
+    else:
+        is_optional = False
+
+    if isinstance(arg, _ParsedUnionAnnotation):
         arg_type = {
-            "anyOf": [_annotation_parse_to_json_schema(sub_type) for sub_type in arg[1:]],
+            "anyOf": [_annotation_parse_to_json_schema(sub_type) for sub_type in arg.annotation],
         }
-    if arg[0] is tuple:
-        if len(arg) == 1:
+
+    elif isinstance(arg, _ParsedTupleAnnotation):
+        if arg.annotation is None:
             # tuple annotation with no type hints
             # This is equivalent with a list, since the
             # number of elements is not specified
             arg_type = {
                 "type": "array",
-                "items": {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]},
+                "items": {"type": _JSON_SCHEMA_ANY},
             }
         else:
             arg_type = {
                 "type": "array",
-                "items": [_annotation_parse_to_json_schema(sub_type) for sub_type in arg[1:]],
+                "items": [_annotation_parse_to_json_schema(sub_type) for sub_type in arg.annotation],
             }
-    if arg[0] is list:
-        if len(arg) == 1:
-            # list annotation with no type hints
-            if isinstance(arg, tuple):
-                # Support Optional annotation
-                arg = (list, [Parameter.empty])
-            else:
-                # Support non-Optional list annotation
-                arg = [list, [Parameter.empty]]
-        arg_type = {
-            "type": "array",
-            "items": _annotation_parse_to_json_schema(arg[1]),
-        }
-    if arg[0] is dict:
-        if len(arg) == 1:
-            # dict annotation with no type hints
-            if isinstance(arg, tuple):
-                arg = (dict, [Parameter.empty], [Parameter.empty])
-            else:
-                arg = [dict, [Parameter.empty], [Parameter.empty]]
-        arg_type = {
-            "type": "object",
-            "properties": {
-                "key": _annotation_parse_to_json_schema(arg[1]),
-                "value": _annotation_parse_to_json_schema(arg[2]),
-            },
-        }
-    if arg[0] is builtins.str:
-        arg_type = {"type": "string"}
-    if arg[0] is builtins.int:
-        arg_type = {"type": "integer"}
-    if arg[0] is builtins.float:
-        arg_type = {"type": "number"}
-    if arg[0] is builtins.bool:
-        arg_type = {"type": "boolean"}
-    if arg[0] is Parameter.empty:
-        # JSON Schema dropped support for 'any' type, we allow any type as a workaround
-        arg_type = {"type": ["string", "integer", "number", "boolean", "object", "array", "null"]}
 
-    if is_nullable:
-        if arg[0] is typing.Union:
-            arg_type["anyOf"] = [  # type: ignore
-                {**type_option, "type": [type_option["type"], "null"]}  # type: ignore
-                for type_option in arg_type["anyOf"]  # type: ignore
-            ]
+    elif isinstance(arg, _ParsedListAnnotation):
+        if arg.annotation is None:
+            # list annotation with no type hints
+            if is_optional:
+                arg_type = {
+                    "type": ["array", "null"],
+                    "items": {"type": _JSON_SCHEMA_ANY},
+                }
+            else:
+                arg_type = {
+                    "type": "array",
+                    "items": {"type": _JSON_SCHEMA_ANY},
+                }
         else:
-            arg_type = {**arg_type, "type": [arg_type["type"], "null"]}
+            arg_type = {
+                "type": "array",
+                "items": _annotation_parse_to_json_schema(arg.annotation),
+            }
+
+    elif isinstance(arg, _ParsedDictAnnotation):
+        if arg.key_annotation is None and arg.value_annotation is None:
+            # dict annotation with no type hints
+            if is_optional:
+                arg_type = {
+                    "type": ["object", "null"],
+                    "properties": {
+                        "key": {"type": _JSON_SCHEMA_ANY},
+                        "value": {"type": _JSON_SCHEMA_ANY},
+                    },
+                }
+            else:
+                arg_type = {
+                    "type": "object",
+                    "properties": {
+                        "key": {"type": _JSON_SCHEMA_ANY},
+                        "value": {"type": _JSON_SCHEMA_ANY},
+                    },
+                }
+        else:
+            arg_type = {
+                "type": "object",
+                "properties": {
+                    "key": _annotation_parse_to_json_schema(arg.key_annotation),  # type: ignore
+                    "value": _annotation_parse_to_json_schema(arg.value_annotation),  # type: ignore
+                },
+            }
+
+    elif isinstance(arg, _ParsedPrimitiveAnnotation):
+        if arg.annotation is builtins.str:
+            arg_type = {"type": "string"}
+        if arg.annotation is builtins.int:
+            arg_type = {"type": "integer"}
+        if arg.annotation is builtins.float:
+            arg_type = {"type": "number"}
+        if arg.annotation is builtins.bool:
+            arg_type = {"type": "boolean"}
+        if arg.annotation is Parameter.empty:
+            # JSON Schema dropped support for 'any' type, we allow any type as a workaround
+            arg_type = {"type": _JSON_SCHEMA_ANY}
+
+    else:
+        raise ValueError(f"Unsupported annotation type: {arg}")
+
+    if is_optional:
+        if isinstance(arg, _ParsedUnionAnnotation):
+            for type_option in arg_type["anyOf"]:
+                if isinstance(type_option["type"], list) and "null" not in type_option["type"]:  # type: ignore
+                    type_option["type"] = [*type_option["type"], "null"]  # type: ignore
+                elif not isinstance(type_option["type"], list):  # type: ignore
+                    type_option["type"] = [type_option["type"], "null"]  # type: ignore
+        else:
+            if isinstance(arg_type["type"], list) and "null" not in arg_type["type"]:  # type: ignore
+                arg_type = {**arg_type, "type": [*arg_type["type"], "null"]}  # type: ignore
+            elif not isinstance(arg_type["type"], list):  # type: ignore
+                arg_type = {**arg_type, "type": [arg_type["type"], "null"]}  # type: ignore
 
     return arg_type
 
 
-def _parameter_is_optional(parameter: inspect.Parameter) -> bool:
+def _parameter_is_optional(
+    parameter: inspect.Parameter,
+) -> bool:
     """Check if tool parameter is mandatory.
 
     Examples:

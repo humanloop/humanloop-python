@@ -7,7 +7,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 from pydantic import ValidationError as PydanticValidationError
 
-from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY
 from humanloop.otel.helpers import (
     is_humanloop_span,
     is_llm_provider_call,
@@ -69,14 +69,14 @@ def _is_instrumentor_span(span: ReadableSpan) -> bool:
 
 
 def _process_span_dispatch(span: ReadableSpan, children_spans: list[ReadableSpan]):
-    file_type = span.attributes[HL_FILE_TYPE_KEY]  # type: ignore
+    file_type = span.attributes[HUMANLOOP_FILE_TYPE_KEY]  # type: ignore
 
     # Processing common to all Humanloop File types
     if span.start_time:
-        span._attributes[f"{HL_LOG_KEY}.start_time"] = int(span.start_time / 1e9)  # type: ignore
+        span._attributes[f"{HUMANLOOP_LOG_KEY}.start_time"] = int(span.start_time / 1e9)  # type: ignore
     if span.end_time:
-        span._attributes[f"{HL_LOG_KEY}.end_time"] = int(span.end_time / 1e9)  # type: ignore
-        span._attributes[f"{HL_LOG_KEY}.created_at"] = int(span.end_time / 1e9)  # type: ignore
+        span._attributes[f"{HUMANLOOP_LOG_KEY}.end_time"] = int(span.end_time / 1e9)  # type: ignore
+        span._attributes[f"{HUMANLOOP_LOG_KEY}.created_at"] = int(span.end_time / 1e9)  # type: ignore
 
     # Processing specific to each Humanloop File type
     if file_type == "prompt":
@@ -104,7 +104,7 @@ def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan
 
 
 def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
-    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_FILE_KEY)
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HUMANLOOP_FILE_KEY)
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
     llm_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="llm")
 
@@ -137,7 +137,7 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
     hl_file["prompt"] = prompt
     write_to_opentelemetry_span(
         span=prompt_span,
-        key=HL_FILE_KEY,
+        key=HUMANLOOP_FILE_KEY,
         # hl_file was modified in place via prompt_kernel reference
         value=hl_file,
     )
@@ -145,7 +145,7 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
 
 def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: ReadableSpan):
     try:
-        hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HL_LOG_KEY)
+        hl_log: dict[str, Any] = read_from_opentelemetry_span(prompt_span, key=HUMANLOOP_LOG_KEY)
     except KeyError:
         hl_log = {}
     gen_ai_object: dict[str, Any] = read_from_opentelemetry_span(llm_provider_call_span, key="gen_ai")
@@ -160,7 +160,7 @@ def _enrich_prompt_log(prompt_span: ReadableSpan, llm_provider_call_span: Readab
 
     write_to_opentelemetry_span(
         span=prompt_span,
-        key=HL_LOG_KEY,
+        key=HUMANLOOP_LOG_KEY,
         # hl_log was modified in place
         value=hl_log,
     )

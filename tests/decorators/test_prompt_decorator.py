@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from groq import NotFoundError as GroqNotFoundError
 from humanloop.decorators.prompt import prompt
-from humanloop.otel.constants import HL_FILE_KEY
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.types.model_providers import ModelProviders
 from humanloop.types.prompt_kernel_request import PromptKernelRequest
@@ -194,7 +194,7 @@ def test_prompt_decorator_with_hl_processor(
     prompt_kernel = PromptKernelRequest.model_validate(
         read_from_opentelemetry_span(
             span=spans[1],
-            key=HL_FILE_KEY,
+            key=HUMANLOOP_FILE_KEY,
         )["prompt"]  # type: ignore
     )
     # THEN temperature is intercepted from LLM provider call
@@ -234,7 +234,7 @@ def test_prompt_decorator_with_defaults(
     spans = exporter.get_finished_spans()
     # THEN the Prompt span is enhanced with information and forms a correct PromptKernel
     prompt = PromptKernelRequest.model_validate(
-        read_from_opentelemetry_span(span=spans[1], key=HL_FILE_KEY)["prompt"]  # type: ignore
+        read_from_opentelemetry_span(span=spans[1], key=HUMANLOOP_FILE_KEY)["prompt"]  # type: ignore
     )
     # THEN temperature intercepted from LLM provider call is overridden by default value
     assert prompt.temperature == 0.9
@@ -242,35 +242,6 @@ def test_prompt_decorator_with_defaults(
     assert prompt.top_p == 0.1
     # THEN the provider intercepted from LLM provider call
     assert prompt.model == model
-
-
-@pytest.mark.parametrize(
-    "hyperparameters",
-    (
-        {"temperature": 1.1},
-        {"top_p": 1.1},
-        {"presence_penalty": 3},
-        {"frequency_penalty": 3},
-    ),
-)
-def test_hyperparameter_values_fail_out_of_domain(
-    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
-    hyperparameters: dict[str, float],
-):
-    tracer, _ = opentelemetry_test_configuration
-
-    # GIVEN a Prompt decorated function
-
-    with pytest.raises(ValueError):
-        # WHEN passing default values to the @prompt decorator that are out of domain
-
-        _test_scenario(
-            opentelemetry_tracer=tracer,
-            path=None,
-            **hyperparameters,
-        )
-
-    # THEN an exception is raised
 
 
 @pytest.mark.parametrize(
@@ -315,7 +286,7 @@ def test_prompt_attributes(
     prompt_kernel = PromptKernelRequest.model_validate(
         read_from_opentelemetry_span(
             span=exporter.get_finished_spans()[1],
-            key=HL_FILE_KEY,
+            key=HUMANLOOP_FILE_KEY,
         )["prompt"]  # type: ignore
     )
     assert prompt_kernel.attributes == expected_attributes

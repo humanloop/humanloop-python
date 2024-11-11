@@ -1,19 +1,20 @@
+import uuid
 from typing import Union
 
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
-from humanloop.otel.constants import HL_FILE_KEY, HL_LOG_KEY
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_LOG_KEY
 
 NestedDict = dict[str, Union["NestedDict", AttributeValue]]
 NestedList = list[Union["NestedList", NestedDict]]
 
 
-def _list_to_ott(lst: NestedList) -> NestedDict:
+def _list_to_otel_format(lst: NestedList) -> NestedDict:
     """Transforms list of values to be written into a dictionary with index values as keys.
 
-    When writing to Otel span attributes, only primitive values or lists are allowed.
+    When writing to OTel span attributes, only primitive values or lists are allowed.
     Nested dictionaries must be linearised. For example, writing to span attribute `foo`
     the dictionary value {'a': 7, 'b': 'hello'} would translated in the span attributes
     dictionary to look like:
@@ -40,7 +41,7 @@ def _list_to_ott(lst: NestedList) -> NestedDict:
     }
     ```
     """
-    return {str(idx): val if not isinstance(val, list) else _list_to_ott(val) for idx, val in enumerate(lst)}
+    return {str(idx): val if not isinstance(val, list) else _list_to_otel_format(val) for idx, val in enumerate(lst)}
 
 
 def write_to_opentelemetry_span(
@@ -85,7 +86,7 @@ def write_to_opentelemetry_span(
 
     to_write_copy: Union[dict, AttributeValue]
     if isinstance(value, list):
-        to_write_copy = _list_to_ott(value)
+        to_write_copy = _list_to_otel_format(value)
     else:
         to_write_copy = dict(value)  # type: ignore
     linearised_attributes: dict[str, AttributeValue] = {}
@@ -267,8 +268,8 @@ def is_humanloop_span(span: ReadableSpan) -> bool:
     """Check if the Span was created by the Humanloop SDK."""
     try:
         # Valid spans will have keys with the HL_FILE_OT_KEY and HL_LOG_OT_KEY prefixes present
-        read_from_opentelemetry_span(span, key=HL_FILE_KEY)
-        read_from_opentelemetry_span(span, key=HL_LOG_KEY)
+        read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
+        read_from_opentelemetry_span(span, key=HUMANLOOP_LOG_KEY)
     except KeyError:
         return False
     return True
@@ -284,3 +285,7 @@ def module_is_installed(module_name: str) -> bool:
     except ImportError:
         return False
     return True
+
+
+def generate_span_id() -> str:
+    return str(uuid.uuid4())

@@ -1,13 +1,15 @@
-import logging
+from contextvars import ContextVar
 import os
 import typing
-from typing import Any, Callable, List, Optional, Sequence, Union
+from typing import Any, List, Optional, Sequence
 
 import httpx
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
+from humanloop.core.client_wrapper import SyncClientWrapper
+from humanloop.eval_utils.context import EVALUATION_CONTEXT_VARIABLE_NAME, EvaluationContext
 from humanloop.types.model_endpoints import ModelEndpoints
 from humanloop.types.model_providers import ModelProviders
 from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
@@ -15,30 +17,39 @@ from humanloop.types.prompt_kernel_request_template import PromptKernelRequestTe
 from humanloop.types.response_format import ResponseFormat
 
 if typing.TYPE_CHECKING:
-    from . import ToolFunctionParams
+    from humanloop import ToolFunctionParams
 
 from humanloop.eval_utils import log_with_evaluation_context, run_eval
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
-from .base_client import AsyncBaseHumanloop, BaseHumanloop
-from .decorators.flow import flow as flow_decorator_factory
-from .decorators.prompt import prompt as prompt_decorator_factory
-from .decorators.tool import tool as tool_decorator_factory
-from .environment import HumanloopEnvironment
-from .evaluations.client import EvaluationsClient
-from .otel import instrument_provider
-from .otel.exporter import HumanloopSpanExporter
-from .otel.processor import HumanloopSpanProcessor
-from .prompt_utils import populate_template
-from .prompts.client import PromptsClient
+from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
+from humanloop.decorators.flow import flow as flow_decorator_factory
+from humanloop.decorators.prompt import prompt as prompt_decorator_factory
+from humanloop.decorators.tool import tool as tool_decorator_factory
+from humanloop.environment import HumanloopEnvironment
+from humanloop.evaluations.client import EvaluationsClient
+from humanloop.otel import instrument_provider
+from humanloop.otel.exporter import HumanloopSpanExporter
+from humanloop.otel.processor import HumanloopSpanProcessor
+from humanloop.prompt_utils import populate_template
+from humanloop.prompts.client import PromptsClient
 
 
 class ExtendedEvalsClient(EvaluationsClient):
     client: BaseHumanloop
 
+    def __init__(
+        self,
+        *,
+        client_wrapper: SyncClientWrapper,
+        evaluation_context_variable: ContextVar[Optional[EvaluationContext]],
+    ):
+        super().__init__(client_wrapper=client_wrapper)
+        self._evaluation_context_variable = evaluation_context_variable
+
     def run(
         self,
-        file: Union[File, Callable],
+        file: File,
         name: Optional[str],
         dataset: Dataset,
         evaluators: Optional[Sequence[Evaluator]] = None,
@@ -64,6 +75,7 @@ class ExtendedEvalsClient(EvaluationsClient):
             dataset=dataset,
             evaluators=evaluators,
             workers=workers,
+            evaluation_context_variable=self._evaluation_context_variable,
         )
 
 
@@ -111,7 +123,14 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
-        eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
+        self.evaluation_context_variable: ContextVar[Optional[EvaluationContext]] = ContextVar(
+            EVALUATION_CONTEXT_VARIABLE_NAME
+        )
+
+        eval_client = ExtendedEvalsClient(
+            client_wrapper=self._client_wrapper,
+            evaluation_context_variable=self.evaluation_context_variable,
+        )
         eval_client.client = self
         self.evaluations = eval_client
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
@@ -119,10 +138,16 @@ class Humanloop(BaseHumanloop):
         # Overload the .log method of the clients to be aware of Evaluation Context
         # TODO: Overload the log for Evaluators and Tools once run_id is added
         # to them.
-        self.prompts = log_with_evaluation_context(client=self.prompts)
+        self.prompts = log_with_evaluation_context(
+            client=self.prompts,
+            evaluation_context_variable=self.evaluation_context_variable,
+        )
         # self.evaluators = log_with_evaluation_context(client=self.evaluators)
         # self.tools = log_with_evaluation_context(client=self.tools)
-        self.flows = log_with_evaluation_context(client=self.flows)
+        self.flows = log_with_evaluation_context(
+            client=self.flows,
+            evaluation_context_variable=self.evaluation_context_variable,
+        )
 
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider

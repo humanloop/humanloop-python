@@ -1,4 +1,6 @@
 import logging
+import os
+import sys
 import typing
 import uuid
 from functools import wraps
@@ -7,13 +9,15 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 
+from humanloop.types.prompt_kernel_request import PromptKernelRequest
+
 if typing.TYPE_CHECKING:
     from humanloop import ToolFunctionParams
 from humanloop.decorators.helpers import args_to_inputs
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HL_FILE_KEY, HL_FILE_TYPE_KEY, HL_LOG_KEY, HL_PATH_KEY
-from humanloop.otel.helpers import write_to_opentelemetry_span
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
+from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
 from humanloop.types.model_endpoints import ModelEndpoints
 from humanloop.types.model_providers import ModelProviders
 from humanloop.types.prompt_kernel_request_stop import PromptKernelRequestStop
@@ -45,27 +49,6 @@ def prompt(
 ):
     def decorator(func: Callable):
         prompt_kernel = {}
-
-        if temperature is not None:
-            if not 0 <= temperature < 1:
-                raise ValueError(f"{func.__name__}: Temperature parameter must be between 0 and 1")
-            prompt_kernel["temperature"] = temperature
-
-        if top_p is not None:
-            if not 0 <= top_p <= 1:
-                raise ValueError(f"{func.__name__}: Top-p parameter must be between 0 and 1")
-            prompt_kernel["top_p"] = top_p
-
-        if presence_penalty is not None:
-            if not -2 <= presence_penalty <= 2:
-                raise ValueError(f"{func.__name__}: Presence penalty parameter must be between -2 and 2")
-            prompt_kernel["presence_penalty"] = presence_penalty
-
-        if frequency_penalty is not None:
-            if not -2 <= frequency_penalty <= 2:
-                raise ValueError(f"{func.__name__}: Frequency penalty parameter must be between -2 and 2")
-            prompt_kernel["frequency_penalty"] = frequency_penalty
-
         for attr_name, attr_value in {
             "model": model,
             "endpoint": endpoint,
@@ -76,16 +59,19 @@ def prompt(
             "other": other,
             "seed": seed,
             "response_format": response_format,
-            # {} -> None
             "attributes": attributes or None,
             "tools": tools,
+            "temperature": temperature,
+            "top_p": top_p,
+            "presence_penalty": presence_penalty,
+            "frequency_penalty": frequency_penalty,
         }.items():
             prompt_kernel[attr_name] = attr_value  # type: ignore
 
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
             span: Span
-            with opentelemetry_tracer.start_as_current_span(str(uuid.uuid4())) as span:
+            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:
                 span_id = span.get_span_context().span_id
                 if span.parent:
                     span_parent_id = span.parent.span_id
@@ -97,13 +83,13 @@ def prompt(
                             is_flow_log=False,
                         )
 
-                span.set_attribute(HL_PATH_KEY, path if path else func.__name__)
-                span.set_attribute(HL_FILE_TYPE_KEY, "prompt")
+                span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "prompt")
 
                 if prompt_kernel:
                     write_to_opentelemetry_span(
                         span=span,
-                        key=f"{HL_FILE_KEY}.prompt",
+                        key=f"{HUMANLOOP_FILE_KEY}.prompt",
                         value=prompt_kernel,  # type: ignore
                     )
 
@@ -123,7 +109,7 @@ def prompt(
                 }
                 write_to_opentelemetry_span(
                     span=span,
-                    key=HL_LOG_KEY,
+                    key=HUMANLOOP_LOG_KEY,
                     value=prompt_log,
                 )
 
@@ -140,7 +126,6 @@ def prompt(
             path=path if path else func.__name__,
             type="prompt",
             version={**prompt_kernel_file},  # type: ignore
-            is_decorated=True,
             callable=wrapper,
         )
 

@@ -2,7 +2,7 @@ from typing import Any, Optional, TypedDict, Union
 
 import pytest
 from humanloop.decorators.tool import tool
-from humanloop.otel.constants import HL_FILE_KEY, HL_LOG_KEY
+from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_LOG_KEY
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from jsonschema.protocols import Validator
 from opentelemetry.sdk.trace import Tracer
@@ -34,8 +34,8 @@ def test_calculator_decorator(
     # THEN a single span is created and the log and file attributes are correctly set
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
-    hl_file: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_FILE_KEY)
-    hl_log: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HL_LOG_KEY)
+    hl_file: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HUMANLOOP_FILE_KEY)
+    hl_log: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HUMANLOOP_LOG_KEY)
     assert hl_log["output"] == result == 3
     assert hl_log["inputs"] == {
         "operation": "add",
@@ -428,3 +428,53 @@ def test_custom_types_throws(
 
     # THEN a ValueError is raised
     assert exc.value.args[0].startswith("foo_bar: Unsupported type hint")
+
+
+def test_tool_as_higher_order_function(
+    opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    tracer, exporter = opentelemetry_hl_test_configuration
+
+    def calculator(operation: str, num1: float, num2: float) -> float:
+        """Do arithmetic operations on two numbers."""
+        if operation == "add":
+            return num1 + num2
+        elif operation == "subtract":
+            return num1 - num2
+        elif operation == "multiply":
+            return num1 * num2
+        elif operation == "divide":
+            return num1 / num2
+        else:
+            raise ValueError(f"Invalid operation: {operation}")
+
+    higher_order_fn_tool = tool(opentelemetry_tracer=tracer)(calculator)
+
+    @tool(opentelemetry_tracer=tracer)  # type: ignore
+    def calculator(operation: str, num1: float, num2: float) -> float:
+        """Do arithmetic operations on two numbers."""
+        if operation == "add":
+            return num1 + num2
+        elif operation == "subtract":
+            return num1 - num2
+        elif operation == "multiply":
+            return num1 * num2
+        elif operation == "divide":
+            return num1 / num2
+        else:
+            raise ValueError(f"Invalid operation: {operation}")
+
+    higher_order_fn_tool(operation="add", num1=1, num2=2)
+    calculator(operation="add", num1=1, num2=2)
+
+    assert len(spans := exporter.get_finished_spans()) == 2
+
+    hl_file_higher_order_fn = read_from_opentelemetry_span(
+        span=spans[0],
+        key=HUMANLOOP_FILE_KEY,
+    )
+    hl_file_decorated_fn = read_from_opentelemetry_span(
+        span=spans[1],
+        key=HUMANLOOP_FILE_KEY,
+    )
+    assert hl_file_higher_order_fn["tool"]["source_code"] == hl_file_decorated_fn["tool"]["source_code"]  # type: ignore
