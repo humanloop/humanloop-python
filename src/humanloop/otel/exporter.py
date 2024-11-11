@@ -84,10 +84,8 @@ class HumanloopSpanExporter(SpanExporter):
                 evaluation_context = None
             for span in spans:
                 if is_humanloop_span(span):
-                    # The thread doing the logging is different than the
-                    # thread spawned by eval_utils.run.run_eval. Need
-                    # to pass the EvaluationContext to the thread doing
-                    # the logging
+                    # We pass the EvaluationContext from the eval_run utility thread to
+                    # the export thread so the .log action works as expected
                     self._upload_queue.put(
                         (
                             span,

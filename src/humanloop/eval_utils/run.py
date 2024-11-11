@@ -467,7 +467,7 @@ def run_eval(
         )
         start_time = datetime.now()
         try:
-            if datapoint_dict.get("messages"):
+            if "messages" in datapoint_dict and datapoint_dict["messages"] is not None:
                 # function_ is decorated by Humanloop, the OTel Exporter will
                 # handle the logging, which will call the upload_callback
                 # function above when it's done
