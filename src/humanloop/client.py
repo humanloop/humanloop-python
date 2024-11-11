@@ -173,7 +173,7 @@ class Humanloop(BaseHumanloop):
         self,
         *,
         path: Optional[str] = None,
-        **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],
+        **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],  # type: ignore
     ):
         """Decorator for declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code.
 
@@ -252,7 +252,7 @@ class Humanloop(BaseHumanloop):
         self,
         *,
         path: Optional[str] = None,
-        **tool_kernel: Unpack[ToolKernelRequestParams],
+        **tool_kernel: Unpack[ToolKernelRequestParams],  # type: ignore
     ):
         """Decorator for declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code.
 
@@ -325,7 +325,7 @@ class Humanloop(BaseHumanloop):
         self,
         *,
         path: Optional[str] = None,
-        **flow_kernel: Unpack[FlowKernelRequestParams],
+        **flow_kernel: Unpack[FlowKernelRequestParams],  # type: ignore
     ):
         """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
 

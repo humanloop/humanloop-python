@@ -20,7 +20,7 @@ logger = logging.getLogger("humanloop.sdk")
 def flow(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
-    **flow_kernel: Unpack[FlowKernelRequestParams],
+    **flow_kernel: Unpack[FlowKernelRequestParams],  # type: ignore
 ):
     flow_kernel["attributes"] = {k: v for k, v in flow_kernel.get("attributes", {}).items() if v is not None}
 

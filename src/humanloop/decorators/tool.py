@@ -30,7 +30,7 @@ logger = logging.getLogger("humanloop.sdk")
 def tool(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
-    **tool_kernel: Unpack[ToolKernelRequestParams],
+    **tool_kernel: Unpack[ToolKernelRequestParams],  # type: ignore
 ):
     def decorator(func: Callable):
         enhanced_tool_kernel = _build_tool_kernel(

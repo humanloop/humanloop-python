@@ -20,7 +20,7 @@ def prompt(
     opentelemetry_tracer: Tracer,
     path: Optional[str] = None,
     # TODO: Template can be a list of objects?
-    **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],
+    **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],  # type: ignore
 ):
     def decorator(func: Callable):
         @wraps(func)
