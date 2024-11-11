@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: poetry install
       - name: Compile
-        run: poetry run mypy  --enable-incomplete-feature=Unpack  --show-traceback .
+        run: poetry run mypy . --enable-incomplete-feature=Unpack
   test:
     runs-on: ubuntu-20.04
     steps:
