@@ -99,15 +99,13 @@ class HumanloopSpanExporter(SpanExporter):
                     self._upload_queue.put(
                         (
                             span,
-                            copy.deepcopy(
-                                self._client.evaluation_context_variable.get()
-                            ),
+                            copy.deepcopy(evaluation_context),
                         ),
                     )
                     logger.debug(
                         "Span %s with EvaluationContext %s added to upload queue",
                         span.attributes,
-                        copy.deepcopy(self._client.evaluation_context_variable.get()),
+                        copy.deepcopy(evaluation_context),
                     )
             # Reset the EvaluationContext so run eval does not
             # create a duplicate Log
