@@ -504,7 +504,7 @@ def run_eval(
                 logger.debug(
                     "process_datapoint on Thread %s: function_ %s is a simple callable, context was not consumed",
                     threading.get_ident(),
-                    function_.__name__,
+                    function_.__name__,  # type: ignore
                 )
                 log_func(
                     inputs=datapoint.inputs,

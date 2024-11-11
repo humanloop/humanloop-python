@@ -168,9 +168,7 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
             inspect.Parameter.VAR_POSITIONAL,
             inspect.Parameter.VAR_KEYWORD,
         ):
-            raise ValueError(
-                f"{func.__name__}: *args and **kwargs are not supported by the @tool decorator"
-            )
+            raise ValueError(f"{func.__name__}: *args and **kwargs are not supported by the @tool decorator")
 
     for parameter in signature.parameters.values():
         try:
@@ -337,9 +335,7 @@ def _parse_annotation(annotation: typing.Type) -> _ParsedAnnotation:
             # Union has sub_types and is Optional
             return _ParsedOptionalAnnotation(
                 annotation=_ParsedUnionAnnotation(
-                    annotation=[
-                        _parse_annotation(sub_type) for sub_type in sub_types[:-1]
-                    ],
+                    annotation=[_parse_annotation(sub_type) for sub_type in sub_types[:-1]],
                 )
             )
         # Union type that is not Optional
@@ -373,10 +369,7 @@ def _annotation_parse_to_json_schema(
 
     if isinstance(arg, _ParsedUnionAnnotation):
         arg_type = {
-            "anyOf": [
-                _annotation_parse_to_json_schema(sub_type)
-                for sub_type in arg.annotation
-            ],
+            "anyOf": [_annotation_parse_to_json_schema(sub_type) for sub_type in arg.annotation],
         }
 
     elif isinstance(arg, _ParsedTupleAnnotation):
@@ -391,10 +384,7 @@ def _annotation_parse_to_json_schema(
         else:
             arg_type = {
                 "type": "array",
-                "items": [
-                    _annotation_parse_to_json_schema(sub_type)
-                    for sub_type in arg.annotation
-                ],
+                "items": [_annotation_parse_to_json_schema(sub_type) for sub_type in arg.annotation],
             }
 
     elif isinstance(arg, _ParsedListAnnotation):
@@ -464,8 +454,8 @@ def _annotation_parse_to_json_schema(
         if isinstance(arg, _ParsedUnionAnnotation):
             for type_option in arg_type["anyOf"]:
                 if (
-                    isinstance(type_option["type"], list)
-                    and "null" not in type_option["type"]
+                    isinstance(type_option["type"], list)  # type: ignore
+                    and "null" not in type_option["type"]  # type: ignore
                 ):  # type: ignore
                     type_option["type"] = [*type_option["type"], "null"]  # type: ignore
                 elif not isinstance(type_option["type"], list):  # type: ignore
