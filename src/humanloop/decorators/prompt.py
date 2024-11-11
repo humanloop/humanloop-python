@@ -1,15 +1,11 @@
 import logging
-import os
-import sys
 import typing
-import uuid
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 
-from humanloop.types.prompt_kernel_request import PromptKernelRequest
 
 if typing.TYPE_CHECKING:
     from humanloop import ToolFunctionParams

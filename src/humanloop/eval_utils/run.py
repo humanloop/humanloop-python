@@ -103,7 +103,6 @@ def log_with_evaluation_context(
     def _is_evaluated_file(
         evaluation_context: EvaluationContext,
         log_args: dict,
-        file_id_attribute: str,
     ) -> bool:
         """Check if the File that will Log against is part of the current Evaluation.
 
@@ -112,7 +111,7 @@ def log_with_evaluation_context(
         """
         if evaluation_context is None:
             return False
-        return evaluation_context.get("file_id") == log_args.get(file_id_attribute) or evaluation_context.get(
+        return evaluation_context.get("file_id") == log_args.get("id") or evaluation_context.get(
             "path"
         ) == log_args.get("path")
 
@@ -130,19 +129,9 @@ def log_with_evaluation_context(
     ]:
         evaluation_context = evaluation_context_variable.get()
 
-        if isinstance(client, PromptsClient):
-            file_id_attribute = "prompt_id"
-        elif isinstance(client, ToolsClient):
-            file_id_attribute = "tool_id"
-        elif isinstance(client, FlowsClient):
-            file_id_attribute = "flow_id"
-        elif isinstance(client, EvaluatorsClient):
-            file_id_attribute = "evaluator_id"
-
         if _is_evaluated_file(
             evaluation_context=evaluation_context,  # type: ignore
             log_args=kwargs,
-            file_id_attribute=file_id_attribute,
         ):
             # If the .log API user does not provide the source_datapoint_id or run_id,
             # override them with the values from the EvaluationContext
@@ -161,7 +150,6 @@ def log_with_evaluation_context(
         if _is_evaluated_file(
             evaluation_context=evaluation_context,  # type: ignore
             log_args=kwargs,
-            file_id_attribute=file_id_attribute,
         ):
             # Notify that the Log has been added to the Evaluation
             # evaluation_context cannot be None
@@ -171,8 +159,10 @@ def log_with_evaluation_context(
             )
             evaluation_context["upload_callback"](  # type: ignore
                 {
-                    "id": response.id,
                     **kwargs,
+                    # ID in kwargs refers to the File ID
+                    # Replace it with the Log ID
+                    "id": response.id,
                 }
             )
 

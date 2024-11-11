@@ -195,7 +195,6 @@ class HumanloopSpanExporter(SpanExporter):
             log_object["inputs"] = {}
         if "messages" not in log_object:
             log_object["messages"] = []
-        # Same as with messages above
         if "tools" not in file_object["prompt"]:
             file_object["prompt"]["tools"] = []
         trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id)
