@@ -85,9 +85,7 @@ class HumanloopSpanExporter(SpanExporter):
             try:
                 evaluation_context = self._client.evaluation_context_variable.get()
                 if len(spans) > 1:
-                    raise RuntimeError(
-                        "HumanloopSpanExporter expected a single span when running an evaluation"
-                    )
+                    raise RuntimeError("HumanloopSpanExporter expected a single span when running an evaluation")
                 if not is_evaluated_file(spans[0], evaluation_context):
                     evaluation_context = None
             except LookupError:
@@ -122,9 +120,7 @@ class HumanloopSpanExporter(SpanExporter):
                 self._client.evaluation_context_variable.set(None)
             return SpanExportResult.SUCCESS
         else:
-            logger.warning(
-                "HumanloopSpanExporter is shutting down, not accepting new spans"
-            )
+            logger.warning("HumanloopSpanExporter is shutting down, not accepting new spans")
             return SpanExportResult.FAILURE
 
     def shutdown(self) -> None:
@@ -172,9 +168,7 @@ class HumanloopSpanExporter(SpanExporter):
                 self._client.evaluation_context_variable.set(evaluation_context)
             except EmptyQueue:
                 continue
-            trace_metadata = TRACE_FLOW_CONTEXT.get(
-                span_to_export.get_span_context().span_id
-            )
+            trace_metadata = TRACE_FLOW_CONTEXT.get(span_to_export.get_span_context().span_id)
             if trace_metadata is None:
                 # Span is not part of a Flow Log
                 self._export_span_dispatch(span_to_export)
@@ -239,14 +233,8 @@ class HumanloopSpanExporter(SpanExporter):
         if "tools" not in file_object["prompt"]:
             file_object["prompt"]["tools"] = []
         trace_metadata = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id)
-        if (
-            trace_metadata
-            and "trace_parent_id" in trace_metadata
-            and trace_metadata["trace_parent_id"]
-        ):
-            trace_parent_id = self._span_id_to_uploaded_log_id[
-                trace_metadata["trace_parent_id"]
-            ]
+        if trace_metadata and "trace_parent_id" in trace_metadata and trace_metadata["trace_parent_id"]:
+            trace_parent_id = self._span_id_to_uploaded_log_id[trace_metadata["trace_parent_id"]]
             if trace_parent_id is None:
                 # Parent Log in Trace upload failed
                 file_path = read_from_opentelemetry_span(span, key=HUMANLOOP_PATH_KEY)
@@ -275,15 +263,9 @@ class HumanloopSpanExporter(SpanExporter):
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_tool(self, span: ReadableSpan) -> None:
-        file_object: dict[str, Any] = read_from_opentelemetry_span(
-            span, key=HUMANLOOP_FILE_KEY
-        )
-        log_object: dict[str, Any] = read_from_opentelemetry_span(
-            span, key=HUMANLOOP_LOG_KEY
-        )
-        trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(
-            span.get_span_context().span_id, {}
-        )
+        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
+        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_LOG_KEY)
+        trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(span.get_span_context().span_id, {})
         if "trace_parent_id" in trace_metadata and trace_metadata["trace_parent_id"]:
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
                 trace_metadata["trace_parent_id"],
@@ -301,6 +283,8 @@ class HumanloopSpanExporter(SpanExporter):
         if not tool.get("setup_values"):
             tool["setup_values"] = {}
         path: str = file_object["path"]
+        if "parameters" in tool["function"] and "properties" not in tool["function"]["parameters"]:
+            tool["function"]["parameters"]["properties"] = {}
         if not isinstance(log_object["output"], str):
             # Output expected to be a string, if decorated function
             # does not return one, jsonify it
@@ -317,12 +301,8 @@ class HumanloopSpanExporter(SpanExporter):
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
 
     def _export_flow(self, span: ReadableSpan) -> None:
-        file_object: dict[str, Any] = read_from_opentelemetry_span(
-            span, key=HUMANLOOP_FILE_KEY
-        )
-        log_object: dict[str, Any] = read_from_opentelemetry_span(
-            span, key=HUMANLOOP_LOG_KEY
-        )
+        file_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
+        log_object: dict[str, Any] = read_from_opentelemetry_span(span, key=HUMANLOOP_LOG_KEY)
         trace_metadata: FlowContext = TRACE_FLOW_CONTEXT.get(
             span.get_span_context().span_id,
             {},
@@ -331,10 +311,7 @@ class HumanloopSpanExporter(SpanExporter):
             trace_parent_id = self._span_id_to_uploaded_log_id.get(
                 trace_metadata["trace_parent_id"],  # type: ignore
             )
-            if (
-                trace_parent_id is None
-                and trace_metadata["trace_id"] != span.get_span_context().span_id
-            ):
+            if trace_parent_id is None and trace_metadata["trace_id"] != span.get_span_context().span_id:
                 # Parent Log in Trace upload failed
                 # NOTE: Check if the trace_id metadata field points to the
                 # span itself. This signifies the span is the head of the Trace
@@ -358,9 +335,7 @@ class HumanloopSpanExporter(SpanExporter):
                 **log_object,
                 trace_parent_id=trace_parent_id,
             )
-            self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = (
-                log_response.id
-            )
+            self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = log_response.id
         except HumanloopApiError as e:
             logger.error(str(e))
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
