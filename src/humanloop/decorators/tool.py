@@ -1,8 +1,6 @@
 import builtins
 import inspect
 import logging
-import os
-import sys
 import textwrap
 import typing
 from dataclasses import dataclass
@@ -19,7 +17,7 @@ from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
-from .helpers import args_to_inputs
+from humanloop.otel.helpers import args_to_inputs
 
 logger = logging.getLogger("humanloop.sdk")
 
