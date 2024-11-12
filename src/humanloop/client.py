@@ -236,6 +236,12 @@ class Humanloop(BaseHumanloop):
         }
         ```
 
+        The decorated function should return a string or the output should be JSON serializable. If
+        the output cannot be serialized, TypeError will be raised.
+
+        If the function raises an exception, the log created by the function will have the output
+        field set to None and the error field set to the string representation of the exception.
+
         :param path: The path where the Prompt is created. If not
             provided, the function name is used as the path and the File
             is created in the root of your Humanloop organization workspace.
@@ -308,6 +314,13 @@ class Humanloop(BaseHumanloop):
             },
             "output": 3
         }
+        ```
+
+        The decorated function should return a string or the output should be JSON serializable. If
+        the output cannot be serialized, TypeError will be raised.
+
+        If the function raises an exception, the log created by the function will have the output
+        field set to None and the error field set to the string representation of the exception.
 
         :param path: The path to the Tool. If not provided, the function name
             will be used as the path and the File will be created in the root
@@ -364,6 +377,12 @@ class Humanloop(BaseHumanloop):
         `entrypoint` will create a Flow Trace under which multiple Prompt Logs
         will be nested, allowing you to track the whole conversation session
         between the user and the assistant.
+
+        The decorated function should return a string or the output should be JSON serializable. If
+        the output cannot be serialized, TypeError will be raised.
+
+        If the function raises an exception, the log created by the function will have the output
+        field set to None and the error field set to the string representation of the exception.
 
         :param path: The path to the Flow. If not provided, the function name
             will be used as the path and the File will be created in the root

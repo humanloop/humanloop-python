@@ -1,5 +1,6 @@
+import json
 import uuid
-from typing import Union
+from typing import Any, Callable, Union
 
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
@@ -289,3 +290,12 @@ def module_is_installed(module_name: str) -> bool:
 
 def generate_span_id() -> str:
     return str(uuid.uuid4())
+
+
+def jsonify_if_not_string(func: Callable, output: Any) -> str:
+    if not isinstance(output, str):
+        try:
+            output = json.dumps(output)
+        except TypeError as e:
+            raise TypeError(f"Output of {func.__name__} must be a string or JSON serializable") from e
+    return output

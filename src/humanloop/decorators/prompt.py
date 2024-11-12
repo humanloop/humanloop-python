@@ -11,7 +11,7 @@ from humanloop.decorators.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils import File
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
-from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
+from humanloop.otel.helpers import generate_span_id, jsonify_if_not_string, write_to_opentelemetry_span
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -54,6 +54,10 @@ def prompt(
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
+                    output = jsonify_if_not_string(
+                        func=func,
+                        output=output,
+                    )
                     error = None
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")

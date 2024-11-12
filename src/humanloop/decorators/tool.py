@@ -20,7 +20,7 @@ from humanloop.otel.constants import (
     HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
-from humanloop.otel.helpers import generate_span_id, write_to_opentelemetry_span
+from humanloop.otel.helpers import generate_span_id, jsonify_if_not_string, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
@@ -72,6 +72,10 @@ def tool(
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
+                    output = jsonify_if_not_string(
+                        func=func,
+                        output=output,
+                    )
                     error = None
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
@@ -178,7 +182,7 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
         try:
             parameter_signature = _parse_annotation(parameter.annotation)
         except ValueError as e:
-            raise ValueError(f"{func.__name__}: {e.args[0]}") from e
+            raise ValueError(f"Error parsing signature of @tool annotated function {func.__name__}: {e}") from e
         param_json_schema = _annotation_parse_to_json_schema(parameter_signature)
         properties[parameter.name] = param_json_schema
         if not _parameter_is_optional(parameter):
