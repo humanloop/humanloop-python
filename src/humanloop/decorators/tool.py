@@ -213,14 +213,24 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
     )
 
 
-_PRIMITIVE_TYPES = Union[
-    str,
-    int,
-    float,
-    bool,
-    Parameter.empty,  # type: ignore
-    Ellipsis,
-]
+if sys.version_info >= (3, 10):
+    _PRIMITIVE_TYPES = Union[
+        str,
+        int,
+        float,
+        bool,
+        Parameter.empty,  # type: ignore
+        Ellipsis,  # type: ignore
+    ]
+else:
+    # Ellipsis not supported in typing module before Python 3.10
+    _PRIMITIVE_TYPES = Union[
+        str,
+        int,
+        float,
+        bool,
+        Parameter.empty,  # type: ignore
+    ]
 
 
 @dataclass
