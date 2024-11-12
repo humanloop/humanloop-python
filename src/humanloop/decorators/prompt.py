@@ -54,7 +54,7 @@ def prompt(
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
-                    output = jsonify_if_not_string(
+                    output_stringified = jsonify_if_not_string(
                         func=func,
                         output=output,
                     )
@@ -62,11 +62,15 @@ def prompt(
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
+                    output_stringified = jsonify_if_not_string(
+                        func=func,
+                        output=output,
+                    )
                     error = str(e)
 
                 prompt_log = {
                     "inputs": args_to_inputs(func, args, kwargs),
-                    "output": output,
+                    "output": output_stringified,
                     "error": error,
                 }
                 write_to_opentelemetry_span(

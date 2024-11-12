@@ -37,6 +37,11 @@ def instrument_provider(provider: TracerProvider):
 
         ReplicateInstrumentor().instrument(tracer_provider=provider)
 
+    if module_is_installed("boto3"):
+        from opentelemetry.instrumentation.bedrock import BedrockInstrumentor
+
+        BedrockInstrumentor().instrument(tracer_provider=provider)
+
 
 class FlowContext(TypedDict):
     trace_id: NotRequired[str]

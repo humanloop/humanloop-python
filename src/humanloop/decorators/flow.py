@@ -1,4 +1,3 @@
-import json
 import logging
 from functools import wraps
 from typing import Any, Callable, Mapping, Optional, Sequence
@@ -64,7 +63,7 @@ def flow(
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
-                    output = jsonify_if_not_string(
+                    output_stringified = jsonify_if_not_string(
                         func=func,
                         output=output,
                     )
@@ -72,11 +71,15 @@ def flow(
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
+                    output_stringified = jsonify_if_not_string(
+                        func=func,
+                        output=None,
+                    )
                     error = str(e)
 
                 flow_log = {
                     "inputs": inputs,
-                    "output": output,
+                    "output": output_stringified,
                     "error": error,
                 }
                 if inputs:

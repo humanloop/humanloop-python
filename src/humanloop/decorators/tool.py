@@ -72,7 +72,7 @@ def tool(
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
-                    output = jsonify_if_not_string(
+                    output_stringified = jsonify_if_not_string(
                         func=func,
                         output=output,
                     )
@@ -80,12 +80,16 @@ def tool(
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
+                    output_stringified = jsonify_if_not_string(
+                        func=func,
+                        output=output,
+                    )
                     error = str(e)
 
                 # Populate known Tool Log attributes
                 tool_log = {
                     "inputs": args_to_inputs(func, args, kwargs),
-                    "output": output,
+                    "output": output_stringified,
                     "error": error,
                 }
 

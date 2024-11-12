@@ -31,12 +31,13 @@ def test_calculator_decorator(
 
     # WHEN calling the @tool decorated function
     result = calculator(operation="add", num1=1, num2=2)
+    assert result == 3
     # THEN a single span is created and the log and file attributes are correctly set
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
     hl_file: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HUMANLOOP_FILE_KEY)
     hl_log: dict[str, Any] = read_from_opentelemetry_span(span=spans[0], key=HUMANLOOP_LOG_KEY)
-    assert hl_log["output"] == result == 3
+    assert hl_log["output"] == str(result) == "3"
     assert hl_log["inputs"] == {
         "operation": "add",
         "num1": 1,
@@ -408,7 +409,7 @@ def test_custom_types_throws(
             return foo.a + foo.b  # type: ignore
 
     # THEN a ValueError is raised
-    assert exc.value.args[0].startswith("foo_bar: Unsupported type hint")
+    assert exc.value.args[0].startswith("Error parsing signature of @tool annotated function foo_bar")
 
 
 def test_tool_as_higher_order_function(
