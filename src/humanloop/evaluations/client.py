@@ -11,10 +11,14 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from .requests.create_evaluation_request_evaluators_item import CreateEvaluationRequestEvaluatorsItemParams
+from .requests.create_evaluation_request_evaluators_item import (
+    CreateEvaluationRequestEvaluatorsItemParams,
+)
 from ..requests.file_request import FileRequestParams
 from ..core.serialization import convert_and_respect_annotation_metadata
-from .requests.add_evaluators_request_evaluators_item import AddEvaluatorsRequestEvaluatorsItemParams
+from .requests.add_evaluators_request_evaluators_item import (
+    AddEvaluatorsRequestEvaluatorsItemParams,
+)
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.evaluation_runs_response import EvaluationRunsResponse
 from .requests.create_run_request_dataset import CreateRunRequestDatasetParams
@@ -22,7 +26,9 @@ from .requests.create_run_request_version import CreateRunRequestVersionParams
 from ..types.evaluation_run_response import EvaluationRunResponse
 from ..types.evaluation_status import EvaluationStatus
 from ..types.evaluation_stats import EvaluationStats
-from ..types.paginated_data_evaluation_log_response import PaginatedDataEvaluationLogResponse
+from ..types.paginated_data_evaluation_log_response import (
+    PaginatedDataEvaluationLogResponse,
+)
 from ..core.client_wrapper import AsyncClientWrapper
 from ..core.pagination import AsyncPager
 
@@ -289,7 +295,11 @@ class EvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def remove_evaluator(
-        self, id: str, evaluator_version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        evaluator_version_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
         Remove an Evaluator from an Evaluation.
@@ -594,10 +604,14 @@ class EvaluationsClient:
             method="POST",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=CreateRunRequestDatasetParams, direction="write"
+                    object_=dataset,
+                    annotation=CreateRunRequestDatasetParams,
+                    direction="write",
                 ),
                 "version": convert_and_respect_annotation_metadata(
-                    object_=version, annotation=CreateRunRequestVersionParams, direction="write"
+                    object_=version,
+                    annotation=CreateRunRequestVersionParams,
+                    direction="write",
                 ),
                 "orchestrated": orchestrated,
                 "use_existing_logs": use_existing_logs,
@@ -630,7 +644,11 @@ class EvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def add_existing_run(
-        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        run_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Optional[typing.Any]:
         """
         Add an existing Run to the specified Evaluation.
@@ -695,7 +713,13 @@ class EvaluationsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def remove_run(self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+    def remove_run(
+        self,
+        id: str,
+        run_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
         """
         Remove a Run from an Evaluation.
 
@@ -1331,7 +1355,11 @@ class AsyncEvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def remove_evaluator(
-        self, id: str, evaluator_version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        evaluator_version_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluationResponse:
         """
         Remove an Evaluator from an Evaluation.
@@ -1676,10 +1704,14 @@ class AsyncEvaluationsClient:
             method="POST",
             json={
                 "dataset": convert_and_respect_annotation_metadata(
-                    object_=dataset, annotation=CreateRunRequestDatasetParams, direction="write"
+                    object_=dataset,
+                    annotation=CreateRunRequestDatasetParams,
+                    direction="write",
                 ),
                 "version": convert_and_respect_annotation_metadata(
-                    object_=version, annotation=CreateRunRequestVersionParams, direction="write"
+                    object_=version,
+                    annotation=CreateRunRequestVersionParams,
+                    direction="write",
                 ),
                 "orchestrated": orchestrated,
                 "use_existing_logs": use_existing_logs,
@@ -1712,7 +1744,11 @@ class AsyncEvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def add_existing_run(
-        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        run_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Optional[typing.Any]:
         """
         Add an existing Run to the specified Evaluation.
@@ -1786,7 +1822,11 @@ class AsyncEvaluationsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def remove_run(
-        self, id: str, run_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        id: str,
+        run_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Remove a Run from an Evaluation.

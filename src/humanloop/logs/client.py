@@ -37,6 +37,7 @@ class LogsClient:
         end_date: typing.Optional[dt.datetime] = None,
         include_parent: typing.Optional[bool] = None,
         in_trace_filter: typing.Optional[typing.Union[bool, typing.Sequence[bool]]] = None,
+        sample_n: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[LogResponse]:
         """
@@ -76,6 +77,9 @@ class LogsClient:
 
         in_trace_filter : typing.Optional[typing.Union[bool, typing.Sequence[bool]]]
             If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
+
+        sample_n : typing.Optional[int]
+            If provided, only a random sample of approximately N Logs will be returned.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -118,6 +122,7 @@ class LogsClient:
                 "end_date": serialize_datetime(end_date) if end_date is not None else None,
                 "include_parent": include_parent,
                 "in_trace_filter": in_trace_filter,
+                "sample_n": sample_n,
             },
             request_options=request_options,
         )
@@ -143,6 +148,7 @@ class LogsClient:
                     end_date=end_date,
                     include_parent=include_parent,
                     in_trace_filter=in_trace_filter,
+                    sample_n=sample_n,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records
@@ -296,6 +302,7 @@ class AsyncLogsClient:
         end_date: typing.Optional[dt.datetime] = None,
         include_parent: typing.Optional[bool] = None,
         in_trace_filter: typing.Optional[typing.Union[bool, typing.Sequence[bool]]] = None,
+        sample_n: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[LogResponse]:
         """
@@ -335,6 +342,9 @@ class AsyncLogsClient:
 
         in_trace_filter : typing.Optional[typing.Union[bool, typing.Sequence[bool]]]
             If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
+
+        sample_n : typing.Optional[int]
+            If provided, only a random sample of approximately N Logs will be returned.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -385,6 +395,7 @@ class AsyncLogsClient:
                 "end_date": serialize_datetime(end_date) if end_date is not None else None,
                 "include_parent": include_parent,
                 "in_trace_filter": in_trace_filter,
+                "sample_n": sample_n,
             },
             request_options=request_options,
         )
@@ -410,6 +421,7 @@ class AsyncLogsClient:
                     end_date=end_date,
                     include_parent=include_parent,
                     in_trace_filter=in_trace_filter,
+                    sample_n=sample_n,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records
