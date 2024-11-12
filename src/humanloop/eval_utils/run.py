@@ -24,8 +24,6 @@ from functools import partial
 from logging import INFO
 from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, TypeVar, Union
 
-from pydantic import ValidationError
-
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
 from humanloop.core.api_error import ApiError
 from humanloop.eval_utils.context import EvaluationContext
@@ -59,6 +57,7 @@ from humanloop.types.create_tool_log_response import CreateToolLogResponse
 from humanloop.types.datapoint_response_target_value import DatapointResponseTargetValue
 from humanloop.types.evaluation_run_response import EvaluationRunResponse
 from humanloop.types.run_stats_response import RunStatsResponse
+from humanloop.types.validation_error import ValidationError
 
 if typing.TYPE_CHECKING:
     from humanloop.client import BaseHumanloop
@@ -305,7 +304,6 @@ def run_eval(
     file_dict = {**file_, **version}
     hl_file: Union[PromptResponse, FlowResponse, ToolResponse, EvaluatorResponse]
 
-    # NOTE: This could be cleaner, use polymorphism to avoid the if-else
     if type_ == "flow":
         # Be more lenient with Flow versions as they are arbitrary json
         try:
@@ -716,7 +714,7 @@ def _check_evaluation_improvement(
         return True, 0, 0
 
     previous_evaluator_stats_by_path = _get_evaluator_stats_by_path(
-        stat=stats.run_stats[1],
+        stat=stats.run_stats[1],  # Latest Run is at index 0; previous Run is at index 1
         evaluation=evaluation,
     )
     if evaluator_path in latest_evaluator_stats_by_path and evaluator_path in previous_evaluator_stats_by_path:
