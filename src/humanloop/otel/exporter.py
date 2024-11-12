@@ -14,7 +14,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
 from humanloop.core import ApiError as HumanloopApiError
-from humanloop.eval_utils.context import EvaluationContext
+from humanloop.eval_utils.context import EVALUATION_CONTEXT_VARIABLE_NAME, EvaluationContext
 from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
@@ -94,16 +94,20 @@ class HumanloopSpanExporter(SpanExporter):
                 if is_humanloop_span(span):
                     # We pass the EvaluationContext from the eval_run utility thread to
                     # the export thread so the .log action works as expected
+                    evaluation_context_copy = None
+                    for context_var, context_var_value in contextvars.copy_context().items():
+                        if context_var.name == EVALUATION_CONTEXT_VARIABLE_NAME:
+                            evaluation_context_copy = context_var_value
                     self._upload_queue.put(
                         (
                             span,
-                            copy.deepcopy(evaluation_context),
+                            evaluation_context_copy,
                         ),
                     )
                     logger.debug(
                         "Span %s with EvaluationContext %s added to upload queue",
                         span.attributes,
-                        copy.deepcopy(evaluation_context),
+                        evaluation_context_copy,
                     )
             # Reset the EvaluationContext so run eval does not
             # create a duplicate Log
