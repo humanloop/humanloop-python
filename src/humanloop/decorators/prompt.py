@@ -82,16 +82,10 @@ def prompt(
             # Return the output of the decorated function
             return output
 
-        prompt_kernel_file = {**prompt_kernel}
-        if prompt_kernel_file.get("provider") is None:
-            prompt_kernel_file["provider"] = "openai"  # type: ignore
-        if prompt_kernel_file.get("endpoint") is None:
-            prompt_kernel_file["endpoint"] = "chat"  # type: ignore
-
         wrapper.file = File(  # type: ignore
             path=path if path else func.__name__,
             type="prompt",
-            version={**prompt_kernel_file},  # type: ignore
+            version={**prompt_kernel},  # type: ignore
             callable=wrapper,
         )
 
