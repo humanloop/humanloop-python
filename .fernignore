@@ -1,6 +1,6 @@
 # Specify files that shouldn't be modified by Fern
 
-src/humanloop/eval_utils/*
+src/humanloop/eval_utils
 src/humanloop/prompt_utils.py
 src/humanloop/client.py
 mypy.ini
@@ -8,5 +8,5 @@ README.md
 
 # Directories used by SDK decorators
 
-src/humanloop/decorators/*
-src/humanloop/otel/*
+src/humanloop/decorators
+src/humanloop/otel
