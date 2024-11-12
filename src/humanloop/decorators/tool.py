@@ -1,6 +1,7 @@
 import builtins
 import inspect
 import logging
+import sys
 import textwrap
 import typing
 from dataclasses import dataclass
@@ -23,6 +24,9 @@ from humanloop.otel.constants import (
 from humanloop.otel.helpers import generate_span_id, jsonify_if_not_string, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
+
+if sys.version_info >= (3, 10):
+    import types
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -335,7 +339,7 @@ def _parse_annotation(annotation: typing.Type) -> _ParsedAnnotation:
             annotation=[_parse_annotation(arg) for arg in typing.get_args(annotation)],
         )
 
-    if origin is typing.Union:
+    if origin is typing.Union or (sys.version_info >= (3, 10) and origin is types.UnionType):
         sub_types = typing.get_args(annotation)
         if sub_types[-1] is type(None):
             # type(None) in sub_types indicates Optional type
@@ -495,4 +499,8 @@ def _parameter_is_optional(
     origin = typing.get_origin(parameter.annotation)
     # sub_types refers to T inside the annotation
     sub_types = typing.get_args(parameter.annotation)
-    return origin is typing.Union and len(sub_types) > 0 and sub_types[-1] is type(None)
+    return (
+        (origin is typing.Union or (sys.version_info >= (3, 10) and origin is types.UnionType))
+        and len(sub_types) > 0
+        and sub_types[-1] is type(None)
+    )

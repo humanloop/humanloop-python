@@ -28,7 +28,7 @@ def flow(
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
             span: Span
-            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:
+            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:  # type: ignore
                 span_id = span.get_span_context().span_id
                 if span.parent:
                     span_parent_id = span.parent.span_id

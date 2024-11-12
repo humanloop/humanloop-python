@@ -1,3 +1,4 @@
+import sys
 from typing import Any, Optional, TypedDict, Union
 
 import pytest
@@ -460,3 +461,74 @@ def test_tool_as_higher_order_function(
         key=HUMANLOOP_FILE_KEY,
     )
     assert hl_file_higher_order_fn["tool"]["source_code"] == hl_file_decorated_fn["tool"]["source_code"]  # type: ignore
+
+
+def test_python310_syntax(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    if sys.version_info < (3, 10):
+        pytest.skip("Requires Python 3.10")
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
+    # GIVEN a function annotated with @tool where a parameter uses `|` for Optional
+    @tool(opentelemetry_tracer=tracer)
+    def calculator(a: float, b: float | None = None) -> float:
+        # NOTE: dummy function, only testing its signature not correctness
+        if a is None:
+            a = 0
+        return a + b  # type: ignore
+
+    # WHEN building the Tool kernel
+    # THEN the JSON schema is correct
+    assert calculator.json_schema == {
+        "description": "",
+        "name": "calculator",
+        "parameters": {
+            "properties": {
+                "a": {"type": "number"},
+                "b": {"type": ["number", "null"]},
+            },
+            "required": ("a",),
+            "type": "object",
+            "additionalProperties": False,
+        },
+        "strict": True,
+    }
+
+    Validator.check_schema(calculator.json_schema)
+
+
+def test_python310_union_syntax(
+    opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter],
+):
+    if sys.version_info < (3, 10):
+        pytest.skip("Requires Python 3.10")
+
+    # GIVEN an OTel configuration
+    tracer, _ = opentelemetry_test_configuration
+
+    # GIVEN a function annotated with @tool where a parameter uses `|` for Union
+    @tool(opentelemetry_tracer=tracer)
+    def calculator(a: float, b: float | int | str) -> float:
+        # NOTE: dummy function, only testing its signature not correctness
+        return a + b  # type: ignore
+
+    # WHEN building the Tool kernel
+    # THEN the JSON schema is correct
+    assert calculator.json_schema == {
+        "description": "",
+        "name": "calculator",
+        "parameters": {
+            "properties": {
+                "a": {"type": "number"},
+                "b": {"anyOf": [{"type": "number"}, {"type": "integer"}, {"type": "string"}]},
+            },
+            "required": ("a", "b"),
+            "type": "object",
+            "additionalProperties": False,
+        },
+        "strict": True,
+    }
+
+    Validator.check_schema(calculator.json_schema)
