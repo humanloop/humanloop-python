@@ -76,7 +76,7 @@ def prompt(
                 write_to_opentelemetry_span(
                     span=span,
                     key=HUMANLOOP_LOG_KEY,
-                    value=prompt_log,
+                    value=prompt_log,  # type: ignore
                 )
 
             # Return the output of the decorated function

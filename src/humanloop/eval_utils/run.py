@@ -57,7 +57,7 @@ from humanloop.types.create_tool_log_response import CreateToolLogResponse
 from humanloop.types.datapoint_response_target_value import DatapointResponseTargetValue
 from humanloop.types.evaluation_run_response import EvaluationRunResponse
 from humanloop.types.run_stats_response import RunStatsResponse
-from humanloop.types.validation_error import ValidationError
+from pydantic import ValidationError
 
 if typing.TYPE_CHECKING:
     from humanloop.client import BaseHumanloop
@@ -616,13 +616,13 @@ def _get_log_func(
         "run_id": run_id,
     }
     if file_type == "flow":
-        return partial(client.flows.log, **log_request, trace_status="complete")
+        return partial(client.flows.log, **log_request, trace_status="complete")  # type: ignore
     elif file_type == "prompt":
-        return partial(client.prompts.log, **log_request)
+        return partial(client.prompts.log, **log_request)  # type: ignore
     elif file_type == "evaluator":
-        return partial(client.evaluators.log, **log_request)
+        return partial(client.evaluators.log, **log_request)  # type: ignore
     elif file_type == "tool":
-        return partial(client.tools.log, **log_request)
+        return partial(client.tools.log, **log_request)  # type: ignore
     else:
         raise NotImplementedError(f"Unsupported File version: {file_type}")
 
