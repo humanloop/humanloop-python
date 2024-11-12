@@ -219,6 +219,7 @@ _PRIMITIVE_TYPES = Union[
     float,
     bool,
     Parameter.empty,  # type: ignore
+    Ellipsis,
 ]
 
 
@@ -240,7 +241,7 @@ class _ParsedPrimitiveAnnotation(_ParsedAnnotation):
     annotation: _PRIMITIVE_TYPES
 
     def no_type_hint(self) -> bool:
-        return self.annotation is Parameter.empty
+        return self.annotation is Parameter.empty or self.annotation is Ellipsis
 
 
 @dataclass
@@ -288,12 +289,14 @@ def _parse_annotation(annotation: typing.Type) -> _ParsedAnnotation:
     if origin is None:
         # Either not a nested type or no type hint
         # Parameter.empty is used for parameters without type hints
+        # Ellipsis is interpreted as Any
         if annotation not in (
             str,
             int,
             float,
             bool,
             Parameter.empty,
+            Ellipsis,
             dict,
             list,
             tuple,
@@ -459,7 +462,7 @@ def _annotation_parse_to_json_schema(
             arg_type = {"type": "number"}
         if arg.annotation is builtins.bool:
             arg_type = {"type": "boolean"}
-        if arg.annotation is Parameter.empty:
+        if arg.annotation is Parameter.empty or arg.annotation is Ellipsis:
             # JSON Schema dropped support for 'any' type, we allow any type as a workaround
             arg_type = {"type": _JSON_SCHEMA_ANY}
 
