@@ -126,7 +126,11 @@ def log_with_evaluation_context(
         CreateFlowLogResponse,
         CreateEvaluatorLogResponse,
     ]:
-        evaluation_context = evaluation_context_variable.get()
+        try:
+            evaluation_context = evaluation_context_variable.get()
+        except LookupError:
+            # If the Evaluation Context is not set, an Evaluation is not running
+            evaluation_context = None
 
         if _is_evaluated_file(
             evaluation_context=evaluation_context,  # type: ignore
@@ -134,6 +138,7 @@ def log_with_evaluation_context(
         ):
             # If the .log API user does not provide the source_datapoint_id or run_id,
             # override them with the values from the EvaluationContext
+            # _is_evaluated_file ensures that evaluation_context is not None
             evaluation_context = typing.cast(
                 EvaluationContext,
                 evaluation_context,
@@ -157,7 +162,7 @@ def log_with_evaluation_context(
             log_args=kwargs,
         ):
             # Notify that the Log has been added to the Evaluation
-            # evaluation_context cannot be None
+            # _is_evaluated_file ensures that evaluation_context is not None
             evaluation_context = typing.cast(
                 EvaluationContext,
                 evaluation_context,
@@ -463,6 +468,7 @@ def run_eval(
             "process_datapoint on Thread %s: evaluating Datapoint %s with EvaluationContext %s",
             threading.get_ident(),
             datapoint_dict,
+            # .get() is safe since process_datapoint is always called in the context of an Evaluation
             evaluation_context_variable.get(),
         )
         log_func = _get_log_func(
@@ -495,6 +501,7 @@ def run_eval(
                     # throw error if it fails to serialize
                     raise ValueError(f"Your {type_}'s `callable` must return a string or a JSON serializable object.")
 
+            # .get() is safe since process_datapoint is always called in the context of an Evaluation
             context_variable = evaluation_context_variable.get()
             if context_variable is not None:
                 # Evaluation Context has not been consumed
