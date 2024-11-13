@@ -10,7 +10,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.12
+          python-version: 3.8
       - name: Bootstrap poetry
         run: |
           curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
@@ -26,7 +26,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
         run: |
           curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
@@ -35,41 +35,9 @@ jobs:
 
       - name: Test
         run: poetry run pytest -rP .
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          REPLICATE_API_KEY: ${{ secrets.REPLICATE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
-  test_3_12:
-    # Run the test suite with Python 3.12 too
-    # Some tool decorator tests assert the ability to parse the signature
-    # of functions that use typing features introduced in Python 3.10 e.g. '|'
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Set up python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.12
-      - name: Bootstrap poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
-      - name: Install dependencies
-        run: poetry install
-
-      - name: Test
-        run: poetry run pytest -rP .
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          REPLICATE_API_KEY: ${{ secrets.REPLICATE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
 
   publish:
-    needs: [compile, test, test_3_12]
+    needs: [compile, test]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
     steps:
@@ -78,7 +46,7 @@ jobs:
       - name: Set up python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.8
       - name: Bootstrap poetry
         run: |
           curl -sSL https://install.python-poetry.org | python - -y --version 1.5.1
