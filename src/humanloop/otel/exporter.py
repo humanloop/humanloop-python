@@ -89,6 +89,7 @@ class HumanloopSpanExporter(SpanExporter):
                 if not is_evaluated_file(spans[0], evaluation_context):
                     evaluation_context = None
             except LookupError:
+                # No ongoing Evaluation happening
                 evaluation_context = None
             for span in spans:
                 if is_humanloop_span(span):
