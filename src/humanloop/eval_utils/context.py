@@ -4,14 +4,14 @@ from typing import Callable, TypedDict
 class EvaluationContext(TypedDict):
     """Context Log to Humanloop.
 
-    Global state that is set when an Evaluation is ran.
+    Per datapoint state that is set when an Evaluation is ran.
     """
 
     """Required for associating a Log with the Evaluation Run."""
     source_datapoint_id: str
 
-    """Exporter calls this so the eval_utils are notified to evaluate an uploaded Log."""
-    upload_callback: Callable[[dict], None]
+    """Overloaded .log method call."""
+    upload_callback: Callable[[str], None]
 
     """ID of the evaluated File."""
     file_id: str
