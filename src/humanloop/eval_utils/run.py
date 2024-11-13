@@ -720,7 +720,10 @@ def _run_local_evaluators(
     """Run local Evaluators on the Log and send the judgments to Humanloop."""
     # Need to get the full log to pass to the evaluators
     log = client.logs.get(id=log_id)
-    log_dict = log.dict()
+    if not isinstance(log, dict):
+        log_dict = log.dict()
+    else:
+        log_dict = log
     datapoint_dict = datapoint.dict() if datapoint else None
     for local_evaluator in local_evaluators:
         start_time = datetime.now()
