@@ -200,7 +200,6 @@ class FlowsClient:
             ),
         )
         """
-
         _response = self._client_wrapper.httpx_client.request(
             "flows/log",
             method="POST",

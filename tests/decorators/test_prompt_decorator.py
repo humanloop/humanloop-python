@@ -138,6 +138,8 @@ def _test_scenario(opentelemetry_tracer: Tracer, **kwargs):
     return _call_llm_base
 
 
+# LLM provider might not be available, retry the test
+@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
 def test_prompt_decorator(
     provider_model: tuple[str, str],
@@ -167,6 +169,8 @@ def test_prompt_decorator(
     assert spans[1].attributes.get("prompt") is None  # type: ignore
 
 
+# LLM provider might not be available, retry the test
+@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
 def test_prompt_decorator_with_hl_processor(
     provider_model: tuple[str, str],
@@ -207,6 +211,8 @@ def test_prompt_decorator_with_hl_processor(
     assert prompt_kernel.top_p is None
 
 
+# LLM provider might not be available, retry the test
+@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
 def test_prompt_decorator_with_defaults(
     provider_model: tuple[str, str],
@@ -244,6 +250,8 @@ def test_prompt_decorator_with_defaults(
     assert prompt.model == model
 
 
+# LLM provider might not be available, retry the test
+@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.parametrize(
     "attributes_test_expected",
     [
