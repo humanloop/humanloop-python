@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "humanloop"
-version = "0.8.14b3"
+version = "0.8.14b4"
 description = ""
 readme = "README.md"
 authors = []
@@ -10,6 +10,7 @@ classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -46,9 +47,7 @@ pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 typing_extensions = ">= 4.0.0"
 
-
 [tool.poetry.dev-dependencies]
-pytest-retry = "^1.6.3"
 mypy = "1.0.1"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.5"
@@ -60,6 +59,7 @@ groq = ">=0.11.0"
 jsonschema = "^4.23.0"
 openai = "^1.52.2"
 parse-type = ">=0.6.4"
+pytest-retry = "^1.6.3"
 python-dotenv = "^1.0.1"
 replicate = "^1.0.3"
 ruff = "^0.5.6"
