@@ -10,3 +10,7 @@ README.md
 
 src/humanloop/decorators
 src/humanloop/otel
+
+## CI
+
+.github/workflows/ci.yml
