@@ -43,9 +43,7 @@ class EvaluationLogResponse(UncheckedBaseModel):
     """
 
     if IS_PYDANTIC_V2:
-        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
-            extra="allow", frozen=True
-        )  # type: ignore # Pydantic v2
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:
 
         class Config:
@@ -58,14 +56,10 @@ update_forward_refs(EvaluatorLogResponse, EvaluationLogResponse=EvaluationLogRes
 update_forward_refs(EvaluatorResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(FlowLogResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(FlowResponse, EvaluationLogResponse=EvaluationLogResponse)
-update_forward_refs(
-    MonitoringEvaluatorResponse, EvaluationLogResponse=EvaluationLogResponse
-)
+update_forward_refs(MonitoringEvaluatorResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(PromptLogResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(PromptResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(ToolLogResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(ToolResponse, EvaluationLogResponse=EvaluationLogResponse)
-update_forward_refs(
-    VersionDeploymentResponse, EvaluationLogResponse=EvaluationLogResponse
-)
+update_forward_refs(VersionDeploymentResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(VersionIdResponse, EvaluationLogResponse=EvaluationLogResponse)
