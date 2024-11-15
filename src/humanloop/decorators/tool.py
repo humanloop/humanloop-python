@@ -213,7 +213,7 @@ def _build_function_parameters_property(func) -> _JSONSchemaFunctionParameters:
     )
 
 
-if sys.version_info >= (3, 10):
+if sys.version_info >= (3, 11):
     _PRIMITIVE_TYPES = Union[
         str,
         int,
@@ -223,7 +223,7 @@ if sys.version_info >= (3, 10):
         Ellipsis,  # type: ignore
     ]
 else:
-    # Ellipsis not supported in typing module before Python 3.10
+    # Ellipsis not supported as type before Python 3.10
     _PRIMITIVE_TYPES = Union[
         str,
         int,
