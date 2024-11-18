@@ -340,11 +340,11 @@ def run_eval(
     )
 
     # Upsert the local Evaluators; other Evaluators are just referenced by `path` or `id`
-    local_evaluators: List[Evaluator] = []
+    local_evaluators: List[tuple[EvaluatorResponse, Callable]] = []
     if evaluators:
-        for evaluator in evaluators:
+        for evaluator_request in evaluators:
             # If a callable is provided for an Evaluator, we treat it as External
-            eval_function = evaluator.get("callable")
+            eval_function = evaluator_request.get("callable")
             if eval_function is not None:
                 # TODO: support the case where `file` logs generated on Humanloop but Evaluator logs generated locally
                 if function_ is None:
@@ -353,25 +353,26 @@ def run_eval(
                         f"{type_}'s `callable`. Please provide a `callable` for your file in order "
                         "to run Evaluators locally."
                     )
-                local_evaluators.append(evaluator)
                 spec = ExternalEvaluator(
-                    arguments_type=evaluator["args_type"],
-                    return_type=evaluator["return_type"],
+                    arguments_type=evaluator_request["args_type"],
+                    return_type=evaluator_request["return_type"],
                     attributes={"code": inspect.getsource(eval_function)},
                     evaluator_type="external",
                 )
-                client.evaluators.upsert(
-                    id=evaluator.get("id"),
-                    path=evaluator.get("path"),
+                evaluator = client.evaluators.upsert(
+                    id=evaluator_request.get("id"),
+                    path=evaluator_request.get("path"),
                     spec=spec,
                 )
+                local_evaluators.append((evaluator, eval_function))
+
     # function_ cannot be None, cast it for type checking
     function_ = typing.cast(Callable, function_)
 
     # Validate upfront that the local Evaluators and Dataset fit
     requires_target = False
-    for local_evaluator in local_evaluators:
-        if local_evaluator["args_type"] == "target_required":
+    for local_evaluator, _ in local_evaluators:
+        if local_evaluator.spec.arguments_type == "target_required":
             requires_target = True
             break
     if requires_target:
@@ -382,7 +383,7 @@ def run_eval(
         if missing_target > 0:
             raise ValueError(
                 f"{missing_target} Datapoints have no target. A target "
-                f"is required for the Evaluator: {local_evaluator['path']}"
+                f"is required for the Evaluator: {local_evaluator.path}"
             )
 
     # Get or create the Evaluation based on the name
@@ -408,7 +409,7 @@ def run_eval(
     run: EvaluationRunResponse = client.evaluations.create_run(
         id=evaluation.id,
         dataset={"version_id": hl_dataset.version_id},
-        orchestrated=False,
+        orchestrated=False if function_ is not None else True,
     )
     # Every Run will generate a new batch of Logs
     run_id = run.id
@@ -715,7 +716,7 @@ def _run_local_evaluators(
     client: "BaseHumanloop",
     log_id: str,
     datapoint: Optional[Datapoint],
-    local_evaluators: list[Evaluator],
+    local_evaluators: list[tuple[EvaluatorResponse, Callable]],
 ):
     """Run local Evaluators on the Log and send the judgments to Humanloop."""
     # Need to get the full log to pass to the evaluators
@@ -725,11 +726,10 @@ def _run_local_evaluators(
     else:
         log_dict = log
     datapoint_dict = datapoint.dict() if datapoint else None
-    for local_evaluator in local_evaluators:
+    for local_evaluator, eval_function in local_evaluators:
         start_time = datetime.now()
         try:
-            eval_function = local_evaluator["callable"]
-            if local_evaluator["args_type"] == "target_required":
+            if local_evaluator.spec.arguments_type == "target_required":
                 judgement = eval_function(
                     log_dict,
                     datapoint_dict,
@@ -738,20 +738,21 @@ def _run_local_evaluators(
                 judgement = eval_function(log_dict)
 
             _ = client.evaluators.log(
+                version_id=local_evaluator.version_id,
                 parent_id=log_id,
                 judgment=judgement,
-                id=local_evaluator.get("id"),
-                path=local_evaluator.get("path"),
+                id=local_evaluator.id,
+                path=local_evaluator.path,
                 start_time=start_time,
                 end_time=datetime.now(),
             )
         except Exception as e:
             _ = client.evaluators.log(
                 parent_id=log_id,
-                path=local_evaluator.get("path"),
-                id=local_evaluator.get("id"),
+                path=local_evaluator.path,
+                id=local_evaluator.id,
                 error=str(e),
                 start_time=start_time,
                 end_time=datetime.now(),
             )
-            logger.warning(f"\nEvaluator {local_evaluator['path']} failed with error {str(e)}")
+            logger.warning(f"\nEvaluator {local_evaluator.path} failed with error {str(e)}")
