@@ -27,7 +27,7 @@ class FlowResponseParams(typing_extensions.TypedDict):
 
     id: str
     """
-    Unique identifier for the Flow.
+    Unique identifier for the Flow. Starts with fl\_.
     """
 
     directory_id: typing_extensions.NotRequired[str]

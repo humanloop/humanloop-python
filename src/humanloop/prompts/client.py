@@ -236,7 +236,7 @@ class PromptsClient:
             ),
             provider_latency=6.5931549072265625,
             output_message={
-                "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+                "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They dont tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
                 "role": "assistant",
             },
             prompt_tokens=100,
@@ -1213,12 +1213,6 @@ class PromptsClient:
             provider="openai",
             max_tokens=-1,
             temperature=0.7,
-            top_p=1.0,
-            presence_penalty=0.0,
-            frequency_penalty=0.0,
-            other={},
-            tools=[],
-            linked_tools=[],
             commit_message="Initial commit",
         )
         """
@@ -2101,7 +2095,7 @@ class AsyncPromptsClient:
                 ),
                 provider_latency=6.5931549072265625,
                 output_message={
-                    "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+                    "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They dont tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
                     "role": "assistant",
                 },
                 prompt_tokens=100,
@@ -3117,12 +3111,6 @@ class AsyncPromptsClient:
                 provider="openai",
                 max_tokens=-1,
                 temperature=0.7,
-                top_p=1.0,
-                presence_penalty=0.0,
-                frequency_penalty=0.0,
-                other={},
-                tools=[],
-                linked_tools=[],
                 commit_message="Initial commit",
             )
 

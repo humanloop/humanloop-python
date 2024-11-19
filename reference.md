@@ -60,7 +60,7 @@ client.prompts.log(
     ),
     provider_latency=6.5931549072265625,
     output_message={
-        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They dont tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
         "role": "assistant",
     },
     prompt_tokens=100,
@@ -1327,12 +1327,6 @@ client.prompts.upsert(
     provider="openai",
     max_tokens=-1,
     temperature=0.7,
-    top_p=1.0,
-    presence_penalty=0.0,
-    frequency_penalty=0.0,
-    other={},
-    tools=[],
-    linked_tools=[],
     commit_message="Initial commit",
 )
 
@@ -9397,6 +9391,14 @@ for page in response.iter_pages():
 <dd>
 
 **in_trace_filter:** `typing.Optional[typing.Union[bool, typing.Sequence[bool]]]` — If true, return Logs that are associated to a Trace. False, return Logs that are not associated to a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sample:** `typing.Optional[int]` — If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
     
 </dd>
 </dl>
