@@ -377,8 +377,8 @@ def run_eval(
             break
     if requires_target:
         missing_target = 0
-        for datapoint in hl_dataset.datapoints:
-            if not datapoint.target:
+        for _datapoint in hl_dataset.datapoints:
+            if not _datapoint.target:
                 missing_target += 1
         if missing_target > 0:
             raise ValueError(
@@ -482,7 +482,7 @@ def run_eval(
                     function_.__name__,
                 )
                 log_func(
-                    inputs=datapoint.inputs,
+                    inputs=dp.inputs,
                     output=output,
                     start_time=start_time,
                     end_time=datetime.now(),
