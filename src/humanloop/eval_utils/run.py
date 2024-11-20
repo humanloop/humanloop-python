@@ -196,7 +196,7 @@ class _SimpleProgressBar:
             time_per_item = elapsed_time / self._progress if self._progress > 0 else 0
             eta = (self._total - self._progress) * time_per_item
 
-            progress_display = f"\r[{bar}] {self._progress}/{self._total}"
+            progress_display = f"[{bar}] {self._progress}/{self._total}"
             progress_display += f" ({percentage:.2f}%)"
 
             if self._progress < self._total:
@@ -204,6 +204,8 @@ class _SimpleProgressBar:
             else:
                 progress_display += " | DONE"
 
+            sys.stderr.write("\r")  # Move the cursor to the beginning of the line
+            sys.stderr.write("\033[K")  # Clear the line from the cursor to the end
             sys.stderr.write(progress_display)
 
             if self._progress >= self._total:
