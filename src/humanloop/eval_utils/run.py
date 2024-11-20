@@ -409,7 +409,9 @@ def run_eval(
     run: EvaluationRunResponse = client.evaluations.create_run(
         id=evaluation.id,
         dataset={"version_id": hl_dataset.version_id},
+        version={"version_id": hl_file.version_id},
         orchestrated=False if function_ is not None else True,
+        use_existing_logs=False,
     )
     # Every Run will generate a new batch of Logs
     run_id = run.id
