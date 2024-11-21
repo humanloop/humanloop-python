@@ -746,14 +746,12 @@ def _run_local_evaluators(
                 parent_id=log_id,
                 judgment=judgement,
                 id=local_evaluator.id,
-                path=local_evaluator.path,
                 start_time=start_time,
                 end_time=datetime.now(),
             )
         except Exception as e:
             _ = client.evaluators.log(
                 parent_id=log_id,
-                path=local_evaluator.path,
                 id=local_evaluator.id,
                 error=str(e),
                 start_time=start_time,
