@@ -10,8 +10,9 @@ from .tool_response import ToolResponse
 from .version_deployment_response import VersionDeploymentResponse
 from .version_id_response import VersionIdResponse
 import typing
-import datetime as dt
+from .chat_message import ChatMessage
 import pydantic
+import datetime as dt
 from .trace_status import TraceStatus
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
@@ -20,6 +21,16 @@ from ..core.pydantic_utilities import update_forward_refs
 class FlowLogResponse(UncheckedBaseModel):
     """
     General request for creating a Log
+    """
+
+    messages: typing.Optional[typing.List[ChatMessage]] = pydantic.Field(default=None)
+    """
+    List of chat messages that were used as an input to the Flow.
+    """
+
+    output_message: typing.Optional[ChatMessage] = pydantic.Field(default=None)
+    """
+    The output message returned by this Flow.
     """
 
     start_time: typing.Optional[dt.datetime] = pydantic.Field(default=None)

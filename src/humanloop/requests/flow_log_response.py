@@ -3,8 +3,9 @@
 from __future__ import annotations
 import typing_extensions
 import typing_extensions
-import datetime as dt
 import typing
+from .chat_message import ChatMessageParams
+import datetime as dt
 from .flow_response import FlowResponseParams
 from ..types.trace_status import TraceStatus
 import typing
@@ -17,6 +18,16 @@ if typing.TYPE_CHECKING:
 class FlowLogResponseParams(typing_extensions.TypedDict):
     """
     General request for creating a Log
+    """
+
+    messages: typing_extensions.NotRequired[typing.Sequence[ChatMessageParams]]
+    """
+    List of chat messages that were used as an input to the Flow.
+    """
+
+    output_message: typing_extensions.NotRequired[ChatMessageParams]
+    """
+    The output message returned by this Flow.
     """
 
     start_time: typing_extensions.NotRequired[dt.datetime]

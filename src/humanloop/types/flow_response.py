@@ -25,7 +25,7 @@ class FlowResponse(UncheckedBaseModel):
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the Flow. Starts with fl\_.
+    Unique identifier for the Flow.
     """
 
     directory_id: typing.Optional[str] = pydantic.Field(default=None)

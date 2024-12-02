@@ -2,6 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from ..requests.chat_message import ChatMessageParams
 import datetime as dt
 from ..requests.flow_kernel_request import FlowKernelRequestParams
 from ..types.trace_status import TraceStatus
@@ -45,6 +46,8 @@ class FlowsClient:
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
         run_id: typing.Optional[str] = OMIT,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
@@ -83,6 +86,12 @@ class FlowsClient:
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed version to log to.
+
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+            List of chat messages that were used as an input to the Flow.
+
+        output_message : typing.Optional[ChatMessageParams]
+            The output message returned by this Flow.
 
         run_id : typing.Optional[str]
             Unique identifier for the Run to associate the Log to.
@@ -208,6 +217,12 @@ class FlowsClient:
                 "environment": environment,
             },
             json={
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
                 "run_id": run_id,
                 "path": path,
                 "id": id,
@@ -918,6 +933,62 @@ class FlowsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def delete_flow_version(
+        self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Delete a version of the Flow.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        version_id : str
+            Unique identifier for the specific version of the Flow.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.flows.delete_flow_version(
+            id="id",
+            version_id="version_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
     ) -> FlowResponse:
@@ -1205,6 +1276,8 @@ class AsyncFlowsClient:
         *,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
         run_id: typing.Optional[str] = OMIT,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
@@ -1243,6 +1316,12 @@ class AsyncFlowsClient:
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed version to log to.
+
+        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+            List of chat messages that were used as an input to the Flow.
+
+        output_message : typing.Optional[ChatMessageParams]
+            The output message returned by this Flow.
 
         run_id : typing.Optional[str]
             Unique identifier for the Run to associate the Log to.
@@ -1375,6 +1454,12 @@ class AsyncFlowsClient:
                 "environment": environment,
             },
             json={
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
                 "run_id": run_id,
                 "path": path,
                 "id": id,
@@ -2134,6 +2219,70 @@ class AsyncFlowsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_flow_version(
+        self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Delete a version of the Flow.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        version_id : str
+            Unique identifier for the specific version of the Flow.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.flows.delete_flow_version(
+                id="id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"flows/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

@@ -60,7 +60,7 @@ client.prompts.log(
     ),
     provider_latency=6.5931549072265625,
     output_message={
-        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They dont tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
+        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
         "role": "assistant",
     },
     prompt_tokens=100,
@@ -1938,6 +1938,85 @@ client.prompts.commit(
 </dl>
 </details>
 
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">delete_prompt_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a version of the Prompt.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.delete_prompt_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -3395,6 +3474,85 @@ client.tools.commit(
 </dl>
 </details>
 
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">delete_tool_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a version of the Tool.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.delete_tool_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -3956,6 +4114,14 @@ client.datasets.upsert(
 <dd>
 
 **environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_datapoints:** `typing.Optional[bool]` — If set to `true`, include all Datapoints in the response. Defaults to `false`. Consider using the paginated List Datapoints endpoint instead.
     
 </dd>
 </dl>
@@ -4549,6 +4715,85 @@ client.datasets.commit(
 <dd>
 
 **commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">delete_dataset_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a version of the Dataset.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.datasets.delete_dataset_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Dataset.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Dataset.
     
 </dd>
 </dl>
@@ -5830,6 +6075,85 @@ client.evaluators.commit(
 </dl>
 </details>
 
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">delete_evaluator_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a version of the Evaluator.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.delete_evaluator_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">set_deployment</a>(...)</code></summary>
 <dl>
 <dd>
@@ -6257,6 +6581,22 @@ client.flows.log(
 <dd>
 
 **environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — List of chat messages that were used as an input to the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_message:** `typing.Optional[ChatMessageParams]` — The output message returned by this Flow.
     
 </dd>
 </dl>
@@ -7210,6 +7550,85 @@ client.flows.commit(
 <dd>
 
 **commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">delete_flow_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a version of the Flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.delete_flow_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Flow.
     
 </dd>
 </dl>

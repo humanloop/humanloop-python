@@ -148,6 +148,7 @@ class DatasetsClient:
         datapoints: typing.Sequence[CreateDatapointRequestParams],
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        include_datapoints: typing.Optional[bool] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
@@ -184,6 +185,9 @@ class DatasetsClient:
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
+
+        include_datapoints : typing.Optional[bool]
+            If set to `true`, include all Datapoints in the response. Defaults to `false`. Consider using the paginated List Datapoints endpoint instead.
 
         path : typing.Optional[str]
             Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
@@ -243,6 +247,7 @@ class DatasetsClient:
             params={
                 "version_id": version_id,
                 "environment": environment,
+                "include_datapoints": include_datapoints,
             },
             json={
                 "path": path,
@@ -745,6 +750,62 @@ class DatasetsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def delete_dataset_version(
+        self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Delete a version of the Dataset.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        version_id : str
+            Unique identifier for the specific version of the Dataset.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.datasets.delete_dataset_version(
+            id="id",
+            version_id="version_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def upload_csv(
         self,
         id: str,
@@ -1158,6 +1219,7 @@ class AsyncDatasetsClient:
         datapoints: typing.Sequence[CreateDatapointRequestParams],
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        include_datapoints: typing.Optional[bool] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
@@ -1194,6 +1256,9 @@ class AsyncDatasetsClient:
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed Version to base the created Version on. Only used when `action` is `"add"` or `"remove"`.
+
+        include_datapoints : typing.Optional[bool]
+            If set to `true`, include all Datapoints in the response. Defaults to `false`. Consider using the paginated List Datapoints endpoint instead.
 
         path : typing.Optional[str]
             Path of the Dataset, including the name. This locates the Dataset in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
@@ -1261,6 +1326,7 @@ class AsyncDatasetsClient:
             params={
                 "version_id": version_id,
                 "environment": environment,
+                "include_datapoints": include_datapoints,
             },
             json={
                 "path": path,
@@ -1796,6 +1862,70 @@ class AsyncDatasetsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_dataset_version(
+        self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
+        """
+        Delete a version of the Dataset.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        version_id : str
+            Unique identifier for the specific version of the Dataset.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.datasets.delete_dataset_version(
+                id="id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
