@@ -65,6 +65,7 @@ class ToolsClient:
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
@@ -144,6 +145,9 @@ class ToolsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         tool : typing.Optional[ToolKernelRequestParams]
             Details of your Tool. A new Tool version will be created if the provided details are new.
 
@@ -209,6 +213,7 @@ class ToolsClient:
                 "user": user,
                 "environment": tool_log_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "tool": convert_and_respect_annotation_metadata(
                     object_=tool, annotation=ToolKernelRequestParams, direction="write"
                 ),
@@ -1312,6 +1317,7 @@ class AsyncToolsClient:
         user: typing.Optional[str] = OMIT,
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
@@ -1391,6 +1397,9 @@ class AsyncToolsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         tool : typing.Optional[ToolKernelRequestParams]
             Details of your Tool. A new Tool version will be created if the provided details are new.
 
@@ -1464,6 +1473,7 @@ class AsyncToolsClient:
                 "user": user,
                 "environment": tool_log_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "tool": convert_and_respect_annotation_metadata(
                     object_=tool, annotation=ToolKernelRequestParams, direction="write"
                 ),

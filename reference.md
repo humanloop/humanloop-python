@@ -338,6 +338,14 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -677,6 +685,7 @@ response = client.prompts.call_stream(
     user="string",
     prompts_call_stream_request_environment="string",
     save=True,
+    log_id="string",
     provider_api_keys={
         "openai": "string",
         "ai_21": "string",
@@ -844,6 +853,14 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
     
 </dd>
 </dl>
@@ -1109,6 +1126,14 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **provider_api_keys:** `typing.Optional[ProviderApiKeysParams]` — API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
     
 </dd>
@@ -1327,6 +1352,12 @@ client.prompts.upsert(
     provider="openai",
     max_tokens=-1,
     temperature=0.7,
+    top_p=1.0,
+    presence_penalty=0.0,
+    frequency_penalty=0.0,
+    other={},
+    tools=[],
+    linked_tools=[],
     commit_message="Initial commit",
 )
 
@@ -2590,6 +2621,14 @@ client.tools.log(
 <dd>
 
 **save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
     
 </dd>
 </dl>
@@ -5395,6 +5434,14 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
     
 </dd>
@@ -6764,7 +6811,7 @@ client.flows.log(
 <dl>
 <dd>
 
-**log_id:** `typing.Optional[str]` — The identifier for the Log. If not specified, a default ID will be generated. This allows additional Logs to be appended to the trace without waiting for Humanloop to return an ID.
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
     
 </dd>
 </dl>
@@ -7298,6 +7345,8 @@ Update the status, inputs, output of a Flow Log.
 
 Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
 Inputs and output (or error) must be provided in order to mark it as complete.
+
+The end_time log attribute will be set to match the time the log is marked as complete.
 </dd>
 </dl>
 </dd>

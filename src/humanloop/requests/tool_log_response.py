@@ -108,6 +108,11 @@ class ToolLogResponseParams(typing_extensions.TypedDict):
     Whether the request/response payloads will be stored on Humanloop.
     """
 
+    log_id: typing_extensions.NotRequired[str]
+    """
+    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    """
+
     id: str
     """
     Unique identifier for the Log.

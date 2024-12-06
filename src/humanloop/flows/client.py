@@ -154,7 +154,7 @@ class FlowsClient:
             Whether the request/response payloads will be stored on Humanloop.
 
         log_id : typing.Optional[str]
-            The identifier for the Log. If not specified, a default ID will be generated. This allows additional Logs to be appended to the trace without waiting for Humanloop to return an ID.
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
         flow : typing.Optional[FlowKernelRequestParams]
             Flow used to generate the Trace.
@@ -707,6 +707,8 @@ class FlowsClient:
 
         Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
         Inputs and output (or error) must be provided in order to mark it as complete.
+
+        The end_time log attribute will be set to match the time the log is marked as complete.
 
         Parameters
         ----------
@@ -1384,7 +1386,7 @@ class AsyncFlowsClient:
             Whether the request/response payloads will be stored on Humanloop.
 
         log_id : typing.Optional[str]
-            The identifier for the Log. If not specified, a default ID will be generated. This allows additional Logs to be appended to the trace without waiting for Humanloop to return an ID.
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
         flow : typing.Optional[FlowKernelRequestParams]
             Flow used to generate the Trace.
@@ -1984,6 +1986,8 @@ class AsyncFlowsClient:
 
         Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
         Inputs and output (or error) must be provided in order to mark it as complete.
+
+        The end_time log attribute will be set to match the time the log is marked as complete.
 
         Parameters
         ----------

@@ -89,6 +89,7 @@ class PromptsClient:
         user: typing.Optional[str] = OMIT,
         prompt_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreatePromptLogResponse:
         """
@@ -201,6 +202,9 @@ class PromptsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -291,6 +295,7 @@ class PromptsClient:
                 "user": user,
                 "environment": prompt_log_request_environment,
                 "save": save,
+                "log_id": log_id,
             },
             request_options=request_options,
             omit=OMIT,
@@ -521,6 +526,7 @@ class PromptsClient:
         user: typing.Optional[str] = OMIT,
         prompts_call_stream_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
@@ -599,6 +605,9 @@ class PromptsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
@@ -666,6 +675,7 @@ class PromptsClient:
             user="string",
             prompts_call_stream_request_environment="string",
             save=True,
+            log_id="string",
             provider_api_keys={
                 "openai": "string",
                 "ai_21": "string",
@@ -713,6 +723,7 @@ class PromptsClient:
                 "user": user,
                 "environment": prompts_call_stream_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
                     object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
@@ -776,6 +787,7 @@ class PromptsClient:
         user: typing.Optional[str] = OMIT,
         prompts_call_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
@@ -853,6 +865,9 @@ class PromptsClient:
 
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
+
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
         provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
@@ -944,6 +959,7 @@ class PromptsClient:
                 "user": user,
                 "environment": prompts_call_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
                     object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
@@ -1213,6 +1229,12 @@ class PromptsClient:
             provider="openai",
             max_tokens=-1,
             temperature=0.7,
+            top_p=1.0,
+            presence_penalty=0.0,
+            frequency_penalty=0.0,
+            other={},
+            tools=[],
+            linked_tools=[],
             commit_message="Initial commit",
         )
         """
@@ -1998,6 +2020,7 @@ class AsyncPromptsClient:
         user: typing.Optional[str] = OMIT,
         prompt_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreatePromptLogResponse:
         """
@@ -2110,6 +2133,9 @@ class AsyncPromptsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -2209,6 +2235,7 @@ class AsyncPromptsClient:
                 "user": user,
                 "environment": prompt_log_request_environment,
                 "save": save,
+                "log_id": log_id,
             },
             request_options=request_options,
             omit=OMIT,
@@ -2447,6 +2474,7 @@ class AsyncPromptsClient:
         user: typing.Optional[str] = OMIT,
         prompts_call_stream_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
@@ -2525,6 +2553,9 @@ class AsyncPromptsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
@@ -2596,6 +2627,7 @@ class AsyncPromptsClient:
                 user="string",
                 prompts_call_stream_request_environment="string",
                 save=True,
+                log_id="string",
                 provider_api_keys={
                     "openai": "string",
                     "ai_21": "string",
@@ -2646,6 +2678,7 @@ class AsyncPromptsClient:
                 "user": user,
                 "environment": prompts_call_stream_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
                     object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
@@ -2709,6 +2742,7 @@ class AsyncPromptsClient:
         user: typing.Optional[str] = OMIT,
         prompts_call_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         num_samples: typing.Optional[int] = OMIT,
         return_inputs: typing.Optional[bool] = OMIT,
@@ -2786,6 +2820,9 @@ class AsyncPromptsClient:
 
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
+
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
         provider_api_keys : typing.Optional[ProviderApiKeysParams]
             API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
@@ -2885,6 +2922,7 @@ class AsyncPromptsClient:
                 "user": user,
                 "environment": prompts_call_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "provider_api_keys": convert_and_respect_annotation_metadata(
                     object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
                 ),
@@ -3167,6 +3205,12 @@ class AsyncPromptsClient:
                 provider="openai",
                 max_tokens=-1,
                 temperature=0.7,
+                top_p=1.0,
+                presence_penalty=0.0,
+                frequency_penalty=0.0,
+                other={},
+                tools=[],
+                linked_tools=[],
                 commit_message="Initial commit",
             )
 

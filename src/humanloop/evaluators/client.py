@@ -65,6 +65,7 @@ class EvaluatorsClient:
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         marked_completed: typing.Optional[bool] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
@@ -143,6 +144,9 @@ class EvaluatorsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
 
@@ -198,6 +202,7 @@ class EvaluatorsClient:
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
                 ),
@@ -1148,6 +1153,7 @@ class AsyncEvaluatorsClient:
         user: typing.Optional[str] = OMIT,
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         marked_completed: typing.Optional[bool] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
@@ -1226,6 +1232,9 @@ class AsyncEvaluatorsClient:
         save : typing.Optional[bool]
             Whether the request/response payloads will be stored on Humanloop.
 
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
 
@@ -1289,6 +1298,7 @@ class AsyncEvaluatorsClient:
                 "user": user,
                 "environment": create_evaluator_log_request_environment,
                 "save": save,
+                "log_id": log_id,
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
                 ),
