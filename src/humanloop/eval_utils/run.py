@@ -274,7 +274,7 @@ def run_eval(
     try:
         type_ = typing.cast(FileType, file_.pop("type"))
         logger.info(
-            f"{CYAN}Evaluating your {type_} function corresponding to `{file_['path']}` on Humanloop{RESET} \n\n"
+            f"{CYAN}Evaluating your {type_} function corresponding to `{file_.get('path') or file_.get('id')}` on Humanloop{RESET} \n\n"
         )
     except KeyError as _:
         type_ = "flow"
