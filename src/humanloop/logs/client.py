@@ -196,7 +196,9 @@ class LogsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.logs.delete()
+        client.logs.delete(
+            id="string",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "logs",
@@ -472,7 +474,9 @@ class AsyncLogsClient:
 
 
         async def main() -> None:
-            await client.logs.delete()
+            await client.logs.delete(
+                id="string",
+            )
 
 
         asyncio.run(main())

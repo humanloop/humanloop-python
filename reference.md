@@ -605,6 +605,321 @@ Controls how the model uses tools. The following options are supported:
 </dl>
 </details>
 
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">call_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Call a Prompt.
+
+Calling a Prompt calls the model provider before logging
+the request, responses and metadata to Humanloop.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+
+Instead of targeting an existing version explicitly, you can instead pass in
+Prompt details in the request body. In this case, we will check if the details correspond
+to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+in the case where you are storing or deriving your Prompt details in code.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+import datetime
+
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.prompts.call_stream(
+    version_id="string",
+    environment="string",
+    path="string",
+    id="string",
+    messages=[
+        {
+            "content": "string",
+            "name": "string",
+            "tool_call_id": "string",
+            "role": "user",
+            "tool_calls": [
+                {
+                    "id": "string",
+                    "type": "function",
+                    "function": {"name": "string"},
+                }
+            ],
+        }
+    ],
+    prompt={"model": "string"},
+    inputs={"string": {"key": "value"}},
+    source="string",
+    metadata={"string": {"key": "value"}},
+    start_time=datetime.datetime.fromisoformat(
+        "2024-01-15 09:30:00+00:00",
+    ),
+    end_time=datetime.datetime.fromisoformat(
+        "2024-01-15 09:30:00+00:00",
+    ),
+    source_datapoint_id="string",
+    trace_parent_id="string",
+    user="string",
+    prompts_call_stream_request_environment="string",
+    save=True,
+    log_id="string",
+    provider_api_keys={
+        "openai": "string",
+        "ai_21": "string",
+        "mock": "string",
+        "anthropic": "string",
+        "bedrock": "string",
+        "cohere": "string",
+        "openai_azure": "string",
+        "openai_azure_endpoint": "string",
+    },
+    num_samples=1,
+    return_inputs=True,
+    logprobs=1,
+    suffix="string",
+)
+for chunk in response:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Prompt to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_choice:** `typing.Optional[PromptsCallStreamRequestToolChoiceParams]` 
+
+Controls how the model uses tools. The following options are supported: 
+- `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
+- `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
+- `'required'` means the model can decide to call one or more of the provided tools. 
+- `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt:** `typing.Optional[PromptKernelRequestParams]` — Details of your Prompt. A new Prompt version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompts_call_stream_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_api_keys:** `typing.Optional[ProviderApiKeysParams]` — API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**num_samples:** `typing.Optional[int]` — The number of generations.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**return_inputs:** `typing.Optional[bool]` — Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**logprobs:** `typing.Optional[int]` — Include the log probabilities of the top n tokens in the provider_response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**suffix:** `typing.Optional[str]` — The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">call</a>(...)</code></summary>
 <dl>
 <dd>
@@ -1037,12 +1352,6 @@ client.prompts.upsert(
     provider="openai",
     max_tokens=-1,
     temperature=0.7,
-    top_p=1.0,
-    presence_penalty=0.0,
-    frequency_penalty=0.0,
-    other={},
-    tools=[],
-    linked_tools=[],
     commit_message="Initial commit",
 )
 
@@ -9603,7 +9912,9 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.logs.delete()
+client.logs.delete(
+    id="string",
+)
 
 ```
 </dd>

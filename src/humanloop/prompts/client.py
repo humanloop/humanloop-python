@@ -630,6 +630,69 @@ class PromptsClient:
         ------
         typing.Iterator[PromptCallStreamResponse]
 
+
+        Examples
+        --------
+        import datetime
+
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        response = client.prompts.call_stream(
+            version_id="string",
+            environment="string",
+            path="string",
+            id="string",
+            messages=[
+                {
+                    "content": "string",
+                    "name": "string",
+                    "tool_call_id": "string",
+                    "role": "user",
+                    "tool_calls": [
+                        {
+                            "id": "string",
+                            "type": "function",
+                            "function": {"name": "string"},
+                        }
+                    ],
+                }
+            ],
+            prompt={"model": "string"},
+            inputs={"string": {"key": "value"}},
+            source="string",
+            metadata={"string": {"key": "value"}},
+            start_time=datetime.datetime.fromisoformat(
+                "2024-01-15 09:30:00+00:00",
+            ),
+            end_time=datetime.datetime.fromisoformat(
+                "2024-01-15 09:30:00+00:00",
+            ),
+            source_datapoint_id="string",
+            trace_parent_id="string",
+            user="string",
+            prompts_call_stream_request_environment="string",
+            save=True,
+            log_id="string",
+            provider_api_keys={
+                "openai": "string",
+                "ai_21": "string",
+                "mock": "string",
+                "anthropic": "string",
+                "bedrock": "string",
+                "cohere": "string",
+                "openai_azure": "string",
+                "openai_azure_endpoint": "string",
+            },
+            num_samples=1,
+            return_inputs=True,
+            logprobs=1,
+            suffix="string",
+        )
+        for chunk in response:
+            yield chunk
         """
         with self._client_wrapper.httpx_client.stream(
             "prompts/call",
@@ -1166,12 +1229,6 @@ class PromptsClient:
             provider="openai",
             max_tokens=-1,
             temperature=0.7,
-            top_p=1.0,
-            presence_penalty=0.0,
-            frequency_penalty=0.0,
-            other={},
-            tools=[],
-            linked_tools=[],
             commit_message="Initial commit",
         )
         """
@@ -2515,6 +2572,76 @@ class AsyncPromptsClient:
         ------
         typing.AsyncIterator[PromptCallStreamResponse]
 
+
+        Examples
+        --------
+        import asyncio
+        import datetime
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            response = await client.prompts.call_stream(
+                version_id="string",
+                environment="string",
+                path="string",
+                id="string",
+                messages=[
+                    {
+                        "content": "string",
+                        "name": "string",
+                        "tool_call_id": "string",
+                        "role": "user",
+                        "tool_calls": [
+                            {
+                                "id": "string",
+                                "type": "function",
+                                "function": {"name": "string"},
+                            }
+                        ],
+                    }
+                ],
+                prompt={"model": "string"},
+                inputs={"string": {"key": "value"}},
+                source="string",
+                metadata={"string": {"key": "value"}},
+                start_time=datetime.datetime.fromisoformat(
+                    "2024-01-15 09:30:00+00:00",
+                ),
+                end_time=datetime.datetime.fromisoformat(
+                    "2024-01-15 09:30:00+00:00",
+                ),
+                source_datapoint_id="string",
+                trace_parent_id="string",
+                user="string",
+                prompts_call_stream_request_environment="string",
+                save=True,
+                log_id="string",
+                provider_api_keys={
+                    "openai": "string",
+                    "ai_21": "string",
+                    "mock": "string",
+                    "anthropic": "string",
+                    "bedrock": "string",
+                    "cohere": "string",
+                    "openai_azure": "string",
+                    "openai_azure_endpoint": "string",
+                },
+                num_samples=1,
+                return_inputs=True,
+                logprobs=1,
+                suffix="string",
+            )
+            async for chunk in response:
+                yield chunk
+
+
+        asyncio.run(main())
         """
         async with self._client_wrapper.httpx_client.stream(
             "prompts/call",
@@ -3072,12 +3199,6 @@ class AsyncPromptsClient:
                 provider="openai",
                 max_tokens=-1,
                 temperature=0.7,
-                top_p=1.0,
-                presence_penalty=0.0,
-                frequency_penalty=0.0,
-                other={},
-                tools=[],
-                linked_tools=[],
                 commit_message="Initial commit",
             )
 
