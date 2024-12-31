@@ -82,10 +82,6 @@ def flow(
                     "output": output_stringified,
                     "error": error,
                 }
-                if inputs:
-                    flow_log["inputs"] = inputs
-                if output:
-                    flow_log["output"] = output
 
                 # Write the Flow Log to the Span on HL_LOG_OT_KEY
                 if flow_log:

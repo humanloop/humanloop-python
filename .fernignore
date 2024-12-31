@@ -18,3 +18,7 @@ tests/
 ## CI
 
 .github/workflows/ci.yml
+
+## Config
+
+.gitignore

@@ -1,5 +1,4 @@
 import contextvars
-import copy
 import json
 import logging
 import threading
@@ -70,6 +69,7 @@ class HumanloopSpanExporter(SpanExporter):
         for thread in self._threads:
             thread.start()
             logger.debug("Exporter Thread %s started", thread.ident)
+        self._flow_logs_to_complete: list[str] = []
 
     def export(self, spans: trace.Sequence[ReadableSpan]) -> SpanExportResult:
         def is_evaluated_file(
@@ -133,6 +133,11 @@ class HumanloopSpanExporter(SpanExporter):
         for thread in self._threads:
             thread.join()
             logger.debug("Exporter Thread %s joined", thread.ident)
+        for log_id in self._flow_logs_to_complete:
+            self._client.flows.update_log(
+                log_id=log_id,
+                trace_status="complete",
+            )
 
     def force_flush(self, timeout_millis: int = 3000) -> bool:
         self._shutdown = True
@@ -340,6 +345,7 @@ class HumanloopSpanExporter(SpanExporter):
                 **log_object,
                 trace_parent_id=trace_parent_id,
             )
+            self._flow_logs_to_complete.append(log_response.id)
             self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = log_response.id
         except HumanloopApiError as e:
             logger.error(str(e))

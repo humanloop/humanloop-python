@@ -175,14 +175,14 @@ class Humanloop(BaseHumanloop):
         path: Optional[str] = None,
         **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],  # type: ignore
     ):
-        """Decorator for declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code.
+        """Decorator for declaring a [Prompt](https://humanloop.com/docs/explanation/prompts) in code.
 
         The decorator intercepts calls to LLM provider APIs and creates
         a new Prompt file based on the hyperparameters used in the call.
         If a hyperparameter is specified in the `@prompt` decorator, then
         they override any value intercepted from the LLM provider call.
 
-        If the (Prompt)[https://humanloop.com/docs/explanation/prompts] already exists
+        If the [Prompt](https://humanloop.com/docs/explanation/prompts) already exists
         on the specified path, a new version will be upserted when any of the above change.
 
         Here's an example of declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code:
@@ -200,7 +200,7 @@ class Humanloop(BaseHumanloop):
             ).choices[0].message.content
         ```
 
-        This will create a (Prompt)[https://humanloop.com/docs/explanation/prompts] with the following attributes:
+        This will create a [Prompt](https://humanloop.com/docs/explanation/prompts] with the following attributes:
 
         ```python
         {
@@ -342,9 +342,9 @@ class Humanloop(BaseHumanloop):
     ):
         """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
 
-        A [Flow](https://humanloop.com/docs/explanation/flows) decorator should be added
-        at the entrypoint of your LLM feature. Call other functions decorated with
-        Humanloop SDK decorators to create a Trace of Logs on Humanloop.
+        A [Flow](https://humanloop.com/docs/explanation/flows) wrapped callable should
+        be used as the entrypoint of your LLM feature. Call other functions wrapped with
+        Humanloop decorators to create a trace of Logs on Humanloop.
 
         Here's an example of declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code:
         ```python
