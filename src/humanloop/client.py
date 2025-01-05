@@ -49,7 +49,6 @@ class ExtendedEvalsClient(EvaluationsClient):
         name: Optional[str],
         dataset: Dataset,
         evaluators: Optional[Sequence[Evaluator]] = None,
-        # logs: typing.Sequence[dict] | None = None,
         workers: int = 4,
     ) -> List[EvaluatorCheck]:
         """Evaluate your function for a given `Dataset` and set of `Evaluators`.

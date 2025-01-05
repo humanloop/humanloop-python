@@ -2,6 +2,7 @@ from typing import Optional, TypedDict
 
 from opentelemetry.sdk.trace import TracerProvider
 from typing_extensions import NotRequired
+from opentelemetry.sdk.trace import TracerProvider
 
 from humanloop.otel.helpers import module_is_installed
 
@@ -41,12 +42,3 @@ def instrument_provider(provider: TracerProvider):
         from opentelemetry.instrumentation.bedrock import BedrockInstrumentor
 
         BedrockInstrumentor().instrument(tracer_provider=provider)
-
-
-class FlowContext(TypedDict):
-    trace_id: NotRequired[str]
-    trace_parent_id: NotRequired[Optional[int]]
-    is_flow_log: NotRequired[bool]
-
-
-TRACE_FLOW_CONTEXT: dict[int, FlowContext] = {}

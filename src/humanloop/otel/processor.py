@@ -2,12 +2,16 @@ import logging
 from collections import defaultdict
 from typing import Any
 
-# No typing stubs for parse
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 from pydantic import ValidationError as PydanticValidationError
 
-from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY
+from humanloop.otel.constants import (
+    HUMANLOOP_FILE_KEY,
+    HUMANLOOP_FILE_TYPE_KEY,
+    HUMANLOOP_FLOW_PREREQUISITES_KEY,
+    HUMANLOOP_LOG_KEY,
+)
 from humanloop.otel.helpers import (
     is_humanloop_span,
     is_llm_provider_call,
@@ -40,10 +44,17 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         super().__init__(exporter)
         # Span parent to Span children map
         self._children: dict[int, list] = defaultdict(list)
+        self._prerequisites: dict[int, list[int]] = {}
 
-    # NOTE: Could override on_start and process Flow spans ahead of time
-    # and PATCH the created Logs in on_end. A special type of ReadableSpan could be
-    # used for this
+    def on_start(self, span, parent_context=None):
+        span_id = span.context.span_id
+        if span.name == "humanloop.flow":
+            self._prerequisites[span_id] = []
+        if span.parent and is_humanloop_span(span):
+            parent_span_id = span.parent.span_id
+            for trace_head, all_trace_nodes in self._prerequisites.items():
+                if parent_span_id == trace_head or parent_span_id in all_trace_nodes:
+                    all_trace_nodes.append(span_id)
 
     def on_end(self, span: ReadableSpan) -> None:
         if is_humanloop_span(span=span):
@@ -57,6 +68,12 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
                 # arrives in order to enrich it
                 self._children[span.parent.span_id].append(span)
         # Pass the Span to the Exporter
+        if span.name == "humanloop.flow":
+            write_to_opentelemetry_span(
+                span=span,
+                key=HUMANLOOP_FLOW_PREREQUISITES_KEY,
+                value=self._prerequisites[span.context.span_id],
+            )
         self.span_exporter.export([span])
 
 

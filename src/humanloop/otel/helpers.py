@@ -267,13 +267,7 @@ def is_llm_provider_call(span: ReadableSpan) -> bool:
 
 def is_humanloop_span(span: ReadableSpan) -> bool:
     """Check if the Span was created by the Humanloop SDK."""
-    try:
-        # Valid spans will have keys with the HL_FILE_OT_KEY and HL_LOG_OT_KEY prefixes present
-        read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
-        read_from_opentelemetry_span(span, key=HUMANLOOP_LOG_KEY)
-    except KeyError:
-        return False
-    return True
+    return span.name.startswith("humanloop.")
 
 
 def module_is_installed(module_name: str) -> bool:
@@ -286,10 +280,6 @@ def module_is_installed(module_name: str) -> bool:
     except ImportError:
         return False
     return True
-
-
-def generate_span_id() -> str:
-    return str(uuid.uuid4())
 
 
 def jsonify_if_not_string(func: Callable, output: Any) -> str:

@@ -1229,6 +1229,12 @@ class PromptsClient:
             provider="openai",
             max_tokens=-1,
             temperature=0.7,
+            top_p=1.0,
+            presence_penalty=0.0,
+            frequency_penalty=0.0,
+            other={},
+            tools=[],
+            linked_tools=[],
             commit_message="Initial commit",
         )
         """
@@ -3094,116 +3100,125 @@ class AsyncPromptsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
         """
-        Create a Prompt or update it with a new version if it already exists.
+                Create a Prompt or update it with a new version if it already exists.
 
-        Prompts are identified by the `ID` or their `path`. The parameters (i.e. the prompt template, temperature, model etc.) determine the versions of the Prompt.
+                Prompts are identified by the `ID` or their `path`. The parameters (i.e. the prompt template, temperature, model etc.) determine the versions of the Prompt.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+                If you provide a commit message, then the new version will be committed;
+                otherwise it will be uncommitted. If you try to commit an already committed version,
+                an exception will be raised.
 
-        Parameters
-        ----------
-        model : str
-            The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
+                Parameters
+                ----------
+                model : str
+                    The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
 
-        path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Prompt.
+                id : typing.Optional[str]
+                    ID for an existing Prompt.
 
-        endpoint : typing.Optional[ModelEndpoints]
-            The provider model endpoint used.
+                endpoint : typing.Optional[ModelEndpoints]
+                    The provider model endpoint used.
 
-        template : typing.Optional[PromptRequestTemplateParams]
-            The template contains the main structure and instructions for the model, including input variables for dynamic values.
+                template : typing.Optional[PromptRequestTemplateParams]
+                    The template contains the main structure and instructions for the model, including input variables for dynamic values.
 
-            For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
-            For completion models, provide a prompt template as a string.
+                    For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+                    For completion models, provide a prompt template as a string.
 
-            Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
+                    Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
 
-        provider : typing.Optional[ModelProviders]
-            The company providing the underlying model service.
+                provider : typing.Optional[ModelProviders]
+                    The company providing the underlying model service.
 
-        max_tokens : typing.Optional[int]
-            The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
+                max_tokens : typing.Optional[int]
+                    The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
 
-        temperature : typing.Optional[float]
-            What sampling temperature to use when making a generation. Higher values means the model will be more creative.
+                temperature : typing.Optional[float]
+                    What sampling temperature to use when making a generation. Higher values means the model will be more creative.
 
-        top_p : typing.Optional[float]
-            An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
+                top_p : typing.Optional[float]
+                    An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
 
-        stop : typing.Optional[PromptRequestStopParams]
-            The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
+                stop : typing.Optional[PromptRequestStopParams]
+                    The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
 
-        presence_penalty : typing.Optional[float]
-            Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
+                presence_penalty : typing.Optional[float]
+                    Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
 
-        frequency_penalty : typing.Optional[float]
-            Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
+                frequency_penalty : typing.Optional[float]
+                    Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
 
-        other : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Other parameter values to be passed to the provider call.
+                other : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Other parameter values to be passed to the provider call.
 
-        seed : typing.Optional[int]
-            If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+                seed : typing.Optional[int]
+                    If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
 
-        response_format : typing.Optional[ResponseFormatParams]
-            The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
+                response_format : typing.Optional[ResponseFormatParams]
+                    The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
-            The tool specification that the model can choose to call if Tool calling is supported.
+                tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
+                    The tool specification that the model can choose to call if Tool calling is supported.
 
-        linked_tools : typing.Optional[typing.Sequence[str]]
-            The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
+                linked_tools : typing.Optional[typing.Sequence[str]]
+                    The IDs of the Tools in your organization that the model can choose to call if Tool calling is supported. The default deployed version of that tool is called.
 
-        attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
+                attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
+                commit_message : typing.Optional[str]
+                    Message describing the changes made.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        PromptResponse
-            Successful Response
+                Returns
+                -------
+                PromptResponse
+                    Successful Response
 
-        Examples
-        --------
-        import asyncio
+                Examples
+                --------
+                import asyncio
 
-        from humanloop import AsyncHumanloop
+                from humanloop import AsyncHumanloop
 
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.upsert(
-                path="Personal Projects/Coding Assistant",
-                model="gpt-4o",
-                endpoint="chat",
-                template=[
-                    {
-                        "content": "You are a helpful coding assistant specialising in {{language}}",
-                        "role": "system",
-                    }
-                ],
-                provider="openai",
-                max_tokens=-1,
-                temperature=0.7,
-                commit_message="Initial commit",
-            )
+                client = AsyncHumanloop(
+                    api_key="YOUR_API_KEY",
+                )
 
 
-        asyncio.run(main())
+                async def main() -> None:
+                    await client.prompts.upsert(
+                        path="Personal Projects/Coding Assistant",
+                        model="gpt-4o",
+                        endpoint="chat",
+                        template=[
+                            {
+                                "content": "You are a helpful coding assistant specialising in {{language}}",
+                                "role": "system",
+                            }
+                        ],
+                        provider="openai",
+                        max_tokens=-1,
+                        temperature=0.7,
+        <<<<<<< HEAD
+        =======
+                        top_p=1.0,
+                        presence_penalty=0.0,
+                        frequency_penalty=0.0,
+                        other={},
+                        tools=[],
+                        linked_tools=[],
+        >>>>>>> 0799123 (draft)
+                        commit_message="Initial commit",
+                    )
+
+
+                asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
             "prompts",
