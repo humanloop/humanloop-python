@@ -108,8 +108,9 @@ class HumanloopSpanExporter(SpanExporter):
                         ),
                     )
                     logger.debug(
-                        "Span %s with EvaluationContext %s added to upload queue",
-                        span.attributes,
+                        "[HumanloopSpanExporter] Span %s %s with EvaluationContext %s added to upload queue",
+                        span.context.span_id,
+                        span.name,
                         evaluation_context_copy,
                     )
             # Reset the EvaluationContext so run eval does not
@@ -119,7 +120,7 @@ class HumanloopSpanExporter(SpanExporter):
                 evaluation_context,
             ):
                 logger.debug(
-                    "EvaluationContext %s marked as exhausted for Log in Span %s",
+                    "[HumanloopSpanExporter] EvaluationContext %s marked as exhausted for Log in Span %s",
                     evaluation_context,
                     spans[0].attributes,
                 )
@@ -127,16 +128,16 @@ class HumanloopSpanExporter(SpanExporter):
                 self._client.evaluation_context_variable.set(None)
             return SpanExportResult.SUCCESS
         else:
-            logger.warning("HumanloopSpanExporter is shutting down, not accepting new spans")
+            logger.warning("[HumanloopSpanExporter] Shutting down, not accepting new spans")
             return SpanExportResult.FAILURE
 
     def shutdown(self) -> None:
         self._shutdown = True
         for thread in self._threads:
             thread.join()
-            logger.debug("Exporter Thread %s joined", thread.ident)
+            logger.debug("[HumanloopSpanExporter] Exporter Thread %s joined", thread.ident)
 
-    def force_flush(self, timeout_millis: int = 3000) -> bool:
+    def force_flush(self, timeout_millis: int = 10000) -> bool:
         self._shutdown = True
         for thread in self._threads:
             thread.join(timeout=timeout_millis)
@@ -179,14 +180,20 @@ class HumanloopSpanExporter(SpanExporter):
                 # Span is not part of a Flow Log
                 self._export_span_dispatch(span_to_export)
                 logger.debug(
-                    "_do_work on Thread %s: Starting to upload span %s",
+                    "[HumanloopSpanExporter] _do_work on Thread %s: Dispatching span %s %s",
                     threading.get_ident(),
-                    span_to_export,
+                    span_to_export.context.span_id,
+                    span_to_export.name,
                 )
             elif span_to_export.parent.span_id in self._span_id_to_uploaded_log_id:
                 # Span is part of a Flow and its parent has been uploaded
                 self._export_span_dispatch(span_to_export)
-                logger.debug("_do_work on Thread %s: Starting to upload span %s", threading.get_ident(), span_to_export)
+                logger.debug(
+                    "[HumanloopSpanExporter] _do_work on Thread %s: Dispatching span %s %s",
+                    threading.get_ident(),
+                    span_to_export.context.span_id,
+                    span_to_export.name,
+                )
             else:
                 # Requeue the Span and upload after its parent
                 self._upload_queue.put((span_to_export, evaluation_context))
@@ -200,7 +207,7 @@ class HumanloopSpanExporter(SpanExporter):
                     # All logs in the Trace have been uploaded, mark the Flow Log as complete
                     flow_log_id = self._span_id_to_uploaded_log_id[flow_log_span_id]
                     self._client.flows.update_log(log_id=flow_log_id, trace_status="complete")
-            break
+                break
 
     def _export_span_dispatch(self, span: ReadableSpan) -> None:
         hl_file = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
@@ -208,7 +215,19 @@ class HumanloopSpanExporter(SpanExporter):
         parent_span_id = span.parent.span_id if span.parent else None
 
         while parent_span_id and self._span_id_to_uploaded_log_id.get(parent_span_id) is None:
+            logger.debug(
+                "[HumanloopSpanExporter] Span %s %s waiting for parent %s to be uploaded",
+                span.context.span_id,
+                span.name,
+                parent_span_id,
+            )
             time.sleep(0.1)
+
+        logger.debug(
+            "[HumanloopSpanExporter] Exporting span %s with file type %s",
+            span,
+            file_type,
+        )
 
         if file_type == "prompt":
             export_func = self._export_prompt

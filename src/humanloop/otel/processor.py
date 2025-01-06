@@ -1,6 +1,8 @@
+from concurrent.futures import ThreadPoolExecutor
 import logging
 from collections import defaultdict
-from typing import Any
+import time
+from typing import Any, TypedDict
 
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
@@ -23,6 +25,11 @@ from humanloop.types.prompt_kernel_request import PromptKernelRequest
 logger = logging.getLogger("humanloop.sdk")
 
 
+class CompletableSpan(TypedDict):
+    span: ReadableSpan
+    complete: bool
+
+
 class HumanloopSpanProcessor(SimpleSpanProcessor):
     """Enrich Humanloop spans with data from their children spans.
 
@@ -42,43 +49,93 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
 
     def __init__(self, exporter: SpanExporter) -> None:
         super().__init__(exporter)
-        # Span parent to Span children map
-        self._children: dict[int, list] = defaultdict(list)
+        # span parent to span children map
+        self._children: dict[int, list[CompletableSpan]] = defaultdict(list)
+        # List of all span IDs that are contained in a Flow trace
+        # They are passed to the Exporter as a span attribute
+        # so the Exporter knows when to complete a trace
         self._prerequisites: dict[int, list[int]] = {}
+        self._executor = ThreadPoolExecutor(max_workers=4)
+
+    def shutdown(self):
+        self._executor.shutdown()
+        return super().shutdown()
 
     def on_start(self, span, parent_context=None):
         span_id = span.context.span_id
+        parent_span_id = span.parent.span_id if span.parent else None
         if span.name == "humanloop.flow":
             self._prerequisites[span_id] = []
-        if span.parent and is_humanloop_span(span):
-            parent_span_id = span.parent.span_id
+        if parent_span_id and is_humanloop_span(span):
             for trace_head, all_trace_nodes in self._prerequisites.items():
                 if parent_span_id == trace_head or parent_span_id in all_trace_nodes:
                     all_trace_nodes.append(span_id)
+                    break
+        # Handle stream case: when Prompt instrumented function calls a provider with streaming: true
+        # The instrumentor span will end only when the ChunksResponse is consumed, which can happen
+        # after the span created by the Prompt utility finishes. To handle this, we register all instrumentor
+        # spans belonging to a Humanloop span, and their parent will wait for them to complete in onEnd before
+        # exporting the Humanloop span.
+        if parent_span_id and _is_instrumentor_span(span):
+            if parent_span_id not in self._children:
+                self._children[parent_span_id] = []
+            self._children[parent_span_id].append(
+                {
+                    "span": span,
+                    "complete": False,
+                }
+            )
 
     def on_end(self, span: ReadableSpan) -> None:
         if is_humanloop_span(span=span):
-            _process_span_dispatch(span, self._children[span.context.span_id])
-            # Release the reference to the Spans as they've already
-            # been sent to the Exporter
-            del self._children[span.context.span_id]
+            # Wait for children to complete asynchronously
+            self._executor.submit(self._wait_for_children, span=span)
+        elif span.parent is not None and _is_instrumentor_span(span):
+            # If this is one of the children spans waited upon, update its completion status
+
+            # Updating the child span status
+            self._children[span.parent.span_id] = [
+                child if child["span"].context.span_id != span.context.span_id else {"span": span, "complete": True}
+                for child in self._children[span.parent.span_id]
+            ]
+
+            # Export the instrumentor span
+            self.span_exporter.export([span])
         else:
-            if span.parent is not None and _is_instrumentor_span(span):
-                # Copy the Span and keep it until the Humanloop Span
-                # arrives in order to enrich it
-                self._children[span.parent.span_id].append(span)
-        # Pass the Span to the Exporter
+            # Unknown span, pass it to the Exporter
+            self.span_exporter.export([span])
+
+    def _wait_for_children(self, span: ReadableSpan):
+        """Wait for all children spans to complete before processing the Humanloop span."""
+        span_id = span.context.span_id
+        while not all(child["complete"] for child in self._children[span_id]):
+            logger.debug(
+                "[HumanloopSpanProcessor] Span %s %s waiting for children to complete: %s",
+                span_id,
+                span.name,
+                self._children[span_id],
+            )
+            time.sleep(0.1)
+        # All instrumentor spans have arrived, we can process the
+        # Humanloop parent span owning them
         if span.name == "humanloop.flow":
             write_to_opentelemetry_span(
                 span=span,
                 key=HUMANLOOP_FLOW_PREREQUISITES_KEY,
-                value=self._prerequisites[span.context.span_id],
+                value=self._prerequisites[span_id],
             )
+            del self._prerequisites[span_id]
+        logger.debug("[HumanloopSpanProcessor] Dispatching span %s %s", span_id, span.name)
+        _process_span_dispatch(span, [child["span"] for child in self._children[span_id]])
+        # Release references
+        del self._children[span_id]
+        # Pass Humanloop span to Exporter
+        logger.debug("[HumanloopSpanProcessor] Sending span %s %s to exporter", span_id, span.name)
         self.span_exporter.export([span])
 
 
 def _is_instrumentor_span(span: ReadableSpan) -> bool:
-    """Determine if the Span contains information of interest for Spans created by Humanloop decorators."""
+    """Determine if the span contains information of interest for Spans created by Humanloop decorators."""
     # At the moment we only enrich Spans created by the Prompt decorators
     # As we add Instrumentors for other libraries, this function must
     # be expanded
@@ -104,7 +161,11 @@ def _process_span_dispatch(span: ReadableSpan, children_spans: list[ReadableSpan
     elif file_type == "flow":
         pass
     else:
-        logger.error("Unknown Humanloop File Span %s", span)
+        logger.error(
+            "[HumanloopSpanProcessor] Unknown Humanloop File span %s %s",
+            span.context.span_id,
+            span.name,
+        )
 
 
 def _process_prompt(prompt_span: ReadableSpan, children_spans: list[ReadableSpan]):
@@ -150,9 +211,14 @@ def _enrich_prompt_kernel(prompt_span: ReadableSpan, llm_provider_call_span: Rea
         # Validate the Prompt Kernel
         PromptKernelRequest.model_validate(obj=prompt)
     except PydanticValidationError as e:
-        logger.error("Could not validate Prompt Kernel extracted from Span: %s", e)
+        logger.error(
+            "[HumanloopSpanProcessor] Could not validate Prompt Kernel extracted from span: %s %s. Error: %s",
+            prompt_span.context.span_id,
+            prompt_span.name,
+            e,
+        )
 
-    # Write the enriched Prompt Kernel back to the Span
+    # Write the enriched Prompt Kernel back to the span
     hl_file["prompt"] = prompt
     write_to_opentelemetry_span(
         span=prompt_span,
