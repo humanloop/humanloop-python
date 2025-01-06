@@ -84,11 +84,15 @@ def test_decorators_without_flow(
         ]
     )
     # WHEN exporting the spans
+    # Wait for the prompt span to be exported; It was waiting
+    # on the OpenAI call span to finish first
+    time.sleep(1)
     spans = exporter.get_finished_spans()
     # THEN 3 spans arrive at the exporter in the following order:
     #   0. Intercepted OpenAI call, which is ignored by the exporter
     #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
     #   2. Prompt Span
+    print("WOW", [span.name for span in spans])
     assert len(spans) == 3
     assert read_from_opentelemetry_span(
         span=spans[1],
@@ -145,6 +149,10 @@ def test_flow_decorator_flow_in_flow(
 
     # WHEN Calling the _test_flow_in_flow function with specific messages
     _flow_over_flow(call_llm_messages)
+
+    # Wait for the Prompt span to be exported; It was asynchronously waiting
+    # on the OpenAI call span to finish first
+    time.sleep(1)
 
     # THEN 5 spans are arrive at the exporter in the following order:
     #   0. Intercepted OpenAI call, which is ignored by the exporter

@@ -1,4 +1,5 @@
 import os
+import time
 from typing import Optional
 
 import cohere
@@ -158,6 +159,11 @@ def test_prompt_decorator(
         model=model,
         messages=call_llm_messages,
     )
+
+    # Wait for the Prompt span to be exported, it is waiting
+    # asynchronously for the LLM provider call span to finish
+    time.sleep(1)
+
     # THEN two spans are created: one for the OpenAI LLM provider call and one for the Prompt
     spans = exporter.get_finished_spans()
     assert len(spans) == 2
@@ -189,7 +195,13 @@ def test_prompt_decorator_with_hl_processor(
         model=model,
         messages=call_llm_messages,
     )
+
     # THEN two spans are created: one for the OpenAI LLM provider call and one for the Prompt
+
+    # Wait for the Prompt span to be exported, it is waiting
+    # asynchronously for the LLM provider call span to finish
+    time.sleep(1)
+
     spans = exporter.get_finished_spans()
     assert len(spans) == 2
     assert not is_humanloop_span(span=spans[0])
@@ -237,6 +249,11 @@ def test_prompt_decorator_with_defaults(
         model=model,
         messages=call_llm_messages,
     )
+
+    # Wait for the Prompt span to be exported, it is waiting
+    # asynchronously for the LLM provider call span to finish
+    time.sleep(1)
+
     spans = exporter.get_finished_spans()
     # THEN the Prompt span is enhanced with information and forms a correct PromptKernel
     prompt = PromptKernelRequest.model_validate(
@@ -288,6 +305,10 @@ def test_prompt_attributes(
         model="gpt-4o",
         messages=call_llm_messages,
     )
+
+    # Wait for the Prompt span to be exported, it is waiting
+    # asynchronously for the LLM provider call span to finish
+    time.sleep(1)
 
     assert len(exporter.get_finished_spans()) == 2
 

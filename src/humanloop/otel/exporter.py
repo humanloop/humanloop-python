@@ -206,7 +206,13 @@ class HumanloopSpanExporter(SpanExporter):
                 if len(flow_children_span_ids) == 0:
                     # All logs in the Trace have been uploaded, mark the Flow Log as complete
                     flow_log_id = self._span_id_to_uploaded_log_id[flow_log_span_id]
-                    self._client.flows.update_log(log_id=flow_log_id, trace_status="complete")
+                    if flow_log_id is None:
+                        logger.error(
+                            "[HumanloopSpanExporter] Cannot complete Flow log %s, log ID is None",
+                            flow_log_span_id,
+                        )
+                    else:
+                        self._client.flows.update_log(log_id=flow_log_id, trace_status="complete")
                 break
 
     def _export_span_dispatch(self, span: ReadableSpan) -> None:
@@ -324,11 +330,14 @@ class HumanloopSpanExporter(SpanExporter):
             key=HUMANLOOP_LOG_KEY,
         )
         # Spans that must be uploaded before the Flow Span is completed
-        prerequisites = read_from_opentelemetry_span(
-            span=span,
-            key=HUMANLOOP_FLOW_PREREQUISITES_KEY,
-        )
-        self._flow_log_prerequisites[span.context.span_id] = set(prerequisites)
+        try:
+            prerequisites: list[int] = read_from_opentelemetry_span(  # type: ignore
+                span=span,
+                key=HUMANLOOP_FLOW_PREREQUISITES_KEY,
+            )
+            self._flow_log_prerequisites[span.context.span_id] = set(prerequisites)
+        except KeyError:
+            self._flow_log_prerequisites[span.context.span_id] = set()
 
         path: str = file_object["path"]
         flow: FlowKernelRequestParams

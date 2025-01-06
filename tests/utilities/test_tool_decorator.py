@@ -1,4 +1,5 @@
 import sys
+import time
 from typing import Any, Optional, TypedDict, Union
 
 import pytest
@@ -449,6 +450,9 @@ def test_tool_as_higher_order_function(
 
     higher_order_fn_tool(operation="add", num1=1, num2=2)
     calculator(operation="add", num1=1, num2=2)
+
+    # Processor handles HL spans asynchronously, wait for them
+    time.sleep(1)
 
     assert len(spans := exporter.get_finished_spans()) == 2
 
