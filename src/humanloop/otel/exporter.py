@@ -14,7 +14,6 @@ from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
 from humanloop.core import ApiError as HumanloopApiError
 from humanloop.eval_utils.context import EVALUATION_CONTEXT_VARIABLE_NAME, EvaluationContext
-from humanloop.otel import TRACE_FLOW_CONTEXT
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
@@ -176,36 +175,20 @@ class HumanloopSpanExporter(SpanExporter):
                 self._client.evaluation_context_variable.set(evaluation_context)
             except EmptyQueue:
                 continue
-            trace_metadata = TRACE_FLOW_CONTEXT.get(span_to_export.get_span_context().span_id)
-            if trace_metadata is None:
+            if span_to_export.parent is None:
                 # Span is not part of a Flow Log
                 self._export_span_dispatch(span_to_export)
                 logger.debug(
-                    "_do_work on Thread %s: Dispatched span %s with FlowContext %s which is not part of a Flow",
+                    "_do_work on Thread %s: Starting to upload span %s",
                     threading.get_ident(),
-                    span_to_export.attributes,
-                    trace_metadata,
+                    span_to_export,
                 )
-            elif trace_metadata["trace_parent_id"] is None:
-                # Span is the head of a Flow Trace
-                self._export_span_dispatch(span_to_export)
-                logger.debug(
-                    "Dispatched span %s which is a Flow Log with FlowContext %s",
-                    span_to_export.attributes,
-                    trace_metadata,
-                )
-            elif trace_metadata["trace_parent_id"] in self._span_id_to_uploaded_log_id:
+            elif span_to_export.parent.span_id in self._span_id_to_uploaded_log_id:
                 # Span is part of a Flow and its parent has been uploaded
                 self._export_span_dispatch(span_to_export)
-                logger.debug(
-                    "_do_work on Thread %s: Dispatched span %s after its parent %s with FlowContext %s",
-                    threading.get_ident(),
-                    span_to_export.attributes,
-                    trace_metadata["trace_parent_id"],
-                    trace_metadata,
-                )
+                logger.debug("_do_work on Thread %s: Starting to upload span %s", threading.get_ident(), span_to_export)
             else:
-                # Requeue the Span to be uploaded later
+                # Requeue the Span and upload after its parent
                 self._upload_queue.put((span_to_export, evaluation_context))
             self._upload_queue.task_done()
 
@@ -214,6 +197,7 @@ class HumanloopSpanExporter(SpanExporter):
             if span_id in flow_children_span_ids:
                 flow_children_span_ids.remove(span_id)
                 if len(flow_children_span_ids) == 0:
+                    # All logs in the Trace have been uploaded, mark the Flow Log as complete
                     flow_log_id = self._span_id_to_uploaded_log_id[flow_log_span_id]
                     self._client.flows.update_log(log_id=flow_log_id, trace_status="complete")
             break
@@ -346,7 +330,6 @@ class HumanloopSpanExporter(SpanExporter):
                 **log_object,
                 trace_parent_id=trace_parent_id,
             )
-            self._flow_logs_to_complete.append(log_response.id)
             self._span_id_to_uploaded_log_id[span.get_span_context().span_id] = log_response.id
         except HumanloopApiError as e:
             logger.error(str(e))

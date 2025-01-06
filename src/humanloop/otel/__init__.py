@@ -1,7 +1,3 @@
-from typing import Optional, TypedDict
-
-from opentelemetry.sdk.trace import TracerProvider
-from typing_extensions import NotRequired
 from opentelemetry.sdk.trace import TracerProvider
 
 from humanloop.otel.helpers import module_is_installed

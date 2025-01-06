@@ -11,7 +11,7 @@ from anthropic.types.message_param import MessageParam
 from dotenv import load_dotenv
 from groq import Groq
 from groq import NotFoundError as GroqNotFoundError
-from humanloop.decorators.prompt import prompt
+from humanloop.utilities.prompt import prompt
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.types.model_providers import ModelProviders

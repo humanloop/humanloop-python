@@ -2,7 +2,7 @@ import sys
 from typing import Any, Optional, TypedDict, Union
 
 import pytest
-from humanloop.decorators.tool import tool
+from humanloop.utilities.tool import tool
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_LOG_KEY
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from jsonschema.protocols import Validator
