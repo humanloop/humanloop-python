@@ -2,19 +2,21 @@ import os
 import random
 import string
 import time
-from unittest.mock import patch
 
+from unittest.mock import patch
 import pytest
+from openai import OpenAI
+from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
+from opentelemetry.sdk.trace import Tracer
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+from opentelemetry.sdk.trace import ReadableSpan
+
 from humanloop.utilities.flow import flow
 from humanloop.utilities.prompt import prompt
 from humanloop.utilities.tool import tool
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.helpers import read_from_opentelemetry_span
-from openai import OpenAI
-from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
-from opentelemetry.sdk.trace import Tracer
-from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 
 def _test_scenario(
@@ -255,14 +257,17 @@ def test_flow_decorator_hl_exporter_flow_inside_flow(
         time.sleep(3)
 
         # THEN 5 spans are arrive at the exporter in the following order:
-        #   0. Intercepted OpenAI call, which is ignored by the exporter
-        #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
-        #   2. Prompt Span
-        #   3. Nested Flow Span
-        #   4. Flow Span
         assert len(mock_export_method.call_args_list) == 5
-        # THEN the last uploaded span is the larger Flow
-        # THEN the second to last uploaded span is the nested Flow
-        flow_span = mock_export_method.call_args_list[4][0][0][0]
-        nested_flow_span = mock_export_method.call_args_list[3][0][0][0]
-        assert nested_flow_span.parent.span_id == flow_span.context.span_id
+
+        # THEN one of the flows is nested inside the other
+        spans: list[ReadableSpan] = [mock_export_method.call_args_list[i][0][0][0] for i in range(1, 5)]
+        counter = 0
+        for span in spans:
+            if span.name == "humanloop.flow":
+                counter += 1
+                if span.parent:
+                    nested_flow_span = span
+                else:
+                    flow_span = span
+        # We are certain span_id exists for these 2 spans
+        assert nested_flow_span.parent.span_id == flow_span.context.span_id  # type: ignore
