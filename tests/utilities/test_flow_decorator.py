@@ -94,7 +94,6 @@ def test_decorators_without_flow(
     #   0. Intercepted OpenAI call, which is ignored by the exporter
     #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
     #   2. Prompt Span
-    print("WOW", [span.name for span in spans])
     assert len(spans) == 3
     assert read_from_opentelemetry_span(
         span=spans[1],
