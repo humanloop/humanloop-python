@@ -133,7 +133,7 @@ def test_decorators_with_flow_decorator(
     )
 
     # THEN 4 spans arrive at the exporter:
-    spans: list[ReadableSpan] = exporter.get_finished_spans()
+    spans: tuple[ReadableSpan] = exporter.get_finished_spans()
     assert len(spans) == 4
 
     for i in range(4):
@@ -167,7 +167,7 @@ def test_flow_decorator_flow_in_flow(
     time.sleep(1)
 
     # THEN 5 spans arrive at the exporter
-    spans: list[ReadableSpan] = exporter.get_finished_spans()
+    spans: tuple[ReadableSpan] = exporter.get_finished_spans()
     assert len(spans) == 5
 
     for i in range(5):
