@@ -199,7 +199,7 @@ class HumanloopSpanExporter(SpanExporter):
                 self._upload_queue.put((span_to_export, evaluation_context))
             self._upload_queue.task_done()
 
-    def _complete_flow_log(self, span_id: int) -> None:
+    def _mark_span_completed(self, span_id: int) -> None:
         for flow_log_span_id, flow_children_span_ids in self._flow_log_prerequisites.items():
             if span_id in flow_children_span_ids:
                 flow_children_span_ids.remove(span_id)
@@ -282,7 +282,7 @@ class HumanloopSpanExporter(SpanExporter):
             self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
         except HumanloopApiError:
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
-        self._complete_flow_log(span_id=span.context.span_id)
+        self._mark_span_completed(span_id=span.context.span_id)
 
     def _export_tool(self, span: ReadableSpan) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(
@@ -318,7 +318,7 @@ class HumanloopSpanExporter(SpanExporter):
             self._span_id_to_uploaded_log_id[span.context.span_id] = log_response.id
         except HumanloopApiError:
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
-        self._complete_flow_log(span_id=span.context.span_id)
+        self._mark_span_completed(span_id=span.context.span_id)
 
     def _export_flow(self, span: ReadableSpan) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(
@@ -362,4 +362,4 @@ class HumanloopSpanExporter(SpanExporter):
         except HumanloopApiError as e:
             logger.error(str(e))
             self._span_id_to_uploaded_log_id[span.context.span_id] = None
-        self._complete_flow_log(span_id=span.context.span_id)
+        self._mark_span_completed(span_id=span.context.span_id)
