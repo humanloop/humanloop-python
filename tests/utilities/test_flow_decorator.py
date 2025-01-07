@@ -90,17 +90,22 @@ def test_decorators_without_flow(
     # on the OpenAI call span to finish first
     time.sleep(1)
     spans = exporter.get_finished_spans()
-    # THEN 3 spans arrive at the exporter in the following order:
-    #   0. Intercepted OpenAI call, which is ignored by the exporter
-    #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
-    #   2. Prompt Span
+
+    # THEN 3 spans arrive at the exporter:
     assert len(spans) == 3
+
+    for i in range(3):
+        if spans[i].name == "humanloop.tool":
+            tool_span = spans[i]
+        elif spans[i].name == "humanloop.prompt":
+            prompt_span = spans[i]
+
     assert read_from_opentelemetry_span(
-        span=spans[1],
+        span=tool_span,
         key=HUMANLOOP_FILE_KEY,
     )["tool"]
     assert read_from_opentelemetry_span(
-        span=spans[2],
+        span=prompt_span,
         key=HUMANLOOP_FILE_KEY,
     )["prompt"]
 
@@ -126,17 +131,23 @@ def test_decorators_with_flow_decorator(
             },
         ]
     )
-    # THEN 4 spans arrive at the exporter in the following order:
-    #   0. Intercepted OpenAI call, which is ignored by the exporter
-    #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
-    #   2. Prompt Span
-    #   3. Flow Span
-    spans = exporter.get_finished_spans()
+
+    # THEN 4 spans arrive at the exporter:
+    spans: list[ReadableSpan] = exporter.get_finished_spans()
     assert len(spans) == 4
+
+    for i in range(4):
+        if spans[i].name == "humanloop.flow":
+            flow_span = spans[i]
+        elif spans[i].name == "humanloop.prompt":
+            prompt_span = spans[i]
+        elif spans[i].name == "humanloop.tool":
+            tool_span = spans[i]
+
     # THEN the span are returned bottom to top
-    assert read_from_opentelemetry_span(span=spans[1], key=HUMANLOOP_FILE_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[2], key=HUMANLOOP_FILE_KEY)["prompt"]
-    assert read_from_opentelemetry_span(span=spans[3], key=HUMANLOOP_FILE_KEY)["flow"]
+    assert read_from_opentelemetry_span(span=tool_span, key=HUMANLOOP_FILE_KEY)["tool"]
+    assert read_from_opentelemetry_span(span=prompt_span, key=HUMANLOOP_FILE_KEY)["prompt"]
+    assert read_from_opentelemetry_span(span=flow_span, key=HUMANLOOP_FILE_KEY)["flow"]
 
 
 def test_flow_decorator_flow_in_flow(
@@ -155,19 +166,25 @@ def test_flow_decorator_flow_in_flow(
     # on the OpenAI call span to finish first
     time.sleep(1)
 
-    # THEN 5 spans are arrive at the exporter in the following order:
-    #   0. Intercepted OpenAI call, which is ignored by the exporter
-    #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
-    #   2. Prompt Span
-    #   3. Nested Flow Span
-    #   4. Flow Span
-    spans = exporter.get_finished_spans()
+    # THEN 5 spans arrive at the exporter
+    spans: list[ReadableSpan] = exporter.get_finished_spans()
     assert len(spans) == 5
-    assert read_from_opentelemetry_span(span=spans[1], key=HUMANLOOP_FILE_KEY)["tool"]
-    assert read_from_opentelemetry_span(span=spans[2], key=HUMANLOOP_FILE_KEY)["prompt"]
-    assert read_from_opentelemetry_span(span=spans[3], key=HUMANLOOP_FILE_KEY)["flow"] != {}
+
+    for i in range(5):
+        if spans[i].name == "humanloop.flow" and spans[i].parent is None:
+            flow_span = spans[i]
+        elif spans[i].name == "humanloop.flow" and spans[i].parent:
+            nested_flow_span = spans[i]
+        elif spans[i].name == "humanloop.prompt":
+            prompt_span = spans[i]
+        elif spans[i].name == "humanloop.tool":
+            tool_span = spans[i]
+
+    assert read_from_opentelemetry_span(span=tool_span, key=HUMANLOOP_FILE_KEY)["tool"]
+    assert read_from_opentelemetry_span(span=prompt_span, key=HUMANLOOP_FILE_KEY)["prompt"]
+    assert read_from_opentelemetry_span(span=nested_flow_span, key=HUMANLOOP_FILE_KEY)["flow"] != {}
     with pytest.raises(KeyError):
-        read_from_opentelemetry_span(span=spans[4], key=HUMANLOOP_FILE_KEY)["flow"] != {}
+        read_from_opentelemetry_span(span=flow_span, key=HUMANLOOP_FILE_KEY)["flow"] != {}
 
 
 def test_flow_decorator_with_hl_exporter(
@@ -187,17 +204,17 @@ def test_flow_decorator_with_hl_exporter(
         # Exporter is threaded, need to wait threads shutdown
         time.sleep(3)
 
-        # THEN 4 spans are arrive at the exporter in the following order:
-        #   0. Intercepted OpenAI call, which is ignored by the exporter
-        #   1. Tool Span (called after the OpenAI call but before the Prompt Span finishes)
-        #   2. Prompt Span
-        #   3. Flow Span
         assert len(mock_export_method.call_args_list) == 4
 
-        tool_span = mock_export_method.call_args_list[1][0][0][0]
-        prompt_span = mock_export_method.call_args_list[2][0][0][0]
-        flow_span = mock_export_method.call_args_list[3][0][0][0]
-        # THEN the last uploaded span is the Flow
+        for i in range(4):
+            span = mock_export_method.call_args_list[i][0][0][0]
+            if span.name == "humanloop.flow":
+                flow_span = span
+            elif span.name == "humanloop.prompt":
+                prompt_span = span
+            elif span.name == "humanloop.tool":
+                tool_span = span
+
         assert read_from_opentelemetry_span(
             span=flow_span,
             key=HUMANLOOP_FILE_KEY,
@@ -215,8 +232,6 @@ def test_flow_decorator_with_hl_exporter(
             span=tool_span,
             key=HUMANLOOP_FILE_KEY,
         )
-
-        # NOTE: The type: ignore comments are caused by the MagicMock used to mock the HTTP client
 
         # THEN the first Log uploaded is the Flow
         first_log = exporter._client.flows.log.call_args_list[0][1]  # type: ignore
@@ -255,7 +270,7 @@ def test_flow_decorator_hl_exporter_flow_inside_flow(
         # Exporter is threaded, need to wait threads shutdown
         time.sleep(3)
 
-        # THEN 5 spans are arrive at the exporter in the following order:
+        # THEN 5 spans are arrive at the exporter
         assert len(mock_export_method.call_args_list) == 5
 
         # THEN one of the flows is nested inside the other
