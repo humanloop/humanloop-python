@@ -212,10 +212,6 @@ class _SimpleProgressBar:
                 sys.stderr.write("\n")
 
 
-# Module-level so it can be shared by threads.
-_PROGRESS_BAR: Optional[_SimpleProgressBar] = None
-
-
 def run_eval(
     client: "BaseHumanloop",
     file: File,
@@ -236,7 +232,6 @@ def run_eval(
     :param workers: the number of threads to process datapoints using your function concurrently.
     :return: per Evaluator checks.
     """
-    global _PROGRESS_BAR
 
     if hasattr(file["callable"], "file"):
         # When the decorator inside `file` is a decorated function,

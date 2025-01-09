@@ -6,12 +6,16 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.decorators.helpers import args_to_inputs
-from humanloop.decorators.types import DecoratorPromptKernelRequestParams
+from humanloop.utilities.helpers import args_to_inputs
+from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils import File
-from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
-from humanloop.otel.helpers import generate_span_id, jsonify_if_not_string, write_to_opentelemetry_span
+from humanloop.otel.constants import (
+    HUMANLOOP_FILE_KEY,
+    HUMANLOOP_FILE_TYPE_KEY,
+    HUMANLOOP_LOG_KEY,
+    HUMANLOOP_PATH_KEY,
+)
+from humanloop.otel.helpers import jsonify_if_not_string, write_to_opentelemetry_span
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -26,18 +30,7 @@ def prompt(
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
             span: Span
-            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:  # type: ignore
-                span_id = span.get_span_context().span_id
-                if span.parent:
-                    span_parent_id = span.parent.span_id
-                    parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id, {})
-                    if parent_trace_metadata:
-                        TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                            trace_id=parent_trace_metadata["trace_id"],
-                            trace_parent_id=span_parent_id,
-                            is_flow_log=False,
-                        )
-
+            with opentelemetry_tracer.start_as_current_span("humanloop.prompt") as span:  # type: ignore
                 span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "prompt")
 
@@ -73,6 +66,7 @@ def prompt(
                     "output": output_stringified,
                     "error": error,
                 }
+
                 write_to_opentelemetry_span(
                     span=span,
                     key=HUMANLOOP_LOG_KEY,

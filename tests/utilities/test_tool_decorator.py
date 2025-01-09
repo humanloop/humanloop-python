@@ -1,8 +1,9 @@
 import sys
+import time
 from typing import Any, Optional, TypedDict, Union
 
 import pytest
-from humanloop.decorators.tool import tool
+from humanloop.utilities.tool import tool
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_LOG_KEY
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from jsonschema.protocols import Validator
@@ -449,6 +450,9 @@ def test_tool_as_higher_order_function(
 
     higher_order_fn_tool(operation="add", num1=1, num2=2)
     calculator(operation="add", num1=1, num2=2)
+
+    # Processor handles HL spans asynchronously, wait for them
+    time.sleep(1)
 
     assert len(spans := exporter.get_finished_spans()) == 2
 

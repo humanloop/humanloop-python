@@ -6,11 +6,15 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.decorators.helpers import args_to_inputs
+from humanloop.utilities.helpers import args_to_inputs
 from humanloop.eval_utils.types import File
-from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
-from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_FILE_TYPE_KEY, HUMANLOOP_LOG_KEY, HUMANLOOP_PATH_KEY
-from humanloop.otel.helpers import generate_span_id, jsonify_if_not_string, write_to_opentelemetry_span
+from humanloop.otel.constants import (
+    HUMANLOOP_FILE_KEY,
+    HUMANLOOP_FILE_TYPE_KEY,
+    HUMANLOOP_LOG_KEY,
+    HUMANLOOP_PATH_KEY,
+)
+from humanloop.otel.helpers import jsonify_if_not_string, write_to_opentelemetry_span
 from humanloop.requests import FlowKernelRequestParams as FlowDict
 from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
 
@@ -28,37 +32,16 @@ def flow(
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
             span: Span
-            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:  # type: ignore
-                span_id = span.get_span_context().span_id
-                if span.parent:
-                    span_parent_id = span.parent.span_id
-                    parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id)
-                    if parent_trace_metadata:
-                        TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                            trace_id=span_id,
-                            trace_parent_id=span_parent_id,
-                            is_flow_log=True,
-                        )
-
-                else:
-                    # The Flow Log is not nested under another Flow Log
-                    # Set the trace_id to the current span_id
-                    TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                        trace_id=span_id,
-                        trace_parent_id=None,
-                        is_flow_log=True,
-                    )
-
+            with opentelemetry_tracer.start_as_current_span("humanloop.flow") as span:  # type: ignore
                 span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "flow")
+
                 if flow_kernel:
                     write_to_opentelemetry_span(
                         span=span,
                         key=f"{HUMANLOOP_FILE_KEY}.flow",
                         value=flow_kernel,  # type: ignore
                     )
-
-                inputs = args_to_inputs(func, args, kwargs)
 
                 # Call the decorated function
                 try:
@@ -78,7 +61,7 @@ def flow(
                     error = str(e)
 
                 flow_log = {
-                    "inputs": inputs,
+                    "inputs": args_to_inputs(func, args, kwargs),
                     "output": output_stringified,
                     "error": error,
                 }

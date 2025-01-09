@@ -12,16 +12,15 @@ from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDic
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.decorators.helpers import args_to_inputs
+from humanloop.utilities.helpers import args_to_inputs
 from humanloop.eval_utils import File
-from humanloop.otel import TRACE_FLOW_CONTEXT, FlowContext
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
-from humanloop.otel.helpers import generate_span_id, jsonify_if_not_string, write_to_opentelemetry_span
+from humanloop.otel.helpers import jsonify_if_not_string, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
@@ -49,20 +48,7 @@ def tool(
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            with opentelemetry_tracer.start_as_current_span(generate_span_id()) as span:
-                span_id = span.get_span_context().span_id
-                if span.parent:
-                    span_parent_id = span.parent.span_id
-                else:
-                    span_parent_id = None
-                parent_trace_metadata = TRACE_FLOW_CONTEXT.get(span_parent_id)
-                if parent_trace_metadata:
-                    TRACE_FLOW_CONTEXT[span_id] = FlowContext(
-                        span_id=span_id,
-                        trace_parent_id=span_parent_id,
-                        is_flow_log=False,
-                    )
-
+            with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
                 span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "tool")

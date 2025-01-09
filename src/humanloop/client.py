@@ -10,16 +10,16 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
-from humanloop.decorators.types import DecoratorPromptKernelRequestParams
+from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils.context import EVALUATION_CONTEXT_VARIABLE_NAME, EvaluationContext
 
 from humanloop.eval_utils import log_with_evaluation_context, run_eval
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.decorators.flow import flow as flow_decorator_factory
-from humanloop.decorators.prompt import prompt as prompt_decorator_factory
-from humanloop.decorators.tool import tool as tool_decorator_factory
+from humanloop.utilities.flow import flow as flow_decorator_factory
+from humanloop.utilities.prompt import prompt as prompt_decorator_factory
+from humanloop.utilities.tool import tool as tool_decorator_factory
 from humanloop.environment import HumanloopEnvironment
 from humanloop.evaluations.client import EvaluationsClient
 from humanloop.otel import instrument_provider
@@ -49,7 +49,6 @@ class ExtendedEvalsClient(EvaluationsClient):
         name: Optional[str],
         dataset: Dataset,
         evaluators: Optional[Sequence[Evaluator]] = None,
-        # logs: typing.Sequence[dict] | None = None,
         workers: int = 4,
     ) -> List[EvaluatorCheck]:
         """Evaluate your function for a given `Dataset` and set of `Evaluators`.
