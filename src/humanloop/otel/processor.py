@@ -109,6 +109,8 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         """Wait for all children spans to complete before processing the Humanloop span."""
         span_id = span.context.span_id
         while not all(child["complete"] for child in self._children[span_id]):
+            # TODO: This assumes that the children spans will complete
+            # The LLM provider might fail; address in future
             logger.debug(
                 "[HumanloopSpanProcessor] Span %s %s waiting for children to complete: %s",
                 span_id,

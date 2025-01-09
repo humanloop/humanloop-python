@@ -8,7 +8,7 @@ README.md
 
 # Directories used by SDK decorators
 
-src/humanloop/decorators
+src/humanloop/utilities
 src/humanloop/otel
 
 # Tests
