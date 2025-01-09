@@ -222,12 +222,12 @@ class HumanloopSpanExporter(SpanExporter):
 
         while parent_span_id and self._span_id_to_uploaded_log_id.get(parent_span_id) is None:
             logger.debug(
-                "[HumanloopSpanExporter] Span %s %s waiting for parent %s to be uploaded",
+                "[HumanloopSpanExporter] _export_span_dispatch on Thread %s Span %s %s waiting for parent %s to be uploaded",
+                threading.get_ident(),
                 span.context.span_id,
                 span.name,
                 parent_span_id,
             )
-            time.sleep(0.1)
 
         logger.debug(
             "[HumanloopSpanExporter] Exporting span %s with file type %s",

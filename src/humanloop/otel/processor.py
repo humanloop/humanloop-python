@@ -115,7 +115,6 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
                 span.name,
                 self._children[span_id],
             )
-            time.sleep(0.1)
         # All instrumentor spans have arrived, we can process the
         # Humanloop parent span owning them
         if span.name == "humanloop.flow":
