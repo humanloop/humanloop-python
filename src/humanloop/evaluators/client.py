@@ -211,6 +211,9 @@ class EvaluatorsClient:
                     object_=spec, annotation=CreateEvaluatorLogRequestSpecParams, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -414,6 +417,9 @@ class EvaluatorsClient:
                     object_=spec, annotation=EvaluatorRequestSpecParams, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -616,6 +622,9 @@ class EvaluatorsClient:
             json={
                 "path": path,
                 "name": name,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1307,6 +1316,9 @@ class AsyncEvaluatorsClient:
                     object_=spec, annotation=CreateEvaluatorLogRequestSpecParams, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1525,6 +1537,9 @@ class AsyncEvaluatorsClient:
                 "spec": convert_and_respect_annotation_metadata(
                     object_=spec, annotation=EvaluatorRequestSpecParams, direction="write"
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1752,6 +1767,9 @@ class AsyncEvaluatorsClient:
             json={
                 "path": path,
                 "name": name,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

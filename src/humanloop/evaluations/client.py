@@ -184,6 +184,9 @@ class EvaluationsClient:
                     direction="write",
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -260,6 +263,9 @@ class EvaluationsClient:
                     annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
                     direction="write",
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -602,6 +608,9 @@ class EvaluationsClient:
                 "orchestrated": orchestrated,
                 "use_existing_logs": use_existing_logs,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -808,6 +817,9 @@ class EvaluationsClient:
                 "control": control,
                 "status": status,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -883,6 +895,9 @@ class EvaluationsClient:
             method="POST",
             json={
                 "log_ids": log_ids,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1218,6 +1233,9 @@ class AsyncEvaluationsClient:
                     direction="write",
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1302,6 +1320,9 @@ class AsyncEvaluationsClient:
                     annotation=typing.Sequence[AddEvaluatorsRequestEvaluatorsItemParams],
                     direction="write",
                 ),
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1684,6 +1705,9 @@ class AsyncEvaluationsClient:
                 "orchestrated": orchestrated,
                 "use_existing_logs": use_existing_logs,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1916,6 +1940,9 @@ class AsyncEvaluationsClient:
                 "control": control,
                 "status": status,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1999,6 +2026,9 @@ class AsyncEvaluationsClient:
             method="POST",
             json={
                 "log_ids": log_ids,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

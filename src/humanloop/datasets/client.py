@@ -259,6 +259,9 @@ class DatasetsClient:
                 "attributes": attributes,
                 "commit_message": commit_message,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -472,6 +475,9 @@ class DatasetsClient:
             json={
                 "path": path,
                 "name": name,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1338,6 +1344,9 @@ class AsyncDatasetsClient:
                 "attributes": attributes,
                 "commit_message": commit_message,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1575,6 +1584,9 @@ class AsyncDatasetsClient:
             json={
                 "path": path,
                 "name": name,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

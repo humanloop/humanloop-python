@@ -218,6 +218,9 @@ class ToolsClient:
                     object_=tool, annotation=ToolKernelRequestParams, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -349,6 +352,9 @@ class ToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -577,6 +583,9 @@ class ToolsClient:
                 "tool_type": tool_type,
                 "commit_message": commit_message,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -779,6 +788,9 @@ class ToolsClient:
             json={
                 "path": path,
                 "name": name,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1478,6 +1490,9 @@ class AsyncToolsClient:
                     object_=tool, annotation=ToolKernelRequestParams, direction="write"
                 ),
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1617,6 +1632,9 @@ class AsyncToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1864,6 +1882,9 @@ class AsyncToolsClient:
                 "tool_type": tool_type,
                 "commit_message": commit_message,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -2090,6 +2111,9 @@ class AsyncToolsClient:
             json={
                 "path": path,
                 "name": name,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

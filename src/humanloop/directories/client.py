@@ -120,6 +120,9 @@ class DirectoriesClient:
                 "parent_id": parent_id,
                 "path": path,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -311,6 +314,9 @@ class DirectoriesClient:
                 "parent_id": parent_id,
                 "path": path,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -457,6 +463,9 @@ class AsyncDirectoriesClient:
                 "name": name,
                 "parent_id": parent_id,
                 "path": path,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -672,6 +681,9 @@ class AsyncDirectoriesClient:
                 "name": name,
                 "parent_id": parent_id,
                 "path": path,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

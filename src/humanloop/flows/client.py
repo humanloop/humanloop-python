@@ -202,10 +202,10 @@ class FlowsClient:
             output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
             trace_status="incomplete",
             start_time=datetime.datetime.fromisoformat(
-                "2024-07-08 21:40:35+00:00",
+                "2024-07-08 22:40:35+00:00",
             ),
             end_time=datetime.datetime.fromisoformat(
-                "2024-07-08 21:40:39+00:00",
+                "2024-07-08 22:40:39+00:00",
             ),
         )
         """
@@ -248,6 +248,9 @@ class FlowsClient:
                     object_=flow, annotation=FlowKernelRequestParams, direction="write"
                 ),
                 "trace_status": trace_status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -457,6 +460,9 @@ class FlowsClient:
                 "name": name,
                 "directory_id": directory_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -665,6 +671,9 @@ class FlowsClient:
                 "attributes": attributes,
                 "commit_message": commit_message,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -759,6 +768,9 @@ class FlowsClient:
                 "output": output,
                 "error": error,
                 "trace_status": trace_status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1438,10 +1450,10 @@ class AsyncFlowsClient:
                 output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
                 trace_status="incomplete",
                 start_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 21:40:35+00:00",
+                    "2024-07-08 22:40:35+00:00",
                 ),
                 end_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 21:40:39+00:00",
+                    "2024-07-08 22:40:39+00:00",
                 ),
             )
 
@@ -1487,6 +1499,9 @@ class AsyncFlowsClient:
                     object_=flow, annotation=FlowKernelRequestParams, direction="write"
                 ),
                 "trace_status": trace_status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,
@@ -1720,6 +1735,9 @@ class AsyncFlowsClient:
                 "name": name,
                 "directory_id": directory_id,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -1944,6 +1962,9 @@ class AsyncFlowsClient:
                 "attributes": attributes,
                 "commit_message": commit_message,
             },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
             omit=OMIT,
         )
@@ -2046,6 +2067,9 @@ class AsyncFlowsClient:
                 "output": output,
                 "error": error,
                 "trace_status": trace_status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
             omit=OMIT,

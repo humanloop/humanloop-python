@@ -1,6 +1,3 @@
-[project]
-name = "humanloop"
-
 [tool.poetry]
 name = "humanloop"
 version = "0.8.22"
