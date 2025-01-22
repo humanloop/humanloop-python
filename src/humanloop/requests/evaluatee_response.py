@@ -14,7 +14,7 @@ class EvaluateeResponseParams(typing_extensions.TypedDict):
     version: typing_extensions.NotRequired[RunVersionResponseParams]
     batch_id: typing_extensions.NotRequired[str]
     """
-    Unique identifier for the batch of Logs to include in the Evaluation.
+    Unique identifier for the batch of Logs to include in the Evaluation. 
     """
 
     orchestrated: bool

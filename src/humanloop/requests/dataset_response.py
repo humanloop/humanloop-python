@@ -38,6 +38,21 @@ class DatasetResponseParams(typing_extensions.TypedDict):
     Name of the Dataset, which is used as a unique identifier.
     """
 
+    description: typing_extensions.NotRequired[str]
+    """
+    Description of the Dataset.
+    """
+
+    readme: typing_extensions.NotRequired[str]
+    """
+    Long description of the file.
+    """
+
+    tags: typing_extensions.NotRequired[typing.Sequence[str]]
+    """
+    List of tags associated with the file.
+    """
+
     version_id: str
     """
     Unique identifier for the specific Dataset Version. If no query params provided, the default deployed Dataset Version is returned. Starts with `dsv_`.

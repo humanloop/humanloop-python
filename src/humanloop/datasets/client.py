@@ -165,7 +165,7 @@ class DatasetsClient:
         the request. You can also create a new version by adding or removing Datapoints from an existing version
         by specifying `action` as `add` or `remove` respectively. In this case, you may specify
         the `version_id` or `environment` query parameters to identify the existing version to base
-        the new version on. If neither is provided, the default deployed version will be used.
+        the new version on. If neither is provided, the latest created version will be used.
 
         If you provide a commit message, then the new version will be committed;
         otherwise it will be uncommitted. If you try to commit an already committed version,
@@ -1242,7 +1242,7 @@ class AsyncDatasetsClient:
         the request. You can also create a new version by adding or removing Datapoints from an existing version
         by specifying `action` as `add` or `remove` respectively. In this case, you may specify
         the `version_id` or `environment` query parameters to identify the existing version to base
-        the new version on. If neither is provided, the default deployed version will be used.
+        the new version on. If neither is provided, the latest created version will be used.
 
         If you provide a commit message, then the new version will be committed;
         otherwise it will be uncommitted. If you try to commit an already committed version,

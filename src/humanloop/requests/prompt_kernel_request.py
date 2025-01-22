@@ -24,10 +24,10 @@ class PromptKernelRequestParams(typing_extensions.TypedDict):
 
     template: typing_extensions.NotRequired[PromptKernelRequestTemplateParams]
     """
-    The template contains the main structure and instructions for the model, including input variables for dynamic values.
+    The template contains the main structure and instructions for the model, including input variables for dynamic values. 
     
     For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
-    For completion models, provide a prompt template as a string.
+    For completion models, provide a prompt template as a string. 
     
     Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
     """

@@ -56,10 +56,10 @@ class PromptResponse(UncheckedBaseModel):
 
     template: typing.Optional[PromptResponseTemplate] = pydantic.Field(default=None)
     """
-    The template contains the main structure and instructions for the model, including input variables for dynamic values.
+    The template contains the main structure and instructions for the model, including input variables for dynamic values. 
     
     For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
-    For completion models, provide a prompt template as a string.
+    For completion models, provide a prompt template as a string. 
     
     Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
     """
@@ -132,6 +132,21 @@ class PromptResponse(UncheckedBaseModel):
     commit_message: typing.Optional[str] = pydantic.Field(default=None)
     """
     Message describing the changes made.
+    """
+
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the Prompt.
+    """
+
+    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    List of tags associated with the file.
+    """
+
+    readme: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Long description of the file.
     """
 
     name: str = pydantic.Field()

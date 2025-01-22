@@ -11,11 +11,10 @@ class EvaluateeRequest(UncheckedBaseModel):
     Specification of a File version on Humanloop.
 
     This can be done in a couple of ways:
-
     - Specifying `version_id` directly.
     - Specifying a File (and optionally an Environment).
-      - A File can be specified by either `path` or `file_id`.
-      - An Environment can be specified by `environment_id`. If no Environment is specified, the default Environment is used.
+        - A File can be specified by either `path` or `file_id`.
+        - An Environment can be specified by `environment_id`. If no Environment is specified, the default Environment is used.
     """
 
     version_id: typing.Optional[str] = pydantic.Field(default=None)

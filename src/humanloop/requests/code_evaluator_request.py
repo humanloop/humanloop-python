@@ -5,6 +5,9 @@ from ..types.evaluator_arguments_type import EvaluatorArgumentsType
 from ..types.evaluator_return_type_enum import EvaluatorReturnTypeEnum
 import typing_extensions
 import typing
+from .evaluator_judgment_option_response import EvaluatorJudgmentOptionResponseParams
+from .evaluator_judgment_number_limit import EvaluatorJudgmentNumberLimitParams
+from ..types.valence import Valence
 
 
 class CodeEvaluatorRequestParams(typing_extensions.TypedDict):
@@ -21,6 +24,21 @@ class CodeEvaluatorRequestParams(typing_extensions.TypedDict):
     attributes: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
     Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
+    """
+
+    options: typing_extensions.NotRequired[typing.Sequence[EvaluatorJudgmentOptionResponseParams]]
+    """
+    The options that can be applied as judgments. Only for Evaluators with `return_type` of 'boolean', 'select' or 'multi_select'.
+    """
+
+    number_limits: typing_extensions.NotRequired[EvaluatorJudgmentNumberLimitParams]
+    """
+    Limits on the judgment that can be applied. Only for Evaluators with `return_type` of 'number'.
+    """
+
+    number_valence: typing_extensions.NotRequired[Valence]
+    """
+    The valence of the number judgment. Only for Evaluators with `return_type` of 'number'. If 'positive', a higher number is better. If 'negative', a lower number is better.
     """
 
     evaluator_type: typing.Literal["python"]

@@ -2,8 +2,8 @@
 
 import typing_extensions
 import typing_extensions
-import datetime as dt
 import typing
+import datetime as dt
 from .directory_response import DirectoryResponseParams
 from .directory_with_parents_and_children_response_files_item import (
     DirectoryWithParentsAndChildrenResponseFilesItemParams,
@@ -26,9 +26,24 @@ class DirectoryWithParentsAndChildrenResponseParams(typing_extensions.TypedDict)
     Name of the directory.
     """
 
+    description: typing_extensions.NotRequired[str]
+    """
+    Description of the directory.
+    """
+
     path: str
     """
     Path to the directory, relative to the root directory. Includes name, e.g. `path/to/directory`.
+    """
+
+    readme: typing_extensions.NotRequired[str]
+    """
+    Long description of the directory.
+    """
+
+    tags: typing.Sequence[str]
+    """
+    List of tags associated with the directory.
     """
 
     created_at: dt.datetime

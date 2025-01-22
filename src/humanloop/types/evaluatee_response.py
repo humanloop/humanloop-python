@@ -25,7 +25,7 @@ class EvaluateeResponse(UncheckedBaseModel):
     version: typing.Optional[RunVersionResponse] = None
     batch_id: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Unique identifier for the batch of Logs to include in the Evaluation.
+    Unique identifier for the batch of Logs to include in the Evaluation. 
     """
 
     orchestrated: bool = pydantic.Field()

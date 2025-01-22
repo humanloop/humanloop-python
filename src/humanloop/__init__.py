@@ -177,6 +177,7 @@ from .evaluators import (
     EvaluatorRequestSpec,
     EvaluatorRequestSpecParams,
 )
+from .files import RetrieveByPathFilesRetrieveByPathPostResponse, RetrieveByPathFilesRetrieveByPathPostResponseParams
 from .prompts import (
     PromptLogRequestToolChoice,
     PromptLogRequestToolChoiceParams,
@@ -564,6 +565,8 @@ __all__ = [
     "ResponseFormat",
     "ResponseFormatParams",
     "ResponseFormatType",
+    "RetrieveByPathFilesRetrieveByPathPostResponse",
+    "RetrieveByPathFilesRetrieveByPathPostResponseParams",
     "RunStatsResponse",
     "RunStatsResponseEvaluatorStatsItem",
     "RunStatsResponseEvaluatorStatsItemParams",

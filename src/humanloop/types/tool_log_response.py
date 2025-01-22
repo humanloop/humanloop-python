@@ -38,7 +38,7 @@ class ToolLogResponse(UncheckedBaseModel):
 
     created_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
-    User defined timestamp for when the log was created.
+    User defined timestamp for when the log was created. 
     """
 
     error: typing.Optional[str] = pydantic.Field(default=None)

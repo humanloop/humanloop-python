@@ -236,7 +236,7 @@ class PromptsClient:
             messages=[{"role": "user", "content": "What really happened at Roswell?"}],
             inputs={"person": "Trump"},
             created_at=datetime.datetime.fromisoformat(
-                "2024-07-19 00:29:35.178000+00:00",
+                "2024-07-18 23:29:35.178000+00:00",
             ),
             provider_latency=6.5931549072265625,
             output_message={
@@ -639,64 +639,12 @@ class PromptsClient:
 
         Examples
         --------
-        import datetime
-
         from humanloop import Humanloop
 
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.prompts.call_stream(
-            version_id="string",
-            environment="string",
-            path="string",
-            id="string",
-            messages=[
-                {
-                    "content": "string",
-                    "name": "string",
-                    "tool_call_id": "string",
-                    "role": "user",
-                    "tool_calls": [
-                        {
-                            "id": "string",
-                            "type": "function",
-                            "function": {"name": "string"},
-                        }
-                    ],
-                }
-            ],
-            prompt={"model": "string"},
-            inputs={"string": {"key": "value"}},
-            source="string",
-            metadata={"string": {"key": "value"}},
-            start_time=datetime.datetime.fromisoformat(
-                "2024-01-15 09:30:00+00:00",
-            ),
-            end_time=datetime.datetime.fromisoformat(
-                "2024-01-15 09:30:00+00:00",
-            ),
-            source_datapoint_id="string",
-            trace_parent_id="string",
-            user="string",
-            prompts_call_stream_request_environment="string",
-            save=True,
-            log_id="string",
-            provider_api_keys={
-                "openai": "string",
-                "ai_21": "string",
-                "mock": "string",
-                "anthropic": "string",
-                "bedrock": "string",
-                "cohere": "string",
-                "openai_azure": "string",
-                "openai_azure_endpoint": "string",
-            },
-            num_samples=1,
-            return_inputs=True,
-            logprobs=1,
-            suffix="string",
-        )
+        response = client.prompts.call_stream()
         for chunk in response:
             yield chunk
         """
@@ -1138,6 +1086,9 @@ class PromptsClient:
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        readme: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
         """
@@ -1213,6 +1164,15 @@ class PromptsClient:
         commit_message : typing.Optional[str]
             Message describing the changes made.
 
+        description : typing.Optional[str]
+            Description of the Prompt.
+
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tags associated with this prompt.
+
+        readme : typing.Optional[str]
+            Long description of the Prompt.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1275,6 +1235,9 @@ class PromptsClient:
                 "linked_tools": linked_tools,
                 "attributes": attributes,
                 "commit_message": commit_message,
+                "description": description,
+                "tags": tags,
+                "readme": readme,
             },
             headers={
                 "content-type": "application/json",
@@ -2185,7 +2148,7 @@ class AsyncPromptsClient:
                 ],
                 inputs={"person": "Trump"},
                 created_at=datetime.datetime.fromisoformat(
-                    "2024-07-19 00:29:35.178000+00:00",
+                    "2024-07-18 23:29:35.178000+00:00",
                 ),
                 provider_latency=6.5931549072265625,
                 output_message={
@@ -2600,7 +2563,6 @@ class AsyncPromptsClient:
         Examples
         --------
         import asyncio
-        import datetime
 
         from humanloop import AsyncHumanloop
 
@@ -2610,57 +2572,7 @@ class AsyncPromptsClient:
 
 
         async def main() -> None:
-            response = await client.prompts.call_stream(
-                version_id="string",
-                environment="string",
-                path="string",
-                id="string",
-                messages=[
-                    {
-                        "content": "string",
-                        "name": "string",
-                        "tool_call_id": "string",
-                        "role": "user",
-                        "tool_calls": [
-                            {
-                                "id": "string",
-                                "type": "function",
-                                "function": {"name": "string"},
-                            }
-                        ],
-                    }
-                ],
-                prompt={"model": "string"},
-                inputs={"string": {"key": "value"}},
-                source="string",
-                metadata={"string": {"key": "value"}},
-                start_time=datetime.datetime.fromisoformat(
-                    "2024-01-15 09:30:00+00:00",
-                ),
-                end_time=datetime.datetime.fromisoformat(
-                    "2024-01-15 09:30:00+00:00",
-                ),
-                source_datapoint_id="string",
-                trace_parent_id="string",
-                user="string",
-                prompts_call_stream_request_environment="string",
-                save=True,
-                log_id="string",
-                provider_api_keys={
-                    "openai": "string",
-                    "ai_21": "string",
-                    "mock": "string",
-                    "anthropic": "string",
-                    "bedrock": "string",
-                    "cohere": "string",
-                    "openai_azure": "string",
-                    "openai_azure_endpoint": "string",
-                },
-                num_samples=1,
-                return_inputs=True,
-                logprobs=1,
-                suffix="string",
-            )
+            response = await client.prompts.call_stream()
             async for chunk in response:
                 yield chunk
 
@@ -3121,6 +3033,9 @@ class AsyncPromptsClient:
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         commit_message: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        readme: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptResponse:
         """
@@ -3196,6 +3111,15 @@ class AsyncPromptsClient:
         commit_message : typing.Optional[str]
             Message describing the changes made.
 
+        description : typing.Optional[str]
+            Description of the Prompt.
+
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tags associated with this prompt.
+
+        readme : typing.Optional[str]
+            Long description of the Prompt.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -3266,6 +3190,9 @@ class AsyncPromptsClient:
                 "linked_tools": linked_tools,
                 "attributes": attributes,
                 "commit_message": commit_message,
+                "description": description,
+                "tags": tags,
+                "readme": readme,
             },
             headers={
                 "content-type": "application/json",

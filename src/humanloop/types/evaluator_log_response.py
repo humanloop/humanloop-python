@@ -12,6 +12,7 @@ from .version_id_response import VersionIdResponse
 import typing
 import datetime as dt
 import pydantic
+from .chat_message import ChatMessage
 from .evaluator_log_response_judgment import EvaluatorLogResponseJudgment
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
@@ -39,7 +40,7 @@ class EvaluatorLogResponse(UncheckedBaseModel):
 
     created_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
     """
-    User defined timestamp for when the log was created.
+    User defined timestamp for when the log was created. 
     """
 
     error: typing.Optional[str] = pydantic.Field(default=None)
@@ -122,6 +123,11 @@ class EvaluatorLogResponse(UncheckedBaseModel):
     This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
     """
 
+    output_message: typing.Optional[ChatMessage] = pydantic.Field(default=None)
+    """
+    The message returned by the LLM. Only populated for LLM Evaluator Logs.
+    """
+
     judgment: typing.Optional[EvaluatorLogResponseJudgment] = pydantic.Field(default=None)
     """
     Evaluator assessment of the Log.
@@ -164,7 +170,7 @@ class EvaluatorLogResponse(UncheckedBaseModel):
 
     parent: typing.Optional["LogResponse"] = pydantic.Field(default=None)
     """
-    The Log that was evaluated. Only provided if the ?include_parent query parameter is set for the
+    The Log that was evaluated. Only provided if the ?include_parent query parameter is set for the 
     """
 
     if IS_PYDANTIC_V2:

@@ -74,6 +74,21 @@ class ToolResponse(UncheckedBaseModel):
     Name of the Tool, which is used as a unique identifier.
     """
 
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the Tool.
+    """
+
+    readme: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Long description of the file.
+    """
+
+    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    List of tags associated with the file.
+    """
+
     version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Tool Version. If no query params provided, the default deployed Tool Version is returned.

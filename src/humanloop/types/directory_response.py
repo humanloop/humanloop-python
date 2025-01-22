@@ -23,9 +23,24 @@ class DirectoryResponse(UncheckedBaseModel):
     Name of the directory.
     """
 
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the directory.
+    """
+
     path: str = pydantic.Field()
     """
     Path to the directory, relative to the root directory. Includes name, e.g. `path/to/directory`.
+    """
+
+    readme: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Long description of the directory.
+    """
+
+    tags: typing.List[str] = pydantic.Field()
+    """
+    List of tags associated with the directory.
     """
 
     created_at: dt.datetime

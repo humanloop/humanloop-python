@@ -9,7 +9,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class DatapointResponse(UncheckedBaseModel):
-    inputs: typing.Optional[typing.Dict[str, str]] = pydantic.Field(default=None)
+    inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     The inputs to the prompt template.
     """

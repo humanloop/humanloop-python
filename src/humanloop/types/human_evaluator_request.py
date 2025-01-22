@@ -27,25 +27,25 @@ class HumanEvaluatorRequest(UncheckedBaseModel):
     Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
     """
 
-    evaluator_type: typing.Literal["human"] = "human"
-    instructions: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Instructions for the Human annotating the .
-    """
-
     options: typing.Optional[typing.List[EvaluatorJudgmentOptionResponse]] = pydantic.Field(default=None)
     """
-    The options that the Human annotator can choose from.
+    The options that can be applied as judgments.
     """
 
     number_limits: typing.Optional[EvaluatorJudgmentNumberLimit] = pydantic.Field(default=None)
     """
-    Limits on the judgment that can be applied. Only for Evaluators with `return_type` of `'number'`.
+    Limits on the judgment that can be applied. Only for Evaluators with `return_type` of 'number'.
     """
 
     number_valence: typing.Optional[Valence] = pydantic.Field(default=None)
     """
-    The valence of the number judgment. Only for Evaluators with `return_type` of `'number'`. If 'positive', a higher number is better. If 'negative', a lower number is better.
+    The valence of the number judgment. Only for Evaluators with `return_type` of 'number'. If 'positive', a higher number is better. If 'negative', a lower number is better.
+    """
+
+    evaluator_type: typing.Literal["human"] = "human"
+    instructions: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Instructions and guidelines for applying judgments.
     """
 
     if IS_PYDANTIC_V2:

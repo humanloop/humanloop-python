@@ -8,7 +8,7 @@ from .create_datapoint_request_target_value import CreateDatapointRequestTargetV
 
 
 class CreateDatapointRequestParams(typing_extensions.TypedDict):
-    inputs: typing_extensions.NotRequired[typing.Dict[str, str]]
+    inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
     The inputs to the prompt template.
     """

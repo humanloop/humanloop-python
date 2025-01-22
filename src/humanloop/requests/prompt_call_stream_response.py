@@ -18,7 +18,7 @@ class PromptCallStreamResponseParams(typing_extensions.TypedDict):
 
     created_at: typing_extensions.NotRequired[dt.datetime]
     """
-    User defined timestamp for when the log was created.
+    User defined timestamp for when the log was created. 
     """
 
     error: typing_extensions.NotRequired[str]

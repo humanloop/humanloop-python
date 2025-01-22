@@ -202,10 +202,10 @@ class FlowsClient:
             output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
             trace_status="incomplete",
             start_time=datetime.datetime.fromisoformat(
-                "2024-07-08 22:40:35+00:00",
+                "2024-07-08 21:40:35+00:00",
             ),
             end_time=datetime.datetime.fromisoformat(
-                "2024-07-08 22:40:39+00:00",
+                "2024-07-08 21:40:39+00:00",
             ),
         )
         """
@@ -1450,10 +1450,10 @@ class AsyncFlowsClient:
                 output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
                 trace_status="incomplete",
                 start_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 22:40:35+00:00",
+                    "2024-07-08 21:40:35+00:00",
                 ),
                 end_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 22:40:39+00:00",
+                    "2024-07-08 21:40:39+00:00",
                 ),
             )
 

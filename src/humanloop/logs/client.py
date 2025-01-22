@@ -31,6 +31,7 @@ class LogsClient:
         size: typing.Optional[int] = None,
         version_id: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
+        id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         start_date: typing.Optional[dt.datetime] = None,
@@ -59,6 +60,9 @@ class LogsClient:
 
         version_status : typing.Optional[VersionStatus]
             If provided, only Logs belonging to Versions with the specified status will be returned.
+
+        id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            If provided, returns Logs whose IDs contain any of the specified values as substrings.
 
         search : typing.Optional[str]
             If provided, only Logs that contain the provided string in its inputs and output will be returned.
@@ -116,6 +120,7 @@ class LogsClient:
                 "size": size,
                 "version_id": version_id,
                 "version_status": version_status,
+                "id": id,
                 "search": search,
                 "metadata_search": metadata_search,
                 "start_date": serialize_datetime(start_date) if start_date is not None else None,
@@ -142,6 +147,7 @@ class LogsClient:
                     size=size,
                     version_id=version_id,
                     version_status=version_status,
+                    id=id,
                     search=search,
                     metadata_search=metadata_search,
                     start_date=start_date,
@@ -196,9 +202,7 @@ class LogsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.logs.delete(
-            id="string",
-        )
+        client.logs.delete()
         """
         _response = self._client_wrapper.httpx_client.request(
             "logs",
@@ -296,6 +300,7 @@ class AsyncLogsClient:
         size: typing.Optional[int] = None,
         version_id: typing.Optional[str] = None,
         version_status: typing.Optional[VersionStatus] = None,
+        id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
         start_date: typing.Optional[dt.datetime] = None,
@@ -324,6 +329,9 @@ class AsyncLogsClient:
 
         version_status : typing.Optional[VersionStatus]
             If provided, only Logs belonging to Versions with the specified status will be returned.
+
+        id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            If provided, returns Logs whose IDs contain any of the specified values as substrings.
 
         search : typing.Optional[str]
             If provided, only Logs that contain the provided string in its inputs and output will be returned.
@@ -389,6 +397,7 @@ class AsyncLogsClient:
                 "size": size,
                 "version_id": version_id,
                 "version_status": version_status,
+                "id": id,
                 "search": search,
                 "metadata_search": metadata_search,
                 "start_date": serialize_datetime(start_date) if start_date is not None else None,
@@ -415,6 +424,7 @@ class AsyncLogsClient:
                     size=size,
                     version_id=version_id,
                     version_status=version_status,
+                    id=id,
                     search=search,
                     metadata_search=metadata_search,
                     start_date=start_date,
@@ -474,9 +484,7 @@ class AsyncLogsClient:
 
 
         async def main() -> None:
-            await client.logs.delete(
-                id="string",
-            )
+            await client.logs.delete()
 
 
         asyncio.run(main())

@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-19 00:29:35.178000+00:00",
+        "2024-07-18 23:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -643,64 +643,12 @@ in the case where you are storing or deriving your Prompt details in code.
 <dd>
 
 ```python
-import datetime
-
 from humanloop import Humanloop
 
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.prompts.call_stream(
-    version_id="string",
-    environment="string",
-    path="string",
-    id="string",
-    messages=[
-        {
-            "content": "string",
-            "name": "string",
-            "tool_call_id": "string",
-            "role": "user",
-            "tool_calls": [
-                {
-                    "id": "string",
-                    "type": "function",
-                    "function": {"name": "string"},
-                }
-            ],
-        }
-    ],
-    prompt={"model": "string"},
-    inputs={"string": {"key": "value"}},
-    source="string",
-    metadata={"string": {"key": "value"}},
-    start_time=datetime.datetime.fromisoformat(
-        "2024-01-15 09:30:00+00:00",
-    ),
-    end_time=datetime.datetime.fromisoformat(
-        "2024-01-15 09:30:00+00:00",
-    ),
-    source_datapoint_id="string",
-    trace_parent_id="string",
-    user="string",
-    prompts_call_stream_request_environment="string",
-    save=True,
-    log_id="string",
-    provider_api_keys={
-        "openai": "string",
-        "ai_21": "string",
-        "mock": "string",
-        "anthropic": "string",
-        "bedrock": "string",
-        "cohere": "string",
-        "openai_azure": "string",
-        "openai_azure_endpoint": "string",
-    },
-    num_samples=1,
-    return_inputs=True,
-    logprobs=1,
-    suffix="string",
-)
+response = client.prompts.call_stream()
 for chunk in response:
     yield chunk
 
@@ -1521,6 +1469,30 @@ Input variables should be specified with double curly bracket syntax: `{{input_n
 <dd>
 
 **commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tags:** `typing.Optional[typing.Sequence[str]]` — List of tags associated with this prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**readme:** `typing.Optional[str]` — Long description of the Prompt.
     
 </dd>
 </dl>
@@ -4059,7 +4031,7 @@ By default, the new Dataset version will be set to the list of Datapoints provid
 the request. You can also create a new version by adding or removing Datapoints from an existing version
 by specifying `action` as `add` or `remove` respectively. In this case, you may specify
 the `version_id` or `environment` query parameters to identify the existing version to base
-the new version on. If neither is provided, the default deployed version will be used.
+the new version on. If neither is provided, the latest created version will be used.
 
 If you provide a commit message, then the new version will be committed;
 otherwise it will be uncommitted. If you try to commit an already committed version,
@@ -5436,6 +5408,14 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**output_message:** `typing.Optional[ChatMessageParams]` — The message returned by the LLM. Only populated for LLM Evaluator Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **judgment:** `typing.Optional[CreateEvaluatorLogRequestJudgmentParams]` — Evaluator assessment of the Log.
     
 </dd>
@@ -6592,10 +6572,10 @@ client.flows.log(
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
     trace_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:35+00:00",
+        "2024-07-08 21:40:35+00:00",
     ),
     end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:39+00:00",
+        "2024-07-08 21:40:39+00:00",
     ),
 )
 
@@ -8410,7 +8390,7 @@ client.directories.update(
 </details>
 
 ## Files
-<details><summary><code>client.files.<a href="src/humanloop/files/client.py">list</a>(...)</code></summary>
+<details><summary><code>client.files.<a href="src/humanloop/files/client.py">list_files</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -8442,7 +8422,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.files.list()
+client.files.list_files()
 
 ```
 </dd>
@@ -8482,6 +8462,14 @@ client.files.list()
 <dl>
 <dd>
 
+**template:** `typing.Optional[bool]` — Filter to include only template files.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **type:** `typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]]` — List of file types to filter for.
     
 </dd>
@@ -8507,6 +8495,84 @@ client.files.list()
 <dd>
 
 **order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.files.<a href="src/humanloop/files/client.py">retrieve_by_path</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve a File by path.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.files.retrieve_by_path(
+    path="path",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**path:** `str` — Path of the File to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
     
 </dd>
 </dl>
@@ -9812,6 +9878,14 @@ for page in response.iter_pages():
 <dl>
 <dd>
 
+**id:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` — If provided, returns Logs whose IDs contain any of the specified values as substrings.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **search:** `typing.Optional[str]` — If provided, only Logs that contain the provided string in its inputs and output will be returned.
     
 </dd>
@@ -9912,9 +9986,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.logs.delete(
-    id="string",
-)
+client.logs.delete()
 
 ```
 </dd>

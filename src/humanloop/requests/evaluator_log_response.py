@@ -5,6 +5,7 @@ import typing_extensions
 import typing_extensions
 import datetime as dt
 import typing
+from .chat_message import ChatMessageParams
 from .evaluator_log_response_judgment import EvaluatorLogResponseJudgmentParams
 from .evaluator_response import EvaluatorResponseParams
 import typing
@@ -35,7 +36,7 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
 
     created_at: typing_extensions.NotRequired[dt.datetime]
     """
-    User defined timestamp for when the log was created.
+    User defined timestamp for when the log was created. 
     """
 
     error: typing_extensions.NotRequired[str]
@@ -118,6 +119,11 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
     """
 
+    output_message: typing_extensions.NotRequired[ChatMessageParams]
+    """
+    The message returned by the LLM. Only populated for LLM Evaluator Logs.
+    """
+
     judgment: typing_extensions.NotRequired[EvaluatorLogResponseJudgmentParams]
     """
     Evaluator assessment of the Log.
@@ -160,5 +166,5 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
 
     parent: typing_extensions.NotRequired["LogResponseParams"]
     """
-    The Log that was evaluated. Only provided if the ?include_parent query parameter is set for the
+    The Log that was evaluated. Only provided if the ?include_parent query parameter is set for the 
     """

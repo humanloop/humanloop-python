@@ -46,6 +46,21 @@ class EvaluatorResponse(UncheckedBaseModel):
     Name of the Evaluator, which is used as a unique identifier.
     """
 
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the Evaluator.
+    """
+
+    readme: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Long description of the file.
+    """
+
+    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    List of tags associated with the file.
+    """
+
     version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Evaluator Version. If no query params provided, the default deployed Evaluator Version is returned.

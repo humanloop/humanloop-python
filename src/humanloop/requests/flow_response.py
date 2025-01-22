@@ -50,6 +50,21 @@ class FlowResponseParams(typing_extensions.TypedDict):
     Name of the Flow.
     """
 
+    description: typing_extensions.NotRequired[str]
+    """
+    Description of the Flow.
+    """
+
+    readme: typing_extensions.NotRequired[str]
+    """
+    Long description of the file.
+    """
+
+    tags: typing_extensions.NotRequired[typing.Sequence[str]]
+    """
+    List of tags associated with the file.
+    """
+
     version_id: str
     """
     Unique identifier for the specific Flow Version. If no query params provided, the default deployed Flow Version is returned.

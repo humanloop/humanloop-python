@@ -3,6 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 import datetime as dt
+from ..requests.chat_message import ChatMessageParams
 from .requests.create_evaluator_log_request_judgment import CreateEvaluatorLogRequestJudgmentParams
 from .requests.create_evaluator_log_request_spec import CreateEvaluatorLogRequestSpecParams
 from ..core.request_options import RequestOptions
@@ -66,6 +67,7 @@ class EvaluatorsClient:
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         marked_completed: typing.Optional[bool] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
@@ -147,6 +149,9 @@ class EvaluatorsClient:
         log_id : typing.Optional[str]
             This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
+        output_message : typing.Optional[ChatMessageParams]
+            The message returned by the LLM. Only populated for LLM Evaluator Logs.
+
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
 
@@ -203,6 +208,9 @@ class EvaluatorsClient:
                 "environment": create_evaluator_log_request_environment,
                 "save": save,
                 "log_id": log_id,
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
                 ),
@@ -1163,6 +1171,7 @@ class AsyncEvaluatorsClient:
         create_evaluator_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
+        output_message: typing.Optional[ChatMessageParams] = OMIT,
         judgment: typing.Optional[CreateEvaluatorLogRequestJudgmentParams] = OMIT,
         marked_completed: typing.Optional[bool] = OMIT,
         spec: typing.Optional[CreateEvaluatorLogRequestSpecParams] = OMIT,
@@ -1244,6 +1253,9 @@ class AsyncEvaluatorsClient:
         log_id : typing.Optional[str]
             This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
+        output_message : typing.Optional[ChatMessageParams]
+            The message returned by the LLM. Only populated for LLM Evaluator Logs.
+
         judgment : typing.Optional[CreateEvaluatorLogRequestJudgmentParams]
             Evaluator assessment of the Log.
 
@@ -1308,6 +1320,9 @@ class AsyncEvaluatorsClient:
                 "environment": create_evaluator_log_request_environment,
                 "save": save,
                 "log_id": log_id,
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
                 "judgment": convert_and_respect_annotation_metadata(
                     object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
                 ),

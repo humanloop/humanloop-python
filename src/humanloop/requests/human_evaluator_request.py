@@ -26,23 +26,23 @@ class HumanEvaluatorRequestParams(typing_extensions.TypedDict):
     Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
     """
 
-    evaluator_type: typing.Literal["human"]
-    instructions: typing_extensions.NotRequired[str]
-    """
-    Instructions for the Human annotating the .
-    """
-
     options: typing_extensions.NotRequired[typing.Sequence[EvaluatorJudgmentOptionResponseParams]]
     """
-    The options that the Human annotator can choose from.
+    The options that can be applied as judgments.
     """
 
     number_limits: typing_extensions.NotRequired[EvaluatorJudgmentNumberLimitParams]
     """
-    Limits on the judgment that can be applied. Only for Evaluators with `return_type` of `'number'`.
+    Limits on the judgment that can be applied. Only for Evaluators with `return_type` of 'number'.
     """
 
     number_valence: typing_extensions.NotRequired[Valence]
     """
-    The valence of the number judgment. Only for Evaluators with `return_type` of `'number'`. If 'positive', a higher number is better. If 'negative', a lower number is better.
+    The valence of the number judgment. Only for Evaluators with `return_type` of 'number'. If 'positive', a higher number is better. If 'negative', a lower number is better.
+    """
+
+    evaluator_type: typing.Literal["human"]
+    instructions: typing_extensions.NotRequired[str]
+    """
+    Instructions and guidelines for applying judgments.
     """
