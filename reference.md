@@ -9769,6 +9769,14 @@ client.evaluations.get_logs(
 <dl>
 <dd>
 
+**run_id:** `typing.Optional[typing.Union[str, typing.Sequence[str]]]` — Filter by Run IDs. Only Logs for the specified Runs will be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -9935,6 +9943,14 @@ for page in response.iter_pages():
 <dd>
 
 **sample:** `typing.Optional[int]` — If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_trace_children:** `typing.Optional[bool]` — If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
     
 </dd>
 </dl>

@@ -992,6 +992,7 @@ class EvaluationsClient:
         *,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
+        run_id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedDataEvaluationLogResponse:
         """
@@ -1009,6 +1010,9 @@ class EvaluationsClient:
 
         size : typing.Optional[int]
             Page size for pagination. Number of Logs to fetch.
+
+        run_id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Filter by Run IDs. Only Logs for the specified Runs will be returned.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1035,6 +1039,7 @@ class EvaluationsClient:
             params={
                 "page": page,
                 "size": size,
+                "run_id": run_id,
             },
             request_options=request_options,
         )
@@ -2131,6 +2136,7 @@ class AsyncEvaluationsClient:
         *,
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
+        run_id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PaginatedDataEvaluationLogResponse:
         """
@@ -2148,6 +2154,9 @@ class AsyncEvaluationsClient:
 
         size : typing.Optional[int]
             Page size for pagination. Number of Logs to fetch.
+
+        run_id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Filter by Run IDs. Only Logs for the specified Runs will be returned.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2182,6 +2191,7 @@ class AsyncEvaluationsClient:
             params={
                 "page": page,
                 "size": size,
+                "run_id": run_id,
             },
             request_options=request_options,
         )

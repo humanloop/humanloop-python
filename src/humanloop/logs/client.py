@@ -39,6 +39,7 @@ class LogsClient:
         include_parent: typing.Optional[bool] = None,
         in_trace_filter: typing.Optional[typing.Union[bool, typing.Sequence[bool]]] = None,
         sample: typing.Optional[int] = None,
+        include_trace_children: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[LogResponse]:
         """
@@ -85,6 +86,9 @@ class LogsClient:
         sample : typing.Optional[int]
             If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
 
+        include_trace_children : typing.Optional[bool]
+            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -128,6 +132,7 @@ class LogsClient:
                 "include_parent": include_parent,
                 "in_trace_filter": in_trace_filter,
                 "sample": sample,
+                "include_trace_children": include_trace_children,
             },
             request_options=request_options,
         )
@@ -155,6 +160,7 @@ class LogsClient:
                     include_parent=include_parent,
                     in_trace_filter=in_trace_filter,
                     sample=sample,
+                    include_trace_children=include_trace_children,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records
@@ -308,6 +314,7 @@ class AsyncLogsClient:
         include_parent: typing.Optional[bool] = None,
         in_trace_filter: typing.Optional[typing.Union[bool, typing.Sequence[bool]]] = None,
         sample: typing.Optional[int] = None,
+        include_trace_children: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[LogResponse]:
         """
@@ -353,6 +360,9 @@ class AsyncLogsClient:
 
         sample : typing.Optional[int]
             If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
+
+        include_trace_children : typing.Optional[bool]
+            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -405,6 +415,7 @@ class AsyncLogsClient:
                 "include_parent": include_parent,
                 "in_trace_filter": in_trace_filter,
                 "sample": sample,
+                "include_trace_children": include_trace_children,
             },
             request_options=request_options,
         )
@@ -432,6 +443,7 @@ class AsyncLogsClient:
                     include_parent=include_parent,
                     in_trace_filter=in_trace_filter,
                     sample=sample,
+                    include_trace_children=include_trace_children,
                     request_options=request_options,
                 )
                 _items = _parsed_response.records

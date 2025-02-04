@@ -8,7 +8,7 @@ from .datapoint_response_target_value import DatapointResponseTargetValueParams
 
 
 class DatapointResponseParams(typing_extensions.TypedDict):
-    inputs: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    inputs: typing_extensions.NotRequired[typing.Dict[str, str]]
     """
     The inputs to the prompt template.
     """

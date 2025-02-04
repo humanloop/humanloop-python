@@ -13,6 +13,7 @@ class ProviderApiKeys(UncheckedBaseModel):
     ai_21: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="ai21")] = None
     mock: typing.Optional[str] = None
     anthropic: typing.Optional[str] = None
+    deepseek: typing.Optional[str] = None
     bedrock: typing.Optional[str] = None
     cohere: typing.Optional[str] = None
     openai_azure: typing.Optional[str] = None
