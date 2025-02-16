@@ -1,4 +1,3 @@
-from contextvars import ContextVar
 import os
 import typing
 from typing import List, Optional, Sequence
@@ -11,7 +10,6 @@ from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
 from humanloop.utilities.types import DecoratorPromptKernelRequestParams
-from humanloop.eval_utils.context import EVALUATION_CONTEXT_VARIABLE_NAME, EvaluationContext
 
 from humanloop.eval_utils import log_with_evaluation_context, run_eval
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File

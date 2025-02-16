@@ -42,15 +42,15 @@ def test_scenario_runs(
     flow_logs = humanloop_client.logs.list(file_id=flow_file.id)
     assert flow_logs.items and len(flow_logs.items) == 1
     flow_log = flow_logs.items[0]
-    assert flow_log.trace_status == "complete"
+    assert flow_log.trace_status == "complete"  # type: ignore
     # List will not pass the children to the trace_children attribute
-    assert len(flow_log.trace_children) == 0
-    response = humanloop_client.logs.get(flow_log.id)
+    assert len(flow_log.trace_children) == 0  # type: ignore
+    response = humanloop_client.logs.get(flow_log.id)  # type: ignore [assignment]
     if not isinstance(response, dict):
-        response = response.dict()
-    assert response["trace_status"] == "complete"  # type: ignore [attr-defined]
-    assert len(response["trace_children"]) == 2
-    messages = response["trace_children"][1]["messages"]
+        response = response.dict()  # type: ignore [assignment]
+    assert response["trace_status"] == "complete"  # type: ignore
+    assert len(response["trace_children"]) == 2  # type: ignore [index]
+    messages = response["trace_children"][1]["messages"]  # type: ignore [index]
     assert len(messages) == 4
     # Messages are in reverse order
     assert messages[2]["content"] == scenario_io[0]

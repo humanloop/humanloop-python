@@ -38,31 +38,31 @@ def test_scenario(
     response = humanloop_client.directories.get(test_directory.id)
     flow = [file for file in response.files if file.type == "flow"][0]
     logs_page = humanloop_client.logs.list(file_id=flow.id)
-    assert len(logs_page.items) == 1
+    assert len(logs_page.items) == 1  # type: ignore [arg-type]
 
-    flow_log_id = logs_page.items[0].id
+    flow_log_id = logs_page.items[0].id  # type: ignore [index]
     flow_log = humanloop_client.logs.get(flow_log_id)
     if not isinstance(flow_log, dict):
-        flow_log = flow_log.dict()
-    assert flow_log["trace_status"] == "complete"
-    assert len(flow_log["trace_children"]) == 2
+        flow_log = flow_log.dict()  # type: ignore [assignment]
+    assert flow_log["trace_status"] == "complete"  # type: ignore [index]
+    assert len(flow_log["trace_children"]) == 2  # type: ignore [index]
 
     levenshtein = [file for file in response.files if file.path == levenshtein_path][0]
     levenshtein_logs_page = humanloop_client.logs.list(file_id=levenshtein.id)
     assert len(levenshtein_logs_page.items) == 1  # type: ignore [arg-type]
-    assert levenshtein_logs_page.items[0].parent_id == flow_log_id
-    assert levenshtein_logs_page.items[0].error is None
+    assert levenshtein_logs_page.items[0].parent_id == flow_log_id  # type: ignore
+    assert levenshtein_logs_page.items[0].error is None  # type: ignore [index]
 
     exact_match = [file for file in response.files if file.path == exact_match_path][0]
     exact_match_logs_page = humanloop_client.logs.list(file_id=exact_match.id)
-    assert len(exact_match_logs_page.items) == 1
-    assert exact_match_logs_page.items[0].parent_id == flow_log_id
-    assert exact_match_logs_page.items[0].error is None
+    assert len(exact_match_logs_page.items) == 1  # type: ignore [arg-type]
+    assert exact_match_logs_page.items[0].parent_id == flow_log_id  # type: ignore
+    assert exact_match_logs_page.items[0].error is None  # type: ignore [index]
 
-    response = humanloop_client.evaluations.list(file_id=flow.id)
+    response = humanloop_client.evaluations.list(file_id=flow.id)  # type: ignore [assignment]
     assert len(response.items) == 1  # type: ignore [attr-defined]
-    evaluation: EvaluationResponse = response.items[0]
-    assert evaluation.status == "completed"
+    evaluation: EvaluationResponse = response.items[0]  # type: ignore [attr-defined]
+    assert evaluation.status == "completed"  # type: ignore [attr-defined]
     assert evaluation.name == "Test"
     assert evaluation.runs_count == 1
     assert evaluation.file_id == flow.id

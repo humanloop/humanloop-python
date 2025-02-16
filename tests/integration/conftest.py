@@ -139,4 +139,4 @@ def capture_stdout() -> ContextManager[TextIO]:
         with redirect_stdout(f):
             yield f
 
-    return _context_manager
+    return _context_manager  # type: ignore [return-value]

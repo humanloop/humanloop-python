@@ -109,7 +109,7 @@ def evaluate_medqa_scenario(
     def retrieval_tool(question: str) -> str:
         """Retrieve most relevant document from the vector db (Chroma) for the question."""
         response = collection.query(query_texts=[question], n_results=1)
-        retrieved_doc = response["documents"][0][0]
+        retrieved_doc = response["documents"][0][0]  # type: ignore [index]
         return retrieved_doc
 
     @humanloop_client.prompt(path=get_test_path("Call Model"))
