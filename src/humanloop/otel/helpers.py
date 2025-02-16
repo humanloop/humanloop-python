@@ -244,7 +244,7 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
 
 def is_llm_provider_call(span: ReadableSpan) -> bool:
     """Determines if the span was created by an Instrumentor for LLM provider clients."""
-    if not span.instrumentation_scope:
+    if not hasattr(span, "instrumentation_scope") or span.instrumentation_scope is None:
         return False
     span_instrumentor_name = span.instrumentation_scope.name
     # Match against the prefix of the Instrumentor name since

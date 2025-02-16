@@ -38,10 +38,8 @@ class ExtendedEvalsClient(EvaluationsClient):
         self,
         *,
         client_wrapper: SyncClientWrapper,
-        evaluation_context_variable: ContextVar[Optional[EvaluationContext]],
     ):
         super().__init__(client_wrapper=client_wrapper)
-        self._evaluation_context_variable = evaluation_context_variable
 
     def run(
         self,
@@ -70,7 +68,6 @@ class ExtendedEvalsClient(EvaluationsClient):
             dataset=dataset,
             evaluators=evaluators,
             workers=workers,
-            evaluation_context_variable=self._evaluation_context_variable,
         )
 
 
@@ -118,31 +115,14 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
-        self.evaluation_context_variable: ContextVar[Optional[EvaluationContext]] = ContextVar(
-            EVALUATION_CONTEXT_VARIABLE_NAME
-        )
-
-        eval_client = ExtendedEvalsClient(
-            client_wrapper=self._client_wrapper,
-            evaluation_context_variable=self.evaluation_context_variable,
-        )
+        eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
 
         # Overload the .log method of the clients to be aware of Evaluation Context
-        # TODO: Overload the log for Evaluators and Tools once run_id is added
-        # to them.
-        self.prompts = log_with_evaluation_context(
-            client=self.prompts,
-            evaluation_context_variable=self.evaluation_context_variable,
-        )
-        # self.evaluators = log_with_evaluation_context(client=self.evaluators)
-        # self.tools = log_with_evaluation_context(client=self.tools)
-        self.flows = log_with_evaluation_context(
-            client=self.flows,
-            evaluation_context_variable=self.evaluation_context_variable,
-        )
+        self.prompts = log_with_evaluation_context(client=self.prompts)
+        self.flows = log_with_evaluation_context(client=self.flows)
 
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider
@@ -157,9 +137,7 @@ class Humanloop(BaseHumanloop):
         instrument_provider(provider=self._tracer_provider)
         self._tracer_provider.add_span_processor(
             HumanloopSpanProcessor(
-                exporter=HumanloopSpanExporter(
-                    client=self,
-                )
+                exporter=HumanloopSpanExporter(client=self),
             ),
         )
 
