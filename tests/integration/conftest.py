@@ -51,8 +51,12 @@ def root_integration_directory(humanloop_client: Humanloop) -> Generator[str, No
 def api_keys() -> APIKeys:
     openai_key = os.getenv("OPENAI_API_KEY")
     humanloop_key = os.getenv("HUMANLOOP_API_KEY")
-    if openai_key is None or humanloop_key is None:
-        raise ValueError("API keys are not set in .env file")
+    for key_name, key_value in [
+        ("OPENAI_API_KEY", openai_key),
+        ("HUMANLOOP_API_KEY", humanloop_key),
+    ]:
+        if key_value is None:
+            raise ValueError(f"{key_name} is not set in .env file")
     api_keys = APIKeys(
         openai=openai_key,
         humanloop=humanloop_key,
