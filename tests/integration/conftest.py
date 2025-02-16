@@ -31,23 +31,6 @@ def load_env():
 
 
 @pytest.fixture(scope="session")
-def root_integration_directory(humanloop_client: Humanloop) -> Generator[str, None, None]:
-    try:
-        response = humanloop_client.directories.create(path="SDK_INTEGRATION_TESTS")
-    except Exception:
-        list_dirs = humanloop_client.directories.list()
-        for directory in list_dirs:
-            if directory.path == "SDK_INTEGRATION_TESTS":
-                _directory_cleanup(directory.id, humanloop_client)
-        response = humanloop_client.directories.create(path="SDK_INTEGRATION_TESTS")
-    try:
-        yield response.path
-    finally:
-        time.sleep(1)
-        _directory_cleanup(response.id, humanloop_client)
-
-
-@pytest.fixture(scope="session")
 def api_keys() -> APIKeys:
     openai_key = os.getenv("OPENAI_API_KEY")
     humanloop_key = os.getenv("HUMANLOOP_API_KEY")
@@ -107,14 +90,13 @@ class DirectoryIdentifiers:
 
 @pytest.fixture()
 def test_directory(
-    root_integration_directory: str,
     humanloop_client: Humanloop,
 ) -> Generator[DirectoryIdentifiers, None, None]:
     # Generate a random  alphanumeric directory name to avoid conflicts
-    def get_random_string(length: int = 32) -> str:
-        return "".join([random.choice(string.ascii_letters) for _ in range(length)])
+    def get_random_string(length: int = 16) -> str:
+        return "".join([random.choice(string.ascii_letters + "0123456789") for _ in range(length)])
 
-    directory_path = f"{root_integration_directory}/{get_random_string()}"
+    directory_path = "SDK_integ_test_" + get_random_string()
     response = humanloop_client.directories.create(path=directory_path)
     assert response.path == directory_path
     try:
