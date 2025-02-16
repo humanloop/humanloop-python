@@ -58,8 +58,8 @@ def api_keys() -> APIKeys:
         if key_value is None:
             raise ValueError(f"{key_name} is not set in .env file")
     api_keys = APIKeys(
-        openai=openai_key,
-        humanloop=humanloop_key,
+        openai=openai_key,  # type: ignore [arg-type]
+        humanloop=humanloop_key,  # type: ignore [arg-type]
     )
     for key, value in asdict(api_keys).items():
         if value is None:
