@@ -126,8 +126,8 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
 
     def _add_dependency_to_await(self, span: ReadableSpan):
         # We know this span has a parent, need to satisfy the type checker
-        parent_span_id = span.parent.span_id  # type: ignore
         if self._is_dependency(span):
+            parent_span_id = span.parent.span_id  # type: ignore
             self._dependencies[parent_span_id].append(DependantSpan(span=span, finished=False))
 
     def _track_flow_traces(self, span: ReadableSpan):

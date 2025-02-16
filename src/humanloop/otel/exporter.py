@@ -207,12 +207,12 @@ class HumanloopSpanExporter(SpanExporter):
 
         if file_type == "prompt":
             self._export_prompt_span(span=span)
-        if file_type == "tool":
+        elif file_type == "tool":
             self._export_tool_span(span=span)
-        if file_type == "flow":
+        elif file_type == "flow":
             self._export_flow_span(span=span)
         else:
-            raise NotImplementedError(f"Unknown span type: {hl_file}")
+            raise NotImplementedError(f"Unknown span type: {file_type}")
 
     def _export_prompt_span(self, span: ReadableSpan) -> None:
         file_object: dict[str, Any] = read_from_opentelemetry_span(
