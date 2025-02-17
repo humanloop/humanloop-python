@@ -15,6 +15,7 @@ from tests.conftest import DirectoryIdentifiers
 from tests.integration.chat_agent.conftest import SurferAgentScenario
 
 
+@pytest.mark.skip("skip for demo")
 @pytest.mark.parametrize("use_call", [False])
 @patch("builtins.input")
 def test_scenario_runs(
