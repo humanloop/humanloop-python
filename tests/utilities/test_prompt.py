@@ -361,7 +361,7 @@ def test_prompt_decorator_with_hl_call(
     assert len(response.items) == 1  # type: ignore
 
 
-@pytest.mark.flaky(retries=3, delay=5)
+@pytest.mark.flaky(retries=3, delay=20)
 def test_overridden_call_with_prompt_in_prompt(
     humanloop_client: Humanloop,
     test_directory: DirectoryIdentifiers,

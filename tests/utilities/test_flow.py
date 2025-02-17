@@ -65,7 +65,7 @@ def _test_scenario(
     return _random_string, _call_llm, _agent_call, _flow_over_flow
 
 
-@pytest.mark.flaky(retries=3, delay=10)
+@pytest.mark.flaky(retries=3, delay=20)
 def test_decorators_without_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
@@ -111,7 +111,7 @@ def test_decorators_without_flow(
     )["prompt"]
 
 
-@pytest.mark.flaky(retries=3, delay=5)
+@pytest.mark.flaky(retries=3, delay=20)
 def test_decorators_with_flow_decorator(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
