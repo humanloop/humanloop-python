@@ -1,7 +1,16 @@
-from typing import Generator
+from dataclasses import asdict, dataclass
+import os
+import random
+import string
+import time
+from typing import Callable, Generator
+import typing
 from unittest.mock import MagicMock
 
+from dotenv import load_dotenv
 import pytest
+from humanloop.base_client import BaseHumanloop
+from humanloop.client import Humanloop
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
@@ -16,6 +25,9 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import Tracer
+
+if typing.TYPE_CHECKING:
+    from humanloop.client import BaseHumanloop
 
 
 @pytest.fixture(scope="function")
@@ -78,6 +90,7 @@ def opentelemetry_test_configuration(
 @pytest.fixture(scope="function")
 def opentelemetry_hl_test_configuration(
     opentelemetry_test_provider: TracerProvider,
+    humanloop_client: BaseHumanloop,
 ) -> Generator[tuple[Tracer, InMemorySpanExporter], None, None]:
     """Configure OTel backend with HumanloopSpanProcessor.
 
@@ -85,7 +98,10 @@ def opentelemetry_hl_test_configuration(
     Humanloop Spans.
     """
     exporter = InMemorySpanExporter()
-    processor = HumanloopSpanProcessor(exporter=exporter)
+    processor = HumanloopSpanProcessor(
+        exporter=exporter,
+        client=humanloop_client,
+    )
     opentelemetry_test_provider.add_span_processor(processor)
     instrumentors: list[BaseInstrumentor] = [
         OpenAIInstrumentor(),
@@ -126,7 +142,10 @@ def opentelemetry_hl_with_exporter_test_configuration(
     """Configure OTel backend with HumanloopSpanProcessor and
     a HumanloopSpanExporter where HTTP calls are mocked.
     """
-    processor = HumanloopSpanProcessor(exporter=hl_test_exporter)
+    processor = HumanloopSpanProcessor(
+        exporter=hl_test_exporter,
+        client=humanloop_client,  # type: ignore [arg-type]
+    )
     opentelemetry_test_provider.add_span_processor(processor)
     instrumentor = OpenAIInstrumentor()
     instrumentor.instrument(tracer_provider=opentelemetry_test_provider)
@@ -149,3 +168,117 @@ def call_llm_messages() -> list[ChatCompletionMessageParam]:
             "content": "Bonjour!",
         },
     ]
+
+
+@dataclass
+class APIKeys:
+    openai: str
+    humanloop: str
+
+
+@pytest.fixture(scope="session")
+def api_keys() -> APIKeys:
+    openai_key = os.getenv("OPENAI_API_KEY")
+    humanloop_key = os.getenv("HUMANLOOP_API_KEY")
+    for key_name, key_value in [
+        ("OPENAI_API_KEY", openai_key),
+        ("HUMANLOOP_API_KEY", humanloop_key),
+    ]:
+        if key_value is None:
+            raise ValueError(f"{key_name} is not set in .env file")
+    api_keys = APIKeys(
+        openai=openai_key,  # type: ignore [arg-type]
+        humanloop=humanloop_key,  # type: ignore [arg-type]
+    )
+    for key, value in asdict(api_keys).items():
+        if value is None:
+            raise ValueError(f"{key.upper()} key is not set in .env file")
+    return api_keys
+
+
+@pytest.fixture(scope="session")
+def humanloop_client(api_keys: APIKeys) -> Humanloop:
+    return Humanloop(api_key=api_keys.humanloop)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def load_env():
+    load_dotenv()
+
+
+def directory_cleanup(directory_id: str, humanloop_client: Humanloop):
+    response = humanloop_client.directories.get(directory_id)
+    for file in response.files:
+        file_id = file.id
+        if file.type == "prompt":
+            client = humanloop_client.prompts  # type: ignore [assignment]
+        elif file.type == "tool":
+            client = humanloop_client.tools  # type: ignore [assignment]
+        elif file.type == "dataset":
+            client = humanloop_client.datasets  # type: ignore [assignment]
+        elif file.type == "evaluator":
+            client = humanloop_client.evaluators  # type: ignore [assignment]
+        elif file.type == "flow":
+            client = humanloop_client.flows  # type: ignore [assignment]
+        else:
+            raise NotImplementedError(f"Unknown HL file type {file.type}")
+        client.delete(file_id)
+
+    for subdirectory in response.subdirectories:
+        directory_cleanup(
+            directory_id=subdirectory.id,
+            humanloop_client=humanloop_client,
+        )
+
+    humanloop_client.directories.delete(id=response.id)
+
+
+@dataclass
+class DirectoryIdentifiers:
+    path: str
+    id: str
+
+
+@pytest.fixture()
+def test_directory(
+    humanloop_client: Humanloop,
+) -> Generator[DirectoryIdentifiers, None, None]:
+    # Generate a random  alphanumeric directory name to avoid conflicts
+    def get_random_string(length: int = 16) -> str:
+        return "".join([random.choice(string.ascii_letters + "0123456789") for _ in range(length)])
+
+    directory_path = "SDK_integ_test_" + get_random_string()
+    response = humanloop_client.directories.create(path=directory_path)
+    assert response.path == directory_path
+    try:
+        yield DirectoryIdentifiers(
+            path=response.path,
+            id=response.id,
+        )
+    finally:
+        time.sleep(1)
+        directory_cleanup(response.id, humanloop_client)
+
+
+@pytest.fixture()
+def get_test_path(test_directory: DirectoryIdentifiers) -> Callable[[str], str]:
+    def generate_path(name: str) -> str:
+        return f"{test_directory.path}/{name}"
+
+    return generate_path
+
+
+# @pytest.fixture(scope="session", autouse=True)
+# def cleanup_test_dirs(humanloop_client: Humanloop):
+#     def _cleanup_all_test_dirs():
+#         dirs = humanloop_client.directories.list()
+#         for dir in dirs:
+#             if dir.path.startswith("SDK_integ_test_"):
+#                 directory_cleanup(
+#                     directory_id=dir.id,
+#                     humanloop_client=humanloop_client,
+#                 )
+
+#     _cleanup_all_test_dirs()
+#     yield
+#     _cleanup_all_test_dirs()

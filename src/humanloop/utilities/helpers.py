@@ -2,7 +2,7 @@ import inspect
 from typing import Any, Callable
 
 
-def args_to_inputs(func: Callable, args: tuple, kwargs: dict) -> dict[str, Any]:
+def bind_args(func: Callable, args: tuple, kwargs: dict) -> dict[str, Any]:
     """Maps arguments to their corresponding parameter names in the function signature.
 
     For example:

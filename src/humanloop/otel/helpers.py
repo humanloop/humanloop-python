@@ -5,6 +5,8 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
+from humanloop.otel.constants import HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
+
 NestedDict = dict[str, Union["NestedDict", AttributeValue]]
 NestedList = list[Union["NestedList", NestedDict]]
 
@@ -244,7 +246,7 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
 
 def is_llm_provider_call(span: ReadableSpan) -> bool:
     """Determines if the span was created by an Instrumentor for LLM provider clients."""
-    if not span.instrumentation_scope:
+    if not hasattr(span, "instrumentation_scope") or span.instrumentation_scope is None:
         return False
     span_instrumentor_name = span.instrumentation_scope.name
     # Match against the prefix of the Instrumentor name since
@@ -260,6 +262,10 @@ def is_llm_provider_call(span: ReadableSpan) -> bool:
             "opentelemetry.instrumentation.replicate",
         ]
     )
+
+
+def is_intercepted_call(span: ReadableSpan) -> bool:
+    return span.name == HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
 
 
 def is_humanloop_span(span: ReadableSpan) -> bool:

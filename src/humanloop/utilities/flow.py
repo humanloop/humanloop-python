@@ -6,7 +6,8 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.utilities.helpers import args_to_inputs
+from humanloop.eval_utils.run import HumanloopUtilityError
+from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils.types import File
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
@@ -51,6 +52,8 @@ def flow(
                         output=output,
                     )
                     error = None
+                except HumanloopUtilityError as e:
+                    raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
@@ -61,7 +64,9 @@ def flow(
                     error = str(e)
 
                 flow_log = {
-                    "inputs": args_to_inputs(func, args, kwargs),
+                    # TODO: Revisit and agree on
+                    "inputs": {k: v for k, v in bind_args(func, args, kwargs).items() if k != "messages"},
+                    "messages": bind_args(func, args, kwargs).get("messages"),
                     "output": output_stringified,
                     "error": error,
                 }

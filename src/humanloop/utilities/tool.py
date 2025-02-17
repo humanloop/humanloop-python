@@ -12,7 +12,8 @@ from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDic
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.utilities.helpers import args_to_inputs
+from humanloop.eval_utils.run import HumanloopUtilityError
+from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils import File
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
@@ -67,6 +68,8 @@ def tool(
                         output=output,
                     )
                     error = None
+                except HumanloopUtilityError as e:
+                    raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
@@ -78,7 +81,7 @@ def tool(
 
                 # Populate known Tool Log attributes
                 tool_log = {
-                    "inputs": args_to_inputs(func, args, kwargs),
+                    "inputs": bind_args(func, args, kwargs),
                     "output": output_stringified,
                     "error": error,
                 }
