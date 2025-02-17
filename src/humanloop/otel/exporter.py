@@ -375,6 +375,7 @@ class HumanloopSpanExporter(SpanExporter):
 
     def _keep_track_of_trace(self, log_id: str, parent_log_id: str):
         for trace in self._traces:
+            found = False
             if parent_log_id in trace:
                 trace.add(log_id)
                 found = True

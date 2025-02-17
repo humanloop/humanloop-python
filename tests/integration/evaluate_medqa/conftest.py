@@ -173,7 +173,7 @@ def evaluate_medqa_scenario_factory(
             return call_model(**inputs)
 
         with open(medqa_dataset_path, "r") as file:
-            datapoints = [json.loads(line) for line in file.readlines()][:20]
+            datapoints = [json.loads(line) for line in file.readlines()]
 
         for path, code, return_type in [
             (get_test_path("Levenshtein Distance"), levenshtein, "number"),

@@ -23,6 +23,7 @@ from datetime import datetime
 from functools import partial
 from logging import INFO
 from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, TypeVar, Union
+import warnings
 
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
 from humanloop.core.api_error import ApiError
@@ -121,13 +122,23 @@ def prompt_call_evaluation_aware(client: PromptsClient) -> PromptsClient:
                 # TODO: Bug found in backend: not specifying a model 400s but creates a File
                 raise HumanloopUtilityError(message=str(e)) from e
 
+            response_copy = response.dict()
             prompt_utility_context = get_prompt_utility_context()
+            for idx, _ in enumerate(response_copy.get("logs", [])):
+                del response_copy["logs"][idx]["created_at"]
+            for idx, _ in enumerate(response_copy["prompt"].get("environment", [])):
+                del response_copy["prompt"]["environment"][idx]["created_at"]
+            del response_copy["prompt"]["last_used_at"]
+            del response_copy["prompt"]["updated_at"]
+            del response_copy["prompt"]["created_at"]
+            del response_copy["start_time"]
+            del response_copy["end_time"]
 
             with prompt_utility_context.tracer.start_as_current_span(HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME) as span:
                 write_to_opentelemetry_span(
                     span=span,
                     key=HUMANLOOP_INTERCEPTED_HL_CALL_RESPONSE,
-                    value=response.dict(),
+                    value=response_copy,
                 )
             return response
         else:
