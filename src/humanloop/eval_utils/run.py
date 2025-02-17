@@ -126,8 +126,8 @@ def prompt_call_evaluation_aware(client: PromptsClient) -> PromptsClient:
             prompt_utility_context = get_prompt_utility_context()
             for idx, _ in enumerate(response_copy.get("logs", [])):
                 del response_copy["logs"][idx]["created_at"]
-            for idx, _ in enumerate(response_copy["prompt"].get("environment", [])):
-                del response_copy["prompt"]["environment"][idx]["created_at"]
+            for idx, _ in enumerate(response_copy["prompt"].get("environments", [])):
+                del response_copy["prompt"]["environments"][idx]["created_at"]
             del response_copy["prompt"]["last_used_at"]
             del response_copy["prompt"]["updated_at"]
             del response_copy["prompt"]["created_at"]
