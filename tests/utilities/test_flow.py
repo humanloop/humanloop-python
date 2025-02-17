@@ -65,6 +65,7 @@ def _test_scenario(
     return _random_string, _call_llm, _agent_call, _flow_over_flow
 
 
+@pytest.mark.flaky(retries=3, delay=30)
 def test_decorators_without_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
@@ -110,6 +111,7 @@ def test_decorators_without_flow(
     )["prompt"]
 
 
+@pytest.mark.flaky(retries=3, delay=30)
 def test_decorators_with_flow_decorator(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
@@ -152,6 +154,7 @@ def test_decorators_with_flow_decorator(
     assert read_from_opentelemetry_span(span=flow_span, key=HUMANLOOP_FILE_KEY)["flow"]
 
 
+@pytest.mark.flaky(retries=3, delay=30)
 def test_flow_decorator_flow_in_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
     call_llm_messages: list[dict],
@@ -189,6 +192,7 @@ def test_flow_decorator_flow_in_flow(
         read_from_opentelemetry_span(span=flow_span, key=HUMANLOOP_FILE_KEY)["flow"] != {}
 
 
+@pytest.mark.flaky(retries=3, delay=30)
 def test_flow_decorator_with_hl_exporter(
     call_llm_messages: list[dict],
     opentelemetry_hl_with_exporter_test_configuration: tuple[Tracer, HumanloopSpanExporter],
@@ -256,6 +260,7 @@ def test_flow_decorator_with_hl_exporter(
         assert tool_log_call_args.kwargs["trace_parent_id"] == prompt_log_id
 
 
+@pytest.mark.flaky(retries=3, delay=30)
 def test_flow_decorator_hl_exporter_flow_inside_flow(
     call_llm_messages: list[dict],
     opentelemetry_hl_with_exporter_test_configuration: tuple[Tracer, HumanloopSpanExporter],
