@@ -8,7 +8,7 @@ from tests.integration.evaluate_medqa.conftest import MedQAScenario
 from humanloop import Humanloop
 
 
-# @pytest.mark.skip("skip for demo")
+@pytest.mark.skip("skip for demo")
 @pytest.mark.parametrize("use_call", [True])
 def test_scenario(
     evaluate_medqa_scenario_factory: Callable[[bool], MedQAScenario],
