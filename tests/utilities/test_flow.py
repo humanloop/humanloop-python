@@ -65,7 +65,7 @@ def _test_scenario(
     return _random_string, _call_llm, _agent_call, _flow_over_flow
 
 
-@pytest.mark.flaky(retries=3, delay=20)
+@pytest.mark.flaky(retries=3, delay=60)
 def test_decorators_without_flow(
     opentelemetry_hl_test_configuration: tuple[Tracer, InMemorySpanExporter],
 ):
@@ -89,7 +89,7 @@ def test_decorators_without_flow(
     # WHEN exporting the spans
     # Wait for the prompt span to be exported; It was waiting
     # on the OpenAI call span to finish first
-    time.sleep(5)
+    time.sleep(3)
     spans = exporter.get_finished_spans()
 
     # THEN 3 spans arrive at the exporter
