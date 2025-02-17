@@ -2,13 +2,16 @@ from dataclasses import dataclass
 import logging
 from collections import defaultdict
 from typing import Optional
+import typing
 
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
+from humanloop.base_client import BaseHumanloop
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_FLOW_PREREQUISITES_KEY,
+    HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME,
     HUMANLOOP_LOG_KEY,
 )
 from humanloop.otel.helpers import (
@@ -17,6 +20,10 @@ from humanloop.otel.helpers import (
     write_to_opentelemetry_span,
 )
 from humanloop.otel.processor.prompts import enhance_prompt_span
+
+if typing.TYPE_CHECKING:
+    from humanloop.base_client import BaseHumanloop
+
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -49,6 +56,7 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
     def __init__(
         self,
         exporter: SpanExporter,
+        client: "BaseHumanloop",
     ) -> None:
         super().__init__(exporter)
         # span parent to span children map
@@ -58,6 +66,7 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         # They are passed to the Exporter as a span attribute
         # so the Exporter knows when to complete a trace
         self._spans_to_complete_flow_trace: dict[int, list[int]] = {}
+        self._client = client
 
     def shutdown(self):
         return super().shutdown()
@@ -172,6 +181,7 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
             span_id = span.context.span_id
             if file_type == "prompt":
                 enhance_prompt_span(
+                    client=self._client,
                     prompt_span=span,
                     dependencies=dependencies,
                 )
@@ -209,7 +219,9 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         # At the moment we only enrich Spans created by the Prompt decorators
         # As we add Instrumentors for other libraries, this function must
         # be expanded
-        return span.parent is not None and is_llm_provider_call(span=span)
+        return span.parent is not None and (
+            is_llm_provider_call(span=span) or span.name == HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
+        )
 
     @classmethod
     def _write_start_end_times(cls, span: ReadableSpan):

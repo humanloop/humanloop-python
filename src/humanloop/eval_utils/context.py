@@ -1,6 +1,7 @@
 from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import Any, Callable
+from opentelemetry.trace import Tracer
 
 
 @dataclass
@@ -26,11 +27,9 @@ class EvaluationContext:
     run_id: str
 
 
-EVALUATION_CONTEXT_VARIABLE_NAME = "__EVALUATION_CONTEXT"
+_EVALUATION_CONTEXT_VAR: ContextVar[EvaluationContext] = ContextVar("__EVALUATION_CONTEXT")
 
-_EVALUATION_CONTEXT_VAR: ContextVar[EvaluationContext] = ContextVar(EVALUATION_CONTEXT_VARIABLE_NAME)
-
-_UnsafeEvaluationContextRead = RuntimeError("EvaluationContext not set in the current thread.")
+_UnsafeContextRead = RuntimeError("Attempting to read from thread Context when variable was not set.")
 
 
 def set_evaluation_context(context: EvaluationContext):
@@ -41,7 +40,7 @@ def get_evaluation_context() -> EvaluationContext:
     try:
         return _EVALUATION_CONTEXT_VAR.get()
     except LookupError:
-        raise _UnsafeEvaluationContextRead
+        raise _UnsafeContextRead
 
 
 def evaluation_context_set() -> bool:
@@ -66,4 +65,59 @@ def is_evaluated_file(file_path) -> bool:
         evaluation_context = _EVALUATION_CONTEXT_VAR.get()
         return evaluation_context.path == file_path
     except LookupError:
-        raise _UnsafeEvaluationContextRead
+        raise _UnsafeContextRead
+
+
+@dataclass
+class PromptUtilityContext:
+    tracer: Tracer
+    _in_prompt_utility: int
+
+    @property
+    def in_prompt_utility(self) -> bool:
+        return self._in_prompt_utility > 0
+
+
+_PROMPT_UTILITY_CONTEXT_VAR: ContextVar[PromptUtilityContext] = ContextVar("__PROMPT_UTILITY_CONTEXT")
+
+
+def in_prompt_utility_context() -> bool:
+    try:
+        return _PROMPT_UTILITY_CONTEXT_VAR.get().in_prompt_utility
+    except LookupError:
+        return False
+
+
+def set_prompt_utility_context(tracer: Tracer):
+    global _PROMPT_UTILITY_CONTEXT_VAR
+    try:
+        prompt_utility_context = _PROMPT_UTILITY_CONTEXT_VAR.get()
+        # Already set, push another context
+        prompt_utility_context._in_prompt_utility += 1
+        _PROMPT_UTILITY_CONTEXT_VAR.set(prompt_utility_context)
+    except LookupError:
+        _PROMPT_UTILITY_CONTEXT_VAR.set(
+            PromptUtilityContext(
+                tracer=tracer,
+                _in_prompt_utility=1,
+            )
+        )
+
+
+def get_prompt_utility_context() -> PromptUtilityContext:
+    try:
+        return _PROMPT_UTILITY_CONTEXT_VAR.get()
+    except LookupError:
+        raise _UnsafeContextRead
+
+
+def unset_prompt_utility_context():
+    global _PROMPT_UTILITY_CONTEXT_VAR_TOKEN
+    try:
+        prompt_utility_context = _PROMPT_UTILITY_CONTEXT_VAR.get()
+        if prompt_utility_context._in_prompt_utility >= 1:
+            prompt_utility_context._in_prompt_utility -= 1
+        else:
+            raise ValueError("No matching unset_prompt_utility_context() call.")
+    except LookupError:
+        raise _UnsafeContextRead

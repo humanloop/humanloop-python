@@ -49,6 +49,8 @@ parse = ">=1"
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 typing_extensions = ">= 4.0.0"
+deepdiff = {extras = ["murmur"], version = "^8.2.0"}
+mmh3 = "^5.1.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "1.0.1"

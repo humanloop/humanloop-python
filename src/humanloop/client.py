@@ -9,6 +9,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
+from humanloop.eval_utils.run import prompt_call_evaluation_aware
 from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 
 from humanloop.eval_utils import log_with_evaluation_context, run_eval
@@ -120,6 +121,7 @@ class Humanloop(BaseHumanloop):
 
         # Overload the .log method of the clients to be aware of Evaluation Context
         self.prompts = log_with_evaluation_context(client=self.prompts)
+        self.prompts = prompt_call_evaluation_aware(client=self.prompts)
         self.flows = log_with_evaluation_context(client=self.flows)
 
         if opentelemetry_tracer_provider is not None:
@@ -135,6 +137,7 @@ class Humanloop(BaseHumanloop):
         instrument_provider(provider=self._tracer_provider)
         self._tracer_provider.add_span_processor(
             HumanloopSpanProcessor(
+                client=self,
                 exporter=HumanloopSpanExporter(client=self),
             ),
         )

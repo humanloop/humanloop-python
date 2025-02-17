@@ -1,15 +1,21 @@
 import time
+from typing import Callable
+
+import pytest
 from humanloop.types.evaluation_response import EvaluationResponse
-from tests.integration.conftest import DirectoryIdentifiers
+from tests.conftest import DirectoryIdentifiers
 from tests.integration.evaluate_medqa.conftest import MedQAScenario
 from humanloop import Humanloop
 
 
+@pytest.mark.parametrize("use_call", [True, False])
 def test_scenario(
-    evaluate_medqa_scenario: MedQAScenario,
+    evaluate_medqa_scenario_factory: Callable[[bool], MedQAScenario],
     humanloop_client: Humanloop,
     test_directory: DirectoryIdentifiers,
+    use_call: bool,
 ):
+    evaluate_medqa_scenario = evaluate_medqa_scenario_factory(use_call)
     ask_question_path, ask_question = evaluate_medqa_scenario.ask_question
     medqa_dataset_path, medqa_dataset = evaluate_medqa_scenario.medqa_dataset_path
     levenshtein_path = evaluate_medqa_scenario.levenshtein_path

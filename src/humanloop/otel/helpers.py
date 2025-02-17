@@ -5,6 +5,8 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
+from humanloop.otel.constants import HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
+
 NestedDict = dict[str, Union["NestedDict", AttributeValue]]
 NestedList = list[Union["NestedList", NestedDict]]
 
@@ -260,6 +262,10 @@ def is_llm_provider_call(span: ReadableSpan) -> bool:
             "opentelemetry.instrumentation.replicate",
         ]
     )
+
+
+def is_intercepted_call(span: ReadableSpan) -> bool:
+    return span.name == HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
 
 
 def is_humanloop_span(span: ReadableSpan) -> bool:

@@ -6,7 +6,9 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.utilities.helpers import args_to_inputs
+from humanloop.eval_utils.context import set_prompt_utility_context, unset_prompt_utility_context
+from humanloop.eval_utils.run import HumanloopUtilitySyntaxError
+from humanloop.utilities.helpers import bind_args
 from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils import File
 from humanloop.otel.constants import (
@@ -29,6 +31,7 @@ def prompt(
     def decorator(func: Callable):
         @wraps(func)
         def wrapper(*args: Sequence[Any], **kwargs: Mapping[str, Any]) -> Any:
+            set_prompt_utility_context(tracer=opentelemetry_tracer)
             span: Span
             with opentelemetry_tracer.start_as_current_span("humanloop.prompt") as span:  # type: ignore
                 span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
@@ -52,6 +55,8 @@ def prompt(
                         output=output,
                     )
                     error = None
+                except HumanloopUtilitySyntaxError as e:
+                    raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
@@ -62,7 +67,8 @@ def prompt(
                     error = str(e)
 
                 prompt_log = {
-                    "inputs": args_to_inputs(func, args, kwargs),
+                    "inputs": {k: v for k, v in bind_args(func, args, kwargs).items() if k != "messages"},
+                    "messages": bind_args(func, args, kwargs).get("messages"),
                     "output": output_stringified,
                     "error": error,
                 }
@@ -74,6 +80,7 @@ def prompt(
                 )
 
             # Return the output of the decorated function
+            unset_prompt_utility_context()
             return output
 
         wrapper.file = File(  # type: ignore

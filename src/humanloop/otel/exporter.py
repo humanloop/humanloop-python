@@ -186,7 +186,6 @@ class HumanloopSpanExporter(SpanExporter):
 
     def _export_span_dispatch(self, span: ReadableSpan) -> None:
         """Call the appropriate BaseHumanloop.X.log based on the Span type."""
-        hl_file = read_from_opentelemetry_span(span, key=HUMANLOOP_FILE_KEY)
         file_type = span._attributes.get(HUMANLOOP_FILE_TYPE_KEY)  # type: ignore
         parent_span_id = span.parent.span_id if span.parent else None
 
