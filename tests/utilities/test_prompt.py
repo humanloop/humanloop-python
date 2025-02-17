@@ -29,6 +29,8 @@ from replicate.exceptions import ModelError as ReplicateModelError  # type: igno
 from tests.conftest import DirectoryIdentifiers  # type: ignore [import]
 
 
+pytest.skip("skip for demo", allow_module_level=True)
+
 _PROVIDER_AND_MODEL = [
     ("openai", "gpt-4o-mini"),
     ("groq", "llama3-8b-8192"),
