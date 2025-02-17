@@ -6,7 +6,7 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.eval_utils.run import HumanloopUtilitySyntaxError
+from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils.types import File
 from humanloop.otel.constants import (
@@ -52,7 +52,7 @@ def flow(
                         output=output,
                     )
                     error = None
-                except HumanloopUtilitySyntaxError as e:
+                except HumanloopUtilityError as e:
                     raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")

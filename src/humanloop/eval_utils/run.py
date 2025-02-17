@@ -99,7 +99,7 @@ RESET = "\033[0m"
 CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, ToolsClient, FlowsClient, EvaluatorsClient)
 
 
-class HumanloopUtilitySyntaxError(Exception):
+class HumanloopUtilityError(Exception):
     def __init__(self, message):
         self.message = message
 
@@ -119,7 +119,7 @@ def prompt_call_evaluation_aware(client: PromptsClient) -> PromptsClient:
                 response = typing.cast(PromptCallResponse, response)
             except Exception as e:
                 # TODO: Bug found in backend: not specifying a model 400s but creates a File
-                raise HumanloopUtilitySyntaxError(message=str(e)) from e
+                raise HumanloopUtilityError(message=str(e)) from e
 
             prompt_utility_context = get_prompt_utility_context()
 

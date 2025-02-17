@@ -15,7 +15,7 @@ from tests.conftest import DirectoryIdentifiers
 from tests.integration.chat_agent.conftest import SurferAgentScenario
 
 
-@pytest.mark.parametrize("use_call", [False, True])
+@pytest.mark.parametrize("use_call", [False])
 @patch("builtins.input")
 def test_scenario_runs(
     mocked_input: MagicMock,

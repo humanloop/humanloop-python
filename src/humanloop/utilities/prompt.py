@@ -7,7 +7,7 @@ from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
 from humanloop.eval_utils.context import set_prompt_utility_context, unset_prompt_utility_context
-from humanloop.eval_utils.run import HumanloopUtilitySyntaxError
+from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.utilities.helpers import bind_args
 from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 from humanloop.eval_utils import File
@@ -55,7 +55,7 @@ def prompt(
                         output=output,
                     )
                     error = None
-                except HumanloopUtilitySyntaxError as e:
+                except HumanloopUtilityError as e:
                     raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")

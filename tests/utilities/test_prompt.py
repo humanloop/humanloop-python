@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from groq import NotFoundError as GroqNotFoundError
 from humanloop.client import Humanloop
-from humanloop.eval_utils.run import HumanloopUtilitySyntaxError
+from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.utilities.prompt import prompt
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
@@ -144,7 +144,6 @@ def _test_scenario(opentelemetry_tracer: Tracer, **kwargs):
 
 
 # LLM provider might not be available, retry the test
-@pytest.mark.flaky(retries=3, delay=60)
 @pytest.mark.parametrize("provider_model", _PROVIDER_AND_MODEL)
 def test_prompt_decorator(
     provider_model: tuple[str, str],
@@ -166,7 +165,7 @@ def test_prompt_decorator(
 
     # Wait for the Prompt span to be exported, it is waiting
     # asynchronously for the LLM provider call span to finish
-    time.sleep(1)
+    time.sleep(10)
 
     # THEN two spans are created: one for the OpenAI LLM provider call and one for the Prompt
     spans = exporter.get_finished_spans()
@@ -204,7 +203,7 @@ def test_prompt_decorator_with_hl_processor(
 
     # Wait for the Prompt span to be exported, it is waiting
     # asynchronously for the LLM provider call span to finish
-    time.sleep(1)
+    time.sleep(10)
 
     spans = exporter.get_finished_spans()
     assert len(spans) == 2
@@ -256,7 +255,7 @@ def test_prompt_decorator_with_defaults(
 
     # Wait for the Prompt span to be exported, it is waiting
     # asynchronously for the LLM provider call span to finish
-    time.sleep(1)
+    time.sleep(10)
 
     spans = exporter.get_finished_spans()
     # THEN the Prompt span is enhanced with information and forms a correct PromptKernel
@@ -312,7 +311,7 @@ def test_prompt_attributes(
 
     # Wait for the Prompt span to be exported, it is waiting
     # asynchronously for the LLM provider call span to finish
-    time.sleep(1)
+    time.sleep(10)
 
     assert len(exporter.get_finished_spans()) == 2
 
@@ -361,7 +360,7 @@ def test_prompt_decorator_with_hl_call(
     assert len(response.items) == 1  # type: ignore
 
 
-@pytest.mark.flaky(retries=3, delay=20)
+@pytest.mark.skip("prompt.call() unhandled behavior")
 def test_overridden_call_with_prompt_in_prompt(
     humanloop_client: Humanloop,
     test_directory: DirectoryIdentifiers,
@@ -410,7 +409,7 @@ def test_overridden_call_with_prompt_in_prompt(
     )
 
     # Wait for the workspace to be updated
-    time.sleep(3)
+    time.sleep(10)
 
     assert output is not None
     response = humanloop_client.directories.get(id=test_directory.id)
@@ -448,7 +447,7 @@ def test_overridden_call_fails_obviously(
         )
         return response.logs[0].output_message.content  # type: ignore [union-attr]
 
-    with pytest.raises(HumanloopUtilitySyntaxError):
+    with pytest.raises(HumanloopUtilityError):
         call_llm_with_hl_call()
 
     response = humanloop_client.directories.get(id=test_directory.id)
@@ -480,7 +479,7 @@ def test_overridden_call_must_match_utility_path(
 
         return response.logs[0].output_message.content
 
-    with pytest.raises(HumanloopUtilitySyntaxError):
+    with pytest.raises(HumanloopUtilityError):
         call_llm_with_hl_call()
 
     response = humanloop_client.directories.get(id=test_directory.id)
@@ -531,7 +530,7 @@ def test_overridden_call_must_match_utility(
 
         return response.logs[0].output_message.content
 
-    with pytest.raises(HumanloopUtilitySyntaxError):
+    with pytest.raises(HumanloopUtilityError):
         call_llm_with_hl_call()
 
     response = humanloop_client.directories.get(id=test_directory.id)

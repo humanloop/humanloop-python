@@ -5,7 +5,7 @@ import typing
 from opentelemetry.sdk.trace import ReadableSpan
 from pydantic import ValidationError as PydanticValidationError
 
-from humanloop.eval_utils.run import HumanloopUtilitySyntaxError
+from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
     HUMANLOOP_INTERCEPTED_HL_CALL_RESPONSE,
@@ -52,16 +52,6 @@ def enhance_prompt_span(client: "BaseHumanloop", prompt_span: ReadableSpan, depe
             )
 
 
-def _deep_equal(obj_a: list[dict], obj_b: list[dict]) -> bool:
-    def freeze_dict(d: dict) -> frozenset:
-        return frozenset((k, freeze_dict(v) if isinstance(v, dict) else v) for k, v in d.items())
-
-    frozen_a = [freeze_dict(d) for d in obj_a]
-    frozen_b = [freeze_dict(d) for d in obj_b]
-
-    return all(item in frozen_b for item in frozen_a) and all(item in frozen_a for item in frozen_b)
-
-
 def _enrich_prompt_kernel_from_intercepted_call(
     client: "BaseHumanloop",
     prompt_span: ReadableSpan,
@@ -73,7 +63,7 @@ def _enrich_prompt_kernel_from_intercepted_call(
     )
     hl_file = read_from_opentelemetry_span(
         span=prompt_span,
-        key=f"{HUMANLOOP_FILE_KEY}",
+        key=HUMANLOOP_FILE_KEY,
     )
     hl_path = read_from_opentelemetry_span(
         span=prompt_span,
@@ -95,7 +85,7 @@ def _enrich_prompt_kernel_from_intercepted_call(
             # despite not saving the log, so we rollback the File
             file_id = intercepted_response["prompt"]["id"]
             client.prompts.delete(id=file_id)
-            raise HumanloopUtilitySyntaxError(
+            raise HumanloopUtilityError(
                 f"The prompt.call() {key} argument does not match the one provided in the decorator"
             )
 
