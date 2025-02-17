@@ -142,7 +142,7 @@ def prompt_call_evaluation_aware(client: PromptsClient) -> PromptsClient:
                 )
             return response
         else:
-            return self._call(kwargs)
+            return self._call(**kwargs)
 
     # Replace the original log method with the overloaded one
     client.call = types.MethodType(_overload_call, client)
