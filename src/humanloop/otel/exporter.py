@@ -11,7 +11,7 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
 from humanloop.core import ApiError as HumanloopApiError
-from humanloop.eval_utils.context import (
+from humanloop.context_variables import (
     EvaluationContext,
     evaluation_context_set,
     get_evaluation_context,

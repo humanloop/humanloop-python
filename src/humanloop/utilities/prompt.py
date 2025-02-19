@@ -6,7 +6,7 @@ from opentelemetry.sdk.trace import Span
 from opentelemetry.trace import Tracer
 from typing_extensions import Unpack
 
-from humanloop.eval_utils.context import set_prompt_utility_context, unset_prompt_utility_context
+from humanloop.context_variables import set_prompt_utility_context, unset_prompt_utility_context
 from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.utilities.helpers import bind_args
 from humanloop.utilities.types import DecoratorPromptKernelRequestParams
@@ -60,6 +60,8 @@ def prompt(
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
+                    # TODO: output ought to be None on errors, check
+                    # all decorators
                     output_stringified = jsonify_if_not_string(
                         func=func,
                         output=output,
