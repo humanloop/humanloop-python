@@ -1,7 +1,7 @@
+from contextlib import contextmanager
 import os
 import typing
-from typing import List, Optional, Sequence
-from typing_extensions import Unpack
+from typing import Any, List, Optional, Sequence
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -10,7 +10,6 @@ from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
 from humanloop.eval_utils.run import prompt_call_evaluation_aware
-from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 
 from humanloop.eval_utils import log_with_evaluation_context, run_eval
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
@@ -147,11 +146,11 @@ class Humanloop(BaseHumanloop):
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
 
+    @contextmanager
     def prompt(
         self,
         *,
-        path: Optional[str] = None,
-        **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],  # type: ignore
+        path: str,
     ):
         """Decorator for declaring a [Prompt](https://humanloop.com/docs/explanation/prompts) in code.
 
@@ -226,17 +225,14 @@ class Humanloop(BaseHumanloop):
 
         :param prompt_kernel: Attributes that define the Prompt. See `class:DecoratorPromptKernelRequestParams`
         """
-        return prompt_decorator_factory(
-            opentelemetry_tracer=self._opentelemetry_tracer,
-            path=path,
-            **prompt_kernel,
-        )
+        return prompt_decorator_factory(path=path)
 
     def tool(
         self,
         *,
-        path: Optional[str] = None,
-        **tool_kernel: Unpack[ToolKernelRequestParams],  # type: ignore
+        path: str,
+        attributes: dict[str, Any] | None = None,
+        setup_values: dict[str, Any] | None = None,
     ):
         """Decorator for declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code.
 
@@ -309,14 +305,15 @@ class Humanloop(BaseHumanloop):
         return tool_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            **tool_kernel,
+            attributes=attributes,
+            setup_values=setup_values,
         )
 
     def flow(
         self,
         *,
-        path: Optional[str] = None,
-        **flow_kernel: Unpack[FlowKernelRequestParams],  # type: ignore
+        path: str = None,
+        attributes: dict[str, Any] | None = None,
     ):
         """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
 
@@ -371,7 +368,7 @@ class Humanloop(BaseHumanloop):
         return flow_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            **flow_kernel,
+            attributes=attributes,
         )
 
 

@@ -10,8 +10,8 @@ from inspect import Parameter
 from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
 
 from opentelemetry.trace import Tracer
-from typing_extensions import Unpack
 
+from humanloop.context import get_trace_id
 from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils import File
@@ -33,32 +33,35 @@ logger = logging.getLogger("humanloop.sdk")
 
 def tool(
     opentelemetry_tracer: Tracer,
-    path: Optional[str] = None,
-    **tool_kernel: Unpack[ToolKernelRequestParams],  # type: ignore
+    path: str,
+    attributes: dict[str, Any] | None = None,
+    setup_values: dict[str, Any] | None = None,
 ):
     def decorator(func: Callable):
-        enhanced_tool_kernel = _build_tool_kernel(
+        decorator_path = path or func.__name__
+        file_type = "tool"
+
+        tool_kernel = _build_tool_kernel(
             func=func,
-            attributes=tool_kernel.get("attributes"),
-            setup_values=tool_kernel.get("setup_values"),
+            attributes=attributes,
+            setup_values=setup_values,
             strict=True,
         )
 
-        # Mypy complains about adding attribute on function, but it's nice UX
-        func.json_schema = enhanced_tool_kernel["function"]  # type: ignore
+        # Mypy complains about adding attribute on function, but it's nice DX
+        func.json_schema = tool_kernel["function"]  # type: ignore
 
         @wraps(func)
         def wrapper(*args, **kwargs):
             with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
-                span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
-                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "tool")
-                if enhanced_tool_kernel:
-                    write_to_opentelemetry_span(
-                        span=span,
-                        key=f"{HUMANLOOP_FILE_KEY}.tool",
-                        value=enhanced_tool_kernel,
-                    )
+                span.set_attribute(HUMANLOOP_PATH_KEY, decorator_path)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
+                write_to_opentelemetry_span(
+                    span=span,
+                    key=HUMANLOOP_FILE_KEY,
+                    value=tool_kernel,
+                )
 
                 # Call the decorated function
                 try:
@@ -68,8 +71,6 @@ def tool(
                         output=output,
                     )
                     error = None
-                except HumanloopUtilityError as e:
-                    raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
@@ -84,6 +85,7 @@ def tool(
                     "inputs": bind_args(func, args, kwargs),
                     "output": output_stringified,
                     "error": error,
+                    "trace_parent_id": get_trace_id(),
                 }
 
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
@@ -97,9 +99,9 @@ def tool(
                 return output
 
         wrapper.file = File(  # type: ignore
-            path=path if path else func.__name__,
-            type="tool",
-            version=enhanced_tool_kernel,
+            path=decorator_path,
+            type=file_type,
+            version=tool_kernel,
             callable=wrapper,
         )
 

@@ -16,17 +16,16 @@ import logging
 import sys
 import threading
 import time
-import types
 import typing
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from functools import partial
 from logging import INFO
-from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, TypeVar, Union
+from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Union
 
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
+from humanloop.context import EvaluationContext, set_evaluation_context
 from humanloop.core.api_error import ApiError
-from humanloop.context_variables import EvaluationContext, set_evaluation_context
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
 # We use TypedDicts for requests, which is consistent with the rest of the SDK
