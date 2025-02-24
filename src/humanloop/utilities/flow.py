@@ -1,21 +1,21 @@
 import logging
 from functools import wraps
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Mapping, Optional, Sequence
 
 from opentelemetry.trace import Span, Tracer
 from opentelemetry import context as context_api
+import requests
 
 from humanloop.base_client import BaseHumanloop
 from humanloop.context import get_trace_id, set_trace_id
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils.types import File
 from humanloop.otel.constants import (
-    HUMANLOOP_FILE_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
-from humanloop.otel.helpers import jsonify_if_not_string, write_to_opentelemetry_span
+from humanloop.otel.helpers import process_output, write_to_opentelemetry_span
 from humanloop.requests import FlowKernelRequestParams as FlowDict
 
 logger = logging.getLogger("humanloop.sdk")
@@ -25,7 +25,7 @@ def flow(
     client: "BaseHumanloop",
     opentelemetry_tracer: Tracer,
     path: str,
-    attributes: dict[str, Any] | None = None,
+    attributes: Optional[dict[str, Any]] = None,
 ):
     flow_kernel = {"attributes": attributes or {}}
 
@@ -46,34 +46,55 @@ def flow(
                     "messages": args_to_func.get("messages"),
                     "trace_parent_id": trace_id,
                 }
-                log_id = client.flows.log(path=path, flow=flow_kernel, **log_inputs).id
-                token = set_trace_id(log_id)
+                init_log = requests.post(
+                    f"{client._client_wrapper.get_base_url()}/flows/log",
+                    headers=client._client_wrapper.get_headers(),
+                    json={
+                        "path": path,
+                        "flow": flow_kernel,
+                        "log_status": "incomplete",
+                        **log_inputs,
+                    },
+                ).json()
+                # log = client.flows.log(
+                #     path=path,
+                #     **log_inputs,
+                #     log_status="incomplete",
+                # )
+                token = set_trace_id(init_log["id"])
 
                 span.set_attribute(HUMANLOOP_PATH_KEY, decorator_path)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
-                write_to_opentelemetry_span(HUMANLOOP_FILE_KEY, flow_kernel)
 
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
-                    output_stringified = jsonify_if_not_string(
-                        func=func,
-                        output=output,
-                    )
+                    if (
+                        isinstance(output, dict)
+                        and len(output.keys()) == 2
+                        and "role" in output
+                        and "content" in output
+                    ):
+                        output_message = output
+                        output = None
+                    else:
+                        output = process_output(func=func, output=output)
+                        output_message = None
                     error = None
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
-                    output_stringified = jsonify_if_not_string(
-                        func=func,
-                        output=None,
-                    )
+                    output_message = None
                     error = str(e)
 
                 flow_log = {
-                    # TODO: Revisit and agree on
-                    "output": output_stringified,
+                    "inputs": {k: v for k, v in args_to_func.items() if k != "messages"},
+                    "messages": args_to_func.get("messages"),
+                    "log_status": "complete",
+                    "output": output,
                     "error": error,
+                    "output_message": output_message,
+                    "id": init_log["id"],
                 }
 
                 # Write the Flow Log to the Span on HL_LOG_OT_KEY
@@ -81,7 +102,7 @@ def flow(
                     write_to_opentelemetry_span(
                         span=span,
                         key=HUMANLOOP_LOG_KEY,
-                        value={**log_inputs},  # type: ignore
+                        value=flow_log,  # type: ignore
                     )
 
             context_api.detach(token=token)

@@ -166,7 +166,7 @@ def run_eval(
             set_evaluation_context(
                 EvaluationContext(
                     source_datapoint_id=dp.id,
-                    upload_callback=upload_callback,
+                    callback=upload_callback,
                     file_id=hl_file.id,
                     run_id=run.id,
                     path=hl_file.path,
@@ -741,32 +741,32 @@ def _run_local_evaluators(
         else:
             log_dict = log
     datapoint_dict = datapoint.dict() if datapoint else None
-    for local_evaluator, eval_function in local_evaluators:
+    for local_evaluator in local_evaluators:
         start_time = datetime.now()
         try:
-            if local_evaluator.spec.arguments_type == "target_required":
-                judgement = eval_function(
+            if local_evaluator.hl_evaluator.spec.arguments_type == "target_required":
+                judgement = local_evaluator.function(
                     log_dict,
                     datapoint_dict,
                 )
             else:
-                judgement = eval_function(log_dict)
+                judgement = local_evaluator.function(log_dict)
 
             _ = client.evaluators.log(
-                version_id=local_evaluator.version_id,
+                version_id=local_evaluator.hl_evaluator.version_id,
                 parent_id=log_id,
                 judgment=judgement,
-                id=local_evaluator.id,
+                id=local_evaluator.hl_evaluator.id,
                 start_time=start_time,
                 end_time=datetime.now(),
             )
         except Exception as e:
             _ = client.evaluators.log(
                 parent_id=log_id,
-                id=local_evaluator.id,
+                id=local_evaluator.hl_evaluator.id,
                 error=str(e),
                 start_time=start_time,
                 end_time=datetime.now(),
             )
-            logger.warning(f"\nEvaluator {local_evaluator.path} failed with error {str(e)}")
+            logger.warning(f"\nEvaluator {local_evaluator.hl_evaluator.path} failed with error {str(e)}")
     progress_bar.increment()

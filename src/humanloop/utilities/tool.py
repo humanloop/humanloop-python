@@ -12,7 +12,6 @@ from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDic
 from opentelemetry.trace import Tracer
 
 from humanloop.context import get_trace_id
-from humanloop.eval_utils.run import HumanloopUtilityError
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils import File
 from humanloop.otel.constants import (
@@ -21,7 +20,7 @@ from humanloop.otel.constants import (
     HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
-from humanloop.otel.helpers import jsonify_if_not_string, write_to_opentelemetry_span
+from humanloop.otel.helpers import process_output, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
@@ -34,11 +33,11 @@ logger = logging.getLogger("humanloop.sdk")
 def tool(
     opentelemetry_tracer: Tracer,
     path: str,
-    attributes: dict[str, Any] | None = None,
-    setup_values: dict[str, Any] | None = None,
+    attributes: Optional[dict[str, Any]] = None,
+    setup_values: Optional[dict[str, Any]] = None,
 ):
     def decorator(func: Callable):
-        decorator_path = path or func.__name__
+        path_in_decorator = path or func.__name__
         file_type = "tool"
 
         tool_kernel = _build_tool_kernel(
@@ -55,18 +54,18 @@ def tool(
         def wrapper(*args, **kwargs):
             with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
-                span.set_attribute(HUMANLOOP_PATH_KEY, decorator_path)
-                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
                 write_to_opentelemetry_span(
                     span=span,
                     key=HUMANLOOP_FILE_KEY,
                     value=tool_kernel,
                 )
+                span.set_attribute(HUMANLOOP_PATH_KEY, path_in_decorator)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
 
                 # Call the decorated function
                 try:
                     output = func(*args, **kwargs)
-                    output_stringified = jsonify_if_not_string(
+                    output_stringified = process_output(
                         func=func,
                         output=output,
                     )
@@ -74,7 +73,7 @@ def tool(
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
-                    output_stringified = jsonify_if_not_string(
+                    output_stringified = process_output(
                         func=func,
                         output=output,
                     )
@@ -99,7 +98,7 @@ def tool(
                 return output
 
         wrapper.file = File(  # type: ignore
-            path=decorator_path,
+            path=path_in_decorator,
             type=file_type,
             version=tool_kernel,
             callable=wrapper,

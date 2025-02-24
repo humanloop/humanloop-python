@@ -15,7 +15,6 @@ ResetToken = object
 
 def get_trace_id() -> Optional[str]:
     key = hash((HUMANLOOP_CONTEXT_TRACE_ID, threading.get_ident()))
-    context_api.get_value()
     return context_api.get_value(key=key)
 
 
@@ -28,16 +27,27 @@ def reset_trace_id_context(token: ResetToken):
     context_api.detach(token=token)
 
 
-def set_prompt_path(path: str) -> ResetToken:
+@dataclass
+class PromptContext:
+    path: str
+    template: Optional[str]
+
+
+def set_prompt_context(prompt_context: PromptContext) -> ResetToken:
     key = hash((HUMANLOOP_CONTEXT_PROMPT_PATH, threading.get_ident()))
-    return context_api.set_value(key=key, value=path)
+    return context_api.attach(
+        context_api.set_value(
+            key=key,
+            value=prompt_context,
+        )
+    )
 
 
-def reset_prompt_path(token: ResetToken):
+def reset_prompt_context(token: ResetToken):
     context_api.detach(token=token)
 
 
-def get_prompt_path() -> Optional[str]:
+def get_prompt_context() -> Optional[PromptContext]:
     key = hash((HUMANLOOP_CONTEXT_PROMPT_PATH, threading.get_ident()))
     return context_api.get_value(key)
 
@@ -51,9 +61,9 @@ class EvaluationContext:
     path: str
 
 
-def set_evaluation_context(evaluation_context: EvaluationContext):
+def set_evaluation_context(evaluation_context: EvaluationContext) -> ResetToken:
     key = hash((HUMANLOOP_CONTEXT_EVALUATION, threading.get_ident()))
-    context_api.set_value(key, evaluation_context)
+    return context_api.attach(context_api.set_value(key, evaluation_context))
 
 
 def get_evaluation_context() -> Optional[EvaluationContext]:

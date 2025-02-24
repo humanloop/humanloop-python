@@ -5,8 +5,11 @@ from typing import TypedDict
 from opentelemetry.sdk.trace import ReadableSpan, Span
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
-from humanloop.context import get_prompt_path
+from humanloop.context import get_prompt_context, get_trace_id
 from humanloop.otel.constants import (
+    HUMANLOOP_FILE_KEY,
+    HUMANLOOP_FILE_TYPE_KEY,
+    HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
 from humanloop.otel.helpers import is_llm_provider_call
@@ -39,10 +42,21 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
     def __init__(self, exporter: SpanExporter) -> None:
         super().__init__(exporter)
 
-    def on_start(self, span: Span):
+    def on_start(self, span: Span, parent_context):
         if is_llm_provider_call(span):
-            prompt_path = get_prompt_path()
-            if prompt_path:
-                span.set_attribute(HUMANLOOP_PATH_KEY, prompt_path)
+            context = get_prompt_context()
+            prompt_path, prompt_template = context.path, context.template
+            if context:
+                span.set_attribute(HUMANLOOP_PATH_KEY, context.path)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "prompt")
+                if prompt_template:
+                    span.set_attribute(
+                        f"{HUMANLOOP_FILE_KEY}.template",
+                        prompt_template,
+                    )
             else:
-                raise ValueError("Provider call outside @prompt context manager")
+                raise ValueError(f"Provider call outside @prompt context manager: {prompt_path}")
+            trace_id = get_trace_id()
+            if trace_id:
+                span.set_attribute(f"{HUMANLOOP_LOG_KEY}.trace_parent_id", trace_id)
+                print(span)

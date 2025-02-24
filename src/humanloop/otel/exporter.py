@@ -9,6 +9,7 @@ from typing import Optional, Sequence
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
+import requests
 from humanloop.context import get_evaluation_context, EvaluationContext
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_TYPE_KEY,
@@ -156,8 +157,17 @@ class HumanloopSpanExporter(SpanExporter):
                         value=log_args,
                     )
 
-            id = self._client.export(span_to_export.to_json())
-            if evaluation_context:
-                evaluation_context.callback(id)
+            response = requests.post(
+                f"{self._client._client_wrapper.get_base_url()}/import/otel",
+                headers=self._client._client_wrapper.get_headers(),
+                data=span_to_export.to_json().encode("ascii"),
+            )
+            if response.status_code != 200:
+                # TODO: handle
+                pass
+            else:
+                if evaluation_context and span_file_path == evaluation_context.path:
+                    log_id = response.json()["log_id"]
+                    evaluation_context.callback(log_id)
 
             self._upload_queue.task_done()

@@ -17,7 +17,7 @@ from humanloop.types.prompt_call_response import PromptCallResponse
 logger = logging.getLogger("humanloop.sdk")
 
 
-CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, FlowsClient)
+CLIENT_TYPE = TypeVar("CLIENT_TYPE")
 
 
 def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
@@ -51,8 +51,7 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
                 "trace_parent_id": trace_id,
             }
         try:
-            response = self._call(**kwargs)
-            response = typing.cast(PromptCallResponse, response)
+            response = self._log(**kwargs)
         except Exception as e:
             # TODO handle
             # TODO: Bug found in backend: not specifying a model 400s but creates a File
@@ -67,7 +66,7 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
     return client
 
 
-def overload_prompt_call(client: PromptsClient) -> PromptsClient:
+def overload_call(client: PromptsClient) -> PromptsClient:
     client._call = client.call
 
     def _overload_call(self, **kwargs) -> PromptCallResponse:

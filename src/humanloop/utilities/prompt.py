@@ -2,16 +2,22 @@ import logging
 
 
 from contextlib import contextmanager
+from typing import Optional
 
-from humanloop.context import reset_prompt_path, set_prompt_path
+from humanloop.context import PromptContext, reset_prompt_context, set_prompt_context
 
 logger = logging.getLogger("humanloop.sdk")
 
 
 @contextmanager
-def prompt(path: str):
+def prompt(path: str, template: Optional[str]):
     try:
-        token = set_prompt_path(path=path)
+        token = set_prompt_context(
+            PromptContext(
+                path=path,
+                template=template,
+            )
+        )
         yield
     finally:
-        reset_prompt_path(token=token)
+        reset_prompt_context(token=token)
