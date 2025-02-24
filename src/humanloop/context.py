@@ -5,7 +5,7 @@ from opentelemetry import context as context_api
 
 from humanloop.otel.constants import (
     HUMANLOOP_CONTEXT_EVALUATION,
-    HUMANLOOP_CONTEXT_PROMPT_PATH,
+    HUMANLOOP_CONTEXT_PROMPT,
     HUMANLOOP_CONTEXT_TRACE_ID,
 )
 
@@ -34,7 +34,7 @@ class PromptContext:
 
 
 def set_prompt_context(prompt_context: PromptContext) -> ResetToken:
-    key = hash((HUMANLOOP_CONTEXT_PROMPT_PATH, threading.get_ident()))
+    key = hash((HUMANLOOP_CONTEXT_PROMPT, threading.get_ident()))
     return context_api.attach(
         context_api.set_value(
             key=key,
@@ -48,7 +48,7 @@ def reset_prompt_context(token: ResetToken):
 
 
 def get_prompt_context() -> Optional[PromptContext]:
-    key = hash((HUMANLOOP_CONTEXT_PROMPT_PATH, threading.get_ident()))
+    key = hash((HUMANLOOP_CONTEXT_PROMPT, threading.get_ident()))
     return context_api.get_value(key)
 
 
