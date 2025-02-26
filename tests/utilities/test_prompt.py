@@ -14,7 +14,7 @@ from groq import Groq
 from groq import NotFoundError as GroqNotFoundError
 from humanloop.client import Humanloop
 from humanloop.eval_utils.run import HumanloopUtilityError
-from humanloop.utilities.prompt import prompt
+from humanloop.utilities.prompt import prompt_decorator_factory
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
 from humanloop.types.model_providers import ModelProviders
@@ -49,7 +49,7 @@ def _test_scenario(opentelemetry_tracer: Tracer, **kwargs):
     call this function to setup the decorated function that is tested.
     """
 
-    @prompt(opentelemetry_tracer=opentelemetry_tracer, **kwargs)
+    @prompt_decorator_factory(opentelemetry_tracer=opentelemetry_tracer, **kwargs)
     def _call_llm_base(provider: ModelProviders, model: str, messages: list[dict]) -> Optional[str]:
         load_dotenv()
         if provider == "openai":

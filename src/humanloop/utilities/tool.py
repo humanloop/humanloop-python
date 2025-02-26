@@ -7,12 +7,12 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 from inspect import Parameter
-from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
+from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypeVar, TypedDict, Union
+from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Tracer
-from typing_extensions import Unpack
 
-from humanloop.eval_utils.run import HumanloopUtilityError
+from humanloop.context import get_trace_id
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils import File
 from humanloop.otel.constants import (
@@ -21,7 +21,7 @@ from humanloop.otel.constants import (
     HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
-from humanloop.otel.helpers import jsonify_if_not_string, write_to_opentelemetry_span
+from humanloop.otel.helpers import process_output, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
 from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
@@ -31,59 +31,67 @@ if sys.version_info >= (3, 10):
 logger = logging.getLogger("humanloop.sdk")
 
 
-def tool(
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def tool_decorator_factory(
     opentelemetry_tracer: Tracer,
-    path: Optional[str] = None,
-    **tool_kernel: Unpack[ToolKernelRequestParams],  # type: ignore
+    path: str,
+    attributes: Optional[dict[str, Any]] = None,
+    setup_values: Optional[dict[str, Any]] = None,
 ):
-    def decorator(func: Callable):
-        enhanced_tool_kernel = _build_tool_kernel(
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+        file_type = "tool"
+
+        tool_kernel = _build_tool_kernel(
             func=func,
-            attributes=tool_kernel.get("attributes"),
-            setup_values=tool_kernel.get("setup_values"),
+            attributes=attributes,
+            setup_values=setup_values,
             strict=True,
         )
 
-        # Mypy complains about adding attribute on function, but it's nice UX
-        func.json_schema = enhanced_tool_kernel["function"]  # type: ignore
+        # Mypy complains about adding attribute on function, but it's nice DX
+        func.json_schema = tool_kernel["function"]  # type: ignore
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
             with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
-                span.set_attribute(HUMANLOOP_PATH_KEY, path if path else func.__name__)
-                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "tool")
-                if enhanced_tool_kernel:
-                    write_to_opentelemetry_span(
-                        span=span,
-                        key=f"{HUMANLOOP_FILE_KEY}.tool",
-                        value=enhanced_tool_kernel,
-                    )
+                write_to_opentelemetry_span(
+                    span=span,
+                    key=HUMANLOOP_FILE_KEY,
+                    value=tool_kernel,
+                )
+                span.set_attribute(HUMANLOOP_PATH_KEY, path)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
 
-                # Call the decorated function
+                func_output: Optional[R]
+                log_output: str
+                log_error: Optional[str]
+                log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
                 try:
-                    output = func(*args, **kwargs)
-                    output_stringified = jsonify_if_not_string(
+                    func_output = func(*args, **kwargs)
+                    log_output = process_output(
                         func=func,
-                        output=output,
+                        output=func_output,
                     )
-                    error = None
-                except HumanloopUtilityError as e:
-                    raise e
+                    log_error = None
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
-                    output_stringified = jsonify_if_not_string(
+                    log_output = process_output(
                         func=func,
                         output=output,
                     )
-                    error = str(e)
+                    log_error = str(e)
 
                 # Populate known Tool Log attributes
                 tool_log = {
-                    "inputs": bind_args(func, args, kwargs),
-                    "output": output_stringified,
-                    "error": error,
+                    "inputs": log_inputs,
+                    "output": log_output,
+                    "error": log_error,
+                    "trace_parent_id": get_trace_id(),
                 }
 
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
@@ -97,9 +105,9 @@ def tool(
                 return output
 
         wrapper.file = File(  # type: ignore
-            path=path if path else func.__name__,
-            type="tool",
-            version=enhanced_tool_kernel,
+            path=path,
+            type=file_type,
+            version=tool_kernel,
             callable=wrapper,
         )
 

@@ -12,8 +12,8 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanE
 from opentelemetry.sdk.trace import ReadableSpan
 
 from humanloop.utilities.flow import flow
-from humanloop.utilities.prompt import prompt
-from humanloop.utilities.tool import tool
+from humanloop.utilities.prompt import prompt_decorator_factory
+from humanloop.utilities.tool import tool_decorator_factory
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.helpers import read_from_opentelemetry_span
@@ -25,7 +25,7 @@ pytest.skip("skip for demo", allow_module_level=True)
 def _test_scenario(
     opentelemetry_tracer: Tracer,
 ):
-    @tool(opentelemetry_tracer=opentelemetry_tracer)
+    @tool_decorator_factory(opentelemetry_tracer=opentelemetry_tracer)
     def _random_string() -> str:
         """Return a random string."""
         return "".join(
@@ -35,7 +35,7 @@ def _test_scenario(
             )
         )
 
-    @prompt(  # type: ignore
+    @prompt_decorator_factory(  # type: ignore
         opentelemetry_tracer=opentelemetry_tracer,
         path=None,
         template="You are an assistant on the following topics: {topics}.",

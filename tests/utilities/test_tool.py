@@ -3,7 +3,7 @@ import time
 from typing import Any, Optional, TypedDict, Union
 
 import pytest
-from humanloop.utilities.tool import tool
+from humanloop.utilities.tool import tool_decorator_factory
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY, HUMANLOOP_LOG_KEY
 from humanloop.otel.helpers import read_from_opentelemetry_span
 from jsonschema.protocols import Validator
@@ -17,7 +17,7 @@ def test_calculator_decorator(
     # GIVEN a test OpenTelemetry configuration
     tracer, exporter = opentelemetry_test_configuration
 
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def calculator(operation: str, num1: float, num2: float) -> float:
         """Do arithmetic operations on two numbers."""
         if operation == "add":
@@ -55,7 +55,7 @@ def test_calculator_decorator(
 def test_union_type(opentelemetry_test_configuration: tuple[Tracer, InMemorySpanExporter]):
     tracer, _ = opentelemetry_test_configuration
 
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def foo(a: Union[int, float], b: float) -> float:
         return a + b
 
@@ -76,7 +76,7 @@ def test_not_required_parameter(
 ):
     tracer, exporter = opentelemetry_test_configuration
 
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def test_calculator(a: Optional[float], b: float) -> float:
         if a is None:
             a = 0
@@ -98,7 +98,7 @@ def test_no_annotation_on_parameter(
     tracer, _ = opentelemetry_test_configuration
 
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b) -> float:
         if a is None:
             a = 0
@@ -133,7 +133,7 @@ def test_dict_annotation_no_sub_types(
     tracer, _ = opentelemetry_test_configuration
 
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b: dict) -> float:
         if a is None:
             a = 0
@@ -173,7 +173,7 @@ def test_list_annotation_no_sub_types(
     tracer, _ = opentelemetry_test_configuration
 
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b: Optional[list]) -> float:
         if a is None:
             a = 0
@@ -212,7 +212,7 @@ def test_tuple_annotation_no_sub_types(
     tracer, _ = opentelemetry_test_configuration
 
     # GIVEN a function annotated with @tool and without type hint on a parameter
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def calculator(a: Optional[float], b: Optional[tuple]) -> float:
         if a is None:
             a = 0
@@ -252,7 +252,7 @@ def test_function_without_return_annotation(
 
     # GIVEN a function annotated with @tool and without type hint on the return value
     # WHEN building the Tool kernel
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def foo(a: Optional[float], b: float) -> float:
         """Add two numbers."""
         if a is None:
@@ -270,7 +270,7 @@ def test_list_annotation_parameter(
     tracer, exporter = opentelemetry_test_configuration
 
     # WHEN defining a tool with a list parameter
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def foo(to_join: list[str]) -> str:
         return " ".join(to_join)
 
@@ -295,7 +295,7 @@ def test_list_in_list_parameter_annotation(
 
     # GIVEN a tool definition with a list of lists parameter
     # WHEN building the Tool Kernel
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def nested_plain_join(to_join: list[list[str]]):
         return " ".join([val for sub_list in to_join for val in sub_list])
 
@@ -320,7 +320,7 @@ def test_complex_dict_annotation(
 
     # GIVEN a tool definition with a dictionary parameter
     # WHEN building the Tool Kernel
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def foo(a: dict[Union[int, str], list[str]]):
         return a
 
@@ -345,7 +345,7 @@ def test_tuple_annotation(
 
     # GIVEN a tool definition with a tuple parameter
     # WHEN building the Tool Kernel
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def foo(a: Optional[tuple[int, Optional[str], float]]):
         return a
 
@@ -371,7 +371,7 @@ def test_tool_no_args(
 
     # GIVEN a tool definition without arguments
     # WHEN building the Tool Kernel
-    @tool(opentelemetry_tracer=tracer)
+    @tool_decorator_factory(opentelemetry_tracer=tracer)
     def foo():
         return 42
 
@@ -406,7 +406,7 @@ def test_custom_types_throws(
     # WHEN defining a tool with a parameter of that type
     with pytest.raises(ValueError) as exc:
 
-        @tool(opentelemetry_tracer=tracer)
+        @tool_decorator_factory(opentelemetry_tracer=tracer)
         def foo_bar(foo: Foo):
             return foo.a + foo.b  # type: ignore
 
@@ -432,9 +432,9 @@ def test_tool_as_higher_order_function(
         else:
             raise ValueError(f"Invalid operation: {operation}")
 
-    higher_order_fn_tool = tool(opentelemetry_tracer=tracer)(calculator)
+    higher_order_fn_tool = tool_decorator_factory(opentelemetry_tracer=tracer)(calculator)
 
-    @tool(opentelemetry_tracer=tracer)  # type: ignore
+    @tool_decorator_factory(opentelemetry_tracer=tracer)  # type: ignore
     def calculator(operation: str, num1: float, num2: float) -> float:
         """Do arithmetic operations on two numbers."""
         if operation == "add":
@@ -478,7 +478,7 @@ if sys.version_info >= (3, 10):
         tracer, _ = opentelemetry_test_configuration
 
         # GIVEN a function annotated with @tool where a parameter uses `|` for Optional
-        @tool(opentelemetry_tracer=tracer)
+        @tool_decorator_factory(opentelemetry_tracer=tracer)
         def calculator(a: float, b: float | None = None) -> float:
             # NOTE: dummy function, only testing its signature not correctness
             if a is None:
@@ -511,7 +511,7 @@ if sys.version_info >= (3, 10):
         tracer, _ = opentelemetry_test_configuration
 
         # GIVEN a function annotated with @tool where a parameter uses `|` for Union
-        @tool(opentelemetry_tracer=tracer)
+        @tool_decorator_factory(opentelemetry_tracer=tracer)
         def calculator(a: float, b: float | int | str) -> float:
             # NOTE: dummy function, only testing its signature not correctness
             return a + b  # type: ignore
@@ -542,7 +542,7 @@ if sys.version_info >= (3, 10):
         tracer, _ = opentelemetry_test_configuration
 
         # GIVEN a function annotated with @tool where a parameter uses `...`
-        @tool(opentelemetry_tracer=tracer)
+        @tool_decorator_factory(opentelemetry_tracer=tracer)
         def calculator(b: ...) -> float | None:  # type: ignore
             # NOTE: dummy function, only testing its signature not correctness
             if isinstance(b, list):
