@@ -26,29 +26,6 @@ logger = logging.getLogger("humanloop.sdk")
 
 
 class HumanloopSpanExporter(SpanExporter):
-    """Upload Spans created by SDK decorators to Humanloop.
-
-    Spans not created by Humanloop SDK decorators will be dropped.
-
-    Each Humanloop Span contains information about the File to log against and
-    the Log to create. We are using the .log actions that pass the kernel in the
-    request. This allows us to create new Versions if the decorated function
-    is changed.
-
-    The exporter uploads Spans top-to-bottom, where a Span is uploaded only after
-    its parent Span has been uploaded. This is necessary for Flow Traces, where
-    the parent Span is a Flow Log and the children are the Logs in the Trace.
-
-    The exporter keeps an upload queue and only uploads a Span if its direct parent has
-    been uploaded.
-    """
-
-    # NOTE: LLM Instrumentors will only intercept calls to the provider made via the
-    # official libraries e.g. import openai from openai. This is 100% the reason why
-    # prompt call is not intercepted by the Instrumentor. The way to fix this is likely
-    # overriding the hl_client.prompt.call utility. @James I'll do this since it will
-    # involve looking at the EvaluationContext deep magic.
-
     DEFAULT_NUMBER_THREADS = 4
 
     def __init__(
@@ -62,8 +39,6 @@ class HumanloopSpanExporter(SpanExporter):
         """
         super().__init__()
         self._client = client
-        # Uploaded spans translate to a Log on Humanloop. The IDs are required to link Logs in a Flow Trace
-        self._span_to_uploaded_log_id: dict[int, Optional[str]] = {}
         # Work queue for the threads uploading the spans
         self._upload_queue: Queue = Queue()
         # Worker threads to export the spans
@@ -81,9 +56,6 @@ class HumanloopSpanExporter(SpanExporter):
         for thread in self._threads:
             thread.start()
             logger.debug("Exporter Thread %s started", thread.ident)
-        # Flow Log Span ID mapping to children Spans that must be uploaded first
-        self._spans_left_in_trace: dict[int, set[int]] = {}
-        self._traces: list[set[str]] = []
 
     def export(self, spans: Sequence[ReadableSpan]) -> SpanExportResult:
         if self._shutdown:
@@ -122,40 +94,29 @@ class HumanloopSpanExporter(SpanExporter):
                 continue
 
             span_to_export, evaluation_context = thread_args
-            span_file_type = span_to_export.attributes.get(HUMANLOOP_FILE_TYPE_KEY)
-            if span_file_type is None:
+            file_type = span_to_export.attributes.get(HUMANLOOP_FILE_TYPE_KEY)
+            file_path = span_to_export.attributes.get(HUMANLOOP_PATH_KEY)
+            if file_type is None:
                 raise ValueError("Span does not have type set")
 
-            if span_file_type == "flow":
-                log_args = read_from_opentelemetry_span(
-                    span=span_to_export,
-                    key=HUMANLOOP_LOG_KEY,
-                )
-                log_args = {
-                    **log_args,
-                    "log_status": "complete",
-                }
+            log_args = read_from_opentelemetry_span(
+                span=span_to_export,
+                key=HUMANLOOP_LOG_KEY,
+            )
 
             if evaluation_context:
-                log_args = read_from_opentelemetry_span(
-                    span=span_to_export,
-                    key=HUMANLOOP_LOG_KEY,
-                )
-                span_file_path = read_from_opentelemetry_span(
-                    span=span_to_export,
-                    key=HUMANLOOP_PATH_KEY,
-                )
-                if span_file_path == evaluation_context.path:
+                if file_path == evaluation_context.path:
                     log_args = {
                         **log_args,
                         "source_datapoint_id": evaluation_context.source_datapoint_id,
                         "run_id": evaluation_context.run_id,
                     }
-                    write_to_opentelemetry_span(
-                        span=span_to_export,
-                        key=HUMANLOOP_LOG_KEY,
-                        value=log_args,
-                    )
+
+            write_to_opentelemetry_span(
+                span=span_to_export,
+                key=HUMANLOOP_LOG_KEY,
+                value=log_args,
+            )
 
             response = requests.post(
                 f"{self._client._client_wrapper.get_base_url()}/import/otel",
@@ -166,7 +127,7 @@ class HumanloopSpanExporter(SpanExporter):
                 # TODO: handle
                 pass
             else:
-                if evaluation_context and span_file_path == evaluation_context.path:
+                if evaluation_context and file_path == evaluation_context.path:
                     log_id = response.json()["log_id"]
                     evaluation_context.callback(log_id)
 

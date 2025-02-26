@@ -8,7 +8,6 @@ from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
-from humanloop.context import PromptContext, reset_prompt_context, set_prompt_context
 from humanloop.core.client_wrapper import SyncClientWrapper
 
 from humanloop.eval_utils import run_eval
@@ -17,8 +16,8 @@ from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
 from humanloop.overload import overload_call, overload_log
 from humanloop.utilities.flow import flow as flow_decorator_factory
-from humanloop.utilities.prompt import prompt
-from humanloop.utilities.tool import tool as tool_decorator_factory
+from humanloop.utilities.prompt import prompt_decorator_factory
+from humanloop.utilities.tool import tool_decorator_factory as tool_decorator_factory
 from humanloop.environment import HumanloopEnvironment
 from humanloop.evaluations.client import EvaluationsClient
 from humanloop.otel import instrument_provider
@@ -223,9 +222,7 @@ class Humanloop(BaseHumanloop):
 
         :param prompt_kernel: Attributes that define the Prompt. See `class:DecoratorPromptKernelRequestParams`
         """
-
-        with prompt(path=path, template=template):
-            yield
+        return prompt_decorator_factory(path=path, template=template)
 
     def tool(
         self,

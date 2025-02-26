@@ -5,7 +5,6 @@ import typing
 
 from humanloop.context import get_trace_id
 from humanloop.eval_utils.run import HumanloopUtilityError
-from humanloop.flows.client import FlowsClient
 
 from humanloop.prompts.client import PromptsClient
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse

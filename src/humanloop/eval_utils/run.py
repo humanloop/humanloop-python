@@ -104,6 +104,10 @@ def run_eval(
     :param workers: the number of threads to process datapoints using your function concurrently.
     :return: per Evaluator checks.
     """
+    if workers > 32:
+        logger.warning("Too many workers requested, capping the number to 32.")
+    workers = min(workers, 32)
+
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
     file_ = _file_or_file_inside_hl_utility(file)
@@ -183,7 +187,7 @@ def run_eval(
             start_time = datetime.now()
             try:
                 output = _call_function(function_, hl_file.type, dp)
-                if not _callable_is_hl_utility(file):
+                if not _callable_is_decorated(file):
                     # function_ is a plain callable so we need to create a Log
                     log_func(
                         inputs=dp.inputs,
@@ -277,7 +281,7 @@ class _LocalEvaluator:
     function: Callable
 
 
-def _callable_is_hl_utility(file: File) -> bool:
+def _callable_is_decorated(file: File) -> bool:
     """Check if a File is a decorated function."""
     return hasattr(file["callable"], "file")
 
@@ -348,34 +352,29 @@ def _get_checks(
 
 
 def _file_or_file_inside_hl_utility(file: File) -> File:
-    if _callable_is_hl_utility(file):
+    if _callable_is_decorated(file):
         # When the decorator inside `file` is a decorated function,
         # we need to validate that the other parameters of `file`
         # match the attributes of the decorator
+        decorated_fn_name = file["callable"].__name__
         inner_file: File = file["callable"].file
-        if "path" in file and inner_file["path"] != file["path"]:
-            raise ValueError(
-                "`path` attribute specified in the `file` does not match the File path of the decorated function."
-            )
-        if "version" in file and inner_file["version"] != file["version"]:
-            raise ValueError(
-                "`version` attribute in the `file` does not match the File version of the decorated function."
-            )
-        if "type" in file and inner_file["type"] != file["type"]:
-            raise ValueError(
-                "`type` attribute of `file` argument does not match the File type of the decorated function."
-            )
-        if "id" in file:
-            raise ValueError("Do not specify an `id` attribute in `file` argument when using a decorated function.")
-        # file on decorated function holds at least
-        # or more information than the `file` argument
-        file_ = copy.deepcopy(inner_file)
-    else:
-        file_ = file
+        for argument in ["version", "path", "type", "id"]:
+            if argument in file:
+                logger.warning(
+                    f"Argument `file.{argument}` will be ignored: "
+                    f"callable `{decorated_fn_name}` is managed by "
+                    "the @{inner_file['type']} decorator."
+                )
 
-    # Raise error if one of path or id not provided
-    if not file_.get("path") and not file_.get("id"):
-        raise ValueError("You must provide a path or id in your `file`.")
+        # Use the file manifest in the decorated function
+        file_ = copy.deepcopy(inner_file)
+
+    else:
+        # Simple function
+        # Raise error if one of path or id not provided
+        file_ = file
+        if not file_.get("path") and not file_.get("id"):
+            raise ValueError("You must provide a path or id in your `file`.")
 
     return file_
 

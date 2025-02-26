@@ -7,7 +7,8 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 from inspect import Parameter
-from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypedDict, Union
+from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypeVar, TypedDict, Union
+from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Tracer
 
@@ -30,14 +31,17 @@ if sys.version_info >= (3, 10):
 logger = logging.getLogger("humanloop.sdk")
 
 
-def tool(
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def tool_decorator_factory(
     opentelemetry_tracer: Tracer,
     path: str,
     attributes: Optional[dict[str, Any]] = None,
     setup_values: Optional[dict[str, Any]] = None,
 ):
-    def decorator(func: Callable):
-        path_in_decorator = path or func.__name__
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
         file_type = "tool"
 
         tool_kernel = _build_tool_kernel(
@@ -51,7 +55,7 @@ def tool(
         func.json_schema = tool_kernel["function"]  # type: ignore
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
             with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
                 write_to_opentelemetry_span(
@@ -59,31 +63,34 @@ def tool(
                     key=HUMANLOOP_FILE_KEY,
                     value=tool_kernel,
                 )
-                span.set_attribute(HUMANLOOP_PATH_KEY, path_in_decorator)
+                span.set_attribute(HUMANLOOP_PATH_KEY, path)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
 
-                # Call the decorated function
+                func_output: Optional[R]
+                log_output: str
+                log_error: Optional[str]
+                log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
                 try:
-                    output = func(*args, **kwargs)
-                    output_stringified = process_output(
+                    func_output = func(*args, **kwargs)
+                    log_output = process_output(
                         func=func,
-                        output=output,
+                        output=func_output,
                     )
-                    error = None
+                    log_error = None
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
-                    output_stringified = process_output(
+                    log_output = process_output(
                         func=func,
                         output=output,
                     )
-                    error = str(e)
+                    log_error = str(e)
 
                 # Populate known Tool Log attributes
                 tool_log = {
-                    "inputs": bind_args(func, args, kwargs),
-                    "output": output_stringified,
-                    "error": error,
+                    "inputs": log_inputs,
+                    "output": log_output,
+                    "error": log_error,
                     "trace_parent_id": get_trace_id(),
                 }
 
@@ -98,7 +105,7 @@ def tool(
                 return output
 
         wrapper.file = File(  # type: ignore
-            path=path_in_decorator,
+            path=path,
             type=file_type,
             version=tool_kernel,
             callable=wrapper,
