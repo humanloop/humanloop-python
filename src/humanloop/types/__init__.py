@@ -127,6 +127,7 @@ from .prompt_response import PromptResponse
 from .prompt_response_stop import PromptResponseStop
 from .prompt_response_template import PromptResponseTemplate
 from .provider_api_keys import ProviderApiKeys
+from .reasoning_effort import ReasoningEffort
 from .response_format import ResponseFormat
 from .response_format_type import ResponseFormatType
 from .run_stats_response import RunStatsResponse
@@ -134,6 +135,7 @@ from .run_stats_response_evaluator_stats_item import RunStatsResponseEvaluatorSt
 from .run_version_response import RunVersionResponse
 from .select_evaluator_stats_response import SelectEvaluatorStatsResponse
 from .sort_order import SortOrder
+from .template_language import TemplateLanguage
 from .text_chat_content import TextChatContent
 from .text_evaluator_stats_response import TextEvaluatorStatsResponse
 from .time_unit import TimeUnit
@@ -282,6 +284,7 @@ __all__ = [
     "PromptResponseStop",
     "PromptResponseTemplate",
     "ProviderApiKeys",
+    "ReasoningEffort",
     "ResponseFormat",
     "ResponseFormatType",
     "RunStatsResponse",
@@ -289,6 +292,7 @@ __all__ = [
     "RunVersionResponse",
     "SelectEvaluatorStatsResponse",
     "SortOrder",
+    "TemplateLanguage",
     "TextChatContent",
     "TextEvaluatorStatsResponse",
     "TimeUnit",
