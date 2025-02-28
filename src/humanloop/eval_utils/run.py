@@ -489,7 +489,7 @@ def _file_or_file_inside_hl_utility(file: File) -> File:
         # or more information than the `file` argument
         file_ = copy.deepcopy(inner_file)
     else:
-        file_ = file
+        file_ = copy.deepcopy(file)
 
     # Raise error if one of path or id not provided
     if not file_.get("path") and not file_.get("id"):

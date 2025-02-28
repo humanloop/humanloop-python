@@ -5,9 +5,11 @@ import pydantic
 import typing
 from .model_endpoints import ModelEndpoints
 from .prompt_kernel_request_template import PromptKernelRequestTemplate
+from .template_language import TemplateLanguage
 from .model_providers import ModelProviders
 from .prompt_kernel_request_stop import PromptKernelRequestStop
 from .response_format import ResponseFormat
+from .reasoning_effort import ReasoningEffort
 from .tool_function import ToolFunction
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -31,6 +33,11 @@ class PromptKernelRequest(UncheckedBaseModel):
     For completion models, provide a prompt template as a string. 
     
     Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
+    """
+
+    template_language: typing.Optional[TemplateLanguage] = pydantic.Field(default=None)
+    """
+    The template language to use for rendering the template.
     """
 
     provider: typing.Optional[ModelProviders] = pydantic.Field(default=None)
@@ -81,6 +88,11 @@ class PromptKernelRequest(UncheckedBaseModel):
     response_format: typing.Optional[ResponseFormat] = pydantic.Field(default=None)
     """
     The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
+    """
+
+    reasoning_effort: typing.Optional[ReasoningEffort] = pydantic.Field(default=None)
+    """
+    Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
     """
 
     tools: typing.Optional[typing.List[ToolFunction]] = pydantic.Field(default=None)

@@ -38,6 +38,7 @@ class NumericEvaluatorStatsResponse(UncheckedBaseModel):
     """
 
     mean: typing.Optional[float] = None
+    sum: typing.Optional[float] = None
     std: typing.Optional[float] = None
     percentiles: typing.Dict[str, float]
 
