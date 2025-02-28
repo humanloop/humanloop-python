@@ -4,10 +4,12 @@ import typing_extensions
 import typing_extensions
 from ..types.model_endpoints import ModelEndpoints
 from .prompt_kernel_request_template import PromptKernelRequestTemplateParams
+from ..types.template_language import TemplateLanguage
 from ..types.model_providers import ModelProviders
 from .prompt_kernel_request_stop import PromptKernelRequestStopParams
 import typing
 from .response_format import ResponseFormatParams
+from ..types.reasoning_effort import ReasoningEffort
 from .tool_function import ToolFunctionParams
 
 
@@ -30,6 +32,11 @@ class PromptKernelRequestParams(typing_extensions.TypedDict):
     For completion models, provide a prompt template as a string. 
     
     Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
+    """
+
+    template_language: typing_extensions.NotRequired[TemplateLanguage]
+    """
+    The template language to use for rendering the template.
     """
 
     provider: typing_extensions.NotRequired[ModelProviders]
@@ -80,6 +87,11 @@ class PromptKernelRequestParams(typing_extensions.TypedDict):
     response_format: typing_extensions.NotRequired[ResponseFormatParams]
     """
     The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
+    """
+
+    reasoning_effort: typing_extensions.NotRequired[ReasoningEffort]
+    """
+    Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
     """
 
     tools: typing_extensions.NotRequired[typing.Sequence[ToolFunctionParams]]

@@ -37,5 +37,6 @@ class NumericEvaluatorStatsResponseParams(typing_extensions.TypedDict):
     """
 
     mean: typing_extensions.NotRequired[float]
+    sum: typing_extensions.NotRequired[float]
     std: typing_extensions.NotRequired[float]
     percentiles: typing.Dict[str, float]
