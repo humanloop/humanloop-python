@@ -66,10 +66,11 @@ def tool_decorator_factory(
                 span.set_attribute(HUMANLOOP_PATH_KEY, path)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
 
-                func_output: Optional[R]
-                log_output: str
-                log_error: Optional[str]
                 log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
+                log_error: Optional[str]
+                log_output: str
+
+                func_output: Optional[R]
                 try:
                     func_output = func(*args, **kwargs)
                     log_output = process_output(
@@ -102,7 +103,7 @@ def tool_decorator_factory(
                 )
 
                 # Return the output of the decorated function
-                return output
+                return func_output
 
         wrapper.file = File(  # type: ignore
             path=path,

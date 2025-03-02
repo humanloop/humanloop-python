@@ -167,7 +167,7 @@ def run_eval(
                 )
 
             # Set the Evaluation Context for current datapoint
-            set_evaluation_context(
+            with set_evaluation_context(
                 EvaluationContext(
                     source_datapoint_id=dp.id,
                     callback=upload_callback,
@@ -175,38 +175,37 @@ def run_eval(
                     run_id=run.id,
                     path=hl_file.path,
                 )
-            )
-
-            log_func = _get_log_func(
-                client=client,
-                file_type=hl_file.type,
-                file_id=hl_file.id,
-                version_id=hl_file.version_id,
-                run_id=run.id,
-            )
-            start_time = datetime.now()
-            try:
-                output = _call_function(function_, hl_file.type, dp)
-                if not _callable_is_decorated(file):
-                    # function_ is a plain callable so we need to create a Log
+            ):
+                log_func = _get_log_func(
+                    client=client,
+                    file_type=hl_file.type,
+                    file_id=hl_file.id,
+                    version_id=hl_file.version_id,
+                    run_id=run.id,
+                )
+                start_time = datetime.now()
+                try:
+                    output = _call_function(function_, hl_file.type, dp)
+                    if not _callable_is_decorated(file):
+                        # function_ is a plain callable so we need to create a Log
+                        log_func(
+                            inputs=dp.inputs,
+                            output=output,
+                            start_time=start_time,
+                            end_time=datetime.now(),
+                        )
+                except Exception as e:
                     log_func(
                         inputs=dp.inputs,
-                        output=output,
+                        error=str(e),
+                        source_datapoint_id=dp.id,
+                        run_id=run.id,
                         start_time=start_time,
                         end_time=datetime.now(),
                     )
-            except Exception as e:
-                log_func(
-                    inputs=dp.inputs,
-                    error=str(e),
-                    source_datapoint_id=dp.id,
-                    run_id=run.id,
-                    start_time=start_time,
-                    end_time=datetime.now(),
-                )
-                logger.warning(
-                    msg=f"\nYour {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}"
-                )
+                    logger.warning(
+                        msg=f"\nYour {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}"
+                    )
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
             for datapoint in hl_dataset.datapoints:

@@ -17,6 +17,14 @@ from humanloop.otel.constants import (
     HUMANLOOP_PATH_KEY,
 )
 from humanloop.otel.helpers import read_from_opentelemetry_span, write_to_opentelemetry_span
+from opentelemetry.proto.common.v1.common_pb2 import KeyValue, Link
+from opentelemetry.proto.trace.v1.trace_pb2 import (
+    TracesData,
+    ResourceSpans,
+    InstrumentationScope,
+    ScopeSpans,
+    Span as ProtoBufferSpan,
+)
 
 if typing.TYPE_CHECKING:
     from humanloop.client import Humanloop
@@ -118,8 +126,50 @@ class HumanloopSpanExporter(SpanExporter):
                 value=log_args,
             )
 
+            payload = TracesData(
+                resource_spans=[
+                    ResourceSpans(
+                        scope_spans=ScopeSpans(
+                            scope=InstrumentationScope(
+                                name="humanloop-otel",
+                                version="0.1.0",
+                            ),
+                            spans=[
+                                ProtoBufferSpan(
+                                    trace_id=span_to_export.context.trace_id,
+                                    span_id=span_to_export.span_id,
+                                    name=span_to_export.name,
+                                    kind=span_to_export.kind,
+                                    start_time_unix_nano=span_to_export.start_time,
+                                    end_time_unix_nano=span_to_export.end_time,
+                                    attributes=[
+                                        KeyValue(
+                                            key=key,
+                                            value=value,
+                                        )
+                                        for key, value in span_to_export.attributes.items()
+                                    ],
+                                    dropped_attributes_count=len(span_to_export.dropped_attributes),
+                                    dropped_events_count=len(span_to_export.dropped_events),
+                                    dropped_links_count=len(span_to_export.dropped_links),
+                                    links=[
+                                        Link(
+                                            trace_id=link.trace_id,
+                                            span_id=link.span_id,
+                                            attributes=link.attributes,
+                                        )
+                                        for link in span_to_export.links
+                                    ],
+                                    events=[],
+                                )
+                            ],
+                        )
+                    )
+                ]
+            )
+
             response = requests.post(
-                f"{self._client._client_wrapper.get_base_url()}/import/otel",
+                f"{self._client._client_wrapper.get_base_url()}/import/otel/v1/traces",
                 headers=self._client._client_wrapper.get_headers(),
                 data=span_to_export.to_json().encode("ascii"),
             )
@@ -127,6 +177,7 @@ class HumanloopSpanExporter(SpanExporter):
                 # TODO: handle
                 pass
             else:
+                print("FOO", response.json())
                 if evaluation_context and file_path == evaluation_context.path:
                     log_id = response.json()["log_id"]
                     evaluation_context.callback(log_id)

@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from typing import Any, Callable, Mapping, Optional, Sequence, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Span, Tracer
@@ -67,56 +67,54 @@ def flow(
                 #     **log_inputs,
                 #     log_status="incomplete",
                 # )
-                token = set_trace_id(init_log["id"])
+                with set_trace_id(init_log["id"]):
+                    span.set_attribute(HUMANLOOP_PATH_KEY, decorator_path)
+                    span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
 
-                span.set_attribute(HUMANLOOP_PATH_KEY, decorator_path)
-                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
-
-                func_output: Optional[R]
-                log_output: str
-                log_error: Optional[str]
-                log_output_message: ChatMessage
-                try:
-                    func_output = func(*args, **kwargs)
-                    if (
-                        isinstance(func_output, dict)
-                        and len(func_output.keys()) == 2
-                        and "role" in func_output
-                        and "content" in func_output
-                    ):
-                        log_output_message = ChatMessage(**func_output)
-                        log_output = None
-                    else:
-                        log_output = process_output(func=func, output=func_output)
+                    func_output: Optional[R]
+                    log_output: str
+                    log_error: Optional[str]
+                    log_output_message: ChatMessage
+                    try:
+                        func_output = func(*args, **kwargs)
+                        if (
+                            isinstance(func_output, dict)
+                            and len(func_output.keys()) == 2
+                            and "role" in func_output
+                            and "content" in func_output
+                        ):
+                            log_output_message = ChatMessage(**func_output)
+                            log_output = None
+                        else:
+                            log_output = process_output(func=func, output=func_output)
+                            log_output_message = None
+                        log_error = None
+                    except Exception as e:
+                        logger.error(f"Error calling {func.__name__}: {e}")
+                        output = None
                         log_output_message = None
-                    log_error = None
-                except Exception as e:
-                    logger.error(f"Error calling {func.__name__}: {e}")
-                    output = None
-                    log_output_message = None
-                    log_error = str(e)
+                        log_error = str(e)
 
-                flow_log = {
-                    "inputs": {k: v for k, v in args_to_func.items() if k != "messages"},
-                    "messages": args_to_func.get("messages"),
-                    "log_status": "complete",
-                    "output": log_output,
-                    "error": log_error,
-                    "output_message": log_output_message,
-                    "id": init_log["id"],
-                }
+                    flow_log = {
+                        "inputs": {k: v for k, v in args_to_func.items() if k != "messages"},
+                        "messages": args_to_func.get("messages"),
+                        "log_status": "complete",
+                        "output": log_output,
+                        "error": log_error,
+                        "output_message": log_output_message,
+                        "id": init_log["id"],
+                    }
 
-                # Write the Flow Log to the Span on HL_LOG_OT_KEY
-                if flow_log:
-                    write_to_opentelemetry_span(
-                        span=span,
-                        key=HUMANLOOP_LOG_KEY,
-                        value=flow_log,  # type: ignore
-                    )
+                    # Write the Flow Log to the Span on HL_LOG_OT_KEY
+                    if flow_log:
+                        write_to_opentelemetry_span(
+                            span=span,
+                            key=HUMANLOOP_LOG_KEY,
+                            value=flow_log,  # type: ignore
+                        )
 
-            context_api.detach(token=token)
-            # Return the output of the decorated function
-            return output
+                    # Return the output of the decorated function
+                    return func_output
 
         wrapper.file = File(  # type: ignore
             path=decorator_path,
