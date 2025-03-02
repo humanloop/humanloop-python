@@ -192,7 +192,9 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
         # Notify the run_eval utility about one Log being created
         if log_belongs_to_evaluated_file(log_args=kwargs):
             evaluation_context = get_evaluation_context()
+            evaluation_context.logged = True
             evaluation_context.upload_callback(log_id=response.id)
+            set_evaluation_context(evaluation_context)
 
         return response
 
@@ -288,6 +290,7 @@ def run_eval(
                     file_id=hl_file.id,
                     run_id=run.id,
                     path=hl_file.path,
+                    logged=False,
                 )
             )
 
@@ -301,13 +304,16 @@ def run_eval(
             start_time = datetime.now()
             try:
                 output = _call_function(function_, hl_file.type, dp)
-                if not _callable_is_hl_utility(file):
-                    # function_ is a plain callable so we need to create a Log
+                evaluation_context = get_evaluation_context()
+                if not evaluation_context.logged:
+                    # function_ did not Log against the source_datapoint_id/ run_id pair
+                    # so we need to create a Log
                     log_func(
                         inputs=dp.inputs,
                         output=output,
                         start_time=start_time,
                         end_time=datetime.now(),
+                        source_datapoint_id=dp.id,
                     )
             except Exception as e:
                 log_func(

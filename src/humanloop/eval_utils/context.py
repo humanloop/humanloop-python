@@ -26,6 +26,9 @@ class EvaluationContext:
     """Required for associating a Log with the Evaluation Run."""
     run_id: str
 
+    """Whether a log has been made for this datapoint/ run_id pair."""
+    logged: bool
+
 
 _EVALUATION_CONTEXT_VAR: ContextVar[EvaluationContext] = ContextVar("__EVALUATION_CONTEXT")
 
