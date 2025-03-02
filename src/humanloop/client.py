@@ -1,7 +1,7 @@
+from contextlib import contextmanager
 import os
 import typing
-from typing import List, Optional, Sequence
-from typing_extensions import Unpack
+from typing import Any, List, Optional, Sequence
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -9,16 +9,15 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
-from humanloop.eval_utils.run import prompt_call_evaluation_aware
-from humanloop.utilities.types import DecoratorPromptKernelRequestParams
 
-from humanloop.eval_utils import log_with_evaluation_context, run_eval
+from humanloop.eval_utils import run_eval
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
+from humanloop.overload import overload_call, overload_log
 from humanloop.utilities.flow import flow as flow_decorator_factory
-from humanloop.utilities.prompt import prompt as prompt_decorator_factory
-from humanloop.utilities.tool import tool as tool_decorator_factory
+from humanloop.utilities.prompt import prompt_decorator_factory
+from humanloop.utilities.tool import tool_decorator_factory as tool_decorator_factory
 from humanloop.environment import HumanloopEnvironment
 from humanloop.evaluations.client import EvaluationsClient
 from humanloop.otel import instrument_provider
@@ -26,8 +25,6 @@ from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
-from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
-from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -120,9 +117,10 @@ class Humanloop(BaseHumanloop):
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
 
         # Overload the .log method of the clients to be aware of Evaluation Context
-        self.prompts = log_with_evaluation_context(client=self.prompts)
-        self.prompts = prompt_call_evaluation_aware(client=self.prompts)
-        self.flows = log_with_evaluation_context(client=self.flows)
+        self.prompts = overload_log(client=self.prompts)
+        self.prompts = overload_call(client=self.prompts)
+        self.flows = overload_log(client=self.flows)
+        self.tools = overload_log(client=self.tools)
 
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider
@@ -136,10 +134,7 @@ class Humanloop(BaseHumanloop):
             )
         instrument_provider(provider=self._tracer_provider)
         self._tracer_provider.add_span_processor(
-            HumanloopSpanProcessor(
-                client=self,
-                exporter=HumanloopSpanExporter(client=self),
-            ),
+            HumanloopSpanProcessor(exporter=HumanloopSpanExporter(client=self)),
         )
 
         if opentelemetry_tracer is None:
@@ -147,11 +142,12 @@ class Humanloop(BaseHumanloop):
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
 
+    @contextmanager
     def prompt(
         self,
         *,
-        path: Optional[str] = None,
-        **prompt_kernel: Unpack[DecoratorPromptKernelRequestParams],  # type: ignore
+        path: str,
+        template: Optional[str] = None,
     ):
         """Decorator for declaring a [Prompt](https://humanloop.com/docs/explanation/prompts) in code.
 
@@ -226,17 +222,14 @@ class Humanloop(BaseHumanloop):
 
         :param prompt_kernel: Attributes that define the Prompt. See `class:DecoratorPromptKernelRequestParams`
         """
-        return prompt_decorator_factory(
-            opentelemetry_tracer=self._opentelemetry_tracer,
-            path=path,
-            **prompt_kernel,
-        )
+        return prompt_decorator_factory(path=path, template=template)
 
     def tool(
         self,
         *,
-        path: Optional[str] = None,
-        **tool_kernel: Unpack[ToolKernelRequestParams],  # type: ignore
+        path: str,
+        attributes: Optional[dict[str, Any]] = None,
+        setup_values: Optional[dict[str, Any]] = None,
     ):
         """Decorator for declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code.
 
@@ -309,14 +302,15 @@ class Humanloop(BaseHumanloop):
         return tool_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            **tool_kernel,
+            attributes=attributes,
+            setup_values=setup_values,
         )
 
     def flow(
         self,
         *,
-        path: Optional[str] = None,
-        **flow_kernel: Unpack[FlowKernelRequestParams],  # type: ignore
+        path: str,
+        attributes: Optional[dict[str, Any]] = None,
     ):
         """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
 
@@ -369,9 +363,10 @@ class Humanloop(BaseHumanloop):
         :param flow_kernel: Attributes that define the Flow. See `class:ToolKernelRequestParams`
         """
         return flow_decorator_factory(
+            client=self,
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
-            **flow_kernel,
+            attributes=attributes,
         )
 
 

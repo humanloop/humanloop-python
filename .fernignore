@@ -3,6 +3,8 @@
 src/humanloop/eval_utils
 src/humanloop/prompt_utils.py
 src/humanloop/client.py
+src/humanloop/overload.py
+src/humanloop/context_variables.py
 mypy.ini
 README.md
 
