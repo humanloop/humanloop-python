@@ -308,6 +308,7 @@ def run_eval(
         def _process_datapoint(dp: Datapoint):
             def upload_callback(log_id: str):
                 """Logic ran after the Log has been created."""
+                # Need to get the full log to pass to the evaluators
                 evaluators_worker_pool.submit(
                     _run_local_evaluators,
                     client=client,
@@ -901,11 +902,6 @@ def _run_local_evaluators(
     progress_bar: _SimpleProgressBar,
 ):
     """Run local Evaluators on the Log and send the judgments to Humanloop."""
-    # If there are no local evaluators, we don't need to do the log lookup.
-    if len(local_evaluators) == 0:
-        progress_bar.increment()
-        return
-
     try:
         # Need to get the full log to pass to the evaluators
         log = client.logs.get(id=log_id)
@@ -915,12 +911,15 @@ def _run_local_evaluators(
             log_dict = log
 
         # Wait for the Flow trace to complete before running evaluators
-        while file_type == "flow" and log_dict["trace_status"] != "complete":
+        while True:
+            if file_type != "flow" or log_dict["trace_status"] == "complete":
+                break
             log = client.logs.get(id=log_id)
             if not isinstance(log, dict):
                 log_dict = log.dict()
             else:
                 log_dict = log
+            time.sleep(2)
         datapoint_dict = datapoint.dict() if datapoint else None
 
         for local_evaluator_tuple in local_evaluators:
