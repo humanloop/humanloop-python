@@ -40,6 +40,7 @@ from humanloop.core.api_error import ApiError
 from humanloop.eval_utils.context import (
     EvaluationContext,
     get_evaluation_context,
+    evaluation_context_set,
     get_prompt_utility_context,
     in_prompt_utility_context,
     log_belongs_to_evaluated_file,
@@ -182,11 +183,14 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
         CreateFlowLogResponse,
         CreateEvaluatorLogResponse,
     ]:
-        if log_belongs_to_evaluated_file(log_args=kwargs):
+        if evaluation_context_set():
             evaluation_context = get_evaluation_context()
+        else:
+            evaluation_context = None
+
+        if log_belongs_to_evaluated_file(log_args=kwargs) and evaluation_context and not evaluation_context.logged:
             for attribute in ["source_datapoint_id", "run_id"]:
-                if attribute not in kwargs or kwargs[attribute] is None:
-                    kwargs[attribute] = getattr(evaluation_context, attribute)
+                kwargs[attribute] = getattr(evaluation_context, attribute)
 
             # Call the original .log method
             logger.debug(
@@ -244,6 +248,7 @@ def run_eval(
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
     file_ = _file_or_file_inside_hl_utility(file)
+    is_decorator = _callable_is_hl_utility(file_)
     type_ = _get_file_type(file_)
     function_ = _get_file_callable(file_, type_)
 
@@ -336,7 +341,7 @@ def run_eval(
             try:
                 output = _call_function(function_, hl_file.type, dp)
                 evaluation_context = get_evaluation_context()
-                if not evaluation_context.logged:
+                if not evaluation_context.logged and not is_decorator:
                     # function_ did not Log against the source_datapoint_id/ run_id pair
                     # so we need to create a Log
                     log_func(
@@ -925,7 +930,9 @@ def _run_local_evaluators(
                 log_dict = log
         datapoint_dict = datapoint.dict() if datapoint else None
 
-        for local_evaluator, eval_function in local_evaluators:
+        for local_evaluator_tuple in local_evaluators:
+            eval_function = local_evaluator_tuple.function
+            local_evaluator = local_evaluator_tuple.hl_evaluator
             start_time = datetime.now()
             try:
                 if local_evaluator.spec.arguments_type == "target_required":

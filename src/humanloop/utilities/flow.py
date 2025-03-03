@@ -57,10 +57,7 @@ def flow(
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
-                    output_stringified = jsonify_if_not_string(
-                        func=func,
-                        output=None,
-                    )
+                    output_stringified = None
                     error = str(e)
 
                 flow_log = {
