@@ -116,7 +116,7 @@ class HumanloopSpanExporter(SpanExporter):
     def shutdown(self) -> None:
         self._shutdown = True
         for thread in self._threads:
-            thread.join(timeout=5000 / 1000)
+            thread.join(timeout=5)
             logger.debug("[HumanloopSpanExporter] Exporter Thread %s joined", thread.ident)
 
     def force_flush(self, timeout_millis: int = 5000) -> bool:

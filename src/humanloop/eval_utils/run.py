@@ -19,7 +19,7 @@ import threading
 import time
 import types
 import typing
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from functools import partial
 from logging import INFO
@@ -367,15 +367,8 @@ def run_eval(
                 )
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = []
             for datapoint in hl_dataset.datapoints:
-                futures.append(executor.submit(_process_datapoint, datapoint))
-            # Program hangs if any uncaught exceptions are not handled here
-            for future in as_completed(futures):
-                try:
-                    future.result()
-                except Exception:
-                    pass
+                executor.submit(_process_datapoint, datapoint)
 
     stats = _wait_for_evaluation_to_complete(
         client=client,
@@ -413,7 +406,6 @@ class _SimpleProgressBar:
     def increment(self):
         """Increment the progress bar by one finished task."""
         with self._lock:
-            # NOTE: There is a deadlock here that needs further investigation
             if self._progress == self._total:
                 return
             self._progress += 1
@@ -461,7 +453,7 @@ def _wait_for_evaluation_to_complete(
     # Wait for the Evaluation to complete then print the results
     complete = False
 
-    wrote_explainer = False
+    waiting_for_local_evals_message_printed = False
 
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
@@ -471,9 +463,9 @@ def _wait_for_evaluation_to_complete(
         )
         complete = run_stats is not None and run_stats.status == "completed"
         if not complete:
-            if not wrote_explainer:
+            if not waiting_for_local_evals_message_printed:
                 sys.stderr.write("\n\nWaiting for Evaluators on Humanloop runtime...\n")
-                wrote_explainer = True
+                waiting_for_local_evals_message_printed = True
             sys.stderr.write(stats.progress)
             # Move the cursor up in stderr a number of lines equal to the number of lines in stats.progress
             sys.stderr.write("\033[A" * (stats.progress.count("\n")))
