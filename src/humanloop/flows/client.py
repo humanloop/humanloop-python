@@ -14,13 +14,13 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.flow_log_response import FlowLogResponse
-from ..core.jsonable_encoder import jsonable_encoder
 from ..types.flow_response import FlowResponse
+from ..core.jsonable_encoder import jsonable_encoder
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.paginated_data_flow_response import PaginatedDataFlowResponse
+from ..types.flow_log_response import FlowLogResponse
 from ..types.version_status import VersionStatus
 from ..types.list_flows import ListFlows
 from ..types.file_environment_response import FileEnvironmentResponse
@@ -78,9 +78,6 @@ class FlowsClient:
 
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
-
-        If you create the Flow Log with a `trace_status` of `incomplete`, you should later update it to `complete`
-        in order to trigger Evaluators.
 
         Parameters
         ----------
@@ -205,10 +202,10 @@ class FlowsClient:
             output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
             trace_status="incomplete",
             start_time=datetime.datetime.fromisoformat(
-                "2024-07-08 21:40:35+00:00",
+                "2024-07-08 22:40:35+00:00",
             ),
             end_time=datetime.datetime.fromisoformat(
-                "2024-07-08 21:40:39+00:00",
+                "2024-07-08 22:40:39+00:00",
             ),
         )
         """
@@ -264,118 +261,6 @@ class FlowsClient:
                     CreateFlowLogResponse,
                     construct_type(
                         type_=CreateFlowLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def update_log(
-        self,
-        log_id: str,
-        *,
-        trace_status: TraceStatus,
-        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
-        output_message: typing.Optional[ChatMessageParams] = OMIT,
-        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        output: typing.Optional[str] = OMIT,
-        error: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowLogResponse:
-        """
-        Update the status, inputs, output of a Flow Log.
-
-        Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
-        Inputs and output (or error) must be provided in order to mark it as complete.
-
-        The end_time log attribute will be set to match the time the log is marked as complete.
-
-        Parameters
-        ----------
-        log_id : str
-            Unique identifier of the Flow Log.
-
-        trace_status : TraceStatus
-            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
-
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            List of chat messages that were used as an input to the Flow.
-
-        output_message : typing.Optional[ChatMessageParams]
-            The output message returned by this Flow.
-
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the Flow Log.
-
-        output : typing.Optional[str]
-            The output of the Flow Log. Provide None to unset existing `output` value. Provide either this, `output_message` or `error`.
-
-        error : typing.Optional[str]
-            The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowLogResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.update_log(
-            log_id="medqa_experiment_0001",
-            inputs={
-                "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
-            },
-            output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-            trace_status="complete",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/logs/{jsonable_encoder(log_id)}",
-            method="PATCH",
-            json={
-                "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
-                ),
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "inputs": inputs,
-                "output": output,
-                "error": error,
-                "trace_status": trace_status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowLogResponse,
-                    construct_type(
-                        type_=FlowLogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -798,6 +683,104 @@ class FlowsClient:
                     FlowResponse,
                     construct_type(
                         type_=FlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_log(
+        self,
+        log_id: str,
+        *,
+        trace_status: TraceStatus,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        output: typing.Optional[str] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowLogResponse:
+        """
+        Update the status, inputs, output of a Flow Log.
+
+        Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
+        Inputs and output (or error) must be provided in order to mark it as complete.
+
+        The end_time log attribute will be set to match the time the log is marked as complete.
+
+        Parameters
+        ----------
+        log_id : str
+            Unique identifier of the Flow Log.
+
+        trace_status : TraceStatus
+            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the Flow Log.
+
+        output : typing.Optional[str]
+            The output of the Flow Log. Provide None to unset existing `output` value. Provide either this or `error`.
+
+        error : typing.Optional[str]
+            The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this or `output`.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowLogResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.flows.update_log(
+            log_id="medqa_experiment_0001",
+            inputs={
+                "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
+            },
+            output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
+            trace_status="complete",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"flows/logs/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "inputs": inputs,
+                "output": output,
+                "error": error,
+                "trace_status": trace_status,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowLogResponse,
+                    construct_type(
+                        type_=FlowLogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1340,9 +1323,6 @@ class AsyncFlowsClient:
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
-        If you create the Flow Log with a `trace_status` of `incomplete`, you should later update it to `complete`
-        in order to trigger Evaluators.
-
         Parameters
         ----------
         version_id : typing.Optional[str]
@@ -1470,10 +1450,10 @@ class AsyncFlowsClient:
                 output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
                 trace_status="incomplete",
                 start_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 21:40:35+00:00",
+                    "2024-07-08 22:40:35+00:00",
                 ),
                 end_time=datetime.datetime.fromisoformat(
-                    "2024-07-08 21:40:39+00:00",
+                    "2024-07-08 22:40:39+00:00",
                 ),
             )
 
@@ -1532,126 +1512,6 @@ class AsyncFlowsClient:
                     CreateFlowLogResponse,
                     construct_type(
                         type_=CreateFlowLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def update_log(
-        self,
-        log_id: str,
-        *,
-        trace_status: TraceStatus,
-        messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
-        output_message: typing.Optional[ChatMessageParams] = OMIT,
-        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        output: typing.Optional[str] = OMIT,
-        error: typing.Optional[str] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> FlowLogResponse:
-        """
-        Update the status, inputs, output of a Flow Log.
-
-        Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
-        Inputs and output (or error) must be provided in order to mark it as complete.
-
-        The end_time log attribute will be set to match the time the log is marked as complete.
-
-        Parameters
-        ----------
-        log_id : str
-            Unique identifier of the Flow Log.
-
-        trace_status : TraceStatus
-            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
-
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            List of chat messages that were used as an input to the Flow.
-
-        output_message : typing.Optional[ChatMessageParams]
-            The output message returned by this Flow.
-
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the Flow Log.
-
-        output : typing.Optional[str]
-            The output of the Flow Log. Provide None to unset existing `output` value. Provide either this, `output_message` or `error`.
-
-        error : typing.Optional[str]
-            The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowLogResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.update_log(
-                log_id="medqa_experiment_0001",
-                inputs={
-                    "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
-                },
-                output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-                trace_status="complete",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/logs/{jsonable_encoder(log_id)}",
-            method="PATCH",
-            json={
-                "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
-                ),
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "inputs": inputs,
-                "output": output,
-                "error": error,
-                "trace_status": trace_status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowLogResponse,
-                    construct_type(
-                        type_=FlowLogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2114,6 +1974,112 @@ class AsyncFlowsClient:
                     FlowResponse,
                     construct_type(
                         type_=FlowResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_log(
+        self,
+        log_id: str,
+        *,
+        trace_status: TraceStatus,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        output: typing.Optional[str] = OMIT,
+        error: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowLogResponse:
+        """
+        Update the status, inputs, output of a Flow Log.
+
+        Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
+        Inputs and output (or error) must be provided in order to mark it as complete.
+
+        The end_time log attribute will be set to match the time the log is marked as complete.
+
+        Parameters
+        ----------
+        log_id : str
+            Unique identifier of the Flow Log.
+
+        trace_status : TraceStatus
+            Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the Flow Log.
+
+        output : typing.Optional[str]
+            The output of the Flow Log. Provide None to unset existing `output` value. Provide either this or `error`.
+
+        error : typing.Optional[str]
+            The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this or `output`.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowLogResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.flows.update_log(
+                log_id="medqa_experiment_0001",
+                inputs={
+                    "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
+                },
+                output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
+                trace_status="complete",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"flows/logs/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "inputs": inputs,
+                "output": output,
+                "error": error,
+                "trace_status": trace_status,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    FlowLogResponse,
+                    construct_type(
+                        type_=FlowLogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

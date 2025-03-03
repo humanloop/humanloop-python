@@ -19,7 +19,7 @@ import threading
 import time
 import types
 import typing
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from functools import partial
 from logging import INFO
@@ -367,15 +367,8 @@ def run_eval(
                 )
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = []
             for datapoint in hl_dataset.datapoints:
-                futures.append(executor.submit(_process_datapoint, datapoint))
-            # Program hangs if any uncaught exceptions are not handled here
-            for future in as_completed(futures):
-                try:
-                    future.result()
-                except Exception:
-                    pass
+                executor.submit(_process_datapoint, datapoint)
 
     stats = _wait_for_evaluation_to_complete(
         client=client,
