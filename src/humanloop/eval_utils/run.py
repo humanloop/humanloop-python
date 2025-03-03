@@ -204,10 +204,7 @@ def log_with_evaluation_context(client: CLIENT_TYPE) -> CLIENT_TYPE:
             response = self._log(**kwargs)
         except Exception as e:
             error_message = str(e).replace("\n", " ")
-            if len(error_message) > 100:
-                sys.stderr.write(f"{RED}Failed to log: {error_message[:100]}...{RESET}\n")
-            else:
-                sys.stderr.write(f"{RED}Failed to log: {error_message}{RESET}\n")
+            sys.stderr.write(f"{RED}Failed to log: {error_message[:100]}...{RESET}\n")
             raise e
 
         # Notify the run_eval utility about one Log being created
@@ -365,14 +362,9 @@ def run_eval(
                     end_time=datetime.now(),
                 )
                 error_message = str(e).replace("\n", " ")
-                if len(error_message) > 100:
-                    sys.stderr.write(
-                        f"\n{RED}Your {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. Error: {error_message[:100]}...{RESET}\n"
-                    )
-                else:
-                    sys.stderr.write(
-                        f"\n{RED}Your {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. Error: {error_message}{RESET}\n"
-                    )
+                sys.stderr.write(
+                    f"\n{RED}Your {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. Error: {error_message[:100]}...{RESET}\n"
+                )
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = []
@@ -916,8 +908,13 @@ def _run_local_evaluators(
     progress_bar: _SimpleProgressBar,
 ):
     """Run local Evaluators on the Log and send the judgments to Humanloop."""
-    # Need to get the full log to pass to the evaluators
+    # If there are no local evaluators, we don't need to do the log lookup.
+    if len(local_evaluators) == 0:
+        progress_bar.increment()
+        return
+
     try:
+        # Need to get the full log to pass to the evaluators
         log = client.logs.get(id=log_id)
         if not isinstance(log, dict):
             log_dict = log.dict()
@@ -964,24 +961,14 @@ def _run_local_evaluators(
                     end_time=datetime.now(),
                 )
                 error_message = str(e).replace("\n", " ")
-                if len(error_message) > 100:
-                    sys.stderr.write(
-                        f"{RED}Evaluator {local_evaluator.path} failed with error {error_message[:100]}...{RESET}\n"
-                    )
-                else:
-                    sys.stderr.write(
-                        f"{RED}Evaluator {local_evaluator.path} failed with error {error_message}{RESET}\n"
-                    )
+                sys.stderr.write(
+                    f"{RED}Evaluator {local_evaluator.path} failed with error {error_message[:100]}...{RESET}\n"
+                )
     except Exception as e:
         error_message = str(e).replace("\n", " ")
-        if len(error_message) > 100:
-            sys.stderr.write(
-                f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message[:100]}...{RESET}\n"
-            )
-        else:
-            sys.stderr.write(
-                f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message}{RESET}\n"
-            )
+        sys.stderr.write(
+            f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message[:100]}...{RESET}\n"
+        )
         pass
     finally:
         progress_bar.increment()
