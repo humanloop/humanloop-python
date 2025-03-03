@@ -1,4 +1,4 @@
-import deepdiff
+import deepdiff  # type: ignore [import]
 import logging
 from typing import Any
 import typing
