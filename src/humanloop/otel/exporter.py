@@ -16,12 +16,12 @@ from humanloop.otel.constants import (
     HUMANLOOP_LOG_KEY,
     HUMANLOOP_PATH_KEY,
 )
-from humanloop.otel.helpers import read_from_opentelemetry_span, write_to_opentelemetry_span
-from opentelemetry.proto.common.v1.common_pb2 import KeyValue, Link
+from google.protobuf.json_format import MessageToJson
+from humanloop.otel.helpers import is_llm_provider_call, read_from_opentelemetry_span, write_to_opentelemetry_span
+from opentelemetry.proto.common.v1.common_pb2 import KeyValue, AnyValue, InstrumentationScope
 from opentelemetry.proto.trace.v1.trace_pb2 import (
     TracesData,
     ResourceSpans,
-    InstrumentationScope,
     ScopeSpans,
     Span as ProtoBufferSpan,
 )
@@ -102,15 +102,19 @@ class HumanloopSpanExporter(SpanExporter):
                 continue
 
             span_to_export, evaluation_context = thread_args
+
             file_type = span_to_export.attributes.get(HUMANLOOP_FILE_TYPE_KEY)
             file_path = span_to_export.attributes.get(HUMANLOOP_PATH_KEY)
             if file_type is None:
                 raise ValueError("Span does not have type set")
 
-            log_args = read_from_opentelemetry_span(
-                span=span_to_export,
-                key=HUMANLOOP_LOG_KEY,
-            )
+            try:
+                log_args = read_from_opentelemetry_span(
+                    span=span_to_export,
+                    key=HUMANLOOP_LOG_KEY,
+                )
+            except Exception:
+                log_args = {}
 
             if evaluation_context:
                 if file_path == evaluation_context.path:
@@ -129,57 +133,74 @@ class HumanloopSpanExporter(SpanExporter):
             payload = TracesData(
                 resource_spans=[
                     ResourceSpans(
-                        scope_spans=ScopeSpans(
-                            scope=InstrumentationScope(
-                                name="humanloop-otel",
-                                version="0.1.0",
-                            ),
-                            spans=[
-                                ProtoBufferSpan(
-                                    trace_id=span_to_export.context.trace_id,
-                                    span_id=span_to_export.span_id,
-                                    name=span_to_export.name,
-                                    kind=span_to_export.kind,
-                                    start_time_unix_nano=span_to_export.start_time,
-                                    end_time_unix_nano=span_to_export.end_time,
-                                    attributes=[
-                                        KeyValue(
-                                            key=key,
-                                            value=value,
-                                        )
-                                        for key, value in span_to_export.attributes.items()
-                                    ],
-                                    dropped_attributes_count=len(span_to_export.dropped_attributes),
-                                    dropped_events_count=len(span_to_export.dropped_events),
-                                    dropped_links_count=len(span_to_export.dropped_links),
-                                    links=[
-                                        Link(
-                                            trace_id=link.trace_id,
-                                            span_id=link.span_id,
-                                            attributes=link.attributes,
-                                        )
-                                        for link in span_to_export.links
-                                    ],
-                                    events=[],
-                                )
-                            ],
-                        )
+                        scope_spans=[
+                            ScopeSpans(
+                                scope=InstrumentationScope(
+                                    name="humanloop.sdk.provider"
+                                    if is_llm_provider_call(span_to_export)
+                                    else "humanloop.sdk.decorator",
+                                    version="0.1.0",
+                                ),
+                                spans=[
+                                    ProtoBufferSpan(
+                                        trace_id=span_to_export.context.trace_id.to_bytes(length=16, byteorder="big"),
+                                        span_id=span_to_export.context.span_id.to_bytes(length=8, byteorder="big"),
+                                        name=span_to_export.name,
+                                        kind={
+                                            0: ProtoBufferSpan.SpanKind.SPAN_KIND_INTERNAL,
+                                            1: ProtoBufferSpan.SpanKind.SPAN_KIND_SERVER,
+                                            2: ProtoBufferSpan.SpanKind.SPAN_KIND_CLIENT,
+                                            3: ProtoBufferSpan.SpanKind.SPAN_KIND_PRODUCER,
+                                            4: ProtoBufferSpan.SpanKind.SPAN_KIND_CONSUMER,
+                                        }[span_to_export.kind.value],
+                                        start_time_unix_nano=span_to_export.start_time,
+                                        end_time_unix_nano=span_to_export.end_time,
+                                        attributes=[
+                                            KeyValue(
+                                                key=key,
+                                                value=AnyValue(string_value=str(value)),
+                                            )
+                                            for key, value in span_to_export.attributes.items()
+                                        ],
+                                        dropped_attributes_count=span_to_export.dropped_attributes,
+                                        dropped_events_count=span_to_export.dropped_events,
+                                        dropped_links_count=span_to_export.dropped_links,
+                                        links=[
+                                            ProtoBufferSpan.Link(
+                                                trace_id=link.trace_id,
+                                                span_id=link.span_id,
+                                                attributes=[
+                                                    KeyValue(
+                                                        key=key,
+                                                        value=AnyValue(string_value=str(value)),
+                                                    )
+                                                    for key, value in link.attributes.items()
+                                                ],
+                                            )
+                                            for link in span_to_export.links
+                                        ],
+                                        events=[],
+                                    )
+                                ],
+                            )
+                        ]
                     )
                 ]
             )
 
             response = requests.post(
                 f"{self._client._client_wrapper.get_base_url()}/import/otel/v1/traces",
-                headers=self._client._client_wrapper.get_headers(),
-                data=span_to_export.to_json().encode("ascii"),
+                headers={
+                    **self._client._client_wrapper.get_headers(),
+                },
+                data=MessageToJson(payload),
             )
             if response.status_code != 200:
                 # TODO: handle
                 pass
             else:
-                print("FOO", response.json())
                 if evaluation_context and file_path == evaluation_context.path:
-                    log_id = response.json()["log_id"]
+                    log_id = response.json()["records"][0]["log_id"]
                     evaluation_context.callback(log_id)
 
             self._upload_queue.task_done()

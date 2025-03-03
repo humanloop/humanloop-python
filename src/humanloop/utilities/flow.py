@@ -8,7 +8,7 @@ from opentelemetry import context as context_api
 import requests
 
 from humanloop.base_client import BaseHumanloop
-from humanloop.context import get_trace_id, set_trace_id
+from humanloop.context import get_evaluation_context, get_trace_id, set_trace_id
 from humanloop.types.chat_message import ChatMessage
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils.types import File
@@ -83,7 +83,7 @@ def flow(
                             and "role" in func_output
                             and "content" in func_output
                         ):
-                            log_output_message = ChatMessage(**func_output)
+                            log_output_message = func_output
                             log_output = None
                         else:
                             log_output = process_output(func=func, output=func_output)
@@ -91,9 +91,10 @@ def flow(
                         log_error = None
                     except Exception as e:
                         logger.error(f"Error calling {func.__name__}: {e}")
-                        output = None
+                        log_output = None
                         log_output_message = None
                         log_error = str(e)
+                        func_output = None
 
                     flow_log = {
                         "inputs": {k: v for k, v in args_to_func.items() if k != "messages"},
@@ -106,12 +107,11 @@ def flow(
                     }
 
                     # Write the Flow Log to the Span on HL_LOG_OT_KEY
-                    if flow_log:
-                        write_to_opentelemetry_span(
-                            span=span,
-                            key=HUMANLOOP_LOG_KEY,
-                            value=flow_log,  # type: ignore
-                        )
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=HUMANLOOP_LOG_KEY,
+                        value=flow_log,  # type: ignore
+                    )
 
                     # Return the output of the decorated function
                     return func_output

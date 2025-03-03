@@ -142,7 +142,6 @@ class Humanloop(BaseHumanloop):
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
 
-    @contextmanager
     def prompt(
         self,
         *,

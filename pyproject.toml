@@ -30,6 +30,9 @@ packages = [
     { include = "humanloop", from = "src"}
 ]
 
+[tool.poetry.group.dev.dependencies]
+protobuf = "^5.29.3"
+
 [project.urls]
 Repository = 'https://github.com/humanloop/humanloop-python'
 

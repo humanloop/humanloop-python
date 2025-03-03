@@ -44,4 +44,11 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
             trace_id = get_trace_id()
             if trace_id:
                 span.set_attribute(f"{HUMANLOOP_LOG_KEY}.trace_parent_id", trace_id)
-                print(span)
+
+    def on_end(self, span: ReadableSpan):
+        if is_llm_provider_call(span):
+            prompt_context = get_prompt_context()
+            if prompt_context is None:
+                return
+
+        self.span_exporter.export([span])

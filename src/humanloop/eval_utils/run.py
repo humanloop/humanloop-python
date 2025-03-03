@@ -13,22 +13,40 @@ from dataclasses import dataclass
 import inspect
 import json
 import logging
+import signal
 import sys
 import threading
 import time
 import typing
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from functools import partial
 from logging import INFO
-from typing import Callable, Dict, List, Literal, Optional, Sequence, Tuple, Union
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
-from humanloop.context import EvaluationContext, set_evaluation_context
 from humanloop.core.api_error import ApiError
+from humanloop.context import (
+    EvaluationContext,
+    get_evaluation_context,
+    set_evaluation_context,
+)
 from humanloop.eval_utils.types import Dataset, Evaluator, EvaluatorCheck, File
 
 # We use TypedDicts for requests, which is consistent with the rest of the SDK
+from humanloop.evaluators.client import EvaluatorsClient
+from humanloop.flows.client import FlowsClient
+from humanloop.prompts.client import PromptsClient
 from humanloop.requests import CodeEvaluatorRequestParams as CodeEvaluatorDict
 from humanloop.requests import ExternalEvaluatorRequestParams as ExternalEvaluator
 from humanloop.requests import FlowKernelRequestParams as FlowDict
@@ -36,6 +54,7 @@ from humanloop.requests import HumanEvaluatorRequestParams as HumanEvaluatorDict
 from humanloop.requests import LlmEvaluatorRequestParams as LLMEvaluatorDict
 from humanloop.requests import PromptKernelRequestParams as PromptDict
 from humanloop.requests import ToolKernelRequestParams as ToolDict
+from humanloop.tools.client import ToolsClient
 from humanloop.types import BooleanEvaluatorStatsResponse as BooleanStats
 from humanloop.types import DatapointResponse as Datapoint
 from humanloop.types import EvaluationResponse, EvaluationStats
@@ -77,6 +96,9 @@ RED = "\033[91m"
 RESET = "\033[0m"
 
 
+CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, ToolsClient, FlowsClient, EvaluatorsClient)
+
+
 class HumanloopUtilityError(Exception):
     def __init__(self, message):
         self.message = message
@@ -104,10 +126,6 @@ def run_eval(
     :param workers: the number of threads to process datapoints using your function concurrently.
     :return: per Evaluator checks.
     """
-    if workers > 32:
-        logger.warning("Too many workers requested, capping the number to 32.")
-    workers = min(workers, 32)
-
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
     file_ = _file_or_file_inside_hl_utility(file)
@@ -133,12 +151,22 @@ def run_eval(
         function=function_,
     )
 
-    # Header of the CLI Report
-    logger.info(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n")
-    logger.info(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}")
-    logger.info(f"{CYAN}Run ID: {run.id}{RESET}")
+    def handle_exit_signal(signum, frame):
+        client.evaluations.update_evaluation_run(
+            id=evaluation.id,
+            run_id=run.id,
+            status="cancelled",
+        )
+        evaluators_worker_pool.shutdown(wait=False)
+        sys.exit(signum)
 
-    _PROGRESS_BAR = _SimpleProgressBar(len(hl_dataset.datapoints))
+    signal.signal(signal.SIGINT, handle_exit_signal)
+    signal.signal(signal.SIGTERM, handle_exit_signal)
+
+    # Header of the CLI Report
+    sys.stdout.write(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n\n")
+    sys.stdout.write(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}\n")
+    sys.stdout.write(f"{CYAN}Run ID: {run.id}{RESET}\n")
 
     # This will apply apply the local callable to each datapoint
     # and log the results to Humanloop
@@ -146,13 +174,17 @@ def run_eval(
     # Generate locally if a file `callable` is provided
     if function_ is None:
         # TODO: trigger run when updated API is available
-        logger.info(f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}'{RESET}")
+        sys.stdout.write(f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}'{RESET}\n")
     else:
         # Running the evaluation locally
-        logger.info(
-            f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}' using {workers} workers{RESET} "
+        sys.stdout.write(
+            f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}' using {workers} workers...{RESET}\n\n"
         )
 
+    _PROGRESS_BAR = _SimpleProgressBar(len(hl_dataset.datapoints))
+
+    if function_ is not None:
+        # Generate locally if a file `callable` is provided
         def _process_datapoint(dp: Datapoint):
             def upload_callback(log_id: str):
                 """Logic ran after the Log has been created."""
@@ -186,13 +218,17 @@ def run_eval(
                 start_time = datetime.now()
                 try:
                     output = _call_function(function_, hl_file.type, dp)
-                    if not _callable_is_decorated(file):
-                        # function_ is a plain callable so we need to create a Log
+                    evaluation_context = get_evaluation_context()
+                    if not evaluation_context.logging_counter == 0:
+                        # function_ did not Log against the source_datapoint_id/ run_id pair
+                        # so we need to create a Log
                         log_func(
                             inputs=dp.inputs,
                             output=output,
                             start_time=start_time,
                             end_time=datetime.now(),
+                            source_datapoint_id=dp.id,
+                            run_id=run.id,
                         )
                 except Exception as e:
                     log_func(
@@ -203,31 +239,46 @@ def run_eval(
                         start_time=start_time,
                         end_time=datetime.now(),
                     )
-                    logger.warning(
-                        msg=f"\nYour {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. \n Error: {str(e)}"
-                    )
+                    error_message = str(e).replace("\n", " ")
+                    if len(error_message) > 100:
+                        sys.stderr.write(
+                            f"\n{RED}Your {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. Error: {error_message[:100]}...{RESET}\n"
+                        )
+                    else:
+                        sys.stderr.write(
+                            f"\n{RED}Your {hl_file.type}'s `callable` failed for Datapoint: {dp.id}. Error: {error_message}{RESET}\n"
+                        )
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = []
             for datapoint in hl_dataset.datapoints:
-                executor.submit(_process_datapoint, datapoint)
+                futures.append(executor.submit(_process_datapoint, datapoint))
+            # Program hangs if any uncaught exceptions are not handled here
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception:
+                    pass
 
     stats = _wait_for_evaluation_to_complete(
         client=client,
         evaluation=evaluation,
         run=run,
     )
-    logger.info(f"\n{CYAN}View your Evaluation:{RESET}\n{evaluation.url}\n")
+    sys.stderr.write(f"\n{CYAN}View your Evaluation:{RESET}\n{evaluation.url}\n")
 
     # Print Evaluation results
-    logger.info(stats.report)
+    sys.stderr.write(stats.report)
 
-    return _get_checks(
+    checks = _get_checks(
         client=client,
         evaluation=evaluation,
         stats=stats,
         evaluators=evaluators,
         run=run,
     )
+    evaluators_worker_pool.shutdown(wait=False)
+    return checks
 
 
 class _SimpleProgressBar:
@@ -245,6 +296,9 @@ class _SimpleProgressBar:
     def increment(self):
         """Increment the progress bar by one finished task."""
         with self._lock:
+            # NOTE: There is a deadlock here that needs further investigation
+            if self._progress == self._total:
+                return
             self._progress += 1
             if self._start_time is None:
                 self._start_time = time.time()
@@ -270,9 +324,6 @@ class _SimpleProgressBar:
             sys.stderr.write("\033[K")  # Clear the line from the cursor to the end
             sys.stderr.write(progress_display)
 
-            if self._progress >= self._total:
-                sys.stderr.write("\n")
-
 
 @dataclass
 class _LocalEvaluator:
@@ -280,7 +331,7 @@ class _LocalEvaluator:
     function: Callable
 
 
-def _callable_is_decorated(file: File) -> bool:
+def _callable_is_hl_utility(file: File) -> bool:
     """Check if a File is a decorated function."""
     return hasattr(file["callable"], "file")
 
@@ -292,16 +343,24 @@ def _wait_for_evaluation_to_complete(
 ):
     # Wait for the Evaluation to complete then print the results
     complete = False
+
+    wrote_explainer = False
+
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
-        logger.info(f"\r{stats.progress}")
         run_stats = next(
             (run_stats for run_stats in stats.run_stats if run_stats.run_id == run.id),
             None,
         )
         complete = run_stats is not None and run_stats.status == "completed"
         if not complete:
+            if not wrote_explainer:
+                sys.stderr.write("\n\nWaiting for Evaluators on Humanloop runtime...\n\n")
+                wrote_explainer = True
+            sys.stderr.write(stats.progress + "\n")
+            # Move the cursor up in stderr a number of lines equal to the number of lines in stats.progress
             time.sleep(5)
+
     return stats
 
 
@@ -351,29 +410,34 @@ def _get_checks(
 
 
 def _file_or_file_inside_hl_utility(file: File) -> File:
-    if _callable_is_decorated(file):
+    if _callable_is_hl_utility(file):
         # When the decorator inside `file` is a decorated function,
         # we need to validate that the other parameters of `file`
         # match the attributes of the decorator
-        decorated_fn_name = file["callable"].__name__
         inner_file: File = file["callable"].file
-        for argument in ["version", "path", "type", "id"]:
-            if argument in file:
-                logger.warning(
-                    f"Argument `file.{argument}` will be ignored: "
-                    f"callable `{decorated_fn_name}` is managed by "
-                    "the @{inner_file['type']} decorator."
-                )
-
-        # Use the file manifest in the decorated function
+        if "path" in file and inner_file["path"] != file["path"]:
+            raise ValueError(
+                "`path` attribute specified in the `file` does not match the File path of the decorated function."
+            )
+        if "version" in file and inner_file["version"] != file["version"]:
+            raise ValueError(
+                "`version` attribute in the `file` does not match the File version of the decorated function."
+            )
+        if "type" in file and inner_file["type"] != file["type"]:
+            raise ValueError(
+                "`type` attribute of `file` argument does not match the File type of the decorated function."
+            )
+        if "id" in file:
+            raise ValueError("Do not specify an `id` attribute in `file` argument when using a decorated function.")
+        # file on decorated function holds at least
+        # or more information than the `file` argument
         file_ = copy.deepcopy(inner_file)
-
     else:
-        # Simple function
-        # Raise error if one of path or id not provided
-        file_ = file
-        if not file_.get("path") and not file_.get("id"):
-            raise ValueError("You must provide a path or id in your `file`.")
+        file_ = copy.deepcopy(file)
+
+    # Raise error if one of path or id not provided
+    if not file_.get("path") and not file_.get("id"):
+        raise ValueError("You must provide a path or id in your `file`.")
 
     return file_
 
@@ -382,13 +446,14 @@ def _get_file_type(file: File) -> FileType:
     # Determine the `type` of the `file` to Evaluate - if not `type` provided, default to `flow`
     try:
         type_ = typing.cast(FileType, file.pop("type"))
-        logger.info(
-            f"{CYAN}Evaluating your {type_} function corresponding to `{file.get('path') or file.get('id')}` on Humanloop{RESET} \n\n"
+        sys.stdout.write(
+            f"{CYAN}Evaluating your {type_} function corresponding to `{file.get('path') or file.get('id')}` on Humanloop{RESET}\n\n"
         )
         return type_ or "flow"
     except KeyError as _:
         type_ = "flow"
-        logger.warning("No `file` type specified, defaulting to flow.")
+        sys.stdout.write(f"{CYAN}No `file` type specified, defaulting to flow.{RESET}\n")
+        return type_
 
 
 def _get_file_callable(file: File, type_: FileType) -> Optional[Callable]:
@@ -398,7 +463,9 @@ def _get_file_callable(file: File, type_: FileType) -> Optional[Callable]:
         if type_ == "flow":
             raise ValueError("You must provide a `callable` for your Flow `file` to run a local eval.")
         else:
-            logger.info(f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.")
+            sys.stdout.write(
+                f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.\n"
+            )
     return function_
 
 
@@ -422,7 +489,7 @@ def _upsert_file(
         try:
             Prompt.model_validate(version)
         except ValidationError as error_:
-            logger.error(msg="Invalid Prompt `version` in your `file` request. \n\nValidation error: \n)")
+            sys.stdout.write(f"Invalid Prompt `version` in your `file` request. \n\nValidation error: \n{error_}")
             raise error_
         try:
             hl_file = client.prompts.upsert(**file_dict)
@@ -433,7 +500,7 @@ def _upsert_file(
         try:
             Tool.model_validate(version)
         except ValidationError as error_:
-            logger.error(msg="Invalid Tool `version` in your `file` request. \n\nValidation error: \n)")
+            sys.stdout.write(f"Invalid Tool `version` in your `file` request. \n\nValidation error: \n{error_}")
             raise error_
         hl_file = client.tools.upsert(**file_dict)
 
@@ -597,7 +664,7 @@ def _get_log_func(
         "run_id": run_id,
     }
     if file_type == "flow":
-        return partial(client.flows.log, **log_request, trace_status="complete")
+        return partial(client.flows.log, **log_request)
     elif file_type == "prompt":
         return partial(client.prompts.log, **log_request)
     elif file_type == "evaluator":
@@ -657,12 +724,12 @@ def _check_evaluation_threshold(
         evaluator_stat = evaluator_stats_by_path[evaluator_path]
         score = _get_score_from_evaluator_stat(stat=evaluator_stat)
         if score >= threshold:
-            logger.info(
+            sys.stderr.write(
                 f"{GREEN}✅ Latest eval [{score}] above threshold [{threshold}] for evaluator {evaluator_path}.{RESET}"
             )
             return True
         else:
-            logger.info(
+            sys.stderr.write(
                 f"{RED}❌ Latest score [{score}] below the threshold [{threshold}] for evaluator {evaluator_path}.{RESET}"
             )
             return False
@@ -691,7 +758,7 @@ def _check_evaluation_improvement(
         evaluation=evaluation,
     )
     if len(stats.run_stats) == 1:
-        logger.info(f"{YELLOW}⚠️ No previous versions to compare with.{RESET}")
+        sys.stderr.write(f"{YELLOW}⚠️ No previous versions to compare with.{RESET}\n")
         return True, 0, 0
 
     previous_evaluator_stats_by_path = _get_evaluator_stats_by_path(
@@ -707,10 +774,10 @@ def _check_evaluation_improvement(
             raise ValueError(f"Could not find score for Evaluator {evaluator_path}.")
         diff = round(latest_score - previous_score, 2)
         if diff >= 0:
-            logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
+            sys.stderr.write(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}\n")
             return True, latest_score, diff
         else:
-            logger.info(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}")
+            sys.stderr.write(f"{CYAN}Change of [{diff}] for Evaluator {evaluator_path}{RESET}\n")
             return False, latest_score, diff
     else:
         raise ValueError(f"Evaluator {evaluator_path} not found in the stats.")
@@ -726,45 +793,68 @@ def _run_local_evaluators(
 ):
     """Run local Evaluators on the Log and send the judgments to Humanloop."""
     # Need to get the full log to pass to the evaluators
-    log = client.logs.get(id=log_id)
-    if not isinstance(log, dict):
-        log_dict = log.dict()
-    else:
-        log_dict = log
-    # Wait for the Flow trace to complete before running evaluators
-    while file_type == "flow" and log_dict["trace_status"] != "complete":
+    try:
         log = client.logs.get(id=log_id)
         if not isinstance(log, dict):
             log_dict = log.dict()
         else:
             log_dict = log
-    datapoint_dict = datapoint.dict() if datapoint else None
-    for local_evaluator in local_evaluators:
-        start_time = datetime.now()
-        try:
-            if local_evaluator.hl_evaluator.spec.arguments_type == "target_required":
-                judgement = local_evaluator.function(
-                    log_dict,
-                    datapoint_dict,
-                )
+        # Wait for the Flow trace to complete before running evaluators
+        while file_type == "flow" and log_dict["log_status"] != "complete":
+            log = client.logs.get(id=log_id)
+            if not isinstance(log, dict):
+                log_dict = log.dict()
             else:
-                judgement = local_evaluator.function(log_dict)
+                log_dict = log
+        datapoint_dict = datapoint.dict() if datapoint else None
 
-            _ = client.evaluators.log(
-                version_id=local_evaluator.hl_evaluator.version_id,
-                parent_id=log_id,
-                judgment=judgement,
-                id=local_evaluator.hl_evaluator.id,
-                start_time=start_time,
-                end_time=datetime.now(),
+        for local_evaluator in local_evaluators:
+            start_time = datetime.now()
+            try:
+                if local_evaluator.hl_evaluator.spec.arguments_type == "target_required":
+                    judgement = local_evaluator.function(
+                        log_dict,
+                        datapoint_dict,
+                    )
+                else:
+                    judgement = local_evaluator.function(log_dict)
+
+                _ = client.evaluators.log(
+                    version_id=local_evaluator.hl_evaluator.version_id,
+                    parent_id=log_id,
+                    judgment=judgement,
+                    id=local_evaluator.hl_evaluator.id,
+                    start_time=start_time,
+                    end_time=datetime.now(),
+                )
+            except Exception as e:
+                _ = client.evaluators.log(
+                    parent_id=log_id,
+                    id=local_evaluator.hl_evaluator.id,
+                    version_id=local_evaluator.hl_evaluator.version_id,
+                    error=str(e),
+                    start_time=start_time,
+                    end_time=datetime.now(),
+                )
+                error_message = str(e).replace("\n", " ")
+                if len(error_message) > 100:
+                    sys.stderr.write(
+                        f"{RED}Evaluator {local_evaluator.hl_evaluator.path} failed with error {error_message[:100]}...{RESET}\n"
+                    )
+                else:
+                    sys.stderr.write(
+                        f"{RED}Evaluator {local_evaluator.hl_evaluator.path} failed with error {error_message}{RESET}\n"
+                    )
+    except Exception as e:
+        error_message = str(e).replace("\n", " ")
+        if len(error_message) > 100:
+            sys.stderr.write(
+                f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message[:100]}...{RESET}\n"
             )
-        except Exception as e:
-            _ = client.evaluators.log(
-                parent_id=log_id,
-                id=local_evaluator.hl_evaluator.id,
-                error=str(e),
-                start_time=start_time,
-                end_time=datetime.now(),
+        else:
+            sys.stderr.write(
+                f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message}{RESET}\n"
             )
-            logger.warning(f"\nEvaluator {local_evaluator.hl_evaluator.path} failed with error {str(e)}")
-    progress_bar.increment()
+        pass
+    finally:
+        progress_bar.increment()
