@@ -774,7 +774,7 @@ def _get_log_func(
         "run_id": run_id,
     }
     if file_type == "flow":
-        return partial(client.flows.log, **log_request, trace_status="complete")
+        return partial(client.flows.log, **log_request, log_status="complete")
     elif file_type == "prompt":
         return partial(client.prompts.log, **log_request)
     elif file_type == "evaluator":
@@ -912,7 +912,7 @@ def _run_local_evaluators(
 
         # Wait for the Flow trace to complete before running evaluators
         while True:
-            if file_type != "flow" or log_dict["trace_status"] == "complete":
+            if file_type != "flow" or log_dict["log_status"] == "complete":
                 break
             log = client.logs.get(id=log_id)
             if not isinstance(log, dict):

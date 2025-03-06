@@ -371,7 +371,7 @@ class HumanloopSpanExporter(SpanExporter):
                     trace_head_span_id,
                 )
             else:
-                self._client.flows.update_log(log_id=flow_log_id, trace_status="complete")
+                self._client.flows.update_log(log_id=flow_log_id, log_status="complete")
 
     def _keep_track_of_trace(self, log_id: str, parent_log_id: str):
         found = False
