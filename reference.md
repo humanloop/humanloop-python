@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-19 00:29:35.178000+00:00",
+        "2024-07-18 23:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -133,6 +133,14 @@ client.prompts.log(
 <dd>
 
 **prompt_tokens:** `typing.Optional[int]` — Number of tokens in the prompt used to generate the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reasoning_tokens:** `typing.Optional[int]` — Number of reasoning tokens used to generate the output.
     
 </dd>
 </dl>
@@ -298,6 +306,14 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -436,6 +452,14 @@ client.prompts.update_log(
 <dd>
 
 **prompt_tokens:** `typing.Optional[int]` — Number of tokens in the prompt used to generate the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reasoning_tokens:** `typing.Optional[int]` — Number of reasoning tokens used to generate the output.
     
 </dd>
 </dl>
@@ -586,6 +610,14 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -761,6 +793,14 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -1027,6 +1067,14 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -1364,6 +1412,14 @@ Input variables should be specified with double curly bracket syntax: `{{input_n
 <dl>
 <dd>
 
+**template_language:** `typing.Optional[TemplateLanguage]` — The template language to use for rendering the template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **provider:** `typing.Optional[ModelProviders]` — The company providing the underlying model service.
     
 </dd>
@@ -1437,6 +1493,14 @@ Input variables should be specified with double curly bracket syntax: `{{input_n
 <dd>
 
 **response_format:** `typing.Optional[ResponseFormatParams]` — The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reasoning_effort:** `typing.Optional[ReasoningEffort]` — Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
     
 </dd>
 </dl>
@@ -1739,6 +1803,104 @@ client.prompts.move(
 <dd>
 
 **name:** `typing.Optional[str]` — Name of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">populate_template</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Prompt with the given ID, including the populated template.
+
+By default, the deployed version of the Prompt is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Prompt.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.populate_template(
+    id="id",
+    request={"key": "value"},
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `typing.Dict[str, typing.Optional[typing.Any]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Prompt to retrieve to populate the template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from to populate the template.
     
 </dd>
 </dl>
@@ -2554,6 +2716,14 @@ client.tools.log(
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -2780,6 +2950,14 @@ client.tools.update(
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -5360,6 +5538,14 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -6528,6 +6714,9 @@ Log to a Flow.
 
 You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Flow. Otherwise, the default deployed version will be chosen.
+
+If you create the Flow Log with a `log_status` of `incomplete`, you should later update it to `complete`
+in order to trigger Evaluators.
 </dd>
 </dl>
 </dd>
@@ -6550,7 +6739,6 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.log(
-    log_id="medqa_experiment_0001",
     id="fl_6o701g4jmcanPVHxdqD0O",
     flow={
         "attributes": {
@@ -6570,12 +6758,12 @@ client.flows.log(
         "question": "Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath."
     },
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-    trace_status="incomplete",
+    log_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:35+00:00",
+        "2024-07-08 21:40:35+00:00",
     ),
     end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:39+00:00",
+        "2024-07-08 21:40:39+00:00",
     ),
 )
 
@@ -6745,6 +6933,14 @@ client.flows.log(
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of the Flow Log. When a Log is updated from `incomplete` to `complete`, it becomes available to Monitoring Evaluators. Flow Logs cannot have an unspecified status: they must start as `incomplete` to allow children to be added. Provide `complete` if you don't intend to add children to the trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -6801,7 +6997,127 @@ client.flows.log(
 <dl>
 <dd>
 
-**trace_status:** `typing.Optional[TraceStatus]` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces. If you do not intend to add more Logs to the Trace after creation, set this to `complete`.
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_log</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the status, inputs, output of a Flow Log.
+
+Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
+Inputs and output (or error) must be provided in order to mark it as complete.
+
+The end_time log attribute will be set to match the time the log is marked as complete.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.update_log(
+    log_id="medqa_experiment_0001",
+    inputs={
+        "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
+    },
+    output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
+    log_status="complete",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**log_id:** `str` — Unique identifier of the Flow Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — List of chat messages that were used as an input to the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_message:** `typing.Optional[ChatMessageParams]` — The output message returned by this Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the Flow Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — The output of the Flow Log. Provide None to unset existing `output` value. Provide either this, `output_message` or `error`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
     
 </dd>
 </dl>
@@ -7284,118 +7600,6 @@ client.flows.upsert(
 <dd>
 
 **commit_message:** `typing.Optional[str]` — Message describing the changes made.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_log</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Update the status, inputs, output of a Flow Log.
-
-Marking a Flow Log as complete will trigger any monitoring Evaluators to run.
-Inputs and output (or error) must be provided in order to mark it as complete.
-
-The end_time log attribute will be set to match the time the log is marked as complete.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.update_log(
-    log_id="medqa_experiment_0001",
-    inputs={
-        "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
-    },
-    output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-    trace_status="complete",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**log_id:** `str` — Unique identifier of the Flow Log.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_status:** `TraceStatus` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the Flow Log.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**output:** `typing.Optional[str]` — The output of the Flow Log. Provide None to unset existing `output` value. Provide either this or `error`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**error:** `typing.Optional[str]` — The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this or `output`.
     
 </dd>
 </dl>
@@ -10002,7 +10206,9 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.logs.delete()
+client.logs.delete(
+    id="prv_Wu6zx1lAWJRqOyL8nWuZk",
+)
 
 ```
 </dd>

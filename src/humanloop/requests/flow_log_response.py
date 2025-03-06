@@ -6,8 +6,8 @@ import typing_extensions
 import typing
 from .chat_message import ChatMessageParams
 import datetime as dt
+from ..types.log_status import LogStatus
 from .flow_response import FlowResponseParams
-from ..types.trace_status import TraceStatus
 import typing
 
 if typing.TYPE_CHECKING:
@@ -90,6 +90,11 @@ class FlowLogResponseParams(typing_extensions.TypedDict):
     Any additional metadata to record.
     """
 
+    log_status: typing_extensions.NotRequired[LogStatus]
+    """
+    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    """
+
     source_datapoint_id: typing_extensions.NotRequired[str]
     """
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -153,9 +158,4 @@ class FlowLogResponseParams(typing_extensions.TypedDict):
     flow: FlowResponseParams
     """
     Flow used to generate the Log.
-    """
-
-    trace_status: typing_extensions.NotRequired[TraceStatus]
-    """
-    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
     """

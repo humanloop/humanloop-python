@@ -5,6 +5,7 @@ import typing_extensions
 import typing_extensions
 import datetime as dt
 import typing
+from ..types.log_status import LogStatus
 from .chat_message import ChatMessageParams
 from .evaluator_log_response_judgment import EvaluatorLogResponseJudgmentParams
 from .evaluator_response import EvaluatorResponseParams
@@ -77,6 +78,11 @@ class EvaluatorLogResponseParams(typing_extensions.TypedDict):
     metadata: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
     Any additional metadata to record.
+    """
+
+    log_status: typing_extensions.NotRequired[LogStatus]
+    """
+    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     """
 
     parent_id: typing_extensions.NotRequired[str]

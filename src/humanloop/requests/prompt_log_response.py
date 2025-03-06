@@ -8,6 +8,7 @@ import typing
 from .prompt_log_response_tool_choice import PromptLogResponseToolChoiceParams
 from .prompt_response import PromptResponseParams
 import datetime as dt
+from ..types.log_status import LogStatus
 import typing
 
 if typing.TYPE_CHECKING:
@@ -28,6 +29,11 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     prompt_tokens: typing_extensions.NotRequired[int]
     """
     Number of tokens in the prompt used to generate the output.
+    """
+
+    reasoning_tokens: typing_extensions.NotRequired[int]
+    """
+    Number of reasoning tokens used to generate the output.
     """
 
     output_tokens: typing_extensions.NotRequired[int]
@@ -127,6 +133,11 @@ class PromptLogResponseParams(typing_extensions.TypedDict):
     metadata: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
     """
     Any additional metadata to record.
+    """
+
+    log_status: typing_extensions.NotRequired[LogStatus]
+    """
+    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     """
 
     source_datapoint_id: typing_extensions.NotRequired[str]

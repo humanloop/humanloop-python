@@ -68,7 +68,7 @@ class ExtendedEvalsClient(EvaluationsClient):
 
 
 class ExtendedPromptsClient(PromptsClient):
-    populate_template = staticmethod(populate_template)
+    populate_template = staticmethod(populate_template)  # type: ignore [assignment]
 
 
 class Humanloop(BaseHumanloop):

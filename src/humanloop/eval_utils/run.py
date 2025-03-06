@@ -137,6 +137,7 @@ def run_eval(
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
     file_ = _file_or_file_inside_hl_utility(file)
+    is_decorator = _callable_is_hl_utility(file_)
     type_ = _get_file_type(file_)
     function_ = _get_file_callable(file_, type_)
 
@@ -160,6 +161,9 @@ def run_eval(
     )
 
     def handle_exit_signal(signum, frame):
+        sys.stderr.write(
+            f"\n{RED}Received signal {signum}, cancelling Evaluation and shutting down threads...{RESET}\n"
+        )
         client.evaluations.update_evaluation_run(
             id=evaluation.id,
             run_id=run.id,
@@ -196,6 +200,7 @@ def run_eval(
         def _process_datapoint(dp: Datapoint):
             def upload_callback(log_id: str):
                 """Logic ran after the Log has been created."""
+                # Need to get the full log to pass to the evaluators
                 evaluators_worker_pool.submit(
                     _run_local_evaluators,
                     client=client,
@@ -214,6 +219,7 @@ def run_eval(
                     file_id=hl_file.id,
                     run_id=run.id,
                     path=hl_file.path,
+                    logged=False,
                 )
             ):
                 log_func = _get_log_func(
@@ -254,6 +260,8 @@ def run_eval(
                         run_id=run.id,
                         start_time=start_time,
                         end_time=datetime.now(),
+                        source_datapoint_id=dp.id,
+                        run_id=run.id,
                     )
                     error_message = str(e).replace("\n", " ")
                     if len(error_message) > 100:
@@ -312,7 +320,6 @@ class _SimpleProgressBar:
     def increment(self):
         """Increment the progress bar by one finished task."""
         with self._lock:
-            # NOTE: There is a deadlock here that needs further investigation
             if self._progress == self._total:
                 return
             self._progress += 1
@@ -360,7 +367,7 @@ def _wait_for_evaluation_to_complete(
     # Wait for the Evaluation to complete then print the results
     complete = False
 
-    wrote_explainer = False
+    waiting_for_local_evals_message_printed = False
 
     while not complete:
         stats = client.evaluations.get_stats(id=evaluation.id)
@@ -370,11 +377,12 @@ def _wait_for_evaluation_to_complete(
         )
         complete = run_stats is not None and run_stats.status == "completed"
         if not complete:
-            if not wrote_explainer:
-                sys.stderr.write("\n\nWaiting for Evaluators on Humanloop runtime...\n\n")
-                wrote_explainer = True
-            sys.stderr.write(stats.progress + "\n")
+            if not waiting_for_local_evals_message_printed:
+                sys.stderr.write("\n\nWaiting for Evaluators on Humanloop runtime...\n")
+                waiting_for_local_evals_message_printed = True
+            sys.stderr.write(stats.progress)
             # Move the cursor up in stderr a number of lines equal to the number of lines in stats.progress
+            sys.stderr.write("\033[A" * (stats.progress.count("\n")))
             time.sleep(5)
 
     return stats
@@ -844,69 +852,64 @@ def _run_local_evaluators(
     progress_bar: _SimpleProgressBar,
 ):
     """Run local Evaluators on the Log and send the judgments to Humanloop."""
-    # Need to get the full log to pass to the evaluators
     try:
+        # Need to get the full log to pass to the evaluators
         log = client.logs.get(id=log_id)
         if not isinstance(log, dict):
             log_dict = log.dict()
         else:
             log_dict = log
+
         # Wait for the Flow trace to complete before running evaluators
-        while file_type == "flow" and log_dict["log_status"] != "complete":
+        while True:
+            if file_type != "flow" or log_dict["log_status"] == "complete":
+                break
             log = client.logs.get(id=log_id)
             if not isinstance(log, dict):
                 log_dict = log.dict()
             else:
                 log_dict = log
+            time.sleep(2)
         datapoint_dict = datapoint.dict() if datapoint else None
 
-        for local_evaluator in local_evaluators:
+        for local_evaluator_tuple in local_evaluators:
+            eval_function = local_evaluator_tuple.function
+            local_evaluator = local_evaluator_tuple.hl_evaluator
             start_time = datetime.now()
             try:
-                if local_evaluator.hl_evaluator.spec.arguments_type == "target_required":
-                    judgement = local_evaluator.function(
+                if local_evaluator.spec.arguments_type == "target_required":
+                    judgement = eval_function(
                         log_dict,
                         datapoint_dict,
                     )
                 else:
-                    judgement = local_evaluator.function(log_dict)
+                    judgement = eval_function(log_dict)
 
                 _ = client.evaluators.log(
-                    version_id=local_evaluator.hl_evaluator.version_id,
+                    version_id=local_evaluator.version_id,
                     parent_id=log_id,
                     judgment=judgement,
-                    id=local_evaluator.hl_evaluator.id,
+                    id=local_evaluator.id,
                     start_time=start_time,
                     end_time=datetime.now(),
                 )
             except Exception as e:
                 _ = client.evaluators.log(
                     parent_id=log_id,
-                    id=local_evaluator.hl_evaluator.id,
-                    version_id=local_evaluator.hl_evaluator.version_id,
+                    id=local_evaluator.id,
                     error=str(e),
                     start_time=start_time,
                     end_time=datetime.now(),
                 )
                 error_message = str(e).replace("\n", " ")
-                if len(error_message) > 100:
-                    sys.stderr.write(
-                        f"{RED}Evaluator {local_evaluator.hl_evaluator.path} failed with error {error_message[:100]}...{RESET}\n"
-                    )
-                else:
-                    sys.stderr.write(
-                        f"{RED}Evaluator {local_evaluator.hl_evaluator.path} failed with error {error_message}{RESET}\n"
-                    )
+                sys.stderr.write(
+                    f"{RED}Evaluator {local_evaluator.path} failed with error {error_message[:100]}...{RESET}\n"
+                )
     except Exception as e:
         error_message = str(e).replace("\n", " ")
-        if len(error_message) > 100:
-            sys.stderr.write(
-                f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message[:100]}...{RESET}\n"
-            )
-        else:
-            sys.stderr.write(
-                f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message}{RESET}\n"
-            )
+        sys.stderr.write(
+            f"{RED}Failed to run local Evaluators for source datapoint {datapoint.dict()['id'] if datapoint else None}: {error_message[:100]}...{RESET}\n"
+        )
         pass
     finally:
         progress_bar.increment()
