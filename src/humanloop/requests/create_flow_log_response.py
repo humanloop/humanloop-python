@@ -2,7 +2,7 @@
 
 import typing_extensions
 import typing_extensions
-from ..types.trace_status import TraceStatus
+from ..types.log_status import LogStatus
 
 
 class CreateFlowLogResponseParams(typing_extensions.TypedDict):
@@ -25,7 +25,7 @@ class CreateFlowLogResponseParams(typing_extensions.TypedDict):
     Unique identifier for the Flow Version.
     """
 
-    trace_status: typing_extensions.NotRequired[TraceStatus]
+    log_status: typing_extensions.NotRequired[LogStatus]
     """
-    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
+    Status of the Flow Log. When a Flow Log is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
     """

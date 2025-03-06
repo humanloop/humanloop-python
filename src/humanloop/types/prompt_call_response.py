@@ -14,6 +14,7 @@ import datetime as dt
 import pydantic
 from .chat_message import ChatMessage
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoice
+from .log_status import LogStatus
 from .prompt_call_log_response import PromptCallLogResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
@@ -66,6 +67,11 @@ class PromptCallResponse(UncheckedBaseModel):
     metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     Any additional metadata to record.
+    """
+
+    log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
+    """
+    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     """
 
     source_datapoint_id: typing.Optional[str] = pydantic.Field(default=None)

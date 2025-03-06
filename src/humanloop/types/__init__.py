@@ -86,6 +86,7 @@ from .list_prompts import ListPrompts
 from .list_tools import ListTools
 from .llm_evaluator_request import LlmEvaluatorRequest
 from .log_response import LogResponse
+from .log_status import LogStatus
 from .model_endpoints import ModelEndpoints
 from .model_providers import ModelProviders
 from .monitoring_evaluator_environment_request import MonitoringEvaluatorEnvironmentRequest
@@ -145,7 +146,6 @@ from .tool_function import ToolFunction
 from .tool_kernel_request import ToolKernelRequest
 from .tool_log_response import ToolLogResponse
 from .tool_response import ToolResponse
-from .trace_status import TraceStatus
 from .update_dateset_action import UpdateDatesetAction
 from .update_evaluation_status_request import UpdateEvaluationStatusRequest
 from .user_response import UserResponse
@@ -247,6 +247,7 @@ __all__ = [
     "ListTools",
     "LlmEvaluatorRequest",
     "LogResponse",
+    "LogStatus",
     "ModelEndpoints",
     "ModelProviders",
     "MonitoringEvaluatorEnvironmentRequest",
@@ -302,7 +303,6 @@ __all__ = [
     "ToolKernelRequest",
     "ToolLogResponse",
     "ToolResponse",
-    "TraceStatus",
     "UpdateDatesetAction",
     "UpdateEvaluationStatusRequest",
     "UserResponse",

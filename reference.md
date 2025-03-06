@@ -306,6 +306,14 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -609,6 +617,14 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
     
 </dd>
@@ -777,6 +793,14 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -1043,6 +1067,14 @@ Controls how the model uses tools. The following options are supported:
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -2684,6 +2716,14 @@ client.tools.log(
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -2910,6 +2950,14 @@ client.tools.update(
 <dd>
 
 **end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     
 </dd>
 </dl>
@@ -5490,6 +5538,14 @@ client.evaluators.log(
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -6659,7 +6715,7 @@ Log to a Flow.
 You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
-If you create the Flow Log with a `trace_status` of `incomplete`, you should later update it to `complete`
+If you create the Flow Log with a `log_status` of `incomplete`, you should later update it to `complete`
 in order to trigger Evaluators.
 </dd>
 </dl>
@@ -6683,7 +6739,6 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.flows.log(
-    log_id="medqa_experiment_0001",
     id="fl_6o701g4jmcanPVHxdqD0O",
     flow={
         "attributes": {
@@ -6703,7 +6758,7 @@ client.flows.log(
         "question": "Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath."
     },
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-    trace_status="incomplete",
+    log_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
         "2024-07-08 21:40:35+00:00",
     ),
@@ -6878,6 +6933,14 @@ client.flows.log(
 <dl>
 <dd>
 
+**log_status:** `typing.Optional[LogStatus]` — Status of the Flow Log. When a Log is updated from `incomplete` to `complete`, it becomes available to Monitoring Evaluators. Flow Logs cannot have an unspecified status: they must start as `incomplete` to allow children to be added. Provide `complete` if you don't intend to add children to the trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
     
 </dd>
@@ -6927,14 +6990,6 @@ client.flows.log(
 <dd>
 
 **flow:** `typing.Optional[FlowKernelRequestParams]` — Flow used to generate the Trace.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_status:** `typing.Optional[TraceStatus]` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces. If you do not intend to add more Logs to the Trace after creation, set this to `complete`.
     
 </dd>
 </dl>
@@ -6997,7 +7052,7 @@ client.flows.update_log(
         "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
     },
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-    trace_status="complete",
+    log_status="complete",
 )
 
 ```
@@ -7015,14 +7070,6 @@ client.flows.update_log(
 <dd>
 
 **log_id:** `str` — Unique identifier of the Flow Log.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**trace_status:** `TraceStatus` — Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
     
 </dd>
 </dl>
@@ -7063,6 +7110,14 @@ client.flows.update_log(
 <dd>
 
 **error:** `typing.Optional[str]` — The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
     
 </dd>
 </dl>
@@ -10151,7 +10206,9 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.logs.delete()
+client.logs.delete(
+    id="prv_Wu6zx1lAWJRqOyL8nWuZk",
+)
 
 ```
 </dd>

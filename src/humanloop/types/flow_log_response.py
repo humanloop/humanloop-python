@@ -13,7 +13,7 @@ import typing
 from .chat_message import ChatMessage
 import pydantic
 import datetime as dt
-from .trace_status import TraceStatus
+from .log_status import LogStatus
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
 
@@ -93,6 +93,11 @@ class FlowLogResponse(UncheckedBaseModel):
     Any additional metadata to record.
     """
 
+    log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
+    """
+    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    """
+
     source_datapoint_id: typing.Optional[str] = pydantic.Field(default=None)
     """
     Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -156,11 +161,6 @@ class FlowLogResponse(UncheckedBaseModel):
     flow: FlowResponse = pydantic.Field()
     """
     Flow used to generate the Log.
-    """
-
-    trace_status: typing.Optional[TraceStatus] = pydantic.Field(default=None)
-    """
-    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on completed Traces.
     """
 
     if IS_PYDANTIC_V2:

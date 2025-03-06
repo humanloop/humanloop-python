@@ -3,7 +3,7 @@
 from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
 import typing
-from .trace_status import TraceStatus
+from .log_status import LogStatus
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -27,9 +27,9 @@ class CreateFlowLogResponse(UncheckedBaseModel):
     Unique identifier for the Flow Version.
     """
 
-    trace_status: typing.Optional[TraceStatus] = pydantic.Field(default=None)
+    log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
     """
-    Status of the Trace. When a Trace is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Traces.
+    Status of the Flow Log. When a Flow Log is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
     """
 
     if IS_PYDANTIC_V2:

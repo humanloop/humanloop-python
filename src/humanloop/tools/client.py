@@ -3,6 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 import datetime as dt
+from ..types.log_status import LogStatus
 from ..requests.tool_kernel_request import ToolKernelRequestParams
 from ..core.request_options import RequestOptions
 from ..types.create_tool_log_response import CreateToolLogResponse
@@ -60,6 +61,7 @@ class ToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -129,6 +131,9 @@ class ToolsClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
+
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -208,6 +213,7 @@ class ToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
+                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -265,6 +271,7 @@ class ToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> LogResponse:
         """
@@ -316,6 +323,9 @@ class ToolsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -352,6 +362,7 @@ class ToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
+                "log_status": log_status,
             },
             headers={
                 "content-type": "application/json",
@@ -1324,6 +1335,7 @@ class AsyncToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1393,6 +1405,9 @@ class AsyncToolsClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
+
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -1480,6 +1495,7 @@ class AsyncToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
+                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -1537,6 +1553,7 @@ class AsyncToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> LogResponse:
         """
@@ -1588,6 +1605,9 @@ class AsyncToolsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1632,6 +1652,7 @@ class AsyncToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
+                "log_status": log_status,
             },
             headers={
                 "content-type": "application/json",

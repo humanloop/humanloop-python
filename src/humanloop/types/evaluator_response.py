@@ -67,9 +67,7 @@ class EvaluatorResponse(UncheckedBaseModel):
     """
 
     type: typing.Optional[typing.Literal["evaluator"]] = None
-    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(
-        default=None
-    )
+    environments: typing.Optional[typing.List[EnvironmentResponse]] = pydantic.Field(default=None)
     """
     The list of environments the Evaluator Version is deployed to.
     """
@@ -108,31 +106,23 @@ class EvaluatorResponse(UncheckedBaseModel):
     Inputs associated to the Evaluator. Inputs correspond to any of the variables used within the Evaluator template.
     """
 
-    evaluators: typing.Optional[typing.List["MonitoringEvaluatorResponse"]] = (
-        pydantic.Field(default=None)
-    )
+    evaluators: typing.Optional[typing.List["MonitoringEvaluatorResponse"]] = pydantic.Field(default=None)
     """
     Evaluators that have been attached to this Evaluator that are used for monitoring logs.
     """
 
-    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = (
-        pydantic.Field(default=None)
-    )
+    evaluator_aggregates: typing.Optional[typing.List[EvaluatorAggregate]] = pydantic.Field(default=None)
     """
     Aggregation of Evaluator results for the Evaluator Version.
     """
 
-    attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = (
-        pydantic.Field(default=None)
-    )
+    attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     Additional fields to describe the Evaluator. Helpful to separate Evaluator versions from each other with details on how they were created or used.
     """
 
     if IS_PYDANTIC_V2:
-        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
-            extra="allow", frozen=True
-        )  # type: ignore # Pydantic v2
+        model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:
 
         class Config:
