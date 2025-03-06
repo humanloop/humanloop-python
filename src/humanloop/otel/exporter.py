@@ -201,6 +201,6 @@ class HumanloopSpanExporter(SpanExporter):
             else:
                 if evaluation_context and file_path == evaluation_context.path:
                     log_id = response.json()["records"][0]["log_id"]
-                    evaluation_context.callback(log_id)
+                    evaluation_context.logging_callback(log_id)
 
             self._upload_queue.task_done()

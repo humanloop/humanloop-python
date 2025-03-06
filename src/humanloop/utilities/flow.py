@@ -4,11 +4,10 @@ from typing import Any, Callable, Optional, TypeVar
 from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Span, Tracer
-from opentelemetry import context as context_api
 import requests
 
 from humanloop.base_client import BaseHumanloop
-from humanloop.context import get_evaluation_context, get_trace_id, set_trace_id
+from humanloop.context import get_trace_id, set_trace_id
 from humanloop.types.chat_message import ChatMessage
 from humanloop.utilities.helpers import bind_args
 from humanloop.eval_utils.types import File

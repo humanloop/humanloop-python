@@ -1,12 +1,12 @@
 from contextlib import contextmanager
 from dataclasses import dataclass
 import threading
-from typing import Callable, Generator, Optional
+from typing import Any, Callable, Generator, Literal, Optional
 from opentelemetry import context as context_api
 
 from humanloop.otel.constants import (
     HUMANLOOP_CONTEXT_EVALUATION,
-    HUMANLOOP_CONTEXT_PROMPT,
+    HUMANLOOP_CONTEXT_DECORATOR,
     HUMANLOOP_CONTEXT_TRACE_ID,
 )
 
@@ -25,14 +25,15 @@ def set_trace_id(flow_log_id: str) -> Generator[None, None, None]:
 
 
 @dataclass
-class PromptContext:
+class DecoratorContext:
     path: str
-    template: Optional[str]
+    type: Literal["prompt", "tool", "flow"]
+    version: dict[str, Optional[Any]]
 
 
 @contextmanager
-def set_prompt_context(prompt_context: PromptContext) -> Generator[None, None, None]:
-    key = hash((HUMANLOOP_CONTEXT_PROMPT, threading.get_ident()))
+def set_decorator_context(prompt_context: DecoratorContext) -> Generator[None, None, None]:
+    key = hash((HUMANLOOP_CONTEXT_DECORATOR, threading.get_ident()))
     reset_token = context_api.attach(
         context_api.set_value(
             key=key,
@@ -43,15 +44,15 @@ def set_prompt_context(prompt_context: PromptContext) -> Generator[None, None, N
     context_api.detach(token=reset_token)
 
 
-def get_prompt_context() -> Optional[PromptContext]:
-    key = hash((HUMANLOOP_CONTEXT_PROMPT, threading.get_ident()))
+def get_decorator_context() -> Optional[DecoratorContext]:
+    key = hash((HUMANLOOP_CONTEXT_DECORATOR, threading.get_ident()))
     return context_api.get_value(key)
 
 
 class EvaluationContext:
     source_datapoint_id: str
     run_id: str
-    callback: Callable[[str], None]
+    logging_callback: Callable[[str], None]
     file_id: str
     path: str
     logging_counter: int
@@ -60,13 +61,13 @@ class EvaluationContext:
         self,
         source_datapoint_id: str,
         run_id: str,
-        callback: Callable[[str], None],
+        logging_callback: Callable[[str], None],
         file_id: str,
         path: str,
     ):
         self.source_datapoint_id = source_datapoint_id
         self.run_id = run_id
-        self.callback = callback
+        self.logging_callback = logging_callback
         self.file_id = file_id
         self.path = path
         self.logging_counter = 0

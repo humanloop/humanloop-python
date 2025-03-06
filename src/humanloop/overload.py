@@ -1,12 +1,16 @@
+import inspect
 import logging
 import types
 from typing import TypeVar, Union
 import typing
 
-from humanloop.context import get_trace_id
-from humanloop.eval_utils.run import HumanloopUtilityError
+from humanloop.context import get_decorator_context, get_trace_id
+from humanloop.eval_utils.run import HumanloopDecoratorError
 
+from humanloop.evaluators.client import EvaluatorsClient
+from humanloop.flows.client import FlowsClient
 from humanloop.prompts.client import PromptsClient
+from humanloop.tools.client import ToolsClient
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
@@ -16,7 +20,7 @@ from humanloop.types.prompt_call_response import PromptCallResponse
 logger = logging.getLogger("humanloop.sdk")
 
 
-CLIENT_TYPE = TypeVar("CLIENT_TYPE")
+CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, FlowsClient, EvaluatorsClient, ToolsClient)
 
 
 def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
@@ -41,10 +45,20 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
         CreateEvaluatorLogResponse,
     ]:
         trace_id = get_trace_id()
+        if trace_id is not None and type(client) is FlowsClient:
+            context = get_decorator_context()
+            if context is None:
+                raise HumanloopDecoratorError("Internal error: trace_id context is set outside a decorator context.")
+            raise HumanloopDecoratorError(
+                f"Using flows.log() in this context is not allowed at line {inspect.currentframe().f_lineno}: "
+                f"Flow decorator for File {context.path} manages the tracing and trace completion."
+            )
         if trace_id is not None:
             if "trace_parent_id" in kwargs:
-                # TODO: revisit
-                logger.warning("Overriding trace_parent_id argument")
+                logger.warning(
+                    "Ignoring trace_parent_id argument at line %d: the Flow decorator manages tracing.",
+                    inspect.currentframe().f_lineno,
+                )
             kwargs = {
                 **kwargs,
                 "trace_parent_id": trace_id,
@@ -52,9 +66,8 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
         try:
             response = self._log(**kwargs)
         except Exception as e:
-            # TODO handle
-            # TODO: Bug found in backend: not specifying a model 400s but creates a File
-            raise HumanloopUtilityError(message=str(e)) from e
+            # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+            raise HumanloopDecoratorError from e
 
         return response
 
@@ -73,8 +86,10 @@ def overload_call(client: PromptsClient) -> PromptsClient:
         trace_id = get_trace_id()
         if trace_id is not None:
             if "trace_parent_id" in kwargs:
-                # TODO: revisit
-                logger.warning("Overriding trace_parent_id argument")
+                logger.warning(
+                    "Ignoring trace_parent_id argument at line %d: the Flow decorator manages tracing.",
+                    inspect.currentframe().f_lineno,
+                )
             kwargs = {
                 **kwargs,
                 "trace_parent_id": trace_id,
@@ -84,9 +99,8 @@ def overload_call(client: PromptsClient) -> PromptsClient:
             response = self._call(**kwargs)
             response = typing.cast(PromptCallResponse, response)
         except Exception as e:
-            # TODO handle
-            # TODO: Bug found in backend: not specifying a model 400s but creates a File
-            raise HumanloopUtilityError(message=str(e)) from e
+            # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+            raise HumanloopDecoratorError from e
 
         return response
 

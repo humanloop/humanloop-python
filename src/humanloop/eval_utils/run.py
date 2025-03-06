@@ -67,8 +67,14 @@ from humanloop.types import ToolKernelRequest as Tool
 from humanloop.types.datapoint_response import DatapointResponse
 from humanloop.types.dataset_response import DatasetResponse
 from humanloop.types.evaluation_run_response import EvaluationRunResponse
+from humanloop.types.evaluator_log_response import EvaluatorLogResponse
+from humanloop.types.flow_log_response import FlowLogResponse
+from humanloop.types.log_response import LogResponse
+from humanloop.types.prompt_log_response import PromptLogResponse
 from humanloop.types.run_stats_response import RunStatsResponse
 from pydantic import ValidationError
+
+from humanloop.types.tool_log_response import ToolLogResponse
 
 if typing.TYPE_CHECKING:
     from humanloop.client import BaseHumanloop
@@ -99,11 +105,13 @@ RESET = "\033[0m"
 CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, ToolsClient, FlowsClient, EvaluatorsClient)
 
 
-class HumanloopUtilityError(Exception):
-    def __init__(self, message):
+class HumanloopDecoratorError(Exception):
+    def __init__(self, message: Optional[str] = None):
         self.message = message
 
     def __str__(self):
+        if self.message is None:
+            return super().__str__()
         return self.message
 
 
@@ -202,7 +210,7 @@ def run_eval(
             with set_evaluation_context(
                 EvaluationContext(
                     source_datapoint_id=dp.id,
-                    callback=upload_callback,
+                    logging_callback=upload_callback,
                     file_id=hl_file.id,
                     run_id=run.id,
                     path=hl_file.path,
@@ -219,10 +227,14 @@ def run_eval(
                 try:
                     output = _call_function(function_, hl_file.type, dp)
                     evaluation_context = get_evaluation_context()
-                    if not evaluation_context.logging_counter == 0:
+                    if evaluation_context is None:
+                        raise HumanloopDecoratorError(
+                            "Internal error: evaluation context is not set while processing a datapoint."
+                        )
+                    if evaluation_context.logging_counter == 0:
                         # function_ did not Log against the source_datapoint_id/ run_id pair
                         # so we need to create a Log
-                        log_func(
+                        log = log_func(
                             inputs=dp.inputs,
                             output=output,
                             start_time=start_time,
@@ -230,6 +242,10 @@ def run_eval(
                             source_datapoint_id=dp.id,
                             run_id=run.id,
                         )
+                        evaluation_context.logging_counter += 1
+                        evaluation_context.logging_callback(log.id)
+                except HumanloopDecoratorError as e:
+                    raise e
                 except Exception as e:
                     log_func(
                         inputs=dp.inputs,
@@ -650,11 +666,47 @@ def _call_function(
 
 def _get_log_func(
     client: "BaseHumanloop",
+    file_type: Literal["flow"],
+    file_id: str,
+    version_id: str,
+    run_id: str,
+) -> Callable[..., FlowLogResponse]: ...
+
+
+def _get_log_func(
+    client: "BaseHumanloop",
+    file_type: Literal["prompt"],
+    file_id: str,
+    version_id: str,
+    run_id: str,
+) -> Callable[..., PromptLogResponse]: ...
+
+
+def _get_log_func(
+    client: "BaseHumanloop",
+    file_type: Literal["tool"],
+    file_id: str,
+    version_id: str,
+    run_id: str,
+) -> Callable[..., ToolLogResponse]: ...
+
+
+def _get_log_func(
+    client: "BaseHumanloop",
+    file_type: Literal["evaluator"],
+    file_id: str,
+    version_id: str,
+    run_id: str,
+) -> Callable[..., EvaluatorLogResponse]: ...
+
+
+def _get_log_func(
+    client: "BaseHumanloop",
     file_type: FileType,
     file_id: str,
     version_id: str,
     run_id: str,
-) -> Callable:
+) -> Callable[..., LogResponse]:
     """Returns the appropriate log function pre-filled with common parameters."""
     log_request = {
         # TODO: why does the Log `id` field refer to the file ID in the API?

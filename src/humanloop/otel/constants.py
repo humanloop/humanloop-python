@@ -6,6 +6,6 @@ HUMANLOOP_LOG_ID_KEY = "humanloop.log_id"
 HUMANLOOP_FILE_TYPE_KEY = "humanloop.file.type"
 HUMANLOOP_PATH_KEY = "humanloop.file.path"
 # Opentelemetry context
-HUMANLOOP_CONTEXT_PROMPT = "humanloop.context.prompt"
+HUMANLOOP_CONTEXT_DECORATOR = "humanloop.context.decorator"
 HUMANLOOP_CONTEXT_TRACE_ID = "humanloop.context.flow.trace_id"
 HUMANLOOP_CONTEXT_EVALUATION = "humanloop.context.evaluation"

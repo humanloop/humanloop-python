@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from groq import NotFoundError as GroqNotFoundError
 from humanloop.client import Humanloop
-from humanloop.eval_utils.run import HumanloopUtilityError
+from humanloop.eval_utils.run import HumanloopDecoratorError
 from humanloop.utilities.prompt import prompt_decorator_factory
 from humanloop.otel.constants import HUMANLOOP_FILE_KEY
 from humanloop.otel.helpers import is_humanloop_span, read_from_opentelemetry_span
@@ -449,7 +449,7 @@ def test_overridden_call_fails_obviously(
         )
         return response.logs[0].output_message.content  # type: ignore [union-attr]
 
-    with pytest.raises(HumanloopUtilityError):
+    with pytest.raises(HumanloopDecoratorError):
         call_llm_with_hl_call()
 
     response = humanloop_client.directories.get(id=test_directory.id)
@@ -481,7 +481,7 @@ def test_overridden_call_must_match_utility_path(
 
         return response.logs[0].output_message.content
 
-    with pytest.raises(HumanloopUtilityError):
+    with pytest.raises(HumanloopDecoratorError):
         call_llm_with_hl_call()
 
     response = humanloop_client.directories.get(id=test_directory.id)
@@ -532,7 +532,7 @@ def test_overridden_call_must_match_utility(
 
         return response.logs[0].output_message.content
 
-    with pytest.raises(HumanloopUtilityError):
+    with pytest.raises(HumanloopDecoratorError):
         call_llm_with_hl_call()
 
     response = humanloop_client.directories.get(id=test_directory.id)
