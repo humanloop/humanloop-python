@@ -64,7 +64,7 @@ def tool_decorator_factory(
             with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
                 write_to_opentelemetry_span(
-                    span=span,
+                    span=span,  # type: ignore [arg-type]
                     key=HUMANLOOP_FILE_KEY,
                     value=tool_kernel,  # type: ignore [arg-type]
                 )
@@ -104,7 +104,7 @@ def tool_decorator_factory(
                 }
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
                 write_to_opentelemetry_span(
-                    span=span,
+                    span=span,  # type: ignore [arg-type]
                     key=HUMANLOOP_LOG_KEY,
                     value=tool_log,  # type: ignore [arg-type]
                 )
