@@ -249,25 +249,6 @@ humanfriendly = ">=9.1"
 cron = ["capturer (>=2.4)"]
 
 [[package]]
-name = "deepdiff"
-version = "8.3.0"
-description = "Deep Difference and Search of any Python object/data. Recreate objects by adding adding deltas to each other."
-optional = false
-python-versions = ">=3.8"
-groups = ["main"]
-files = [
-    {file = "deepdiff-8.3.0-py3-none-any.whl", hash = "sha256:838acf1b17d228f4155bcb69bb265c41cbb5b2aba2575f07efa67ad9b9b7a0b5"},
-    {file = "deepdiff-8.3.0.tar.gz", hash = "sha256:92a8d7c75a4b26b385ec0372269de258e20082307ccf74a4314341add3d88391"},
-]
-
-[package.dependencies]
-orderly-set = ">=5.3.0,<6"
-
-[package.extras]
-cli = ["click (==8.1.8)", "pyyaml (==6.0.2)"]
-optimize = ["orjson"]
-
-[[package]]
 name = "deprecated"
 version = "1.2.18"
 description = "Python @deprecated decorator to deprecate old python classes, functions or methods."
@@ -1232,18 +1213,6 @@ groups = ["main"]
 files = [
     {file = "opentelemetry_semantic_conventions_ai-0.4.2-py3-none-any.whl", hash = "sha256:0a5432aacd441eb7dbdf62e0de3f3d90ed4f69595b687a6dd2ccc4c5b94c5861"},
     {file = "opentelemetry_semantic_conventions_ai-0.4.2.tar.gz", hash = "sha256:90b969c7d838e03e30a9150ffe46543d8e58e9d7370c7221fd30d4ce4d7a1b96"},
-]
-
-[[package]]
-name = "orderly-set"
-version = "5.3.0"
-description = "Orderly set"
-optional = false
-python-versions = ">=3.8"
-groups = ["main"]
-files = [
-    {file = "orderly_set-5.3.0-py3-none-any.whl", hash = "sha256:c2c0bfe604f5d3d9b24e8262a06feb612594f37aa3845650548befd7772945d1"},
-    {file = "orderly_set-5.3.0.tar.gz", hash = "sha256:80b3d8fdd3d39004d9aad389eaa0eab02c71f0a0511ba3a6d54a935a6c6a0acc"},
 ]
 
 [[package]]
@@ -2504,4 +2473,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4"
-content-hash = "228369a2cf47fc8534f45277fd0a0118ab96b5ec90b0c6088de2f00f06a502d4"
+content-hash = "8841da1852d6bbeddd7c87b36fe7d3d64e1aacf550a1e6cfdfaa9a1bc3f76301"
