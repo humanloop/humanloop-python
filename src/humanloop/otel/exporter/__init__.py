@@ -1,5 +1,6 @@
 import logging
 
+import time
 import typing
 from queue import Empty as EmptyQueue
 from queue import Queue
@@ -129,7 +130,8 @@ class HumanloopSpanExporter(SpanExporter):
                 # Don't block or the thread will never be notified of the shutdown
                 thread_args = self._upload_queue.get(block=False)  # type: ignore
             except EmptyQueue:
-                # Wait for the another span to arrive
+                # Wait for another span to arrive
+                time.sleep(0.1)
                 continue
 
             span_to_export, eval_context_callback = thread_args
