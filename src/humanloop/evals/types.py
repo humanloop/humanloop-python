@@ -19,9 +19,13 @@ from humanloop.types import (
 )
 
 # Responses are Pydantic models and we leverage them for improved request validation
-from humanloop.types import UpdateDatesetAction as UpdateDatasetAction  # TODO: fix original type typo
+from humanloop.types import (
+    UpdateDatesetAction as UpdateDatasetAction,
+)  # TODO: fix original type typo
 
-EvaluatorDict = Union[CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator]
+EvaluatorDict = Union[
+    CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator
+]
 Version = Union[FlowDict, PromptDict, ToolDict, EvaluatorDict]
 FileType = Literal["flow", "prompt", "tool", "evaluator"]
 
@@ -38,7 +42,7 @@ class Identifiers(TypedDict):
 class File(Identifiers):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
 
-    type: NotRequired[FileType]
+    type: Literal["flow", "prompt"]
     """The type of File this callable relates to on Humanloop."""
     version: NotRequired[Version]
     """The contents uniquely define the version of the File on Humanloop."""

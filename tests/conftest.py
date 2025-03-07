@@ -98,10 +98,7 @@ def opentelemetry_hl_test_configuration(
     Humanloop Spans.
     """
     exporter = InMemorySpanExporter()
-    processor = HumanloopSpanProcessor(
-        exporter=exporter,
-        client=humanloop_client,
-    )
+    processor = HumanloopSpanProcessor(exporter=exporter)
     opentelemetry_test_provider.add_span_processor(processor)
     instrumentors: list[BaseInstrumentor] = [
         OpenAIInstrumentor(),
@@ -142,10 +139,7 @@ def opentelemetry_hl_with_exporter_test_configuration(
     """Configure OTel backend with HumanloopSpanProcessor and
     a HumanloopSpanExporter where HTTP calls are mocked.
     """
-    processor = HumanloopSpanProcessor(
-        exporter=hl_test_exporter,
-        client=humanloop_client,  # type: ignore [arg-type]
-    )
+    processor = HumanloopSpanProcessor(exporter=hl_test_exporter)
     opentelemetry_test_provider.add_span_processor(processor)
     instrumentor = OpenAIInstrumentor()
     instrumentor.instrument(tracer_provider=opentelemetry_test_provider)

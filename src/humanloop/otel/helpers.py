@@ -5,7 +5,6 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
-from humanloop.otel.constants import HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
 
 NestedDict = dict[str, Union["NestedDict", AttributeValue]]
 NestedList = list[Union["NestedList", NestedDict]]
@@ -178,12 +177,6 @@ def read_from_opentelemetry_span(span: ReadableSpan, key: str = "") -> NestedDic
             # Remove the key prefix and the first dot
             to_process.append((span_key, span_value))
 
-    if not to_process:
-        if key == "":
-            # Empty span attributes
-            return result
-        raise KeyError(f"Key {key} not found in span attributes")
-
     for span_key, span_value in to_process:  # type: ignore
         parts = span_key.split(".")
         len_parts = len(parts)
@@ -264,10 +257,6 @@ def is_llm_provider_call(span: ReadableSpan) -> bool:
     )
 
 
-def is_intercepted_call(span: ReadableSpan) -> bool:
-    return span.name == HUMANLOOP_INTERCEPTED_HL_CALL_SPAN_NAME
-
-
 def is_humanloop_span(span: ReadableSpan) -> bool:
     """Check if the Span was created by the Humanloop SDK."""
     return span.name.startswith("humanloop.")
@@ -285,7 +274,7 @@ def module_is_installed(module_name: str) -> bool:
     return True
 
 
-def jsonify_if_not_string(func: Callable, output: Any) -> str:
+def process_output(func: Callable, output: Any) -> str:
     if not isinstance(output, str):
         try:
             output = json.dumps(output)
