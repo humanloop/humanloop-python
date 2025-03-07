@@ -2312,6 +2312,18 @@ files = [
 referencing = "*"
 
 [[package]]
+name = "types-protobuf"
+version = "5.29.1.20250208"
+description = "Typing stubs for protobuf"
+optional = false
+python-versions = ">=3.9"
+groups = ["dev"]
+files = [
+    {file = "types_protobuf-5.29.1.20250208-py3-none-any.whl", hash = "sha256:c5f8bfb4afdc1b5cbca1848f2c8b361a2090add7401f410b22b599ef647bf483"},
+    {file = "types_protobuf-5.29.1.20250208.tar.gz", hash = "sha256:c1acd6a59ab554dbe09b5d1fa7dd701e2fcfb2212937a3af1c03b736060b792a"},
+]
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.9.0.20241206"
 description = "Typing stubs for python-dateutil"
@@ -2492,4 +2504,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4"
-content-hash = "8968de9bd0b7af7b55c9aa9799f974a083c39b0e3af8c352e9f8a31cbdbbefcb"
+content-hash = "228369a2cf47fc8534f45277fd0a0118ab96b5ec90b0c6088de2f00f06a502d4"

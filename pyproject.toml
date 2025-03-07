@@ -30,9 +30,6 @@ packages = [
     { include = "humanloop", from = "src"}
 ]
 
-[tool.poetry.group.dev.dependencies]
-protobuf = "^5.29.3"
-
 [project.urls]
 Repository = 'https://github.com/humanloop/humanloop-python'
 
@@ -69,6 +66,8 @@ jsonschema = "^4.23.0"
 numpy = "<2.0.0"
 onnxruntime = "<=1.19.2"
 openai = "^1.52.2"
+protobuf = "^5.29.3"
+types-protobuf = "^5.29.1.20250208"
 pandas = "^2.2.0"
 parse-type = ">=0.6.4"
 pyarrow = "^19.0.0"

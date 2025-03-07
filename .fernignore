@@ -1,19 +1,19 @@
 # Specify files that shouldn't be modified by Fern
 
-src/humanloop/eval_utils
+
+## Custom code
+
+src/humanloop/evals
 src/humanloop/prompt_utils.py
 src/humanloop/client.py
 src/humanloop/overload.py
-src/humanloop/context_variables.py
+src/humanloop/context.py
 mypy.ini
 README.md
-
-# Directories used by SDK decorators
-
-src/humanloop/utilities
+src/humanloop/decorators
 src/humanloop/otel
 
-# Tests
+## Tests
 
 tests/
 

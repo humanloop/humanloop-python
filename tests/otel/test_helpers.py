@@ -4,11 +4,12 @@ from opentelemetry.sdk.trace import Span
 
 
 def test_read_empty(test_span: Span):
-    assert read_from_opentelemetry_span(test_span) == {}
+    with pytest.raises(TypeError):
+        assert read_from_opentelemetry_span(test_span) == {}
 
 
 def test_read_non_existent_key(test_span: Span):
-    with pytest.raises(KeyError):
+    with pytest.raises(TypeError):
         assert read_from_opentelemetry_span(test_span, "key") == {}
     write_to_opentelemetry_span(test_span, {"x": 7, "y": "foo"}, key="key")
     # NOTE: attributes cannot be None at this point
@@ -16,7 +17,7 @@ def test_read_non_existent_key(test_span: Span):
         "key.x": 7,
         "key.y": "foo",
     }
-    with pytest.raises(KeyError):
+    with pytest.raises(TypeError):
         assert read_from_opentelemetry_span(test_span, "key.z") is None
 
 
@@ -158,7 +159,7 @@ def test_write_drops_dict_all_null_values(test_span: Span):
     # WHEN reading the value from the span
     # THEN the value is not present in the span attributes
     assert "key" not in test_span.attributes  # type: ignore
-    with pytest.raises(KeyError):
+    with pytest.raises(TypeError):
         assert read_from_opentelemetry_span(test_span, "key") == {}
 
 

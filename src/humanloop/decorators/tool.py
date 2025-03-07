@@ -12,14 +12,15 @@ from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Tracer
 
-from humanloop.context import get_trace_id
-from humanloop.utilities.helpers import bind_args
-from humanloop.eval_utils import File
+from humanloop.context import get_evaluation_context, get_trace_id
+from humanloop.decorators.helpers import bind_args
+from humanloop.evals import File
+from humanloop.evals.run import HumanloopRuntimeError
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
-    HUMANLOOP_PATH_KEY,
+    HUMANLOOP_FILE_PATH_KEY,
 )
 from humanloop.otel.helpers import process_output, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
@@ -41,7 +42,7 @@ def tool_decorator_factory(
     attributes: Optional[dict[str, Any]] = None,
     setup_values: Optional[dict[str, Any]] = None,
 ):
-    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+    def decorator(func: Callable[P, R]) -> Callable[P, Optional[R]]:
         file_type = "tool"
 
         tool_kernel = _build_tool_kernel(
@@ -56,14 +57,18 @@ def tool_decorator_factory(
 
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+            evaluation_context = get_evaluation_context()
+            if evaluation_context is not None:
+                if evaluation_context.path == path:
+                    raise HumanloopRuntimeError("Tools cannot be evaluated with the `evaluations.run()` utility.")
             with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
                 # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
                 write_to_opentelemetry_span(
                     span=span,
                     key=HUMANLOOP_FILE_KEY,
-                    value=tool_kernel,
+                    value=tool_kernel,  # type: ignore [arg-type]
                 )
-                span.set_attribute(HUMANLOOP_PATH_KEY, path)
+                span.set_attribute(HUMANLOOP_FILE_PATH_KEY, path)
                 span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
 
                 log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
@@ -78,6 +83,9 @@ def tool_decorator_factory(
                         output=func_output,
                     )
                     log_error = None
+                except HumanloopRuntimeError as e:
+                    # Critical error, re-raise
+                    raise e
                 except Exception as e:
                     logger.error(f"Error calling {func.__name__}: {e}")
                     output = None
@@ -87,19 +95,18 @@ def tool_decorator_factory(
                     )
                     log_error = str(e)
 
-                # Populate known Tool Log attributes
+                # Populate Tool Log attributes
                 tool_log = {
                     "inputs": log_inputs,
                     "output": log_output,
                     "error": log_error,
                     "trace_parent_id": get_trace_id(),
                 }
-
                 # Write the Tool Log to the Span on HL_LOG_OT_KEY
                 write_to_opentelemetry_span(
                     span=span,
                     key=HUMANLOOP_LOG_KEY,
-                    value=tool_log,
+                    value=tool_log,  # type: ignore [arg-type]
                 )
 
                 # Return the output of the decorated function
@@ -107,7 +114,7 @@ def tool_decorator_factory(
 
         wrapper.file = File(  # type: ignore
             path=path,
-            type=file_type,
+            type=file_type,  # type: ignore [arg-type, typeddict-item]
             version=tool_kernel,
             callable=wrapper,
         )
