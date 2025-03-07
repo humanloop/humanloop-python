@@ -2,7 +2,7 @@ from functools import wraps
 import logging
 
 from typing_extensions import ParamSpec
-from typing import Callable, Optional, TypeVar
+from typing import Callable, TypeVar
 
 from humanloop.context import DecoratorContext, set_decorator_context
 from humanloop.evals.types import File
@@ -13,7 +13,7 @@ P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def prompt_decorator_factory(path: str, template: Optional[str]):
+def prompt_decorator_factory(path: str):
     def decorator(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
@@ -22,7 +22,8 @@ def prompt_decorator_factory(path: str, template: Optional[str]):
                     path=path,
                     type="prompt",
                     version={
-                        "template": template,
+                        # TODO: Implement a reverse-lookup of the template
+                        "template": None,
                     },
                 )
             ):
@@ -33,7 +34,7 @@ def prompt_decorator_factory(path: str, template: Optional[str]):
             path=path,
             type="prompt",
             version={  # type: ignore [typeddict-item]
-                "template": template,
+                "template": None,
             },
             callable=wrapper,
         )

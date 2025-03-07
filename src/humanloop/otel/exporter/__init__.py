@@ -85,25 +85,24 @@ class HumanloopSpanExporter(SpanExporter):
                 )
                 evaluation_context = get_evaluation_context()
                 if evaluation_context is not None:
-                    with evaluation_context.spy_log_args(
+                    kwargs_eval, eval_callback = evaluation_context.log_args_with_context(
                         path=path,  # type: ignore [arg-type]
                         log_args=log_args,  # type: ignore [arg-type]
-                    ) as log_args:
-                        write_to_opentelemetry_span(
-                            span=span,
-                            key=HUMANLOOP_LOG_KEY,
-                            value=log_args,
-                        )
-                        eval_context_callback = evaluation_context.callback
+                    )
+                    write_to_opentelemetry_span(
+                        span=span,
+                        key=HUMANLOOP_LOG_KEY,
+                        value=kwargs_eval,
+                    )
                 else:
-                    eval_context_callback = None
+                    eval_callback = None
             except HumanloopRuntimeError as e:
                 raise e
-            except Exception as e:
-                # No log args, no callback
-                eval_context_callback = None
+            except Exception:
+                # No log args in the span
+                eval_callback = None
 
-            self._upload_queue.put((span, eval_context_callback))
+            self._upload_queue.put((span, eval_callback))
 
         return SpanExportResult.SUCCESS
 

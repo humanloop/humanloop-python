@@ -27,6 +27,10 @@ from humanloop.prompts.client import PromptsClient
 
 
 class ExtendedEvalsClient(EvaluationsClient):
+    """
+    Provides high-level utilities for running Evaluations on the local runtime.
+    """
+
     client: BaseHumanloop
 
     def __init__(
@@ -50,7 +54,7 @@ class ExtendedEvalsClient(EvaluationsClient):
         :param name: the name of the Evaluation to run. If it does not exist, a new Evaluation will be created under your File.
         :param dataset: the dataset to map your function over to produce the outputs required by the Evaluation.
         :param evaluators: define how judgments are provided for this Evaluation.
-        :param workers: the number of threads to process datapoints using your function concurrently.
+        :param workers: Number of concurrent threads for processing datapoints.
         :return: per Evaluator checks.
         """
         if self.client is None:
@@ -67,6 +71,10 @@ class ExtendedEvalsClient(EvaluationsClient):
 
 
 class ExtendedPromptsClient(PromptsClient):
+    """
+    Adds utility for populating Prompt template inputs.
+    """
+
     populate_template = staticmethod(populate_template)  # type: ignore [assignment]
 
 
@@ -90,16 +98,14 @@ class Humanloop(BaseHumanloop):
         opentelemetry_tracer_provider: Optional[TracerProvider] = None,
         opentelemetry_tracer: Optional[Tracer] = None,
     ):
-        """See docstring of :func:`BaseHumanloop.__init__(...)`
+        """
+        Extends the base client with custom evaluation utilities and
+        decorators for declaring Files in code.
 
-        This class extends the base client with custom evaluation utilities
-        and decorators for declaring Files in code.
-
-        The Humanloop SDK File decorators use OpenTelemetry internally. You can provide a
-        TracerProvider and a Tracer if you'd like to integrate them with your existing
-        telemetry system. Otherwise, an internal TracerProvider will be used.
-        If you provide only the `TraceProvider`, the SDK will log under a Tracer
-        named `humanloop.sdk`.
+        The Humanloop SDK File decorators use OpenTelemetry internally.
+        You can provide a TracerProvider and a Tracer to integrate
+        with your existing telemetry system. If not provided,
+        an internal TracerProvider will be used.
         """
         super().__init__(
             base_url=base_url,
@@ -116,6 +122,7 @@ class Humanloop(BaseHumanloop):
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
 
         # Overload the .log method of the clients to be aware of Evaluation Context
+        # and the @flow decorator providing the trace_id
         self.prompts = overload_log(client=self.prompts)
         self.prompts = overload_call(client=self.prompts)
         self.flows = overload_log(client=self.flows)
@@ -145,22 +152,12 @@ class Humanloop(BaseHumanloop):
         self,
         *,
         path: str,
-        template: Optional[str] = None,
     ):
-        """Decorator for declaring a [Prompt](https://humanloop.com/docs/explanation/prompts) in code.
-
-        The decorator intercepts calls to LLM provider APIs and creates
-        a new Prompt file based on the hyperparameters used in the call.
-        If a hyperparameter is specified in the `@prompt` decorator, then
-        they override any value intercepted from the LLM provider call.
-
-        If the [Prompt](https://humanloop.com/docs/explanation/prompts) already exists
-        on the specified path, a new version will be upserted when any of the above change.
-
-        Here's an example of declaring a (Prompt)[https://humanloop.com/docs/explanation/prompts] in code:
+        """Auto-instrument LLM provider and create [Prompt](https://humanloop.com/docs/explanation/prompts)
+        Logs on Humanloop from them.
 
         ```python
-        @prompt(template="You are an assistant on the following topics: {{topics}}.")
+        @prompt(path="My Prompt")
         def call_llm(messages):
             client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
             return client.chat.completions.create(
@@ -170,49 +167,55 @@ class Humanloop(BaseHumanloop):
                 max_tokens=200,
                 messages=messages,
             ).choices[0].message.content
-        ```
 
-        This will create a [Prompt](https://humanloop.com/docs/explanation/prompts] with the following attributes:
-
-        ```python
+        Calling the function above creates a new Log on Humanloop
+        against this Prompt version:
         {
+            provider: "openai",
             model: "gpt-4o",
             endpoint: "chat",
-            template: "You are an assistant on the following topics: {{topics}}.",
-            provider: "openai",
             max_tokens: 200,
             temperature: 0.8,
             frequency_penalty: 0.5,
         }
-
-        Every call to the decorated function will create a Log against the Prompt. For example:
-
-        ```python
-        call_llm(messages=[
-            {"role": "system", "content": "You are an assistant on the following topics: finance."}
-            {"role": "user", "content": "What can you do?"}
-        ])
         ```
 
-        The Prompt Log will be created with the following inputs:
-        ```python
+        If a different model, endpoint, or hyperparameter is used, a new
+        Prompt version is created. For example:
+        ```
+        @humanloop_client.prompt(path="My Prompt")
+        def call_llm(messages):
+            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            client.chat.completions.create(
+                model="gpt-4o-mini",
+                temperature=0.5,
+            ).choices[0].message.content
+
+            client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+            client.messages.create(
+                model="claude-3-5-sonnet-20240620",
+                temperature=0.5,
+            ).content
+
+        Calling this function will create two versions of the same Prompt:
         {
-            "inputs": {
-                "topics": "finance"
-            },
-            messages: [
-                {"role": "system", "content": "You are an assistant on the following topics: finance."}
-                {"role": "user", "content": "What can you do?"}
-            ]
-            "output": "Hello, I'm an assistant that can help you with anything related to finance."
+            provider: "openai",
+            model: "gpt-4o-mini",
+            endpoint: "chat",
+            max_tokens: 200,
+            temperature: 0.5,
+            frequency_penalty: 0.5,
         }
+
+        {
+            provider: "anthropic",
+            model: "claude-3-5-sonnet-20240620",
+            endpoint: "messages",
+            temperature: 0.5,
+        }
+
+        And one Log will be added to each version of the Prompt.
         ```
-
-        The decorated function should return a string or the output should be JSON serializable. If
-        the output cannot be serialized, TypeError will be raised.
-
-        If the function raises an exception, the log created by the function will have the output
-        field set to None and the error field set to the string representation of the exception.
 
         :param path: The path where the Prompt is created. If not
             provided, the function name is used as the path and the File
@@ -220,7 +223,7 @@ class Humanloop(BaseHumanloop):
 
         :param prompt_kernel: Attributes that define the Prompt. See `class:DecoratorPromptKernelRequestParams`
         """
-        return prompt_decorator_factory(path=path, template=template)
+        return prompt_decorator_factory(path=path)
 
     def tool(
         self,
@@ -229,27 +232,22 @@ class Humanloop(BaseHumanloop):
         attributes: Optional[dict[str, Any]] = None,
         setup_values: Optional[dict[str, Any]] = None,
     ):
-        """Decorator for declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code.
+        """Manage [Tool](https://humanloop.com/docs/explanation/tools) Files through code.
 
-        The decorator inspects the wrapped function's source code, name,
-        argument type hints and docstring to infer the values that define
-        the [Tool](https://humanloop.com/docs/explanation/tools).
+        The decorator inspects the wrapped function's source code to infer the Tool's
+        JSON Schema. If the function declaration changes, a new Tool version
+        is upserted with an updated JSON Schema.
 
-        If the [Tool](https://humanloop.com/docs/explanation/tools) already exists
-        on the specified path, a new version will be upserted when any of the
-        above change.
-
-        Here's an example of declaring a [Tool](https://humanloop.com/docs/explanation/tools) in code:
+        For example:
 
         ```python
-        @tool
+        # Adding @tool on this function
+        @humanloop_client.tool(path="calculator")
         def calculator(a: int, b: Optional[int]) -> int:
             \"\"\"Add two numbers together.\"\"\"
             return a + b
-        ```
 
-        This will create a [Tool](https://humanloop.com/docs/explanation/tools) with the following attributes:
-        ```python
+        # Creates a Tool with this JSON Schema:
         {
             strict: True,
             function: {
@@ -267,35 +265,16 @@ class Humanloop(BaseHumanloop):
         }
         ```
 
-        Every call to the decorated function will create a Log against the Tool. For example:
+        The return value of the decorated function must be JSON serializable.
 
-        ```python
-        calculator(a=1, b=2)
-        ```
+        If the function raises an exception, the created Log will have `output`
+        set to null, and the `error` field populated.
 
-        Will create the following Log:
+        :param path: The path of the File in the Humanloop workspace.
 
-        ```python
-        {
-            "inputs": {
-                a: 1,
-                b: 2
-            },
-            "output": 3
-        }
-        ```
+        :param setup_values: Values needed to setup the Tool, defined in [JSON Schema](https://json-schema.org/)
 
-        The decorated function should return a string or the output should be JSON serializable. If
-        the output cannot be serialized, TypeError will be raised.
-
-        If the function raises an exception, the log created by the function will have the output
-        field set to None and the error field set to the string representation of the exception.
-
-        :param path: The path to the Tool. If not provided, the function name
-            will be used as the path and the File will be created in the root
-            of your organization's workspace.
-
-        :param tool_kernel: Attributes that define the Tool. See `class:ToolKernelRequestParams`
+        :param attributes: Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
         """
         return tool_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
@@ -310,13 +289,13 @@ class Humanloop(BaseHumanloop):
         path: str,
         attributes: Optional[dict[str, Any]] = None,
     ):
-        """Decorator for declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code.
+        """Trace SDK logging calls through [Flows](https://humanloop.com/docs/explanation/flows).
 
-        A [Flow](https://humanloop.com/docs/explanation/flows) wrapped callable should
-        be used as the entrypoint of your LLM feature. Call other functions wrapped with
-        Humanloop decorators to create a trace of Logs on Humanloop.
+        Use it as the entrypoint of your LLM feature. Logging calls like `prompts.call(...)`,
+        `tools.call(...)`, or other Humanloop decorators will be automatically added to the trace.
 
-        Here's an example of declaring a [Flow](https://humanloop.com/docs/explanation/flows) in code:
+        For example:
+
         ```python
         @prompt(template="You are an assistant on the following topics: {{topics}}.")
         def call_llm(messages):
@@ -330,7 +309,7 @@ class Humanloop(BaseHumanloop):
             ).choices[0].message.content
 
         @flow(attributes={"version": "v1"})
-        def entrypoint():
+        def agent():
             while True:
                 messages = []
                 user_input = input("You: ")
@@ -342,23 +321,23 @@ class Humanloop(BaseHumanloop):
                 print(f"Assistant: {response}")
         ```
 
-        In this example, the Flow instruments a conversational agent where the
-        Prompt defined in `call_llm` is called multiple times in a loop. Calling
-        `entrypoint` will create a Flow Trace under which multiple Prompt Logs
-        will be nested, allowing you to track the whole conversation session
-        between the user and the assistant.
+        Each call to agent will create a trace corresponding to the conversation
+        session. Multiple Prompt Logs will be created as the LLM is called. They
+        will be added to the trace, allowing you to see the whole conversation
+        in the UI.
 
-        The decorated function should return a string or the output should be JSON serializable. If
-        the output cannot be serialized, TypeError will be raised.
+        If the function returns a ChatMessage-like object, the Log will
+        populate the `output_message` field. Otherwise, it will serialize
+        the return value and populate the `output` field.
 
-        If the function raises an exception, the log created by the function will have the output
-        field set to None and the error field set to the string representation of the exception.
+        If an exception is raised, the output fields will be set to None
+        and the error message will be set in the Log's `error` field.
 
         :param path: The path to the Flow. If not provided, the function name
             will be used as the path and the File will be created in the root
             of your organization workspace.
 
-        :param flow_kernel: Attributes that define the Flow. See `class:ToolKernelRequestParams`
+        :param attributes: Additional fields to describe the Flow. Helpful to separate Flow versions from each other with details on how they were created or used.
         """
         return flow_decorator_factory(
             client=self,

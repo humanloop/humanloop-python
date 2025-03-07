@@ -68,14 +68,16 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
             }
         evaluation_context = get_evaluation_context()
         if evaluation_context is not None:
-            with evaluation_context.spy_log_args(path=kwargs.get("path"), log_args=kwargs) as kwargs:
-                try:
-                    response = self._log(**kwargs)
-                except Exception as e:
-                    # Re-raising as HumanloopDecoratorError so the decorators don't catch it
-                    raise HumanloopRuntimeError from e
-                if evaluation_context.callback is not None:
-                    evaluation_context.callback(response.id)
+            kwargs_eval, eval_callback = evaluation_context.log_args_with_context(
+                path=kwargs.get("path"), log_args=kwargs
+            )
+            try:
+                response = self._log(**kwargs_eval)
+            except Exception as e:
+                # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+                raise HumanloopRuntimeError from e
+            if eval_callback is not None:
+                eval_callback(response.id)
         else:
             try:
                 response = self._log(**kwargs)

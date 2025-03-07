@@ -12,6 +12,9 @@ from humanloop.otel.helpers import is_llm_provider_call
 
 
 def serialize_span(span_to_export: ReadableSpan) -> str:
+    """
+    Serialize a span into format compatible with the /otel backend endpoint.
+    """
     payload = TracesData(
         resource_spans=[
             ResourceSpans(

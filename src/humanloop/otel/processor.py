@@ -1,6 +1,4 @@
 import logging
-from typing import Optional
-from opentelemetry import context as context_api
 
 
 from opentelemetry.sdk.trace import ReadableSpan, Span
@@ -23,6 +21,7 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
         super().__init__(exporter)
 
     def on_start(self, span: Span, parent_context=...):
+        """Called when a Span is started."""
         if is_llm_provider_call(span):
             decorator_context = get_decorator_context()
             if decorator_context and decorator_context.type == "prompt":
@@ -42,6 +41,7 @@ class HumanloopSpanProcessor(SimpleSpanProcessor):
                 span.set_attribute(f"{HUMANLOOP_LOG_KEY}.trace_parent_id", trace_id)
 
     def on_end(self, span: ReadableSpan):
+        """Called when a Span finishes recording."""
         if is_llm_provider_call(span):
             decorator_context = get_decorator_context()
             if decorator_context is None or decorator_context.type != "prompt":
