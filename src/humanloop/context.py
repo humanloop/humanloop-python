@@ -78,7 +78,6 @@ class EvaluationContext:
     path: str
     _logged: bool
     _callback: Callable[[str], None]
-    _context_log_belongs_eval_file: bool
 
     def __init__(
         self,
@@ -94,7 +93,6 @@ class EvaluationContext:
         self.file_id = file_id
         self.path = path
         self._logged = False
-        self._context_log_belongs_eval_file = False
 
     @property
     def logged(self) -> bool:
@@ -138,7 +136,6 @@ class EvaluationContext:
 
         if self.path is not None and self.path == path:
             self._logged = True
-            self._context_log_belongs_eval_file = True
             return {
                 **log_args,
                 "source_datapoint_id": self.source_datapoint_id,
@@ -146,7 +143,6 @@ class EvaluationContext:
             }, self._callback
         elif self.file_id is not None and self.file_id == file_id:
             self._logged = True
-            self._context_log_belongs_eval_file = True
             return {
                 **log_args,
                 "source_datapoint_id": self.source_datapoint_id,

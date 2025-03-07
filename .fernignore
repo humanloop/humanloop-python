@@ -8,6 +8,7 @@ src/humanloop/prompt_utils.py
 src/humanloop/client.py
 src/humanloop/overload.py
 src/humanloop/context.py
+src/humanloop/error.py
 mypy.ini
 README.md
 src/humanloop/decorators

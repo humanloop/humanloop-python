@@ -143,12 +143,12 @@ class HumanloopSpanExporter(SpanExporter):
                 },
                 data=serialize_span(span_to_export),
             )
-            print("RECV", span_to_export.attributes, response.json(), response.status_code)
             if response.status_code != 200:
-                pass
+                raise HumanloopRuntimeError(
+                    f"Failed to upload OTEL span to Humanloop: {response.json()} {response.status_code}"
+                )
             else:
                 if eval_context_callback:
-                    print("HELLO")
                     log_id = response.json()["records"][0]
                     eval_context_callback(log_id)
 
