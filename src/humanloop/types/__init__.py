@@ -114,6 +114,10 @@ from .paginated_evaluation_response import PaginatedEvaluationResponse
 from .paginated_prompt_log_response import PaginatedPromptLogResponse
 from .paginated_session_response import PaginatedSessionResponse
 from .platform_access_enum import PlatformAccessEnum
+from .populate_template_response import PopulateTemplateResponse
+from .populate_template_response_populated_template import PopulateTemplateResponsePopulatedTemplate
+from .populate_template_response_stop import PopulateTemplateResponseStop
+from .populate_template_response_template import PopulateTemplateResponseTemplate
 from .project_sort_by import ProjectSortBy
 from .prompt_call_log_response import PromptCallLogResponse
 from .prompt_call_response import PromptCallResponse
@@ -271,6 +275,10 @@ __all__ = [
     "PaginatedPromptLogResponse",
     "PaginatedSessionResponse",
     "PlatformAccessEnum",
+    "PopulateTemplateResponse",
+    "PopulateTemplateResponsePopulatedTemplate",
+    "PopulateTemplateResponseStop",
+    "PopulateTemplateResponseTemplate",
     "ProjectSortBy",
     "PromptCallLogResponse",
     "PromptCallResponse",

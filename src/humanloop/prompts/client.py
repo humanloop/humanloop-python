@@ -38,6 +38,7 @@ from .requests.prompt_request_stop import PromptRequestStopParams
 from ..requests.response_format import ResponseFormatParams
 from ..types.reasoning_effort import ReasoningEffort
 from ..requests.tool_function import ToolFunctionParams
+from ..types.populate_template_response import PopulateTemplateResponse
 from ..types.version_status import VersionStatus
 from ..types.list_prompts import ListPrompts
 from ..types.file_environment_response import FileEnvironmentResponse
@@ -1526,7 +1527,7 @@ class PromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> PopulateTemplateResponse:
         """
         Retrieve the Prompt with the given ID, including the populated template.
 
@@ -1551,7 +1552,7 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        PopulateTemplateResponse
             Successful Response
 
         Examples
@@ -1580,9 +1581,9 @@ class PromptsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    PromptResponse,
+                    PopulateTemplateResponse,
                     construct_type(
-                        type_=PromptResponse,  # type: ignore
+                        type_=PopulateTemplateResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3628,7 +3629,7 @@ class AsyncPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> PopulateTemplateResponse:
         """
         Retrieve the Prompt with the given ID, including the populated template.
 
@@ -3653,7 +3654,7 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        PopulateTemplateResponse
             Successful Response
 
         Examples
@@ -3690,9 +3691,9 @@ class AsyncPromptsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    PromptResponse,
+                    PopulateTemplateResponse,
                     construct_type(
-                        type_=PromptResponse,  # type: ignore
+                        type_=PopulateTemplateResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

@@ -93,6 +93,10 @@ from .paginated_data_union_prompt_response_tool_response_dataset_response_evalua
 from .paginated_datapoint_response import PaginatedDatapointResponseParams
 from .paginated_dataset_response import PaginatedDatasetResponseParams
 from .paginated_evaluation_response import PaginatedEvaluationResponseParams
+from .populate_template_response import PopulateTemplateResponseParams
+from .populate_template_response_populated_template import PopulateTemplateResponsePopulatedTemplateParams
+from .populate_template_response_stop import PopulateTemplateResponseStopParams
+from .populate_template_response_template import PopulateTemplateResponseTemplateParams
 from .prompt_call_log_response import PromptCallLogResponseParams
 from .prompt_call_response import PromptCallResponseParams
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoiceParams
@@ -214,6 +218,10 @@ __all__ = [
     "PaginatedDatapointResponseParams",
     "PaginatedDatasetResponseParams",
     "PaginatedEvaluationResponseParams",
+    "PopulateTemplateResponseParams",
+    "PopulateTemplateResponsePopulatedTemplateParams",
+    "PopulateTemplateResponseStopParams",
+    "PopulateTemplateResponseTemplateParams",
     "PromptCallLogResponseParams",
     "PromptCallResponseParams",
     "PromptCallResponseToolChoiceParams",
