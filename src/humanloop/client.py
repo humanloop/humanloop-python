@@ -22,8 +22,6 @@ from humanloop.evaluations.client import EvaluationsClient
 from humanloop.otel import instrument_provider
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
-from humanloop.prompt_utils import populate_template
-from humanloop.prompts.client import PromptsClient
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -70,14 +68,6 @@ class ExtendedEvalsClient(EvaluationsClient):
         )
 
 
-class ExtendedPromptsClient(PromptsClient):
-    """
-    Adds utility for populating Prompt template inputs.
-    """
-
-    populate_template = staticmethod(populate_template)  # type: ignore [assignment]
-
-
 class Humanloop(BaseHumanloop):
     """
     See docstring of :class:`BaseHumanloop`.
@@ -119,7 +109,6 @@ class Humanloop(BaseHumanloop):
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
-        self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
 
         # Overload the .log method of the clients to be aware of Evaluation Context
         # and the @flow decorator providing the trace_id
@@ -144,7 +133,9 @@ class Humanloop(BaseHumanloop):
         )
 
         if opentelemetry_tracer is None:
-            self._opentelemetry_tracer = self._tracer_provider.get_tracer("humanloop.sdk")
+            self._opentelemetry_tracer = self._tracer_provider.get_tracer(
+                "humanloop.sdk"
+            )
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
 
@@ -153,7 +144,7 @@ class Humanloop(BaseHumanloop):
         *,
         path: str,
     ):
-        """Auto-instrument LLM provider and create [Prompt](https://humanloop.com/docs/explanation/prompts)
+        """Auto-instrument LLM providers and create [Prompt](https://humanloop.com/docs/explanation/prompts)
         Logs on Humanloop from them.
 
         ```python
