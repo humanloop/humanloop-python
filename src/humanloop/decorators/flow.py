@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from functools import wraps
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, Awaitable, Callable, Coroutine, Optional, TypeVar
 from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Span, Tracer
@@ -123,7 +123,7 @@ def flow(
                         return func_output  # type: ignore [return-value]
 
         @wraps(func)
-        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> Awaitable[Optional[R]]:
             span: Span
             with set_decorator_context(
                 DecoratorContext(
@@ -157,7 +157,8 @@ def flow(
                         log_error: Optional[str]
                         log_output_message: Optional[ChatMessage]
                         try:
-                            func_output = await func(*args, **kwargs)
+                            # Polymorphic decorator does not recognize the function is a coroutine
+                            func_output = await func(*args, **kwargs)  # type: ignore [misc]
                             if (
                                 isinstance(func_output, dict)
                                 and len(func_output.keys()) == 2
@@ -206,7 +207,8 @@ def flow(
                 version=FlowDict(**flow_kernel),  # type: ignore
                 callable=async_wrapper,
             )
-            return async_wrapper
+            # Polymorphic decorator does not recognize the function is a coroutine
+            return async_wrapper  # type: ignore [return-value]
 
         # If the decorated function is a sync function, return the sync wrapper
         wrapper.file = File(  # type: ignore

@@ -8,7 +8,7 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 from inspect import Parameter
-from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypeVar, TypedDict, Union
+from typing import Any, Awaitable, Callable, Coroutine, Literal, Mapping, Optional, Sequence, TypeVar, TypedDict, Union
 from typing_extensions import ParamSpec
 
 from opentelemetry.trace import Tracer
@@ -114,7 +114,7 @@ def tool_decorator_factory(
                 return func_output
 
         @wraps(func)
-        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> Awaitable[Optional[R]]:
             evaluation_context = get_evaluation_context()
             if evaluation_context is not None:
                 if evaluation_context.path == path:
@@ -135,7 +135,8 @@ def tool_decorator_factory(
 
                 func_output: Optional[R]
                 try:
-                    func_output = await func(*args, **kwargs)
+                    # Polymorphic decorator does not recognize the function is a coroutine
+                    func_output = await func(*args, **kwargs)  # type: ignore [misc]
                     log_output = process_output(
                         func=func,
                         output=func_output,
@@ -168,7 +169,8 @@ def tool_decorator_factory(
                 )
 
                 # Return the output of the decorated function
-                return func_output
+                # Polymorphic decorator does not recognize the function is a coroutine
+                return func_output  # type: ignore [return-value]
 
         # If the decorated function is an async function, return the async wrapper
         if asyncio.iscoroutinefunction(func):
@@ -178,7 +180,8 @@ def tool_decorator_factory(
                 version=tool_kernel,
                 callable=async_wrapper,
             )
-            return async_wrapper
+            # Polymorphic decorator does not recognize the function is a coroutine
+            return async_wrapper  # type: ignore [return-value]
 
         # If the decorated function is a sync function, return the sync wrapper
         wrapper.file = File(  # type: ignore

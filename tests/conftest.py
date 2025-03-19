@@ -126,8 +126,12 @@ def hl_test_exporter() -> HumanloopSpanExporter:
     Test Exporter where HTTP calls to Humanloop API
     are mocked.
     """
-    client = MagicMock()
-    exporter = HumanloopSpanExporter(client=client)
+    hl_client_headers = MagicMock()
+    hl_client_base_url = MagicMock()
+    exporter = HumanloopSpanExporter(
+        hl_client_headers=hl_client_headers,
+        hl_client_base_url=hl_client_base_url,
+    )
     return exporter
 
 
