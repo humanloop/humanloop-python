@@ -1,3 +1,4 @@
+import asyncio
 import builtins
 import inspect
 import logging
@@ -112,13 +113,80 @@ def tool_decorator_factory(
                 # Return the output of the decorated function
                 return func_output
 
+        @wraps(func)
+        async def async_wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+            evaluation_context = get_evaluation_context()
+            if evaluation_context is not None:
+                if evaluation_context.path == path:
+                    raise HumanloopRuntimeError("Tools cannot be evaluated with the `evaluations.run()` utility.")
+            with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
+                # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
+                write_to_opentelemetry_span(
+                    span=span,  # type: ignore [arg-type]
+                    key=HUMANLOOP_FILE_KEY,
+                    value=tool_kernel,  # type: ignore [arg-type]
+                )
+                span.set_attribute(HUMANLOOP_FILE_PATH_KEY, path)
+                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
+
+                log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
+                log_error: Optional[str]
+                log_output: str
+
+                func_output: Optional[R]
+                try:
+                    func_output = await func(*args, **kwargs)
+                    log_output = process_output(
+                        func=func,
+                        output=func_output,
+                    )
+                    log_error = None
+                except HumanloopRuntimeError as e:
+                    # Critical error, re-raise
+                    raise e
+                except Exception as e:
+                    logger.error(f"Error calling {func.__name__}: {e}")
+                    output = None
+                    log_output = process_output(
+                        func=func,
+                        output=output,
+                    )
+                    log_error = str(e)
+
+                # Populate Tool Log attributes
+                tool_log = {
+                    "inputs": log_inputs,
+                    "output": log_output,
+                    "error": log_error,
+                    "trace_parent_id": get_trace_id(),
+                }
+                # Write the Tool Log to the Span on HL_LOG_OT_KEY
+                write_to_opentelemetry_span(
+                    span=span,  # type: ignore [arg-type]
+                    key=HUMANLOOP_LOG_KEY,
+                    value=tool_log,  # type: ignore [arg-type]
+                )
+
+                # Return the output of the decorated function
+                return func_output
+
+        # If the decorated function is an async function, return the async wrapper
+        if asyncio.iscoroutinefunction(func):
+            async_wrapper.file = File(  # type: ignore
+                path=path,
+                type=file_type,  # type: ignore [arg-type, typeddict-item]
+                version=tool_kernel,
+                callable=async_wrapper,
+            )
+            return async_wrapper
+
+        # If the decorated function is a sync function, return the sync wrapper
         wrapper.file = File(  # type: ignore
             path=path,
             type=file_type,  # type: ignore [arg-type, typeddict-item]
             version=tool_kernel,
             callable=wrapper,
         )
-
         return wrapper
 
     return decorator
