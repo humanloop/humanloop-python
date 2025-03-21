@@ -1,7 +1,6 @@
 import logging
 
 import time
-import typing
 from queue import Empty as EmptyQueue
 from queue import Queue
 from threading import Thread
@@ -26,19 +25,16 @@ from humanloop.otel.helpers import (
 )
 
 
-if typing.TYPE_CHECKING:
-    from humanloop.client import Humanloop
-
-
 logger = logging.getLogger("humanloop.sdk")
 
 
 class HumanloopSpanExporter(SpanExporter):
-    DEFAULT_NUMBER_THREADS = 1
+    DEFAULT_NUMBER_THREADS = 4
 
     def __init__(
         self,
-        client: "Humanloop",
+        hl_client_headers: dict[str, str],
+        hl_client_base_url: str,
         worker_threads: Optional[int] = None,
     ) -> None:
         """Upload Spans created by SDK decorators to Humanloop.
@@ -46,7 +42,8 @@ class HumanloopSpanExporter(SpanExporter):
         Spans not created by Humanloop SDK decorators will be ignored.
         """
         super().__init__()
-        self._client = client
+        self._hl_client_headers = hl_client_headers
+        self._base_url = hl_client_base_url
         # Work queue for the threads uploading the spans
         self._upload_queue: Queue = Queue()
         # Worker threads to export the spans
@@ -135,12 +132,9 @@ class HumanloopSpanExporter(SpanExporter):
                 continue
 
             span_to_export, eval_context_callback = thread_args
-
             response = requests.post(
-                f"{self._client._client_wrapper.get_base_url()}/import/otel/v1/traces",
-                headers={
-                    **self._client._client_wrapper.get_headers(),
-                },
+                f"{self._base_url}/import/otel/v1/traces",
+                headers=self._hl_client_headers,
                 data=serialize_span(span_to_export),
             )
             if response.status_code != 200:

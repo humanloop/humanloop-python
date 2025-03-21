@@ -1,3 +1,4 @@
+from importlib import metadata
 import os
 import typing
 from typing import Any, List, Optional, Sequence
@@ -9,6 +10,7 @@ from opentelemetry.trace import Tracer
 
 from humanloop.core.client_wrapper import SyncClientWrapper
 
+from humanloop.error import HumanloopRuntimeError
 from humanloop.evals import run_eval
 from humanloop.evals.types import Dataset, Evaluator, EvaluatorCheck, File
 
@@ -68,6 +70,41 @@ class ExtendedEvalsClient(EvaluationsClient):
         )
 
 
+class HumanloopTracerSingleton:
+    _instance = None
+
+    def __init__(self, hl_client_headers: dict[str, str], hl_client_base_url: str):
+        if HumanloopTracerSingleton._instance is not None:
+            raise HumanloopRuntimeError("Internal error: HumanloopTracerSingleton already initialized")
+
+        self.tracer_provider = TracerProvider(
+            resource=Resource(
+                attributes={
+                    "service.name": "humanloop-python-sdk",
+                    "service.version": metadata.version("humanloop"),
+                }
+            )
+        )
+        self.tracer_provider.add_span_processor(
+            HumanloopSpanProcessor(
+                exporter=HumanloopSpanExporter(
+                    hl_client_headers=hl_client_headers,
+                    hl_client_base_url=hl_client_base_url,
+                )
+            )
+        )
+
+        instrument_provider(provider=self.tracer_provider)
+
+        self.tracer = self.tracer_provider.get_tracer("humanloop.sdk")
+
+    @classmethod
+    def get_instance(cls, hl_client_headers: dict[str, str], hl_client_base_url: str):
+        if cls._instance is None:
+            cls._instance = cls(hl_client_headers, hl_client_base_url)
+        return cls._instance
+
+
 class Humanloop(BaseHumanloop):
     """
     See docstring of :class:`BaseHumanloop`.
@@ -117,27 +154,12 @@ class Humanloop(BaseHumanloop):
         self.flows = overload_log(client=self.flows)
         self.tools = overload_log(client=self.tools)
 
-        if opentelemetry_tracer_provider is not None:
-            self._tracer_provider = opentelemetry_tracer_provider
-        else:
-            self._tracer_provider = TracerProvider(
-                resource=Resource(
-                    attributes={
-                        "instrumentor": "humanloop.sdk",
-                    }
-                ),
-            )
-        instrument_provider(provider=self._tracer_provider)
-        self._tracer_provider.add_span_processor(
-            HumanloopSpanProcessor(exporter=HumanloopSpanExporter(client=self)),
+        # Initialize the tracer singleton
+        self._tracer_singleton = HumanloopTracerSingleton.get_instance(
+            hl_client_headers=self._client_wrapper.get_headers(),
+            hl_client_base_url=self._client_wrapper._base_url,
         )
-
-        if opentelemetry_tracer is None:
-            self._opentelemetry_tracer = self._tracer_provider.get_tracer(
-                "humanloop.sdk"
-            )
-        else:
-            self._opentelemetry_tracer = opentelemetry_tracer
+        self._opentelemetry_tracer = self._tracer_singleton.tracer
 
     def prompt(
         self,
