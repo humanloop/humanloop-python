@@ -3,7 +3,7 @@ name = "humanloop"
 
 [tool.poetry]
 name = "humanloop"
-version = "0.8.29"
+version = "0.8.29b1"
 description = ""
 readme = "README.md"
 authors = []
