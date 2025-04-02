@@ -2,7 +2,7 @@ deepdiff==^8.2.0
 httpx>=0.21.2
 httpx-sse==0.4.0
 mmh3==^5.1.0
-opentelemetry-api>=1.28.0
+opentelemetry-api>=1.27.0
 opentelemetry-instrumentation-anthropic>=0.20
 opentelemetry-instrumentation-bedrock>=0.15
 opentelemetry-instrumentation-cohere>=0.20
@@ -10,7 +10,7 @@ opentelemetry-instrumentation-groq>=0.29
 opentelemetry-instrumentation-openai>=0.20
 opentelemetry-instrumentation-replicate>=0.20
 opentelemetry-proto>=1.30.0
-opentelemetry-sdk>=1.28.0
+opentelemetry-sdk>=1.27.0
 parse>=1
 protobuf>=5.29.3
 pydantic>= 1.9.2
