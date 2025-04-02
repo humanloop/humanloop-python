@@ -248,7 +248,7 @@ class PromptsClient:
             messages=[{"role": "user", "content": "What really happened at Roswell?"}],
             inputs={"person": "Trump"},
             created_at=datetime.datetime.fromisoformat(
-                "2024-07-18 23:29:35.178000+00:00",
+                "2024-07-19 00:29:35.178000+00:00",
             ),
             provider_latency=6.5931549072265625,
             output_message={
@@ -2283,7 +2283,7 @@ class AsyncPromptsClient:
                 ],
                 inputs={"person": "Trump"},
                 created_at=datetime.datetime.fromisoformat(
-                    "2024-07-18 23:29:35.178000+00:00",
+                    "2024-07-19 00:29:35.178000+00:00",
                 ),
                 provider_latency=6.5931549072265625,
                 output_message={
