@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .agent_linked_file_response import AgentLinkedFileResponse
+from .agent_log_response import AgentLogResponse
+from .agent_response import AgentResponse
 from .evaluator_log_response import EvaluatorLogResponse
 from .evaluator_response import EvaluatorResponse
 from .flow_log_response import FlowLogResponse
@@ -52,6 +55,9 @@ class EvaluationLogResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+update_forward_refs(AgentLinkedFileResponse, EvaluationLogResponse=EvaluationLogResponse)
+update_forward_refs(AgentLogResponse, EvaluationLogResponse=EvaluationLogResponse)
+update_forward_refs(AgentResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(EvaluatorLogResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(EvaluatorResponse, EvaluationLogResponse=EvaluationLogResponse)
 update_forward_refs(FlowLogResponse, EvaluationLogResponse=EvaluationLogResponse)

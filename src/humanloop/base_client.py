@@ -11,6 +11,7 @@ from .tools.client import ToolsClient
 from .datasets.client import DatasetsClient
 from .evaluators.client import EvaluatorsClient
 from .flows.client import FlowsClient
+from .agents.client import AgentsClient
 from .directories.client import DirectoriesClient
 from .files.client import FilesClient
 from .evaluations.client import EvaluationsClient
@@ -21,6 +22,7 @@ from .tools.client import AsyncToolsClient
 from .datasets.client import AsyncDatasetsClient
 from .evaluators.client import AsyncEvaluatorsClient
 from .flows.client import AsyncFlowsClient
+from .agents.client import AsyncAgentsClient
 from .directories.client import AsyncDirectoriesClient
 from .files.client import AsyncFilesClient
 from .evaluations.client import AsyncEvaluationsClient
@@ -94,6 +96,7 @@ class BaseHumanloop:
         self.datasets = DatasetsClient(client_wrapper=self._client_wrapper)
         self.evaluators = EvaluatorsClient(client_wrapper=self._client_wrapper)
         self.flows = FlowsClient(client_wrapper=self._client_wrapper)
+        self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.directories = DirectoriesClient(client_wrapper=self._client_wrapper)
         self.files = FilesClient(client_wrapper=self._client_wrapper)
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
@@ -167,6 +170,7 @@ class AsyncBaseHumanloop:
         self.datasets = AsyncDatasetsClient(client_wrapper=self._client_wrapper)
         self.evaluators = AsyncEvaluatorsClient(client_wrapper=self._client_wrapper)
         self.flows = AsyncFlowsClient(client_wrapper=self._client_wrapper)
+        self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.directories = AsyncDirectoriesClient(client_wrapper=self._client_wrapper)
         self.files = AsyncFilesClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)

@@ -165,6 +165,11 @@ class PopulateTemplateResponseParams(typing_extensions.TypedDict):
     Name of the Prompt.
     """
 
+    schema: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    The JSON schema for the Prompt.
+    """
+
     version_id: str
     """
     Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.

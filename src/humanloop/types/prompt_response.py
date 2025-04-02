@@ -13,6 +13,8 @@ from .response_format import ResponseFormat
 from .reasoning_effort import ReasoningEffort
 from .tool_function import ToolFunction
 from .linked_tool_response import LinkedToolResponse
+import typing_extensions
+from ..core.serialization import FieldMetadata
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
@@ -166,6 +168,13 @@ class PromptResponse(UncheckedBaseModel):
     Name of the Prompt.
     """
 
+    schema_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="schema")
+    ] = pydantic.Field(default=None)
+    """
+    The JSON schema for the Prompt.
+    """
+
     version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
@@ -235,6 +244,8 @@ class PromptResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .agent_linked_file_response import AgentLinkedFileResponse  # noqa: E402
+from .agent_response import AgentResponse  # noqa: E402
 from .evaluator_response import EvaluatorResponse  # noqa: E402
 from .flow_response import FlowResponse  # noqa: E402
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
@@ -242,6 +253,8 @@ from .tool_response import ToolResponse  # noqa: E402
 from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
 from .version_id_response import VersionIdResponse  # noqa: E402
 
+update_forward_refs(AgentLinkedFileResponse, PromptResponse=PromptResponse)
+update_forward_refs(AgentResponse, PromptResponse=PromptResponse)
 update_forward_refs(EvaluatorResponse, PromptResponse=PromptResponse)
 update_forward_refs(FlowResponse, PromptResponse=PromptResponse)
 update_forward_refs(MonitoringEvaluatorResponse, PromptResponse=PromptResponse)

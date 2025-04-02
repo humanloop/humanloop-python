@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 from ..core.unchecked_base_model import UncheckedBaseModel
+from .agent_linked_file_response import AgentLinkedFileResponse
+from .agent_response import AgentResponse
 from .evaluator_response import EvaluatorResponse
 from .flow_response import FlowResponse
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse
@@ -20,6 +22,8 @@ from .response_format import ResponseFormat
 from .reasoning_effort import ReasoningEffort
 from .tool_function import ToolFunction
 from .linked_tool_response import LinkedToolResponse
+import typing_extensions
+from ..core.serialization import FieldMetadata
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
@@ -174,6 +178,13 @@ class PopulateTemplateResponse(UncheckedBaseModel):
     Name of the Prompt.
     """
 
+    schema_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="schema")
+    ] = pydantic.Field(default=None)
+    """
+    The JSON schema for the Prompt.
+    """
+
     version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
@@ -248,6 +259,8 @@ class PopulateTemplateResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+update_forward_refs(AgentLinkedFileResponse, PopulateTemplateResponse=PopulateTemplateResponse)
+update_forward_refs(AgentResponse, PopulateTemplateResponse=PopulateTemplateResponse)
 update_forward_refs(EvaluatorResponse, PopulateTemplateResponse=PopulateTemplateResponse)
 update_forward_refs(FlowResponse, PopulateTemplateResponse=PopulateTemplateResponse)
 update_forward_refs(MonitoringEvaluatorResponse, PopulateTemplateResponse=PopulateTemplateResponse)

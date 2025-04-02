@@ -3,6 +3,8 @@
 from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
 import typing
+import typing_extensions
+from ..core.serialization import FieldMetadata
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
@@ -42,6 +44,13 @@ class DatasetResponse(UncheckedBaseModel):
     description: typing.Optional[str] = pydantic.Field(default=None)
     """
     Description of the Dataset.
+    """
+
+    schema_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="schema")
+    ] = pydantic.Field(default=None)
+    """
+    The JSON schema for the File.
     """
 
     readme: typing.Optional[str] = pydantic.Field(default=None)

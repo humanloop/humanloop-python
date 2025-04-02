@@ -2514,6 +2514,212 @@ client.prompts.update_monitoring(
 </details>
 
 ## Tools
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">call</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Call a Tool.
+
+Calling a Tool with inputs runs the tool's source code and logs the result and metadata to Humanloop.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Tool. Otherwise, the default deployed version will be chosen.
+
+Instead of targeting an existing version explicitly, you can instead pass in
+Tool details in the request body. In this case, we will check if the details correspond
+to an existing version of the Tool. If they do not, we will create a new version. This is helpful
+in the case where you are storing or deriving your Tool details in code.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.call()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Tool to call.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to call.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool:** `typing.Optional[ToolKernelRequestParams]` — Details of your Tool. A new Tool version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_call_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">log</a>(...)</code></summary>
 <dl>
 <dd>
@@ -2613,6 +2819,14 @@ client.tools.log(
 <dd>
 
 **id:** `typing.Optional[str]` — ID for an existing Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool:** `typing.Optional[ToolKernelRequestParams]` — Details of your Tool. A new Tool version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -2765,14 +2979,6 @@ client.tools.log(
 <dd>
 
 **log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**tool:** `typing.Optional[ToolKernelRequestParams]` — Details of your Tool. A new Tool version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -4054,6 +4260,206 @@ client.tools.update_monitoring(
 **deactivate:** `typing.Optional[
     typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
 ]` — Evaluators to deactivate. These will not be run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">get_environment_variables</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.get_environment_variables(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for File.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">add_environment_variable</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Add an environment variable to a Tool.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.add_environment_variable(
+    id="id",
+    request=[{"name": "name", "value": "value"}],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `typing.Sequence[FileEnvironmentVariableRequestParams]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">delete_environment_variable</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.delete_environment_variable(
+    id="id",
+    name="name",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for File.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `str` — Name of the Environment Variable to delete.
     
 </dd>
 </dl>
@@ -8156,6 +8562,2207 @@ client = Humanloop(
 client.flows.update_monitoring(
     id="fl_6o701g4jmcanPVHxdqD0O",
     activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**activate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
+]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**deactivate:** `typing.Optional[
+    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
+]` — Evaluators to deactivate. These will not be run on new Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Agents
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">log</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create an Agent Log.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Agent. Otherwise, the default deployed version will be chosen.
+
+If you create the Agent Log with a `log_status` of `incomplete`, you should later update it to `complete`
+in order to trigger Evaluators.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.log()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Agent to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**run_id:** `typing.Optional[str]` — Unique identifier for the Run to associate the Log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_message:** `typing.Optional[ChatMessageParams]` — The message returned by the provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_tokens:** `typing.Optional[int]` — Number of tokens in the prompt used to generate the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reasoning_tokens:** `typing.Optional[int]` — Number of reasoning tokens used to generate the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_tokens:** `typing.Optional[int]` — Number of tokens in the output generated by the model.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt_cost:** `typing.Optional[float]` — Cost in dollars associated to the tokens in the prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_cost:** `typing.Optional[float]` — Cost in dollars associated to the tokens in the output.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**finish_reason:** `typing.Optional[str]` — Reason the generation finished.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_choice:** `typing.Optional[AgentLogRequestToolChoiceParams]` 
+
+Controls how the model uses tools. The following options are supported: 
+- `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
+- `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
+- `'required'` means the model can decide to call one or more of the provided tools. 
+- `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agent:** `typing.Optional[AgentKernelRequestParams]` — Details of your Agent. A new Agent version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**created_at:** `typing.Optional[dt.datetime]` — User defined timestamp for when the log was created. 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — Error message if the log is an error.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_latency:** `typing.Optional[float]` — Duration of the logged event in seconds.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stdout:** `typing.Optional[str]` — Captured log and debug statements.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_request:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw request sent to provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_response:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Raw response received the provider.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agent_log_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">update_log</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update a Log.
+
+Update the details of a Log with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.update_log(
+    id="id",
+    log_id="log_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `str` — Unique identifier for the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — List of chat messages that were used as an input to the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output_message:** `typing.Optional[ChatMessageParams]` — The output message returned by this Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the Flow Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**output:** `typing.Optional[str]` — The output of the Flow Log. Provide None to unset existing `output` value. Provide either this, `output_message` or `error`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**error:** `typing.Optional[str]` — The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">call_stream</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Call an Agent.
+
+Calling an Agent calls the model provider before logging
+the request, responses and metadata to Humanloop.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Agent. Otherwise the default deployed version will be chosen.
+
+Instead of targeting an existing version explicitly, you can instead pass in
+Agent details in the request body. In this case, we will check if the details correspond
+to an existing version of the Agent. If they do not, we will create a new version. This is helpful
+in the case where you are storing or deriving your Agent details in code.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+response = client.agents.call_stream()
+for chunk in response:
+    yield chunk
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Agent to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_choice:** `typing.Optional[AgentsCallStreamRequestToolChoiceParams]` 
+
+Controls how the model uses tools. The following options are supported: 
+- `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
+- `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
+- `'required'` means the model can decide to call one or more of the provided tools. 
+- `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agent:** `typing.Optional[AgentKernelRequestParams]` — Details of your Agent. A new Agent version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agents_call_stream_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_api_keys:** `typing.Optional[ProviderApiKeysParams]` — API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**return_inputs:** `typing.Optional[bool]` — Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">call</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Call an Agent.
+
+Calling an Agent calls the model provider before logging
+the request, responses and metadata to Humanloop.
+
+You can use query parameters `version_id`, or `environment`, to target
+an existing version of the Agent. Otherwise the default deployed version will be chosen.
+
+Instead of targeting an existing version explicitly, you can instead pass in
+Agent details in the request body. In this case, we will check if the details correspond
+to an existing version of the Agent. If they do not, we will create a new version. This is helpful
+in the case where you are storing or deriving your Agent details in code.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.call()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Agent to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed version to log to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `typing.Optional[typing.Sequence[ChatMessageParams]]` — The messages passed to the to provider chat endpoint.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tool_choice:** `typing.Optional[AgentsCallRequestToolChoiceParams]` 
+
+Controls how the model uses tools. The following options are supported: 
+- `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
+- `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
+- `'required'` means the model can decide to call one or more of the provided tools. 
+- `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agent:** `typing.Optional[AgentKernelRequestParams]` — Details of your Agent. A new Agent version will be created if the provided details are new.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**inputs:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — The inputs passed to the prompt template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source:** `typing.Optional[str]` — Identifies where the model was called from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Any additional metadata to record.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**start_time:** `typing.Optional[dt.datetime]` — When the logged event started.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**end_time:** `typing.Optional[dt.datetime]` — When the logged event ended.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_status:** `typing.Optional[LogStatus]` — Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**source_datapoint_id:** `typing.Optional[str]` — Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**trace_parent_id:** `typing.Optional[str]` — The ID of the parent Log to nest this Log under in a Trace.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `typing.Optional[str]` — End-user ID related to the Log.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**agents_call_request_environment:** `typing.Optional[str]` — The name of the Environment the Log is associated to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**save:** `typing.Optional[bool]` — Whether the request/response payloads will be stored on Humanloop.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**log_id:** `typing.Optional[str]` — This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider_api_keys:** `typing.Optional[ProviderApiKeysParams]` — API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**return_inputs:** `typing.Optional[bool]` — Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">list</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all Agents.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.list()
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**page:** `typing.Optional[int]` — Page number for pagination.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**size:** `typing.Optional[int]` — Page size for pagination. Number of Agents to fetch.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Case-insensitive filter for Agent name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_filter:** `typing.Optional[str]` — Case-insensitive filter for users in the Agent. This filter matches against both email address and name of users.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sort_by:** `typing.Optional[ProjectSortBy]` — Field to sort Agents by
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**order:** `typing.Optional[SortOrder]` — Direction to sort by.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">upsert</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Create an Agent or update it with a new version if it already exists.
+
+Agents are identified by the `ID` or their `path`. The parameters (i.e. the prompt template, temperature, model etc.) determine the versions of the Agent.
+
+If you provide a commit message, then the new version will be committed;
+otherwise it will be uncommitted. If you try to commit an already committed version,
+an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.upsert(
+    model="model",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**model:** `str` — The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `typing.Optional[str]` — ID for an existing Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**endpoint:** `typing.Optional[ModelEndpoints]` — The provider model endpoint used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**template:** `typing.Optional[AgentRequestTemplateParams]` 
+
+The template contains the main structure and instructions for the model, including input variables for dynamic values. 
+
+For chat models, provide the template as a ChatTemplate (a list of messages), e.g. a system message, followed by a user message with an input variable.
+For completion models, provide a prompt template as a string. 
+
+Input variables should be specified with double curly bracket syntax: `{{input_name}}`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**template_language:** `typing.Optional[TemplateLanguage]` — The template language to use for rendering the template.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**provider:** `typing.Optional[ModelProviders]` — The company providing the underlying model service.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**max_tokens:** `typing.Optional[int]` — The maximum number of tokens to generate. Provide max_tokens=-1 to dynamically calculate the maximum number of tokens to generate given the length of the prompt
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**temperature:** `typing.Optional[float]` — What sampling temperature to use when making a generation. Higher values means the model will be more creative.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**top_p:** `typing.Optional[float]` — An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stop:** `typing.Optional[AgentRequestStopParams]` — The string (or list of strings) after which the model will stop generating. The returned text will not contain the stop sequence.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presence_penalty:** `typing.Optional[float]` — Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the generation so far.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**frequency_penalty:** `typing.Optional[float]` — Number between -2.0 and 2.0. Positive values penalize new tokens based on how frequently they appear in the generation so far.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**other:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Other parameter values to be passed to the provider call.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**seed:** `typing.Optional[int]` — If specified, model will make a best effort to sample deterministically, but it is not guaranteed.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**response_format:** `typing.Optional[ResponseFormatParams]` — The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reasoning_effort:** `typing.Optional[ReasoningEffort]` — Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tools:** `typing.Optional[typing.Sequence[AgentRequestToolsItemParams]]` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**attributes:** `typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]` — Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**max_iterations:** `typing.Optional[int]` — The maximum number of iterations the Agent can run. This is used to limit the number of times the Agent model is called.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_name:** `typing.Optional[str]` — Unique name for the Prompt version. Each Prompt can only have one version with a given name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description of the Version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tags:** `typing.Optional[typing.Sequence[str]]` — List of tags associated with this prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**readme:** `typing.Optional[str]` — Long description of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">get</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Retrieve the Agent with the given ID.
+
+By default, the deployed version of the Agent is returned. Use the query parameters
+`version_id` or `environment` to target a specific version of the Agent.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.get(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `typing.Optional[str]` — A specific Version ID of the Agent to retrieve.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">delete</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete the Agent with the given ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.delete(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">move</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Move the Agent to a different path or change the name.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.move(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**path:** `typing.Optional[str]` — Path of the Flow including the Flow name, which is used as a unique identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**directory_id:** `typing.Optional[str]` — Unique identifier for the Directory to move Flow to. Starts with `dir_`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">list_versions</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Get a list of all the versions of a Agent.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.list_versions(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">commit</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Commit a version of the Agent with a commit message.
+
+If the version is already committed, an exception will be raised.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.commit(
+    id="id",
+    version_id="version_id",
+    commit_message="commit_message",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**commit_message:** `str` — Message describing the changes made.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">delete_agent_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Delete a version of the Agent.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.delete_agent_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">set_deployment</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deploy Agent to an Environment.
+
+Set the deployed version for the specified Environment. This Agent
+will be used for calls made to the Agent in this Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.set_deployment(
+    id="id",
+    environment_id="environment_id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment_id:** `str` — Unique identifier for the Environment to deploy the Version to.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">remove_deployment</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Remove deployed Agent from the Environment.
+
+Remove the deployed version for the specified Environment. This Agent
+will no longer be used for calls made to the Agent in this Environment.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.remove_deployment(
+    id="id",
+    environment_id="environment_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**environment_id:** `str` — Unique identifier for the Environment to remove the deployment from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">list_environments</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+List all Environments and their deployed versions for the Agent.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.list_environments(
+    id="id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Agent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">update_monitoring</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Activate and deactivate Evaluators for monitoring the Agent.
+
+An activated Evaluator will automatically be run on all new Logs
+within the Agent for monitoring purposes.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.agents.update_monitoring(
+    id="id",
 )
 
 ```

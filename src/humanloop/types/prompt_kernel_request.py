@@ -15,6 +15,12 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class PromptKernelRequest(UncheckedBaseModel):
+    """
+    Base class used by both PromptKernelRequest and AgentKernelRequest.
+
+    Contains the consistent Prompt-related fields.
+    """
+
     model: str = pydantic.Field()
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)

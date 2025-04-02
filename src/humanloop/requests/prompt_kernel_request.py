@@ -14,6 +14,12 @@ from .tool_function import ToolFunctionParams
 
 
 class PromptKernelRequestParams(typing_extensions.TypedDict):
+    """
+    Base class used by both PromptKernelRequest and AgentKernelRequest.
+
+    Contains the consistent Prompt-related fields.
+    """
+
     model: str
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)

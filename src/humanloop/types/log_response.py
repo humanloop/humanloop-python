@@ -9,4 +9,7 @@ if typing.TYPE_CHECKING:
     from .tool_log_response import ToolLogResponse
     from .evaluator_log_response import EvaluatorLogResponse
     from .flow_log_response import FlowLogResponse
-LogResponse = typing.Union["PromptLogResponse", "ToolLogResponse", "EvaluatorLogResponse", "FlowLogResponse"]
+    from .agent_log_response import AgentLogResponse
+LogResponse = typing.Union[
+    "PromptLogResponse", "ToolLogResponse", "EvaluatorLogResponse", "FlowLogResponse", "AgentLogResponse"
+]

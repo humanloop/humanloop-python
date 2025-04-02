@@ -55,6 +55,11 @@ class FlowResponseParams(typing_extensions.TypedDict):
     Description of the Flow.
     """
 
+    schema: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    The JSON schema for the File.
+    """
+
     readme: typing_extensions.NotRequired[str]
     """
     Long description of the file.
