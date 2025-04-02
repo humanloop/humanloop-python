@@ -21,6 +21,8 @@ from humanloop.otel.constants import (
 )
 from humanloop.otel.exporter.proto import serialize_span
 from humanloop.otel.helpers import (
+    is_humanloop_span,
+    is_llm_provider_call,
     read_from_opentelemetry_span,
     write_to_opentelemetry_span,
 )
@@ -71,9 +73,14 @@ class HumanloopSpanExporter(SpanExporter):
             return SpanExportResult.FAILURE
 
         for span in spans:
+            # only process spans that are relevant to Humanloop
+            if not is_humanloop_span(span) or not is_llm_provider_call(span):
+                continue
+
             file_type = span.attributes.get(HUMANLOOP_FILE_TYPE_KEY)  # type: ignore [union-attr]
             if file_type is None:
-                raise HumanloopRuntimeError("Internal error: Span does not have type set")
+                logger.error("Internal error: Humanloop span does not have file type set")
+                continue
 
             try:
                 log_args = read_from_opentelemetry_span(
