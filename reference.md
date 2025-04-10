@@ -56,7 +56,7 @@ client.prompts.log(
     messages=[{"role": "user", "content": "What really happened at Roswell?"}],
     inputs={"person": "Trump"},
     created_at=datetime.datetime.fromisoformat(
-        "2024-07-19 00:29:35.178000+00:00",
+        "2024-07-18 23:29:35.178000+00:00",
     ),
     provider_latency=6.5931549072265625,
     output_message={
@@ -193,7 +193,7 @@ client.prompts.log(
 Controls how the model uses tools. The following options are supported: 
 - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
 - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
-- `'required'` means the model can decide to call one or more of the provided tools. 
+- `'required'` means the model must call one or more of the provided tools. 
 - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
     
 </dd>
@@ -512,7 +512,7 @@ client.prompts.update_log(
 Controls how the model uses tools. The following options are supported: 
 - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
 - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
-- `'required'` means the model can decide to call one or more of the provided tools. 
+- `'required'` means the model must call one or more of the provided tools. 
 - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
     
 </dd>
@@ -743,7 +743,7 @@ for chunk in response:
 Controls how the model uses tools. The following options are supported: 
 - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
 - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
-- `'required'` means the model can decide to call one or more of the provided tools. 
+- `'required'` means the model must call one or more of the provided tools. 
 - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
     
 </dd>
@@ -1017,7 +1017,7 @@ client.prompts.call(
 Controls how the model uses tools. The following options are supported: 
 - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt. 
 - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt. 
-- `'required'` means the model can decide to call one or more of the provided tools. 
+- `'required'` means the model must call one or more of the provided tools. 
 - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
     
 </dd>
@@ -6760,10 +6760,10 @@ client.flows.log(
     output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
     log_status="incomplete",
     start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:35+00:00",
+        "2024-07-08 21:40:35+00:00",
     ),
     end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 22:40:39+00:00",
+        "2024-07-08 21:40:39+00:00",
     ),
 )
 
