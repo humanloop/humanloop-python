@@ -22,6 +22,8 @@ from humanloop.evaluations.client import EvaluationsClient
 from humanloop.otel import instrument_provider
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
+from humanloop.requests.flow_kernel_request import FlowKernelRequestParams
+from humanloop.requests.tool_kernel_request import ToolKernelRequestParams
 
 
 class ExtendedEvalsClient(EvaluationsClient):
