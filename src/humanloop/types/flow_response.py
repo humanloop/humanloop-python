@@ -7,7 +7,6 @@ import typing
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
-from .version_status import VersionStatus
 from .evaluator_aggregate import EvaluatorAggregate
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 from ..core.pydantic_utilities import update_forward_refs
@@ -38,9 +37,14 @@ class FlowResponse(UncheckedBaseModel):
     A key-value object identifying the Flow Version.
     """
 
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    version_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Message describing the changes made. If provided, a committed version of the Flow is created. Otherwise, an uncommitted version is created.
+    Unique name for the Flow version. Version names must be unique for a given Flow.
+    """
+
+    version_description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the Version.
     """
 
     name: str = pydantic.Field()
@@ -81,21 +85,6 @@ class FlowResponse(UncheckedBaseModel):
     The user who created the Flow.
     """
 
-    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
-    """
-    The user who committed the Flow Version.
-    """
-
-    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    The date and time the Flow Version was committed.
-    """
-
-    status: VersionStatus = pydantic.Field()
-    """
-    The status of the Flow Version.
-    """
-
     last_used_at: dt.datetime
     version_logs_count: int = pydantic.Field()
     """
@@ -129,10 +118,4 @@ from .tool_response import ToolResponse  # noqa: E402
 from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
 from .version_id_response import VersionIdResponse  # noqa: E402
 
-update_forward_refs(EvaluatorResponse, FlowResponse=FlowResponse)
-update_forward_refs(MonitoringEvaluatorResponse, FlowResponse=FlowResponse)
-update_forward_refs(PromptResponse, FlowResponse=FlowResponse)
-update_forward_refs(ToolResponse, FlowResponse=FlowResponse)
-update_forward_refs(VersionDeploymentResponse, FlowResponse=FlowResponse)
-update_forward_refs(VersionIdResponse, FlowResponse=FlowResponse)
 update_forward_refs(FlowResponse)

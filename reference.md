@@ -681,7 +681,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 response = client.prompts.call_stream()
-for chunk in response:
+for chunk in response.data:
     yield chunk
 
 ```
@@ -1313,9 +1313,9 @@ Create a Prompt or update it with a new version if it already exists.
 
 Prompts are identified by the `ID` or their `path`. The parameters (i.e. the prompt template, temperature, model etc.) determine the versions of the Prompt.
 
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
+You can provide `version_name` and `version_description` to identify and describe your versions.
+Version names must be unique within a Prompt - attempting to create a version with a name
+that already exists will result in a 409 Conflict error.
 </dd>
 </dl>
 </dd>
@@ -1348,7 +1348,6 @@ client.prompts.upsert(
     provider="openai",
     max_tokens=-1,
     temperature=0.7,
-    commit_message="Initial commit",
 )
 
 ```
@@ -1532,7 +1531,15 @@ Input variables should be specified with double curly bracket syntax: `{{input_n
 <dl>
 <dd>
 
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+**version_name:** `typing.Optional[str]` — Unique name for the Prompt version. Version names must be unique for a given Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description of the version, e.g., the changes made in this version.
     
 </dd>
 </dl>
@@ -1822,7 +1829,7 @@ client.prompts.move(
 </dl>
 </details>
 
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">populate_template</a>(...)</code></summary>
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">populate</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -1857,7 +1864,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.prompts.populate_template(
+client.prompts.populate(
     id="id",
     request={"key": "value"},
 )
@@ -1954,7 +1961,6 @@ client = Humanloop(
 )
 client.prompts.list_versions(
     id="pr_30gco7dx6JDq4200GVOHa",
-    status="committed",
 )
 
 ```
@@ -1972,14 +1978,6 @@ client.prompts.list_versions(
 <dd>
 
 **id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
     
 </dd>
 </dl>
@@ -1988,96 +1986,6 @@ client.prompts.list_versions(
 <dd>
 
 **evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit a version of the Prompt with a commit message.
-
-If the version is already committed, an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.commit(
-    id="pr_30gco7dx6JDq4200GVOHa",
-    version_id="prv_F34aba5f3asp0",
-    commit_message="Reiterated point about not discussing sentience",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
     
 </dd>
 </dl>
@@ -2157,6 +2065,101 @@ client.prompts.delete_prompt_version(
 <dd>
 
 **version_id:** `str` — Unique identifier for the specific version of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.prompts.<a href="src/humanloop/prompts/client.py">patch_prompt_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the name or description of the Prompt version.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.prompts.patch_prompt_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the version.
     
 </dd>
 </dl>
@@ -3108,9 +3111,9 @@ Create a Tool or update it with a new version if it already exists.
 
 Tools are identified by the `ID` or their `path`. The name, description and parameters determine the versions of the Tool.
 
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
+You can provide `version_name` and `version_description` to identify and describe your versions.
+Version names must be unique within a Tool - attempting to create a version with a name
+that already exists will result in a 409 Conflict error.
 </dd>
 </dl>
 </dd>
@@ -3141,7 +3144,6 @@ client.tools.upsert(
             "required": ["a", "b"],
         },
     },
-    commit_message="Initial commit",
 )
 
 ```
@@ -3214,7 +3216,15 @@ client.tools.upsert(
 <dl>
 <dd>
 
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+**version_name:** `typing.Optional[str]` — Unique identifier for this Tool version. Each Tool can only have one version with a given name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description of the Version.
     
 </dd>
 </dl>
@@ -3514,7 +3524,6 @@ client = Humanloop(
 )
 client.tools.list_versions(
     id="tl_789ghi",
-    status="committed",
 )
 
 ```
@@ -3539,105 +3548,7 @@ client.tools.list_versions(
 <dl>
 <dd>
 
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit a version of the Tool with a commit message.
-
-If the version is already committed, an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.commit(
-    id="tl_789ghi",
-    version_id="tv_012jkl",
-    commit_message="Initial commit",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Tool.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
     
 </dd>
 </dl>
@@ -3717,6 +3628,101 @@ client.tools.delete_tool_version(
 <dd>
 
 **version_id:** `str` — Unique identifier for the specific version of the Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.tools.<a href="src/humanloop/tools/client.py">update_tool_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the name or description of the Tool version.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.tools.update_tool_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Tool.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the version.
     
 </dd>
 </dl>
@@ -4211,9 +4217,9 @@ by specifying `action` as `add` or `remove` respectively. In this case, you may 
 the `version_id` or `environment` query parameters to identify the existing version to base
 the new version on. If neither is provided, the latest created version will be used.
 
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
+You can provide `version_name` and `version_description` to identify and describe your versions.
+Version names must be unique within a Dataset - attempting to create a version with a name
+that already exists will result in a 409 Conflict error.
 
 Humanloop also deduplicates Datapoints. If you try to add a Datapoint that already
 exists, it will be ignored. If you intentionally want to add a duplicate Datapoint,
@@ -4263,7 +4269,6 @@ client.datasets.upsert(
             },
         },
     ],
-    commit_message="Add two new questions and answers",
 )
 
 ```
@@ -4352,7 +4357,15 @@ If `"add"` or `"remove"`, one of the `version_id` or `environment` query paramet
 <dl>
 <dd>
 
-**commit_message:** `typing.Optional[str]` — Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
+**version_name:** `typing.Optional[str]` — Unique name for the Dataset version. Version names must be unique for a given Dataset.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description of the version, e.g., the changes made in this version.
     
 </dd>
 </dl>
@@ -4774,7 +4787,6 @@ client = Humanloop(
 )
 client.datasets.list_versions(
     id="ds_b0baF1ca7652",
-    status="committed",
 )
 
 ```
@@ -4799,105 +4811,7 @@ client.datasets.list_versions(
 <dl>
 <dd>
 
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**include_datapoints:** `typing.Optional[typing.Literal["latest_committed"]]` — If set to 'latest_committed', include the Datapoints for the latest committed version. Defaults to `None`.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit a version of the Dataset with a commit message.
-
-If the version is already committed, an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.commit(
-    id="ds_b0baF1ca7652",
-    version_id="dsv_6L78pqrdFi2xa",
-    commit_message="initial commit",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Dataset.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Dataset.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
+**include_datapoints:** `typing.Optional[ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints]` — If set to 'latest_saved', include datapoints for the latest saved version. Alternatively, 'latest_committed' (deprecated) includes datapoints for the latest committed version only.
     
 </dd>
 </dl>
@@ -4996,6 +4910,101 @@ client.datasets.delete_dataset_version(
 </dl>
 </details>
 
+<details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">update_dataset_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the name or description of the Dataset version.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.datasets.update_dataset_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Dataset.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Dataset.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.datasets.<a href="src/humanloop/datasets/client.py">upload_csv</a>(...)</code></summary>
 <dl>
 <dd>
@@ -5010,12 +5019,15 @@ client.datasets.delete_dataset_version(
 
 Add Datapoints from a CSV file to a Dataset.
 
-This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+This will create a new version of the Dataset with the Datapoints from the CSV file.
 
 If either `version_id` or `environment` is provided, the new version will be based on the specified version,
 with the Datapoints from the CSV file added to the existing Datapoints in the version.
 If neither `version_id` nor `environment` is provided, the new version will be based on the version
 of the Dataset that is deployed to the default Environment.
+
+You can optionally provide a name and description for the new version using `version_name`
+and `version_description` parameters.
 </dd>
 </dl>
 </dd>
@@ -5037,7 +5049,6 @@ client = Humanloop(
 )
 client.datasets.upload_csv(
     id="id",
-    commit_message="commit_message",
 )
 
 ```
@@ -5072,14 +5083,6 @@ core.File` — See core.File for more documentation
 <dl>
 <dd>
 
-**commit_message:** `str` — Commit message for the new Dataset version.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **version_id:** `typing.Optional[str]` — ID of the specific Dataset version to base the created Version on.
     
 </dd>
@@ -5089,6 +5092,22 @@ core.File` — See core.File for more documentation
 <dd>
 
 **environment:** `typing.Optional[str]` — Name of the Environment identifying a deployed Version to base the created Version on.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_name:** `typing.Optional[str]` — Name for the new Dataset version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description for the new Dataset version.
     
 </dd>
 </dl>
@@ -5769,9 +5788,9 @@ Create an Evaluator or update it with a new version if it already exists.
 
 Evaluators are identified by the `ID` or their `path`. The spec provided determines the version of the Evaluator.
 
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
+You can provide `version_name` and `version_description` to identify and describe your versions.
+Version names must be unique within an Evaluator - attempting to create a version with a name
+that already exists will result in a 409 Conflict error.
 </dd>
 </dl>
 </dd>
@@ -5799,7 +5818,6 @@ client.evaluators.upsert(
         "evaluator_type": "python",
         "code": "def evaluate(answer, target):\n    return 0.5",
     },
-    commit_message="Initial commit",
 )
 
 ```
@@ -5840,7 +5858,15 @@ client.evaluators.upsert(
 <dl>
 <dd>
 
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+**version_name:** `typing.Optional[str]` — Unique name for the Evaluator version. Version names must be unique for a given Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description of the version, e.g., the changes made in this version.
     
 </dd>
 </dl>
@@ -6164,105 +6190,7 @@ client.evaluators.list_versions(
 <dl>
 <dd>
 
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
 **evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit a version of the Evaluator with a commit message.
-
-If the version is already committed, an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.commit(
-    id="ev_890bcd",
-    version_id="evv_012def",
-    commit_message="Initial commit",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Prompt.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Evaluator.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
     
 </dd>
 </dl>
@@ -6342,6 +6270,101 @@ client.evaluators.delete_evaluator_version(
 <dd>
 
 **version_id:** `str` — Unique identifier for the specific version of the Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.evaluators.<a href="src/humanloop/evaluators/client.py">update_evaluator_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the name or description of the Evaluator version.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.evaluators.update_evaluator_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Evaluator.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the version.
     
 </dd>
 </dl>
@@ -7522,9 +7545,9 @@ Create or update a Flow.
 
 Flows can also be identified by the `ID` or their `path`.
 
-If you provide a commit message, then the new version will be committed;
-otherwise it will be uncommitted. If you try to commit an already committed version,
-an exception will be raised.
+You can provide `version_name` and `version_description` to identify and describe your versions.
+Version names must be unique within a Flow - attempting to create a version with a name
+that already exists will result in a 409 Conflict error.
 </dd>
 </dl>
 </dd>
@@ -7557,7 +7580,6 @@ client.flows.upsert(
             "description": "Retrieval tool for MedQA.",
             "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
         },
-        "commit_message": "Initial commit",
     },
 )
 
@@ -7599,7 +7621,15 @@ client.flows.upsert(
 <dl>
 <dd>
 
-**commit_message:** `typing.Optional[str]` — Message describing the changes made.
+**version_name:** `typing.Optional[str]` — Unique name for the Flow version. Version names must be unique for a given Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_description:** `typing.Optional[str]` — Description of the version, e.g., the changes made in this version.
     
 </dd>
 </dl>
@@ -7653,7 +7683,6 @@ client = Humanloop(
 )
 client.flows.list_versions(
     id="fl_6o701g4jmcanPVHxdqD0O",
-    status="committed",
 )
 
 ```
@@ -7671,14 +7700,6 @@ client.flows.list_versions(
 <dd>
 
 **id:** `str` — Unique identifier for Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**status:** `typing.Optional[VersionStatus]` — Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
     
 </dd>
 </dl>
@@ -7687,96 +7708,6 @@ client.flows.list_versions(
 <dd>
 
 **evaluator_aggregates:** `typing.Optional[bool]` — Whether to include Evaluator aggregate results for the versions in the response
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">commit</a>(...)</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Commit a version of the Flow with a commit message.
-
-If the version is already committed, an exception will be raised.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```python
-from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.commit(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-    version_id="flv_6o701g4jmcanPVHxdqD0O",
-    commit_message="RAG lookup tool bug fixing",
-)
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `str` — Unique identifier for Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `str` — Unique identifier for the specific version of the Flow.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**commit_message:** `str` — Message describing the changes made.
     
 </dd>
 </dl>
@@ -7856,6 +7787,101 @@ client.flows.delete_flow_version(
 <dd>
 
 **version_id:** `str` — Unique identifier for the specific version of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request_options:** `typing.Optional[RequestOptions]` — Request-specific configuration.
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.flows.<a href="src/humanloop/flows/client.py">update_flow_version</a>(...)</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Update the name or description of the Flow version.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```python
+from humanloop import Humanloop
+
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+)
+client.flows.update_flow_version(
+    id="id",
+    version_id="version_id",
+)
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `str` — Unique identifier for Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `str` — Unique identifier for the specific version of the Flow.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**name:** `typing.Optional[str]` — Name of the version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**description:** `typing.Optional[str]` — Description of the version.
     
 </dd>
 </dl>

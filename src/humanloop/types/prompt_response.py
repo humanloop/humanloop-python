@@ -16,7 +16,6 @@ from .linked_tool_response import LinkedToolResponse
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
-from .version_status import VersionStatus
 from .input_response import InputResponse
 from .evaluator_aggregate import EvaluatorAggregate
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -141,9 +140,14 @@ class PromptResponse(UncheckedBaseModel):
     Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
     """
 
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    version_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Message describing the changes made.
+    Unique name for the Prompt version. Version names must be unique for a given Prompt.
+    """
+
+    version_description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the version, e.g., the changes made in this version.
     """
 
     description: typing.Optional[str] = pydantic.Field(default=None)
@@ -182,21 +186,6 @@ class PromptResponse(UncheckedBaseModel):
     created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
     """
     The user who created the Prompt.
-    """
-
-    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
-    """
-    The user who committed the Prompt Version.
-    """
-
-    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    The date and time the Prompt Version was committed.
-    """
-
-    status: VersionStatus = pydantic.Field()
-    """
-    The status of the Prompt Version.
     """
 
     last_used_at: dt.datetime
@@ -242,10 +231,4 @@ from .tool_response import ToolResponse  # noqa: E402
 from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
 from .version_id_response import VersionIdResponse  # noqa: E402
 
-update_forward_refs(EvaluatorResponse, PromptResponse=PromptResponse)
-update_forward_refs(FlowResponse, PromptResponse=PromptResponse)
-update_forward_refs(MonitoringEvaluatorResponse, PromptResponse=PromptResponse)
-update_forward_refs(ToolResponse, PromptResponse=PromptResponse)
-update_forward_refs(VersionDeploymentResponse, PromptResponse=PromptResponse)
-update_forward_refs(VersionIdResponse, PromptResponse=PromptResponse)
 update_forward_refs(PromptResponse)

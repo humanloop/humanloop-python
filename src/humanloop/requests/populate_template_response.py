@@ -15,7 +15,6 @@ from .linked_tool_response import LinkedToolResponseParams
 from .environment_response import EnvironmentResponseParams
 import datetime as dt
 from ..types.user_response import UserResponse
-from ..types.version_status import VersionStatus
 from .input_response import InputResponseParams
 from .monitoring_evaluator_response import MonitoringEvaluatorResponseParams
 from .evaluator_aggregate import EvaluatorAggregateParams
@@ -140,9 +139,14 @@ class PopulateTemplateResponseParams(typing_extensions.TypedDict):
     Additional fields to describe the Prompt. Helpful to separate Prompt versions from each other with details on how they were created or used.
     """
 
-    commit_message: typing_extensions.NotRequired[str]
+    version_name: typing_extensions.NotRequired[str]
     """
-    Message describing the changes made.
+    Unique name for the Prompt version. Version names must be unique for a given Prompt.
+    """
+
+    version_description: typing_extensions.NotRequired[str]
+    """
+    Description of the version, e.g., the changes made in this version.
     """
 
     description: typing_extensions.NotRequired[str]
@@ -181,21 +185,6 @@ class PopulateTemplateResponseParams(typing_extensions.TypedDict):
     created_by: typing_extensions.NotRequired[UserResponse]
     """
     The user who created the Prompt.
-    """
-
-    committed_by: typing_extensions.NotRequired[UserResponse]
-    """
-    The user who committed the Prompt Version.
-    """
-
-    committed_at: typing_extensions.NotRequired[dt.datetime]
-    """
-    The date and time the Prompt Version was committed.
-    """
-
-    status: VersionStatus
-    """
-    The status of the Prompt Version.
     """
 
     last_used_at: dt.datetime

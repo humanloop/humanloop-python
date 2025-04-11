@@ -7,7 +7,6 @@ import typing
 from .environment_response import EnvironmentResponseParams
 import datetime as dt
 from ..types.user_response import UserResponse
-from ..types.version_status import VersionStatus
 from .evaluator_aggregate import EvaluatorAggregateParams
 import typing
 
@@ -40,9 +39,14 @@ class FlowResponseParams(typing_extensions.TypedDict):
     A key-value object identifying the Flow Version.
     """
 
-    commit_message: typing_extensions.NotRequired[str]
+    version_name: typing_extensions.NotRequired[str]
     """
-    Message describing the changes made. If provided, a committed version of the Flow is created. Otherwise, an uncommitted version is created.
+    Unique name for the Flow version. Version names must be unique for a given Flow.
+    """
+
+    version_description: typing_extensions.NotRequired[str]
+    """
+    Description of the Version.
     """
 
     name: str
@@ -81,21 +85,6 @@ class FlowResponseParams(typing_extensions.TypedDict):
     created_by: typing_extensions.NotRequired[UserResponse]
     """
     The user who created the Flow.
-    """
-
-    committed_by: typing_extensions.NotRequired[UserResponse]
-    """
-    The user who committed the Flow Version.
-    """
-
-    committed_at: typing_extensions.NotRequired[dt.datetime]
-    """
-    The date and time the Flow Version was committed.
-    """
-
-    status: VersionStatus
-    """
-    The status of the Flow Version.
     """
 
     last_used_at: dt.datetime

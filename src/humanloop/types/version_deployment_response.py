@@ -44,10 +44,4 @@ from .tool_response import ToolResponse  # noqa: E402
 from .version_id_response import VersionIdResponse  # noqa: E402
 from .version_deployment_response_file import VersionDeploymentResponseFile  # noqa: E402
 
-update_forward_refs(EvaluatorResponse, VersionDeploymentResponse=VersionDeploymentResponse)
-update_forward_refs(FlowResponse, VersionDeploymentResponse=VersionDeploymentResponse)
-update_forward_refs(MonitoringEvaluatorResponse, VersionDeploymentResponse=VersionDeploymentResponse)
-update_forward_refs(PromptResponse, VersionDeploymentResponse=VersionDeploymentResponse)
-update_forward_refs(ToolResponse, VersionDeploymentResponse=VersionDeploymentResponse)
-update_forward_refs(VersionIdResponse, VersionDeploymentResponse=VersionDeploymentResponse)
 update_forward_refs(VersionDeploymentResponse)

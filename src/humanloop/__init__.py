@@ -10,7 +10,6 @@ from .types import (
     ChatRole,
     ChatToolType,
     CodeEvaluatorRequest,
-    CommitRequest,
     ConfigToolResponse,
     CreateDatapointRequest,
     CreateDatapointRequestTargetValue,
@@ -147,6 +146,7 @@ from .types import (
     ToolResponse,
     UpdateDatesetAction,
     UpdateEvaluationStatusRequest,
+    UpdateVersionRequest,
     UserResponse,
     Valence,
     ValidationError,
@@ -164,6 +164,7 @@ from .types import (
 from .errors import UnprocessableEntityError
 from . import datasets, directories, evaluations, evaluators, files, flows, logs, prompts, tools
 from .client import AsyncHumanloop, Humanloop
+from .datasets import ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints
 from .environment import HumanloopEnvironment
 from .evaluations import (
     AddEvaluatorsRequestEvaluatorsItem,
@@ -205,7 +206,6 @@ from .requests import (
     ChatMessageContentParams,
     ChatMessageParams,
     CodeEvaluatorRequestParams,
-    CommitRequestParams,
     CreateDatapointRequestParams,
     CreateDatapointRequestTargetValueParams,
     CreateEvaluatorLogResponseParams,
@@ -312,6 +312,7 @@ from .requests import (
     ToolKernelRequestParams,
     ToolLogResponseParams,
     ToolResponseParams,
+    UpdateVersionRequestParams,
     ValidationErrorLocItemParams,
     ValidationErrorParams,
     VersionDeploymentResponseFileParams,
@@ -344,8 +345,6 @@ __all__ = [
     "ChatToolType",
     "CodeEvaluatorRequest",
     "CodeEvaluatorRequestParams",
-    "CommitRequest",
-    "CommitRequestParams",
     "ConfigToolResponse",
     "CreateDatapointRequest",
     "CreateDatapointRequestParams",
@@ -490,6 +489,7 @@ __all__ = [
     "ListPromptsParams",
     "ListTools",
     "ListToolsParams",
+    "ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints",
     "LlmEvaluatorRequest",
     "LlmEvaluatorRequestParams",
     "LogResponse",
@@ -617,6 +617,8 @@ __all__ = [
     "UnprocessableEntityError",
     "UpdateDatesetAction",
     "UpdateEvaluationStatusRequest",
+    "UpdateVersionRequest",
+    "UpdateVersionRequestParams",
     "UserResponse",
     "Valence",
     "ValidationError",

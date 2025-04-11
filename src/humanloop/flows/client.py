@@ -2,26 +2,24 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from .raw_client import RawFlowsClient
 from ..requests.chat_message import ChatMessageParams
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..requests.flow_kernel_request import FlowKernelRequestParams
 from ..core.request_options import RequestOptions
 from ..types.create_flow_log_response import CreateFlowLogResponse
-from ..core.serialization import convert_and_respect_annotation_metadata
-from ..core.unchecked_base_model import construct_type
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
-from json.decoder import JSONDecodeError
-from ..core.api_error import ApiError
 from ..types.flow_log_response import FlowLogResponse
-from ..core.jsonable_encoder import jsonable_encoder
 from ..types.flow_response import FlowResponse
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.paginated_data_flow_response import PaginatedDataFlowResponse
-from ..types.version_status import VersionStatus
+from ..core.unchecked_base_model import construct_type
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.http_validation_error import HttpValidationError
+from json.decoder import JSONDecodeError
+from ..core.api_error import ApiError
 from ..types.list_flows import ListFlows
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
@@ -31,6 +29,7 @@ from ..requests.evaluator_activation_deactivation_request_deactivate_item import
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
 from ..core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawFlowsClient
 from ..core.pagination import AsyncPager
 
 # this is used as the default value for optional parameters
@@ -39,7 +38,18 @@ OMIT = typing.cast(typing.Any, ...)
 
 class FlowsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawFlowsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> RawFlowsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawFlowsClient
+        """
+        return self._raw_client
 
     def log(
         self,
@@ -211,75 +221,37 @@ class FlowsClient:
             ),
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "flows/log",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            json={
-                "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
-                ),
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "run_id": run_id,
-                "path": path,
-                "id": id,
-                "start_time": start_time,
-                "end_time": end_time,
-                "output": output,
-                "created_at": created_at,
-                "error": error,
-                "provider_latency": provider_latency,
-                "stdout": stdout,
-                "provider_request": provider_request,
-                "provider_response": provider_response,
-                "inputs": inputs,
-                "source": source,
-                "metadata": metadata,
-                "log_status": log_status,
-                "source_datapoint_id": source_datapoint_id,
-                "trace_parent_id": trace_parent_id,
-                "user": user,
-                "environment": flow_log_request_environment,
-                "save": save,
-                "log_id": log_id,
-                "flow": convert_and_respect_annotation_metadata(
-                    object_=flow, annotation=FlowKernelRequestParams, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.log(
+            version_id=version_id,
+            environment=environment,
+            messages=messages,
+            output_message=output_message,
+            run_id=run_id,
+            path=path,
+            id=id,
+            start_time=start_time,
+            end_time=end_time,
+            output=output,
+            created_at=created_at,
+            error=error,
+            provider_latency=provider_latency,
+            stdout=stdout,
+            provider_request=provider_request,
+            provider_response=provider_response,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            log_status=log_status,
+            source_datapoint_id=source_datapoint_id,
+            trace_parent_id=trace_parent_id,
+            user=user,
+            flow_log_request_environment=flow_log_request_environment,
+            save=save,
+            log_id=log_id,
+            flow=flow,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CreateFlowLogResponse,
-                    construct_type(
-                        type_=CreateFlowLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def update_log(
         self,
@@ -348,50 +320,17 @@ class FlowsClient:
             log_status="complete",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/logs/{jsonable_encoder(log_id)}",
-            method="PATCH",
-            json={
-                "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
-                ),
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "inputs": inputs,
-                "output": output,
-                "error": error,
-                "log_status": log_status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.update_log(
+            log_id,
+            messages=messages,
+            output_message=output_message,
+            inputs=inputs,
+            output=output,
+            error=error,
+            log_status=log_status,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowLogResponse,
-                    construct_type(
-                        type_=FlowLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def get(
         self,
@@ -437,38 +376,10 @@ class FlowsClient:
             id="fl_6o701g4jmcanPVHxdqD0O",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            request_options=request_options,
+        response = self._raw_client.get(
+            id, version_id=version_id, environment=environment, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -497,28 +408,8 @@ class FlowsClient:
             id="fl_6o701g4jmcanPVHxdqD0O",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.delete(id, request_options=request_options)
+        return response.data
 
     def move(
         self,
@@ -566,43 +457,10 @@ class FlowsClient:
             path="new directory/new name",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-                "directory_id": directory_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = self._raw_client.move(
+            id, path=path, name=name, directory_id=directory_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list(
         self,
@@ -663,7 +521,7 @@ class FlowsClient:
             yield page
         """
         page = page if page is not None else 1
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._raw_client._client_wrapper.httpx_client.request(
             "flows",
             method="GET",
             params={
@@ -718,7 +576,8 @@ class FlowsClient:
         attributes: typing.Dict[str, typing.Optional[typing.Any]],
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FlowResponse:
         """
@@ -726,9 +585,9 @@ class FlowsClient:
 
         Flows can also be identified by the `ID` or their `path`.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+        You can provide `version_name` and `version_description` to identify and describe your versions.
+        Version names must be unique within a Flow - attempting to create a version with a name
+        that already exists will result in a 409 Conflict error.
 
         Parameters
         ----------
@@ -741,8 +600,11 @@ class FlowsClient:
         id : typing.Optional[str]
             ID for an existing Flow.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
+        version_name : typing.Optional[str]
+            Unique name for the Flow version. Version names must be unique for a given Flow.
+
+        version_description : typing.Optional[str]
+            Description of the version, e.g., the changes made in this version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -772,54 +634,23 @@ class FlowsClient:
                     "description": "Retrieval tool for MedQA.",
                     "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
                 },
-                "commit_message": "Initial commit",
             },
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "flows",
-            method="POST",
-            json={
-                "path": path,
-                "id": id,
-                "attributes": attributes,
-                "commit_message": commit_message,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.upsert(
+            attributes=attributes,
+            path=path,
+            id=id,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list_versions(
         self,
         id: str,
         *,
-        status: typing.Optional[VersionStatus] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListFlows:
@@ -830,9 +661,6 @@ class FlowsClient:
         ----------
         id : str
             Unique identifier for Flow.
-
-        status : typing.Optional[VersionStatus]
-            Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         evaluator_aggregates : typing.Optional[bool]
             Whether to include Evaluator aggregate results for the versions in the response
@@ -854,114 +682,12 @@ class FlowsClient:
         )
         client.flows.list_versions(
             id="fl_6o701g4jmcanPVHxdqD0O",
-            status="committed",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/versions",
-            method="GET",
-            params={
-                "status": status,
-                "evaluator_aggregates": evaluator_aggregates,
-            },
-            request_options=request_options,
+        response = self._raw_client.list_versions(
+            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ListFlows,
-                    construct_type(
-                        type_=ListFlows,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def commit(
-        self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> FlowResponse:
-        """
-        Commit a version of the Flow with a commit message.
-
-        If the version is already committed, an exception will be raised.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        version_id : str
-            Unique identifier for the specific version of the Flow.
-
-        commit_message : str
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.flows.commit(
-            id="fl_6o701g4jmcanPVHxdqD0O",
-            version_id="flv_6o701g4jmcanPVHxdqD0O",
-            commit_message="RAG lookup tool bug fixing",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
-            method="POST",
-            json={
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete_flow_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -996,28 +722,59 @@ class FlowsClient:
             version_id="version_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
-            method="DELETE",
-            request_options=request_options,
+        response = self._raw_client.delete_flow_version(id, version_id, request_options=request_options)
+        return response.data
+
+    def update_flow_version(
+        self,
+        id: str,
+        version_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Update the name or description of the Flow version.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        version_id : str
+            Unique identifier for the specific version of the Flow.
+
+        name : typing.Optional[str]
+            Name of the version.
+
+        description : typing.Optional[str]
+            Description of the version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        client.flows.update_flow_version(
+            id="id",
+            version_id="version_id",
+        )
+        """
+        response = self._raw_client.update_flow_version(
+            id, version_id, name=name, description=description, request_options=request_options
+        )
+        return response.data
 
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -1060,37 +817,10 @@ class FlowsClient:
             version_id="flv_6o701g4jmcanPVHxdqD0O",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={
-                "version_id": version_id,
-            },
-            request_options=request_options,
+        response = self._raw_client.set_deployment(
+            id, environment_id, version_id=version_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1128,28 +858,8 @@ class FlowsClient:
             environment_id="staging",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
+        return response.data
 
     def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1181,34 +891,8 @@ class FlowsClient:
             id="fl_6o701g4jmcanPVHxdqD0O",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/environments",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[FileEnvironmentResponse],
-                    construct_type(
-                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.list_environments(id, request_options=request_options)
+        return response.data
 
     def update_monitoring(
         self,
@@ -1254,52 +938,26 @@ class FlowsClient:
             activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                    direction="write",
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                    direction="write",
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = self._raw_client.update_monitoring(
+            id, activate=activate, deactivate=deactivate, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncFlowsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawFlowsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawFlowsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawFlowsClient
+        """
+        return self._raw_client
 
     async def log(
         self,
@@ -1478,75 +1136,37 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "flows/log",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            json={
-                "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
-                ),
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "run_id": run_id,
-                "path": path,
-                "id": id,
-                "start_time": start_time,
-                "end_time": end_time,
-                "output": output,
-                "created_at": created_at,
-                "error": error,
-                "provider_latency": provider_latency,
-                "stdout": stdout,
-                "provider_request": provider_request,
-                "provider_response": provider_response,
-                "inputs": inputs,
-                "source": source,
-                "metadata": metadata,
-                "log_status": log_status,
-                "source_datapoint_id": source_datapoint_id,
-                "trace_parent_id": trace_parent_id,
-                "user": user,
-                "environment": flow_log_request_environment,
-                "save": save,
-                "log_id": log_id,
-                "flow": convert_and_respect_annotation_metadata(
-                    object_=flow, annotation=FlowKernelRequestParams, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.log(
+            version_id=version_id,
+            environment=environment,
+            messages=messages,
+            output_message=output_message,
+            run_id=run_id,
+            path=path,
+            id=id,
+            start_time=start_time,
+            end_time=end_time,
+            output=output,
+            created_at=created_at,
+            error=error,
+            provider_latency=provider_latency,
+            stdout=stdout,
+            provider_request=provider_request,
+            provider_response=provider_response,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            log_status=log_status,
+            source_datapoint_id=source_datapoint_id,
+            trace_parent_id=trace_parent_id,
+            user=user,
+            flow_log_request_environment=flow_log_request_environment,
+            save=save,
+            log_id=log_id,
+            flow=flow,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CreateFlowLogResponse,
-                    construct_type(
-                        type_=CreateFlowLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def update_log(
         self,
@@ -1623,50 +1243,17 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/logs/{jsonable_encoder(log_id)}",
-            method="PATCH",
-            json={
-                "messages": convert_and_respect_annotation_metadata(
-                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
-                ),
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "inputs": inputs,
-                "output": output,
-                "error": error,
-                "log_status": log_status,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.update_log(
+            log_id,
+            messages=messages,
+            output_message=output_message,
+            inputs=inputs,
+            output=output,
+            error=error,
+            log_status=log_status,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowLogResponse,
-                    construct_type(
-                        type_=FlowLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def get(
         self,
@@ -1720,38 +1307,10 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            request_options=request_options,
+        response = await self._raw_client.get(
+            id, version_id=version_id, environment=environment, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -1788,28 +1347,8 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.delete(id, request_options=request_options)
+        return response.data
 
     async def move(
         self,
@@ -1865,43 +1404,10 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-                "directory_id": directory_id,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = await self._raw_client.move(
+            id, path=path, name=name, directory_id=directory_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list(
         self,
@@ -1970,7 +1476,7 @@ class AsyncFlowsClient:
         asyncio.run(main())
         """
         page = page if page is not None else 1
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._raw_client._client_wrapper.httpx_client.request(
             "flows",
             method="GET",
             params={
@@ -2025,7 +1531,8 @@ class AsyncFlowsClient:
         attributes: typing.Dict[str, typing.Optional[typing.Any]],
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> FlowResponse:
         """
@@ -2033,9 +1540,9 @@ class AsyncFlowsClient:
 
         Flows can also be identified by the `ID` or their `path`.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+        You can provide `version_name` and `version_description` to identify and describe your versions.
+        Version names must be unique within a Flow - attempting to create a version with a name
+        that already exists will result in a 409 Conflict error.
 
         Parameters
         ----------
@@ -2048,8 +1555,11 @@ class AsyncFlowsClient:
         id : typing.Optional[str]
             ID for an existing Flow.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
+        version_name : typing.Optional[str]
+            Unique name for the Flow version. Version names must be unique for a given Flow.
+
+        version_description : typing.Optional[str]
+            Description of the version, e.g., the changes made in this version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2084,57 +1594,26 @@ class AsyncFlowsClient:
                         "description": "Retrieval tool for MedQA.",
                         "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
                     },
-                    "commit_message": "Initial commit",
                 },
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "flows",
-            method="POST",
-            json={
-                "path": path,
-                "id": id,
-                "attributes": attributes,
-                "commit_message": commit_message,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.upsert(
+            attributes=attributes,
+            path=path,
+            id=id,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list_versions(
         self,
         id: str,
         *,
-        status: typing.Optional[VersionStatus] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListFlows:
@@ -2145,9 +1624,6 @@ class AsyncFlowsClient:
         ----------
         id : str
             Unique identifier for Flow.
-
-        status : typing.Optional[VersionStatus]
-            Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         evaluator_aggregates : typing.Optional[bool]
             Whether to include Evaluator aggregate results for the versions in the response
@@ -2174,125 +1650,15 @@ class AsyncFlowsClient:
         async def main() -> None:
             await client.flows.list_versions(
                 id="fl_6o701g4jmcanPVHxdqD0O",
-                status="committed",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/versions",
-            method="GET",
-            params={
-                "status": status,
-                "evaluator_aggregates": evaluator_aggregates,
-            },
-            request_options=request_options,
+        response = await self._raw_client.list_versions(
+            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ListFlows,
-                    construct_type(
-                        type_=ListFlows,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def commit(
-        self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> FlowResponse:
-        """
-        Commit a version of the Flow with a commit message.
-
-        If the version is already committed, an exception will be raised.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Flow.
-
-        version_id : str
-            Unique identifier for the specific version of the Flow.
-
-        commit_message : str
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        FlowResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.flows.commit(
-                id="fl_6o701g4jmcanPVHxdqD0O",
-                version_id="flv_6o701g4jmcanPVHxdqD0O",
-                commit_message="RAG lookup tool bug fixing",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
-            method="POST",
-            json={
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete_flow_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2335,28 +1701,67 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
-            method="DELETE",
-            request_options=request_options,
+        response = await self._raw_client.delete_flow_version(id, version_id, request_options=request_options)
+        return response.data
+
+    async def update_flow_version(
+        self,
+        id: str,
+        version_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> FlowResponse:
+        """
+        Update the name or description of the Flow version.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Flow.
+
+        version_id : str
+            Unique identifier for the specific version of the Flow.
+
+        name : typing.Optional[str]
+            Name of the version.
+
+        description : typing.Optional[str]
+            Description of the version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        FlowResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+
+        async def main() -> None:
+            await client.flows.update_flow_version(
+                id="id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.update_flow_version(
+            id, version_id, name=name, description=description, request_options=request_options
+        )
+        return response.data
 
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -2407,37 +1812,10 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={
-                "version_id": version_id,
-            },
-            request_options=request_options,
+        response = await self._raw_client.set_deployment(
+            id, environment_id, version_id=version_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2483,28 +1861,8 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
+        return response.data
 
     async def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2544,34 +1902,8 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/environments",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[FileEnvironmentResponse],
-                    construct_type(
-                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.list_environments(id, request_options=request_options)
+        return response.data
 
     async def update_monitoring(
         self,
@@ -2625,44 +1957,7 @@ class AsyncFlowsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"flows/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                    direction="write",
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                    direction="write",
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = await self._raw_client.update_monitoring(
+            id, activate=activate, deactivate=deactivate, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    FlowResponse,
-                    construct_type(
-                        type_=FlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

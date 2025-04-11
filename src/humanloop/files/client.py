@@ -2,6 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from .raw_client import RawFilesClient
 from ..types.file_type import FileType
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
@@ -9,13 +10,9 @@ from ..core.request_options import RequestOptions
 from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response import (
     PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
 )
-from ..core.unchecked_base_model import construct_type
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
-from json.decoder import JSONDecodeError
-from ..core.api_error import ApiError
 from .types.retrieve_by_path_files_retrieve_by_path_post_response import RetrieveByPathFilesRetrieveByPathPostResponse
 from ..core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawFilesClient
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -23,7 +20,18 @@ OMIT = typing.cast(typing.Any, ...)
 
 class FilesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawFilesClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> RawFilesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawFilesClient
+        """
+        return self._raw_client
 
     def list_files(
         self,
@@ -84,44 +92,18 @@ class FilesClient:
         )
         client.files.list_files()
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "files",
-            method="GET",
-            params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "template": template,
-                "type": type,
-                "environment": environment,
-                "sort_by": sort_by,
-                "order": order,
-            },
+        response = self._raw_client.list_files(
+            page=page,
+            size=size,
+            name=name,
+            template=template,
+            type=type,
+            environment=environment,
+            sort_by=sort_by,
+            order=order,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
-                    construct_type(
-                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def retrieve_by_path(
         self,
@@ -160,49 +142,26 @@ class FilesClient:
             path="path",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "files/retrieve-by-path",
-            method="POST",
-            params={
-                "environment": environment,
-            },
-            json={
-                "path": path,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = self._raw_client.retrieve_by_path(
+            path=path, environment=environment, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    RetrieveByPathFilesRetrieveByPathPostResponse,
-                    construct_type(
-                        type_=RetrieveByPathFilesRetrieveByPathPostResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncFilesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawFilesClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawFilesClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawFilesClient
+        """
+        return self._raw_client
 
     async def list_files(
         self,
@@ -271,44 +230,18 @@ class AsyncFilesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "files",
-            method="GET",
-            params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "template": template,
-                "type": type,
-                "environment": environment,
-                "sort_by": sort_by,
-                "order": order,
-            },
+        response = await self._raw_client.list_files(
+            page=page,
+            size=size,
+            name=name,
+            template=template,
+            type=type,
+            environment=environment,
+            sort_by=sort_by,
+            order=order,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
-                    construct_type(
-                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def retrieve_by_path(
         self,
@@ -355,41 +288,7 @@ class AsyncFilesClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "files/retrieve-by-path",
-            method="POST",
-            params={
-                "environment": environment,
-            },
-            json={
-                "path": path,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = await self._raw_client.retrieve_by_path(
+            path=path, environment=environment, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    RetrieveByPathFilesRetrieveByPathPostResponse,
-                    construct_type(
-                        type_=RetrieveByPathFilesRetrieveByPathPostResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

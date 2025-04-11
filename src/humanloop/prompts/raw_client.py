@@ -2,31 +2,30 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .raw_client import RawPromptsClient
 from ..requests.chat_message import ChatMessageParams
 from .requests.prompt_log_request_tool_choice import PromptLogRequestToolChoiceParams
 from ..requests.prompt_kernel_request import PromptKernelRequestParams
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..core.request_options import RequestOptions
+from ..core.http_response import HttpResponse
 from ..types.create_prompt_log_response import CreatePromptLogResponse
-from .requests.prompt_log_update_request_tool_choice import PromptLogUpdateRequestToolChoiceParams
-from ..types.log_response import LogResponse
-from .requests.prompts_call_stream_request_tool_choice import PromptsCallStreamRequestToolChoiceParams
-from ..requests.provider_api_keys import ProviderApiKeysParams
-from ..types.prompt_call_stream_response import PromptCallStreamResponse
-from .requests.prompts_call_request_tool_choice import PromptsCallRequestToolChoiceParams
-from ..types.prompt_call_response import PromptCallResponse
-from ..types.project_sort_by import ProjectSortBy
-from ..types.sort_order import SortOrder
-from ..core.pagination import SyncPager
-from ..types.prompt_response import PromptResponse
-from ..types.paginated_data_prompt_response import PaginatedDataPromptResponse
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from .requests.prompt_log_update_request_tool_choice import PromptLogUpdateRequestToolChoiceParams
+from ..types.log_response import LogResponse
+from ..core.jsonable_encoder import jsonable_encoder
+from .requests.prompts_call_stream_request_tool_choice import PromptsCallStreamRequestToolChoiceParams
+from ..requests.provider_api_keys import ProviderApiKeysParams
+from ..types.prompt_call_stream_response import PromptCallStreamResponse
+import httpx_sse
+import contextlib
+from .requests.prompts_call_request_tool_choice import PromptsCallRequestToolChoiceParams
+from ..types.prompt_call_response import PromptCallResponse
 from ..types.model_endpoints import ModelEndpoints
 from .requests.prompt_request_template import PromptRequestTemplateParams
 from ..types.template_language import TemplateLanguage
@@ -35,6 +34,7 @@ from .requests.prompt_request_stop import PromptRequestStopParams
 from ..requests.response_format import ResponseFormatParams
 from ..types.reasoning_effort import ReasoningEffort
 from ..requests.tool_function import ToolFunctionParams
+from ..types.prompt_response import PromptResponse
 from ..types.populate_template_response import PopulateTemplateResponse
 from ..types.list_prompts import ListPrompts
 from ..types.file_environment_response import FileEnvironmentResponse
@@ -45,27 +45,15 @@ from ..requests.evaluator_activation_deactivation_request_deactivate_item import
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
 from ..core.client_wrapper import AsyncClientWrapper
-from .raw_client import AsyncRawPromptsClient
-from ..core.pagination import AsyncPager
+from ..core.http_response import AsyncHttpResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class PromptsClient:
+class RawPromptsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._raw_client = RawPromptsClient(client_wrapper=client_wrapper)
-
-    @property
-    def with_raw_response(self) -> RawPromptsClient:
-        """
-        Retrieves a raw implementation of this client that returns raw responses.
-
-        Returns
-        -------
-        RawPromptsClient
-        """
-        return self._raw_client
+        self._client_wrapper = client_wrapper
 
     def log(
         self,
@@ -105,7 +93,7 @@ class PromptsClient:
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreatePromptLogResponse:
+    ) -> HttpResponse[CreatePromptLogResponse]:
         """
         Log to a Prompt.
 
@@ -230,84 +218,88 @@ class PromptsClient:
 
         Returns
         -------
-        CreatePromptLogResponse
+        HttpResponse[CreatePromptLogResponse]
             Successful Response
-
-        Examples
-        --------
-        import datetime
-
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.log(
-            path="persona",
-            prompt={
-                "model": "gpt-4",
-                "template": [
-                    {
-                        "role": "system",
-                        "content": "You are {{person}}. Answer questions as this person. Do not break character.",
-                    }
-                ],
-            },
-            messages=[{"role": "user", "content": "What really happened at Roswell?"}],
-            inputs={"person": "Trump"},
-            created_at=datetime.datetime.fromisoformat(
-                "2024-07-18 23:29:35.178000+00:00",
-            ),
-            provider_latency=6.5931549072265625,
-            output_message={
-                "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
-                "role": "assistant",
-            },
-            prompt_tokens=100,
-            output_tokens=220,
-            prompt_cost=1e-05,
-            output_cost=0.0002,
-            finish_reason="stop",
-        )
         """
-        response = self._raw_client.log(
-            version_id=version_id,
-            environment=environment,
-            run_id=run_id,
-            path=path,
-            id=id,
-            output_message=output_message,
-            prompt_tokens=prompt_tokens,
-            reasoning_tokens=reasoning_tokens,
-            output_tokens=output_tokens,
-            prompt_cost=prompt_cost,
-            output_cost=output_cost,
-            finish_reason=finish_reason,
-            messages=messages,
-            tool_choice=tool_choice,
-            prompt=prompt,
-            start_time=start_time,
-            end_time=end_time,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            prompt_log_request_environment=prompt_log_request_environment,
-            save=save,
-            log_id=log_id,
+        _response = self._client_wrapper.httpx_client.request(
+            "prompts/log",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "run_id": run_id,
+                "path": path,
+                "id": id,
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
+                "prompt_tokens": prompt_tokens,
+                "reasoning_tokens": reasoning_tokens,
+                "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
+                "finish_reason": finish_reason,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams, direction="write"
+                ),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
+                "start_time": start_time,
+                "end_time": end_time,
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": prompt_log_request_environment,
+                "save": save,
+                "log_id": log_id,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    CreatePromptLogResponse,
+                    construct_type(
+                        type_=CreatePromptLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_log(
         self,
@@ -337,7 +329,7 @@ class PromptsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> LogResponse:
+    ) -> HttpResponse[LogResponse]:
         """
         Update a Log.
 
@@ -426,50 +418,74 @@ class PromptsClient:
 
         Returns
         -------
-        LogResponse
+        HttpResponse[LogResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.update_log(
-            id="id",
-            log_id="log_id",
-        )
         """
-        response = self._raw_client.update_log(
-            id,
-            log_id,
-            output_message=output_message,
-            prompt_tokens=prompt_tokens,
-            reasoning_tokens=reasoning_tokens,
-            output_tokens=output_tokens,
-            prompt_cost=prompt_cost,
-            output_cost=output_cost,
-            finish_reason=finish_reason,
-            messages=messages,
-            tool_choice=tool_choice,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
+                "prompt_tokens": prompt_tokens,
+                "reasoning_tokens": reasoning_tokens,
+                "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
+                "finish_reason": finish_reason,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams, direction="write"
+                ),
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    LogResponse,
+                    construct_type(
+                        type_=LogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    @contextlib.contextmanager
     def call_stream(
         self,
         *,
@@ -498,7 +514,7 @@ class PromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Iterator[PromptCallStreamResponse]:
+    ) -> typing.Iterator[HttpResponse[typing.Iterator[PromptCallStreamResponse]]]:
         """
         Call a Prompt.
 
@@ -596,48 +612,89 @@ class PromptsClient:
 
         Yields
         ------
-        typing.Iterator[PromptCallStreamResponse]
+        typing.Iterator[HttpResponse[typing.Iterator[PromptCallStreamResponse]]]
 
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        response = client.prompts.call_stream()
-        for chunk in response:
-            yield chunk
         """
-        with self._raw_client.call_stream(
-            version_id=version_id,
-            environment=environment,
-            path=path,
-            id=id,
-            messages=messages,
-            tool_choice=tool_choice,
-            prompt=prompt,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            prompts_call_stream_request_environment=prompts_call_stream_request_environment,
-            save=save,
-            log_id=log_id,
-            provider_api_keys=provider_api_keys,
-            num_samples=num_samples,
-            return_inputs=return_inputs,
-            logprobs=logprobs,
-            suffix=suffix,
+        with self._client_wrapper.httpx_client.stream(
+            "prompts/call",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams, direction="write"
+                ),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": prompts_call_stream_request_environment,
+                "save": save,
+                "log_id": log_id,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
+                ),
+                "num_samples": num_samples,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
+                "stream": True,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
-        ) as r:
-            yield from r.data
+            omit=OMIT,
+        ) as _response:
+
+            def stream() -> HttpResponse[typing.Iterator[PromptCallStreamResponse]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            for _sse in _event_source.iter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data()
+                                except Exception:
+                                    pass
+                            return
+
+                        return HttpResponse(response=_response, data=_iter())
+                    _response.read()
+                    if _response.status_code == 422:
+                        raise UnprocessableEntityError(
+                            typing.cast(
+                                HttpValidationError,
+                                construct_type(
+                                    type_=HttpValidationError,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield stream()
 
     def call(
         self,
@@ -667,7 +724,7 @@ class PromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptCallResponse:
+    ) -> HttpResponse[PromptCallResponse]:
         """
         Call a Prompt.
 
@@ -765,169 +822,65 @@ class PromptsClient:
 
         Returns
         -------
-        PromptCallResponse
+        HttpResponse[PromptCallResponse]
 
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.call(
-            path="persona",
-            prompt={
-                "model": "gpt-4",
-                "template": [
-                    {
-                        "role": "system",
-                        "content": "You are stockbot. Return latest prices.",
-                    }
-                ],
-                "tools": [
-                    {
-                        "name": "get_stock_price",
-                        "description": "Get current stock price",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "ticker_symbol": {
-                                    "type": "string",
-                                    "name": "Ticker Symbol",
-                                    "description": "Ticker symbol of the stock",
-                                }
-                            },
-                            "required": [],
-                        },
-                    }
-                ],
-            },
-            messages=[{"role": "user", "content": "latest apple"}],
-        )
         """
-        response = self._raw_client.call(
-            version_id=version_id,
-            environment=environment,
-            path=path,
-            id=id,
-            messages=messages,
-            tool_choice=tool_choice,
-            prompt=prompt,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            prompts_call_request_environment=prompts_call_request_environment,
-            save=save,
-            log_id=log_id,
-            provider_api_keys=provider_api_keys,
-            num_samples=num_samples,
-            return_inputs=return_inputs,
-            logprobs=logprobs,
-            suffix=suffix,
-            request_options=request_options,
-        )
-        return response.data
-
-    def list(
-        self,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        name: typing.Optional[str] = None,
-        user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
-        order: typing.Optional[SortOrder] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> SyncPager[PromptResponse]:
-        """
-        Get a list of all Prompts.
-
-        Parameters
-        ----------
-        page : typing.Optional[int]
-            Page number for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Prompts to fetch.
-
-        name : typing.Optional[str]
-            Case-insensitive filter for Prompt name.
-
-        user_filter : typing.Optional[str]
-            Case-insensitive filter for users in the Prompt. This filter matches against both email address and name of users.
-
-        sort_by : typing.Optional[ProjectSortBy]
-            Field to sort Prompts by
-
-        order : typing.Optional[SortOrder]
-            Direction to sort by.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        SyncPager[PromptResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        response = client.prompts.list(
-            size=1,
-        )
-        for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        for page in response.iter_pages():
-            yield page
-        """
-        page = page if page is not None else 1
-        _response = self._raw_client._client_wrapper.httpx_client.request(
-            "prompts",
-            method="GET",
+        _response = self._client_wrapper.httpx_client.request(
+            "prompts/call",
+            method="POST",
             params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "user_filter": user_filter,
-                "sort_by": sort_by,
-                "order": order,
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams, direction="write"
+                ),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": prompts_call_request_environment,
+                "save": save,
+                "log_id": log_id,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
+                ),
+                "num_samples": num_samples,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
+                "stream": False,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
+            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(
-                    PaginatedDataPromptResponse,
+                _data = typing.cast(
+                    PromptCallResponse,
                     construct_type(
-                        type_=PaginatedDataPromptResponse,  # type: ignore
+                        type_=PromptCallResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                _has_next = True
-                _get_next = lambda: self.list(
-                    page=page + 1,
-                    size=size,
-                    name=name,
-                    user_filter=user_filter,
-                    sort_by=sort_by,
-                    order=order,
-                    request_options=request_options,
-                )
-                _items = _parsed_response.records
-                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+                return HttpResponse(response=_response, data=_data)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -972,7 +925,7 @@ class PromptsClient:
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         readme: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> HttpResponse[PromptResponse]:
         """
         Create a Prompt or update it with a new version if it already exists.
 
@@ -1069,60 +1022,77 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        HttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.upsert(
-            path="Personal Projects/Coding Assistant",
-            model="gpt-4o",
-            endpoint="chat",
-            template=[
-                {
-                    "content": "You are a helpful coding assistant specialising in {{language}}",
-                    "role": "system",
-                }
-            ],
-            provider="openai",
-            max_tokens=-1,
-            temperature=0.7,
-        )
         """
-        response = self._raw_client.upsert(
-            model=model,
-            path=path,
-            id=id,
-            endpoint=endpoint,
-            template=template,
-            template_language=template_language,
-            provider=provider,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            stop=stop,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-            other=other,
-            seed=seed,
-            response_format=response_format,
-            reasoning_effort=reasoning_effort,
-            tools=tools,
-            linked_tools=linked_tools,
-            attributes=attributes,
-            version_name=version_name,
-            version_description=version_description,
-            description=description,
-            tags=tags,
-            readme=readme,
+        _response = self._client_wrapper.httpx_client.request(
+            "prompts",
+            method="POST",
+            json={
+                "path": path,
+                "id": id,
+                "model": model,
+                "endpoint": endpoint,
+                "template": convert_and_respect_annotation_metadata(
+                    object_=template, annotation=PromptRequestTemplateParams, direction="write"
+                ),
+                "template_language": template_language,
+                "provider": provider,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "top_p": top_p,
+                "stop": convert_and_respect_annotation_metadata(
+                    object_=stop, annotation=PromptRequestStopParams, direction="write"
+                ),
+                "presence_penalty": presence_penalty,
+                "frequency_penalty": frequency_penalty,
+                "other": other,
+                "seed": seed,
+                "response_format": convert_and_respect_annotation_metadata(
+                    object_=response_format, annotation=ResponseFormatParams, direction="write"
+                ),
+                "reasoning_effort": reasoning_effort,
+                "tools": convert_and_respect_annotation_metadata(
+                    object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
+                ),
+                "linked_tools": linked_tools,
+                "attributes": attributes,
+                "version_name": version_name,
+                "version_description": version_description,
+                "description": description,
+                "tags": tags,
+                "readme": readme,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(
         self,
@@ -1131,7 +1101,7 @@ class PromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> HttpResponse[PromptResponse]:
         """
         Retrieve the Prompt with the given ID.
 
@@ -1154,26 +1124,44 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        HttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.get(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
         """
-        response = self._raw_client.get(
-            id, version_id=version_id, environment=environment, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[None]:
         """
         Delete the Prompt with the given ID.
 
@@ -1187,21 +1175,30 @@ class PromptsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.delete(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
+        HttpResponse[None]
         """
-        response = self._raw_client.delete(id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def move(
         self,
@@ -1210,7 +1207,7 @@ class PromptsClient:
         path: typing.Optional[str] = OMIT,
         name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> HttpResponse[PromptResponse]:
         """
         Move the Prompt to a different path or change the name.
 
@@ -1230,23 +1227,46 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        HttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.move(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            path="new directory/new name",
-        )
         """
-        response = self._raw_client.move(id, path=path, name=name, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}",
+            method="PATCH",
+            json={
+                "path": path,
+                "name": name,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def populate(
         self,
@@ -1256,7 +1276,7 @@ class PromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PopulateTemplateResponse:
+    ) -> HttpResponse[PopulateTemplateResponse]:
         """
         Retrieve the Prompt with the given ID, including the populated template.
 
@@ -1281,25 +1301,44 @@ class PromptsClient:
 
         Returns
         -------
-        PopulateTemplateResponse
+        HttpResponse[PopulateTemplateResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.populate(
-            id="id",
-            request={"key": "value"},
-        )
         """
-        response = self._raw_client.populate(
-            id, request=request, version_id=version_id, environment=environment, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/populate",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json=request,
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PopulateTemplateResponse,
+                    construct_type(
+                        type_=PopulateTemplateResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def list_versions(
         self,
@@ -1307,7 +1346,7 @@ class PromptsClient:
         *,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListPrompts:
+    ) -> HttpResponse[ListPrompts]:
         """
         Get a list of all the versions of a Prompt.
 
@@ -1324,28 +1363,45 @@ class PromptsClient:
 
         Returns
         -------
-        ListPrompts
+        HttpResponse[ListPrompts]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.list_versions(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
         """
-        response = self._raw_client.list_versions(
-            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions",
+            method="GET",
+            params={
+                "evaluator_aggregates": evaluator_aggregates,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ListPrompts,
+                    construct_type(
+                        type_=ListPrompts,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete_prompt_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> HttpResponse[None]:
         """
         Delete a version of the Prompt.
 
@@ -1362,22 +1418,30 @@ class PromptsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.delete_prompt_version(
-            id="id",
-            version_id="version_id",
-        )
+        HttpResponse[None]
         """
-        response = self._raw_client.delete_prompt_version(id, version_id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def patch_prompt_version(
         self,
@@ -1387,7 +1451,7 @@ class PromptsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> HttpResponse[PromptResponse]:
         """
         Update the name or description of the Prompt version.
 
@@ -1410,29 +1474,47 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        HttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.patch_prompt_version(
-            id="id",
-            version_id="version_id",
-        )
         """
-        response = self._raw_client.patch_prompt_version(
-            id, version_id, name=name, description=description, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="PATCH",
+            json={
+                "name": name,
+                "description": description,
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> PromptResponse:
+    ) -> HttpResponse[PromptResponse]:
         """
         Deploy Prompt to an Environment.
 
@@ -1455,30 +1537,45 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        HttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.set_deployment(
-            id="id",
-            environment_id="environment_id",
-            version_id="version_id",
-        )
         """
-        response = self._raw_client.set_deployment(
-            id, environment_id, version_id=version_id, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={
+                "version_id": version_id,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> HttpResponse[None]:
         """
         Remove deployed Prompt from the Environment.
 
@@ -1498,26 +1595,34 @@ class PromptsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.remove_deployment(
-            id="id",
-            environment_id="environment_id",
-        )
+        HttpResponse[None]
         """
-        response = self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
+    ) -> HttpResponse[typing.List[FileEnvironmentResponse]]:
         """
         List all Environments and their deployed versions for the Prompt.
 
@@ -1531,22 +1636,38 @@ class PromptsClient:
 
         Returns
         -------
-        typing.List[FileEnvironmentResponse]
+        HttpResponse[typing.List[FileEnvironmentResponse]]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.list_environments(
-            id="pr_30gco7dx6JDq4200GVOHa",
-        )
         """
-        response = self._raw_client.list_environments(id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/environments",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentResponse],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_monitoring(
         self,
@@ -1555,7 +1676,7 @@ class PromptsClient:
         activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
         deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> HttpResponse[PromptResponse]:
         """
         Activate and deactivate Evaluators for monitoring the Prompt.
 
@@ -1577,41 +1698,56 @@ class PromptsClient:
 
         Returns
         -------
-        PromptResponse
+        HttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.prompts.update_monitoring(
-            id="pr_30gco7dx6JDq4200GVOHa",
-            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-        )
         """
-        response = self._raw_client.update_monitoring(
-            id, activate=activate, deactivate=deactivate, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncPromptsClient:
+class AsyncRawPromptsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._raw_client = AsyncRawPromptsClient(client_wrapper=client_wrapper)
-
-    @property
-    def with_raw_response(self) -> AsyncRawPromptsClient:
-        """
-        Retrieves a raw implementation of this client that returns raw responses.
-
-        Returns
-        -------
-        AsyncRawPromptsClient
-        """
-        return self._raw_client
+        self._client_wrapper = client_wrapper
 
     async def log(
         self,
@@ -1651,7 +1787,7 @@ class AsyncPromptsClient:
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreatePromptLogResponse:
+    ) -> AsyncHttpResponse[CreatePromptLogResponse]:
         """
         Log to a Prompt.
 
@@ -1776,93 +1912,88 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        CreatePromptLogResponse
+        AsyncHttpResponse[CreatePromptLogResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-        import datetime
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.log(
-                path="persona",
-                prompt={
-                    "model": "gpt-4",
-                    "template": [
-                        {
-                            "role": "system",
-                            "content": "You are {{person}}. Answer questions as this person. Do not break character.",
-                        }
-                    ],
-                },
-                messages=[
-                    {"role": "user", "content": "What really happened at Roswell?"}
-                ],
-                inputs={"person": "Trump"},
-                created_at=datetime.datetime.fromisoformat(
-                    "2024-07-18 23:29:35.178000+00:00",
-                ),
-                provider_latency=6.5931549072265625,
-                output_message={
-                    "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
-                    "role": "assistant",
-                },
-                prompt_tokens=100,
-                output_tokens=220,
-                prompt_cost=1e-05,
-                output_cost=0.0002,
-                finish_reason="stop",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.log(
-            version_id=version_id,
-            environment=environment,
-            run_id=run_id,
-            path=path,
-            id=id,
-            output_message=output_message,
-            prompt_tokens=prompt_tokens,
-            reasoning_tokens=reasoning_tokens,
-            output_tokens=output_tokens,
-            prompt_cost=prompt_cost,
-            output_cost=output_cost,
-            finish_reason=finish_reason,
-            messages=messages,
-            tool_choice=tool_choice,
-            prompt=prompt,
-            start_time=start_time,
-            end_time=end_time,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            prompt_log_request_environment=prompt_log_request_environment,
-            save=save,
-            log_id=log_id,
+        _response = await self._client_wrapper.httpx_client.request(
+            "prompts/log",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "run_id": run_id,
+                "path": path,
+                "id": id,
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
+                "prompt_tokens": prompt_tokens,
+                "reasoning_tokens": reasoning_tokens,
+                "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
+                "finish_reason": finish_reason,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogRequestToolChoiceParams, direction="write"
+                ),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
+                "start_time": start_time,
+                "end_time": end_time,
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": prompt_log_request_environment,
+                "save": save,
+                "log_id": log_id,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    CreatePromptLogResponse,
+                    construct_type(
+                        type_=CreatePromptLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_log(
         self,
@@ -1892,7 +2023,7 @@ class AsyncPromptsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> LogResponse:
+    ) -> AsyncHttpResponse[LogResponse]:
         """
         Update a Log.
 
@@ -1981,58 +2112,74 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        LogResponse
+        AsyncHttpResponse[LogResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.update_log(
-                id="id",
-                log_id="log_id",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.update_log(
-            id,
-            log_id,
-            output_message=output_message,
-            prompt_tokens=prompt_tokens,
-            reasoning_tokens=reasoning_tokens,
-            output_tokens=output_tokens,
-            prompt_cost=prompt_cost,
-            output_cost=output_cost,
-            finish_reason=finish_reason,
-            messages=messages,
-            tool_choice=tool_choice,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output_message": convert_and_respect_annotation_metadata(
+                    object_=output_message, annotation=ChatMessageParams, direction="write"
+                ),
+                "prompt_tokens": prompt_tokens,
+                "reasoning_tokens": reasoning_tokens,
+                "output_tokens": output_tokens,
+                "prompt_cost": prompt_cost,
+                "output_cost": output_cost,
+                "finish_reason": finish_reason,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptLogUpdateRequestToolChoiceParams, direction="write"
+                ),
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    LogResponse,
+                    construct_type(
+                        type_=LogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    @contextlib.asynccontextmanager
     async def call_stream(
         self,
         *,
@@ -2061,7 +2208,7 @@ class AsyncPromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.AsyncIterator[PromptCallStreamResponse]:
+    ) -> typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[PromptCallStreamResponse]]]:
         """
         Call a Prompt.
 
@@ -2159,57 +2306,89 @@ class AsyncPromptsClient:
 
         Yields
         ------
-        typing.AsyncIterator[PromptCallStreamResponse]
+        typing.AsyncIterator[AsyncHttpResponse[typing.AsyncIterator[PromptCallStreamResponse]]]
 
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            response = await client.prompts.call_stream()
-            async for chunk in response:
-                yield chunk
-
-
-        asyncio.run(main())
         """
-        async with self._raw_client.call_stream(
-            version_id=version_id,
-            environment=environment,
-            path=path,
-            id=id,
-            messages=messages,
-            tool_choice=tool_choice,
-            prompt=prompt,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            prompts_call_stream_request_environment=prompts_call_stream_request_environment,
-            save=save,
-            log_id=log_id,
-            provider_api_keys=provider_api_keys,
-            num_samples=num_samples,
-            return_inputs=return_inputs,
-            logprobs=logprobs,
-            suffix=suffix,
+        async with self._client_wrapper.httpx_client.stream(
+            "prompts/call",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams, direction="write"
+                ),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": prompts_call_stream_request_environment,
+                "save": save,
+                "log_id": log_id,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
+                ),
+                "num_samples": num_samples,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
+                "stream": True,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
-        ) as r:
-            async for data in r.data:
-                yield data
+            omit=OMIT,
+        ) as _response:
+
+            async def stream() -> AsyncHttpResponse[typing.AsyncIterator[PromptCallStreamResponse]]:
+                try:
+                    if 200 <= _response.status_code < 300:
+
+                        async def _iter():
+                            _event_source = httpx_sse.EventSource(_response)
+                            async for _sse in _event_source.aiter_sse():
+                                if _sse.data == None:
+                                    return
+                                try:
+                                    yield _sse.data()
+                                except Exception:
+                                    pass
+                            return
+
+                        return AsyncHttpResponse(response=_response, data=_iter())
+                    await _response.aread()
+                    if _response.status_code == 422:
+                        raise UnprocessableEntityError(
+                            typing.cast(
+                                HttpValidationError,
+                                construct_type(
+                                    type_=HttpValidationError,  # type: ignore
+                                    object_=_response.json(),
+                                ),
+                            )
+                        )
+                    _response_json = _response.json()
+                except JSONDecodeError:
+                    raise ApiError(status_code=_response.status_code, body=_response.text)
+                raise ApiError(status_code=_response.status_code, body=_response_json)
+
+            yield await stream()
 
     async def call(
         self,
@@ -2239,7 +2418,7 @@ class AsyncPromptsClient:
         logprobs: typing.Optional[int] = OMIT,
         suffix: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptCallResponse:
+    ) -> AsyncHttpResponse[PromptCallResponse]:
         """
         Call a Prompt.
 
@@ -2337,185 +2516,65 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptCallResponse
+        AsyncHttpResponse[PromptCallResponse]
 
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.call(
-                path="persona",
-                prompt={
-                    "model": "gpt-4",
-                    "template": [
-                        {
-                            "role": "system",
-                            "content": "You are stockbot. Return latest prices.",
-                        }
-                    ],
-                    "tools": [
-                        {
-                            "name": "get_stock_price",
-                            "description": "Get current stock price",
-                            "parameters": {
-                                "type": "object",
-                                "properties": {
-                                    "ticker_symbol": {
-                                        "type": "string",
-                                        "name": "Ticker Symbol",
-                                        "description": "Ticker symbol of the stock",
-                                    }
-                                },
-                                "required": [],
-                            },
-                        }
-                    ],
-                },
-                messages=[{"role": "user", "content": "latest apple"}],
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.call(
-            version_id=version_id,
-            environment=environment,
-            path=path,
-            id=id,
-            messages=messages,
-            tool_choice=tool_choice,
-            prompt=prompt,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            prompts_call_request_environment=prompts_call_request_environment,
-            save=save,
-            log_id=log_id,
-            provider_api_keys=provider_api_keys,
-            num_samples=num_samples,
-            return_inputs=return_inputs,
-            logprobs=logprobs,
-            suffix=suffix,
-            request_options=request_options,
-        )
-        return response.data
-
-    async def list(
-        self,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        name: typing.Optional[str] = None,
-        user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
-        order: typing.Optional[SortOrder] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncPager[PromptResponse]:
-        """
-        Get a list of all Prompts.
-
-        Parameters
-        ----------
-        page : typing.Optional[int]
-            Page number for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Prompts to fetch.
-
-        name : typing.Optional[str]
-            Case-insensitive filter for Prompt name.
-
-        user_filter : typing.Optional[str]
-            Case-insensitive filter for users in the Prompt. This filter matches against both email address and name of users.
-
-        sort_by : typing.Optional[ProjectSortBy]
-            Field to sort Prompts by
-
-        order : typing.Optional[SortOrder]
-            Direction to sort by.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        AsyncPager[PromptResponse]
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            response = await client.prompts.list(
-                size=1,
-            )
-            async for item in response:
-                yield item
-            # alternatively, you can paginate page-by-page
-            async for page in response.iter_pages():
-                yield page
-
-
-        asyncio.run(main())
-        """
-        page = page if page is not None else 1
-        _response = await self._raw_client._client_wrapper.httpx_client.request(
-            "prompts",
-            method="GET",
+        _response = await self._client_wrapper.httpx_client.request(
+            "prompts/call",
+            method="POST",
             params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "user_filter": user_filter,
-                "sort_by": sort_by,
-                "order": order,
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "messages": convert_and_respect_annotation_metadata(
+                    object_=messages, annotation=typing.Sequence[ChatMessageParams], direction="write"
+                ),
+                "tool_choice": convert_and_respect_annotation_metadata(
+                    object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams, direction="write"
+                ),
+                "prompt": convert_and_respect_annotation_metadata(
+                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                ),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": prompts_call_request_environment,
+                "save": save,
+                "log_id": log_id,
+                "provider_api_keys": convert_and_respect_annotation_metadata(
+                    object_=provider_api_keys, annotation=ProviderApiKeysParams, direction="write"
+                ),
+                "num_samples": num_samples,
+                "return_inputs": return_inputs,
+                "logprobs": logprobs,
+                "suffix": suffix,
+                "stream": False,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
+            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(
-                    PaginatedDataPromptResponse,
+                _data = typing.cast(
+                    PromptCallResponse,
                     construct_type(
-                        type_=PaginatedDataPromptResponse,  # type: ignore
+                        type_=PromptCallResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                _has_next = True
-                _get_next = lambda: self.list(
-                    page=page + 1,
-                    size=size,
-                    name=name,
-                    user_filter=user_filter,
-                    sort_by=sort_by,
-                    order=order,
-                    request_options=request_options,
-                )
-                _items = _parsed_response.records
-                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+                return AsyncHttpResponse(response=_response, data=_data)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -2560,7 +2619,7 @@ class AsyncPromptsClient:
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         readme: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> AsyncHttpResponse[PromptResponse]:
         """
         Create a Prompt or update it with a new version if it already exists.
 
@@ -2657,68 +2716,77 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        AsyncHttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.upsert(
-                path="Personal Projects/Coding Assistant",
-                model="gpt-4o",
-                endpoint="chat",
-                template=[
-                    {
-                        "content": "You are a helpful coding assistant specialising in {{language}}",
-                        "role": "system",
-                    }
-                ],
-                provider="openai",
-                max_tokens=-1,
-                temperature=0.7,
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.upsert(
-            model=model,
-            path=path,
-            id=id,
-            endpoint=endpoint,
-            template=template,
-            template_language=template_language,
-            provider=provider,
-            max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            stop=stop,
-            presence_penalty=presence_penalty,
-            frequency_penalty=frequency_penalty,
-            other=other,
-            seed=seed,
-            response_format=response_format,
-            reasoning_effort=reasoning_effort,
-            tools=tools,
-            linked_tools=linked_tools,
-            attributes=attributes,
-            version_name=version_name,
-            version_description=version_description,
-            description=description,
-            tags=tags,
-            readme=readme,
+        _response = await self._client_wrapper.httpx_client.request(
+            "prompts",
+            method="POST",
+            json={
+                "path": path,
+                "id": id,
+                "model": model,
+                "endpoint": endpoint,
+                "template": convert_and_respect_annotation_metadata(
+                    object_=template, annotation=PromptRequestTemplateParams, direction="write"
+                ),
+                "template_language": template_language,
+                "provider": provider,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "top_p": top_p,
+                "stop": convert_and_respect_annotation_metadata(
+                    object_=stop, annotation=PromptRequestStopParams, direction="write"
+                ),
+                "presence_penalty": presence_penalty,
+                "frequency_penalty": frequency_penalty,
+                "other": other,
+                "seed": seed,
+                "response_format": convert_and_respect_annotation_metadata(
+                    object_=response_format, annotation=ResponseFormatParams, direction="write"
+                ),
+                "reasoning_effort": reasoning_effort,
+                "tools": convert_and_respect_annotation_metadata(
+                    object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
+                ),
+                "linked_tools": linked_tools,
+                "attributes": attributes,
+                "version_name": version_name,
+                "version_description": version_description,
+                "description": description,
+                "tags": tags,
+                "readme": readme,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(
         self,
@@ -2727,7 +2795,7 @@ class AsyncPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> AsyncHttpResponse[PromptResponse]:
         """
         Retrieve the Prompt with the given ID.
 
@@ -2750,34 +2818,46 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        AsyncHttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.get(
-                id="pr_30gco7dx6JDq4200GVOHa",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.get(
-            id, version_id=version_id, environment=environment, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+    async def delete(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[None]:
         """
         Delete the Prompt with the given ID.
 
@@ -2791,29 +2871,30 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.delete(
-                id="pr_30gco7dx6JDq4200GVOHa",
-            )
-
-
-        asyncio.run(main())
+        AsyncHttpResponse[None]
         """
-        response = await self._raw_client.delete(id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def move(
         self,
@@ -2822,7 +2903,7 @@ class AsyncPromptsClient:
         path: typing.Optional[str] = OMIT,
         name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> AsyncHttpResponse[PromptResponse]:
         """
         Move the Prompt to a different path or change the name.
 
@@ -2842,31 +2923,46 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        AsyncHttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.move(
-                id="pr_30gco7dx6JDq4200GVOHa",
-                path="new directory/new name",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.move(id, path=path, name=name, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}",
+            method="PATCH",
+            json={
+                "path": path,
+                "name": name,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def populate(
         self,
@@ -2876,7 +2972,7 @@ class AsyncPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PopulateTemplateResponse:
+    ) -> AsyncHttpResponse[PopulateTemplateResponse]:
         """
         Retrieve the Prompt with the given ID, including the populated template.
 
@@ -2901,33 +2997,44 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PopulateTemplateResponse
+        AsyncHttpResponse[PopulateTemplateResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.populate(
-                id="id",
-                request={"key": "value"},
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.populate(
-            id, request=request, version_id=version_id, environment=environment, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/populate",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json=request,
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PopulateTemplateResponse,
+                    construct_type(
+                        type_=PopulateTemplateResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def list_versions(
         self,
@@ -2935,7 +3042,7 @@ class AsyncPromptsClient:
         *,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListPrompts:
+    ) -> AsyncHttpResponse[ListPrompts]:
         """
         Get a list of all the versions of a Prompt.
 
@@ -2952,36 +3059,45 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        ListPrompts
+        AsyncHttpResponse[ListPrompts]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.list_versions(
-                id="pr_30gco7dx6JDq4200GVOHa",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.list_versions(
-            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions",
+            method="GET",
+            params={
+                "evaluator_aggregates": evaluator_aggregates,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ListPrompts,
+                    construct_type(
+                        type_=ListPrompts,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete_prompt_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete a version of the Prompt.
 
@@ -2998,30 +3114,30 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.delete_prompt_version(
-                id="id",
-                version_id="version_id",
-            )
-
-
-        asyncio.run(main())
+        AsyncHttpResponse[None]
         """
-        response = await self._raw_client.delete_prompt_version(id, version_id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def patch_prompt_version(
         self,
@@ -3031,7 +3147,7 @@ class AsyncPromptsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> AsyncHttpResponse[PromptResponse]:
         """
         Update the name or description of the Prompt version.
 
@@ -3054,37 +3170,47 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        AsyncHttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.patch_prompt_version(
-                id="id",
-                version_id="version_id",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.patch_prompt_version(
-            id, version_id, name=name, description=description, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="PATCH",
+            json={
+                "name": name,
+                "description": description,
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> PromptResponse:
+    ) -> AsyncHttpResponse[PromptResponse]:
         """
         Deploy Prompt to an Environment.
 
@@ -3107,38 +3233,45 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        AsyncHttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.set_deployment(
-                id="id",
-                environment_id="environment_id",
-                version_id="version_id",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.set_deployment(
-            id, environment_id, version_id=version_id, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={
+                "version_id": version_id,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> AsyncHttpResponse[None]:
         """
         Remove deployed Prompt from the Environment.
 
@@ -3158,34 +3291,34 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.remove_deployment(
-                id="id",
-                environment_id="environment_id",
-            )
-
-
-        asyncio.run(main())
+        AsyncHttpResponse[None]
         """
-        response = await self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
+    ) -> AsyncHttpResponse[typing.List[FileEnvironmentResponse]]:
         """
         List all Environments and their deployed versions for the Prompt.
 
@@ -3199,30 +3332,38 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        typing.List[FileEnvironmentResponse]
+        AsyncHttpResponse[typing.List[FileEnvironmentResponse]]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.list_environments(
-                id="pr_30gco7dx6JDq4200GVOHa",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.list_environments(id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/environments",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentResponse],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_monitoring(
         self,
@@ -3231,7 +3372,7 @@ class AsyncPromptsClient:
         activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
         deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PromptResponse:
+    ) -> AsyncHttpResponse[PromptResponse]:
         """
         Activate and deactivate Evaluators for monitoring the Prompt.
 
@@ -3253,30 +3394,48 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        PromptResponse
+        AsyncHttpResponse[PromptResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.prompts.update_monitoring(
-                id="pr_30gco7dx6JDq4200GVOHa",
-                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.update_monitoring(
-            id, activate=activate, deactivate=deactivate, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptResponse,
+                    construct_type(
+                        type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)

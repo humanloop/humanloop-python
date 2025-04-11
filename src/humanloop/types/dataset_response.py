@@ -6,7 +6,6 @@ import typing
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
-from .version_status import VersionStatus
 from .datapoint_response import DatapointResponse
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -72,25 +71,15 @@ class DatasetResponse(UncheckedBaseModel):
     The user who created the Dataset.
     """
 
-    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
-    """
-    The user who committed the Dataset Version.
-    """
-
-    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    The date and time the Dataset Version was committed.
-    """
-
-    status: VersionStatus = pydantic.Field()
-    """
-    The status of the Dataset Version.
-    """
-
     last_used_at: dt.datetime
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    version_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
+    Unique name for the Dataset version. Version names must be unique for a given Dataset.
+    """
+
+    version_description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the version, e.g., the changes made in this version.
     """
 
     datapoints_count: int = pydantic.Field()
