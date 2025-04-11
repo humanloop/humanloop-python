@@ -8,7 +8,6 @@ from .evaluator_response_spec import EvaluatorResponseSpec
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
-from .version_status import VersionStatus
 from .input_response import InputResponse
 from .evaluator_aggregate import EvaluatorAggregate
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -35,9 +34,14 @@ class EvaluatorResponse(UncheckedBaseModel):
     ID of the directory that the file is in on Humanloop.
     """
 
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    version_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Message describing the changes made.
+    Unique name for the Evaluator version. Version names must be unique for a given Evaluator.
+    """
+
+    version_description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the version, e.g., the changes made in this version.
     """
 
     spec: EvaluatorResponseSpec
@@ -79,17 +83,6 @@ class EvaluatorResponse(UncheckedBaseModel):
     The user who created the Evaluator.
     """
 
-    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
-    """
-    The user who committed the Evaluator Version.
-    """
-
-    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    The date and time the Evaluator Version was committed.
-    """
-
-    status: VersionStatus
     last_used_at: dt.datetime
     version_logs_count: int = pydantic.Field()
     """
@@ -138,10 +131,4 @@ from .tool_response import ToolResponse  # noqa: E402
 from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
 from .version_id_response import VersionIdResponse  # noqa: E402
 
-update_forward_refs(FlowResponse, EvaluatorResponse=EvaluatorResponse)
-update_forward_refs(MonitoringEvaluatorResponse, EvaluatorResponse=EvaluatorResponse)
-update_forward_refs(PromptResponse, EvaluatorResponse=EvaluatorResponse)
-update_forward_refs(ToolResponse, EvaluatorResponse=EvaluatorResponse)
-update_forward_refs(VersionDeploymentResponse, EvaluatorResponse=EvaluatorResponse)
-update_forward_refs(VersionIdResponse, EvaluatorResponse=EvaluatorResponse)
 update_forward_refs(EvaluatorResponse)

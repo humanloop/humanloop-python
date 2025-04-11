@@ -9,7 +9,6 @@ from .files_tool_type import FilesToolType
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
-from .version_status import VersionStatus
 from .input_response import InputResponse
 from .evaluator_aggregate import EvaluatorAggregate
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -64,9 +63,14 @@ class ToolResponse(UncheckedBaseModel):
     Type of Tool.
     """
 
-    commit_message: typing.Optional[str] = pydantic.Field(default=None)
+    version_name: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Message describing the changes made.
+    Unique identifier for this Tool version. Each Tool can only have one version with a given name.
+    """
+
+    version_description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Description of the Version.
     """
 
     name: str = pydantic.Field()
@@ -105,21 +109,6 @@ class ToolResponse(UncheckedBaseModel):
     created_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
     """
     The user who created the Tool.
-    """
-
-    committed_by: typing.Optional[UserResponse] = pydantic.Field(default=None)
-    """
-    The user who committed the Tool Version.
-    """
-
-    committed_at: typing.Optional[dt.datetime] = pydantic.Field(default=None)
-    """
-    The date and time the Tool Version was committed.
-    """
-
-    status: VersionStatus = pydantic.Field()
-    """
-    The status of the Tool Version.
     """
 
     last_used_at: dt.datetime
@@ -170,10 +159,4 @@ from .prompt_response import PromptResponse  # noqa: E402
 from .version_deployment_response import VersionDeploymentResponse  # noqa: E402
 from .version_id_response import VersionIdResponse  # noqa: E402
 
-update_forward_refs(EvaluatorResponse, ToolResponse=ToolResponse)
-update_forward_refs(FlowResponse, ToolResponse=ToolResponse)
-update_forward_refs(MonitoringEvaluatorResponse, ToolResponse=ToolResponse)
-update_forward_refs(PromptResponse, ToolResponse=ToolResponse)
-update_forward_refs(VersionDeploymentResponse, ToolResponse=ToolResponse)
-update_forward_refs(VersionIdResponse, ToolResponse=ToolResponse)
 update_forward_refs(ToolResponse)

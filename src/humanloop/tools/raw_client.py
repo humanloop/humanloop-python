@@ -2,25 +2,23 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from .raw_client import RawToolsClient
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..requests.tool_kernel_request import ToolKernelRequestParams
 from ..core.request_options import RequestOptions
+from ..core.http_response import HttpResponse
 from ..types.create_tool_log_response import CreateToolLogResponse
-from ..types.log_response import LogResponse
-from ..types.project_sort_by import ProjectSortBy
-from ..types.sort_order import SortOrder
-from ..core.pagination import SyncPager
-from ..types.tool_response import ToolResponse
-from ..types.paginated_data_tool_response import PaginatedDataToolResponse
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.log_response import LogResponse
+from ..core.jsonable_encoder import jsonable_encoder
 from ..requests.tool_function import ToolFunctionParams
 from ..types.files_tool_type import FilesToolType
+from ..types.tool_response import ToolResponse
 from ..types.list_tools import ListTools
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
@@ -30,27 +28,15 @@ from ..requests.evaluator_activation_deactivation_request_deactivate_item import
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
 from ..core.client_wrapper import AsyncClientWrapper
-from .raw_client import AsyncRawToolsClient
-from ..core.pagination import AsyncPager
+from ..core.http_response import AsyncHttpResponse
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class ToolsClient:
+class RawToolsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._raw_client = RawToolsClient(client_wrapper=client_wrapper)
-
-    @property
-    def with_raw_response(self) -> RawToolsClient:
-        """
-        Retrieves a raw implementation of this client that returns raw responses.
-
-        Returns
-        -------
-        RawToolsClient
-        """
-        return self._raw_client
+        self._client_wrapper = client_wrapper
 
     def log(
         self,
@@ -80,7 +66,7 @@ class ToolsClient:
         log_id: typing.Optional[str] = OMIT,
         tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateToolLogResponse:
+    ) -> HttpResponse[CreateToolLogResponse]:
         """
         Log to a Tool.
 
@@ -171,64 +157,72 @@ class ToolsClient:
 
         Returns
         -------
-        CreateToolLogResponse
+        HttpResponse[CreateToolLogResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.log(
-            path="math-tool",
-            tool={
-                "function": {
-                    "name": "multiply",
-                    "description": "Multiply two numbers",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "a": {"type": "number"},
-                            "b": {"type": "number"},
-                        },
-                        "required": ["a", "b"],
-                    },
-                }
-            },
-            inputs={"a": 5, "b": 7},
-            output="35",
-        )
         """
-        response = self._raw_client.log(
-            version_id=version_id,
-            environment=environment,
-            path=path,
-            id=id,
-            start_time=start_time,
-            end_time=end_time,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            tool_log_request_environment=tool_log_request_environment,
-            save=save,
-            log_id=log_id,
-            tool=tool,
+        _response = self._client_wrapper.httpx_client.request(
+            "tools/log",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "start_time": start_time,
+                "end_time": end_time,
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": tool_log_request_environment,
+                "save": save,
+                "log_id": log_id,
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    CreateToolLogResponse,
+                    construct_type(
+                        type_=CreateToolLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update(
         self,
@@ -249,7 +243,7 @@ class ToolsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> LogResponse:
+    ) -> HttpResponse[LogResponse]:
         """
         Update a Log.
 
@@ -307,134 +301,43 @@ class ToolsClient:
 
         Returns
         -------
-        LogResponse
+        HttpResponse[LogResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.update(
-            id="id",
-            log_id="log_id",
-        )
         """
-        response = self._raw_client.update(
-            id,
-            log_id,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
-            request_options=request_options,
-        )
-        return response.data
-
-    def list(
-        self,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        name: typing.Optional[str] = None,
-        user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
-        order: typing.Optional[SortOrder] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> SyncPager[ToolResponse]:
-        """
-        Get a list of all Tools.
-
-        Parameters
-        ----------
-        page : typing.Optional[int]
-            Page offset for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Tools to fetch.
-
-        name : typing.Optional[str]
-            Case-insensitive filter for Tool name.
-
-        user_filter : typing.Optional[str]
-            Case-insensitive filter for users in the Tool. This filter matches against both email address and name of users.
-
-        sort_by : typing.Optional[ProjectSortBy]
-            Field to sort Tools by
-
-        order : typing.Optional[SortOrder]
-            Direction to sort by.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        SyncPager[ToolResponse]
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        response = client.tools.list(
-            size=1,
-        )
-        for item in response:
-            yield item
-        # alternatively, you can paginate page-by-page
-        for page in response.iter_pages():
-            yield page
-        """
-        page = page if page is not None else 1
-        _response = self._raw_client._client_wrapper.httpx_client.request(
-            "tools",
-            method="GET",
-            params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "user_filter": user_filter,
-                "sort_by": sort_by,
-                "order": order,
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
+            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(
-                    PaginatedDataToolResponse,
+                _data = typing.cast(
+                    LogResponse,
                     construct_type(
-                        type_=PaginatedDataToolResponse,  # type: ignore
+                        type_=LogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                _has_next = True
-                _get_next = lambda: self.list(
-                    page=page + 1,
-                    size=size,
-                    name=name,
-                    user_filter=user_filter,
-                    sort_by=sort_by,
-                    order=order,
-                    request_options=request_options,
-                )
-                _items = _parsed_response.records
-                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+                return HttpResponse(response=_response, data=_data)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -463,7 +366,7 @@ class ToolsClient:
         version_name: typing.Optional[str] = OMIT,
         version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> HttpResponse[ToolResponse]:
         """
         Create a Tool or update it with a new version if it already exists.
 
@@ -507,42 +410,55 @@ class ToolsClient:
 
         Returns
         -------
-        ToolResponse
+        HttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.upsert(
-            path="math-tool",
-            function={
-                "name": "multiply",
-                "description": "Multiply two numbers",
-                "parameters": {
-                    "type": "object",
-                    "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
-                    "required": ["a", "b"],
-                },
-            },
-        )
         """
-        response = self._raw_client.upsert(
-            path=path,
-            id=id,
-            function=function,
-            source_code=source_code,
-            setup_values=setup_values,
-            attributes=attributes,
-            tool_type=tool_type,
-            version_name=version_name,
-            version_description=version_description,
+        _response = self._client_wrapper.httpx_client.request(
+            "tools",
+            method="POST",
+            json={
+                "path": path,
+                "id": id,
+                "function": convert_and_respect_annotation_metadata(
+                    object_=function, annotation=ToolFunctionParams, direction="write"
+                ),
+                "source_code": source_code,
+                "setup_values": setup_values,
+                "attributes": attributes,
+                "tool_type": tool_type,
+                "version_name": version_name,
+                "version_description": version_description,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def get(
         self,
@@ -551,7 +467,7 @@ class ToolsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> HttpResponse[ToolResponse]:
         """
         Retrieve the Tool with the given ID.
 
@@ -574,26 +490,44 @@ class ToolsClient:
 
         Returns
         -------
-        ToolResponse
+        HttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.get(
-            id="tl_789ghi",
-        )
         """
-        response = self._raw_client.get(
-            id, version_id=version_id, environment=environment, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+    def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> HttpResponse[None]:
         """
         Delete the Tool with the given ID.
 
@@ -607,21 +541,30 @@ class ToolsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.delete(
-            id="tl_789ghi",
-        )
+        HttpResponse[None]
         """
-        response = self._raw_client.delete(id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def move(
         self,
@@ -630,7 +573,7 @@ class ToolsClient:
         path: typing.Optional[str] = OMIT,
         name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> HttpResponse[ToolResponse]:
         """
         Move the Tool to a different path or change the name.
 
@@ -650,23 +593,46 @@ class ToolsClient:
 
         Returns
         -------
-        ToolResponse
+        HttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.move(
-            id="tl_789ghi",
-            path="new directory/new name",
-        )
         """
-        response = self._raw_client.move(id, path=path, name=name, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}",
+            method="PATCH",
+            json={
+                "path": path,
+                "name": name,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def list_versions(
         self,
@@ -674,7 +640,7 @@ class ToolsClient:
         *,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListTools:
+    ) -> HttpResponse[ListTools]:
         """
         Get a list of all the versions of a Tool.
 
@@ -691,28 +657,45 @@ class ToolsClient:
 
         Returns
         -------
-        ListTools
+        HttpResponse[ListTools]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.list_versions(
-            id="tl_789ghi",
-        )
         """
-        response = self._raw_client.list_versions(
-            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/versions",
+            method="GET",
+            params={
+                "evaluator_aggregates": evaluator_aggregates,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ListTools,
+                    construct_type(
+                        type_=ListTools,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete_tool_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> HttpResponse[None]:
         """
         Delete a version of the Tool.
 
@@ -729,22 +712,30 @@ class ToolsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.delete_tool_version(
-            id="id",
-            version_id="version_id",
-        )
+        HttpResponse[None]
         """
-        response = self._raw_client.delete_tool_version(id, version_id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_tool_version(
         self,
@@ -754,7 +745,7 @@ class ToolsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> HttpResponse[ToolResponse]:
         """
         Update the name or description of the Tool version.
 
@@ -777,29 +768,47 @@ class ToolsClient:
 
         Returns
         -------
-        ToolResponse
+        HttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.update_tool_version(
-            id="id",
-            version_id="version_id",
-        )
         """
-        response = self._raw_client.update_tool_version(
-            id, version_id, name=name, description=description, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="PATCH",
+            json={
+                "name": name,
+                "description": description,
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> ToolResponse:
+    ) -> HttpResponse[ToolResponse]:
         """
         Deploy Tool to an Environment.
 
@@ -822,30 +831,45 @@ class ToolsClient:
 
         Returns
         -------
-        ToolResponse
+        HttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.set_deployment(
-            id="tl_789ghi",
-            environment_id="staging",
-            version_id="tv_012jkl",
-        )
         """
-        response = self._raw_client.set_deployment(
-            id, environment_id, version_id=version_id, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={
+                "version_id": version_id,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> HttpResponse[None]:
         """
         Remove deployed Tool from the Environment.
 
@@ -865,26 +889,34 @@ class ToolsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.remove_deployment(
-            id="tl_789ghi",
-            environment_id="staging",
-        )
+        HttpResponse[None]
         """
-        response = self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
+    ) -> HttpResponse[typing.List[FileEnvironmentResponse]]:
         """
         List all Environments and their deployed versions for the Tool.
 
@@ -898,22 +930,38 @@ class ToolsClient:
 
         Returns
         -------
-        typing.List[FileEnvironmentResponse]
+        HttpResponse[typing.List[FileEnvironmentResponse]]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.list_environments(
-            id="tl_789ghi",
-        )
         """
-        response = self._raw_client.list_environments(id, request_options=request_options)
-        return response.data
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentResponse],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def update_monitoring(
         self,
@@ -922,7 +970,7 @@ class ToolsClient:
         activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
         deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> HttpResponse[ToolResponse]:
         """
         Activate and deactivate Evaluators for monitoring the Tool.
 
@@ -944,41 +992,56 @@ class ToolsClient:
 
         Returns
         -------
-        ToolResponse
+        HttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.tools.update_monitoring(
-            id="tl_789ghi",
-            activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-        )
         """
-        response = self._raw_client.update_monitoring(
-            id, activate=activate, deactivate=deactivate, request_options=request_options
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncToolsClient:
+class AsyncRawToolsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._raw_client = AsyncRawToolsClient(client_wrapper=client_wrapper)
-
-    @property
-    def with_raw_response(self) -> AsyncRawToolsClient:
-        """
-        Retrieves a raw implementation of this client that returns raw responses.
-
-        Returns
-        -------
-        AsyncRawToolsClient
-        """
-        return self._raw_client
+        self._client_wrapper = client_wrapper
 
     async def log(
         self,
@@ -1008,7 +1071,7 @@ class AsyncToolsClient:
         log_id: typing.Optional[str] = OMIT,
         tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateToolLogResponse:
+    ) -> AsyncHttpResponse[CreateToolLogResponse]:
         """
         Log to a Tool.
 
@@ -1099,72 +1162,72 @@ class AsyncToolsClient:
 
         Returns
         -------
-        CreateToolLogResponse
+        AsyncHttpResponse[CreateToolLogResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.log(
-                path="math-tool",
-                tool={
-                    "function": {
-                        "name": "multiply",
-                        "description": "Multiply two numbers",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {
-                                "a": {"type": "number"},
-                                "b": {"type": "number"},
-                            },
-                            "required": ["a", "b"],
-                        },
-                    }
-                },
-                inputs={"a": 5, "b": 7},
-                output="35",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.log(
-            version_id=version_id,
-            environment=environment,
-            path=path,
-            id=id,
-            start_time=start_time,
-            end_time=end_time,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            log_status=log_status,
-            source_datapoint_id=source_datapoint_id,
-            trace_parent_id=trace_parent_id,
-            user=user,
-            tool_log_request_environment=tool_log_request_environment,
-            save=save,
-            log_id=log_id,
-            tool=tool,
+        _response = await self._client_wrapper.httpx_client.request(
+            "tools/log",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "start_time": start_time,
+                "end_time": end_time,
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": tool_log_request_environment,
+                "save": save,
+                "log_id": log_id,
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    CreateToolLogResponse,
+                    construct_type(
+                        type_=CreateToolLogResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update(
         self,
@@ -1185,7 +1248,7 @@ class AsyncToolsClient:
         end_time: typing.Optional[dt.datetime] = OMIT,
         log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> LogResponse:
+    ) -> AsyncHttpResponse[LogResponse]:
         """
         Update a Log.
 
@@ -1243,150 +1306,43 @@ class AsyncToolsClient:
 
         Returns
         -------
-        LogResponse
+        AsyncHttpResponse[LogResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.update(
-                id="id",
-                log_id="log_id",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.update(
-            id,
-            log_id,
-            output=output,
-            created_at=created_at,
-            error=error,
-            provider_latency=provider_latency,
-            stdout=stdout,
-            provider_request=provider_request,
-            provider_response=provider_response,
-            inputs=inputs,
-            source=source,
-            metadata=metadata,
-            start_time=start_time,
-            end_time=end_time,
-            log_status=log_status,
-            request_options=request_options,
-        )
-        return response.data
-
-    async def list(
-        self,
-        *,
-        page: typing.Optional[int] = None,
-        size: typing.Optional[int] = None,
-        name: typing.Optional[str] = None,
-        user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
-        order: typing.Optional[SortOrder] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncPager[ToolResponse]:
-        """
-        Get a list of all Tools.
-
-        Parameters
-        ----------
-        page : typing.Optional[int]
-            Page offset for pagination.
-
-        size : typing.Optional[int]
-            Page size for pagination. Number of Tools to fetch.
-
-        name : typing.Optional[str]
-            Case-insensitive filter for Tool name.
-
-        user_filter : typing.Optional[str]
-            Case-insensitive filter for users in the Tool. This filter matches against both email address and name of users.
-
-        sort_by : typing.Optional[ProjectSortBy]
-            Field to sort Tools by
-
-        order : typing.Optional[SortOrder]
-            Direction to sort by.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        AsyncPager[ToolResponse]
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            response = await client.tools.list(
-                size=1,
-            )
-            async for item in response:
-                yield item
-            # alternatively, you can paginate page-by-page
-            async for page in response.iter_pages():
-                yield page
-
-
-        asyncio.run(main())
-        """
-        page = page if page is not None else 1
-        _response = await self._raw_client._client_wrapper.httpx_client.request(
-            "tools",
-            method="GET",
-            params={
-                "page": page,
-                "size": size,
-                "name": name,
-                "user_filter": user_filter,
-                "sort_by": sort_by,
-                "order": order,
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/log/{jsonable_encoder(log_id)}",
+            method="PATCH",
+            json={
+                "output": output,
+                "created_at": created_at,
+                "error": error,
+                "provider_latency": provider_latency,
+                "stdout": stdout,
+                "provider_request": provider_request,
+                "provider_response": provider_response,
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+            },
+            headers={
+                "content-type": "application/json",
             },
             request_options=request_options,
+            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
-                _parsed_response = typing.cast(
-                    PaginatedDataToolResponse,
+                _data = typing.cast(
+                    LogResponse,
                     construct_type(
-                        type_=PaginatedDataToolResponse,  # type: ignore
+                        type_=LogResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
-                _has_next = True
-                _get_next = lambda: self.list(
-                    page=page + 1,
-                    size=size,
-                    name=name,
-                    user_filter=user_filter,
-                    sort_by=sort_by,
-                    order=order,
-                    request_options=request_options,
-                )
-                _items = _parsed_response.records
-                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+                return AsyncHttpResponse(response=_response, data=_data)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1415,7 +1371,7 @@ class AsyncToolsClient:
         version_name: typing.Optional[str] = OMIT,
         version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> AsyncHttpResponse[ToolResponse]:
         """
         Create a Tool or update it with a new version if it already exists.
 
@@ -1459,53 +1415,55 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ToolResponse
+        AsyncHttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.upsert(
-                path="math-tool",
-                function={
-                    "name": "multiply",
-                    "description": "Multiply two numbers",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "a": {"type": "number"},
-                            "b": {"type": "number"},
-                        },
-                        "required": ["a", "b"],
-                    },
-                },
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.upsert(
-            path=path,
-            id=id,
-            function=function,
-            source_code=source_code,
-            setup_values=setup_values,
-            attributes=attributes,
-            tool_type=tool_type,
-            version_name=version_name,
-            version_description=version_description,
+        _response = await self._client_wrapper.httpx_client.request(
+            "tools",
+            method="POST",
+            json={
+                "path": path,
+                "id": id,
+                "function": convert_and_respect_annotation_metadata(
+                    object_=function, annotation=ToolFunctionParams, direction="write"
+                ),
+                "source_code": source_code,
+                "setup_values": setup_values,
+                "attributes": attributes,
+                "tool_type": tool_type,
+                "version_name": version_name,
+                "version_description": version_description,
+            },
+            headers={
+                "content-type": "application/json",
+            },
             request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def get(
         self,
@@ -1514,7 +1472,7 @@ class AsyncToolsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> AsyncHttpResponse[ToolResponse]:
         """
         Retrieve the Tool with the given ID.
 
@@ -1537,34 +1495,46 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ToolResponse
+        AsyncHttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.get(
-                id="tl_789ghi",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.get(
-            id, version_id=version_id, environment=environment, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
+    async def delete(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[None]:
         """
         Delete the Tool with the given ID.
 
@@ -1578,29 +1548,30 @@ class AsyncToolsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.delete(
-                id="tl_789ghi",
-            )
-
-
-        asyncio.run(main())
+        AsyncHttpResponse[None]
         """
-        response = await self._raw_client.delete(id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def move(
         self,
@@ -1609,7 +1580,7 @@ class AsyncToolsClient:
         path: typing.Optional[str] = OMIT,
         name: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> AsyncHttpResponse[ToolResponse]:
         """
         Move the Tool to a different path or change the name.
 
@@ -1629,31 +1600,46 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ToolResponse
+        AsyncHttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.move(
-                id="tl_789ghi",
-                path="new directory/new name",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.move(id, path=path, name=name, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}",
+            method="PATCH",
+            json={
+                "path": path,
+                "name": name,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def list_versions(
         self,
@@ -1661,7 +1647,7 @@ class AsyncToolsClient:
         *,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListTools:
+    ) -> AsyncHttpResponse[ListTools]:
         """
         Get a list of all the versions of a Tool.
 
@@ -1678,36 +1664,45 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ListTools
+        AsyncHttpResponse[ListTools]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.list_versions(
-                id="tl_789ghi",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.list_versions(
-            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/versions",
+            method="GET",
+            params={
+                "evaluator_aggregates": evaluator_aggregates,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ListTools,
+                    construct_type(
+                        type_=ListTools,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete_tool_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> AsyncHttpResponse[None]:
         """
         Delete a version of the Tool.
 
@@ -1724,30 +1719,30 @@ class AsyncToolsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.delete_tool_version(
-                id="id",
-                version_id="version_id",
-            )
-
-
-        asyncio.run(main())
+        AsyncHttpResponse[None]
         """
-        response = await self._raw_client.delete_tool_version(id, version_id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_tool_version(
         self,
@@ -1757,7 +1752,7 @@ class AsyncToolsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> AsyncHttpResponse[ToolResponse]:
         """
         Update the name or description of the Tool version.
 
@@ -1780,37 +1775,47 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ToolResponse
+        AsyncHttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.update_tool_version(
-                id="id",
-                version_id="version_id",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.update_tool_version(
-            id, version_id, name=name, description=description, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
+            method="PATCH",
+            json={
+                "name": name,
+                "description": description,
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> ToolResponse:
+    ) -> AsyncHttpResponse[ToolResponse]:
         """
         Deploy Tool to an Environment.
 
@@ -1833,38 +1838,45 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ToolResponse
+        AsyncHttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.set_deployment(
-                id="tl_789ghi",
-                environment_id="staging",
-                version_id="tv_012jkl",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.set_deployment(
-            id, environment_id, version_id=version_id, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="POST",
+            params={
+                "version_id": version_id,
+            },
+            request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> None:
+    ) -> AsyncHttpResponse[None]:
         """
         Remove deployed Tool from the Environment.
 
@@ -1884,34 +1896,34 @@ class AsyncToolsClient:
 
         Returns
         -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.remove_deployment(
-                id="tl_789ghi",
-                environment_id="staging",
-            )
-
-
-        asyncio.run(main())
+        AsyncHttpResponse[None]
         """
-        response = await self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[FileEnvironmentResponse]:
+    ) -> AsyncHttpResponse[typing.List[FileEnvironmentResponse]]:
         """
         List all Environments and their deployed versions for the Tool.
 
@@ -1925,30 +1937,38 @@ class AsyncToolsClient:
 
         Returns
         -------
-        typing.List[FileEnvironmentResponse]
+        AsyncHttpResponse[typing.List[FileEnvironmentResponse]]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.list_environments(
-                id="tl_789ghi",
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.list_environments(id, request_options=request_options)
-        return response.data
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environments",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentResponse],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def update_monitoring(
         self,
@@ -1957,7 +1977,7 @@ class AsyncToolsClient:
         activate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]] = OMIT,
         deactivate: typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ToolResponse:
+    ) -> AsyncHttpResponse[ToolResponse]:
         """
         Activate and deactivate Evaluators for monitoring the Tool.
 
@@ -1979,30 +1999,48 @@ class AsyncToolsClient:
 
         Returns
         -------
-        ToolResponse
+        AsyncHttpResponse[ToolResponse]
             Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.tools.update_monitoring(
-                id="tl_789ghi",
-                activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-            )
-
-
-        asyncio.run(main())
         """
-        response = await self._raw_client.update_monitoring(
-            id, activate=activate, deactivate=deactivate, request_options=request_options
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/evaluators",
+            method="POST",
+            json={
+                "activate": convert_and_respect_annotation_metadata(
+                    object_=activate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
+                    direction="write",
+                ),
+                "deactivate": convert_and_respect_annotation_metadata(
+                    object_=deactivate,
+                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolResponse,
+                    construct_type(
+                        type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)

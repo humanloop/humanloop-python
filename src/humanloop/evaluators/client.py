@@ -2,6 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from .raw_client import RawEvaluatorsClient
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..requests.chat_message import ChatMessageParams
@@ -9,20 +10,17 @@ from .requests.create_evaluator_log_request_judgment import CreateEvaluatorLogRe
 from .requests.create_evaluator_log_request_spec import CreateEvaluatorLogRequestSpecParams
 from ..core.request_options import RequestOptions
 from ..types.create_evaluator_log_response import CreateEvaluatorLogResponse
-from ..core.serialization import convert_and_respect_annotation_metadata
-from ..core.unchecked_base_model import construct_type
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
-from json.decoder import JSONDecodeError
-from ..core.api_error import ApiError
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.evaluator_response import EvaluatorResponse
 from ..types.paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
+from ..core.unchecked_base_model import construct_type
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.http_validation_error import HttpValidationError
+from json.decoder import JSONDecodeError
+from ..core.api_error import ApiError
 from .requests.evaluator_request_spec import EvaluatorRequestSpecParams
-from ..core.jsonable_encoder import jsonable_encoder
-from ..types.version_status import VersionStatus
 from ..types.list_evaluators import ListEvaluators
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
@@ -32,6 +30,7 @@ from ..requests.evaluator_activation_deactivation_request_deactivate_item import
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
 from ..core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawEvaluatorsClient
 from ..core.pagination import AsyncPager
 
 # this is used as the default value for optional parameters
@@ -40,7 +39,18 @@ OMIT = typing.cast(typing.Any, ...)
 
 class EvaluatorsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawEvaluatorsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> RawEvaluatorsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawEvaluatorsClient
+        """
+        return self._raw_client
 
     def log(
         self,
@@ -184,76 +194,38 @@ class EvaluatorsClient:
             parent_id="parent_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "evaluators/log",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            json={
-                "path": path,
-                "id": id,
-                "start_time": start_time,
-                "end_time": end_time,
-                "output": output,
-                "created_at": created_at,
-                "error": error,
-                "provider_latency": provider_latency,
-                "stdout": stdout,
-                "provider_request": provider_request,
-                "provider_response": provider_response,
-                "inputs": inputs,
-                "source": source,
-                "metadata": metadata,
-                "log_status": log_status,
-                "parent_id": parent_id,
-                "source_datapoint_id": source_datapoint_id,
-                "trace_parent_id": trace_parent_id,
-                "user": user,
-                "environment": create_evaluator_log_request_environment,
-                "save": save,
-                "log_id": log_id,
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "judgment": convert_and_respect_annotation_metadata(
-                    object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
-                ),
-                "marked_completed": marked_completed,
-                "spec": convert_and_respect_annotation_metadata(
-                    object_=spec, annotation=CreateEvaluatorLogRequestSpecParams, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.log(
+            parent_id=parent_id,
+            version_id=version_id,
+            environment=environment,
+            path=path,
+            id=id,
+            start_time=start_time,
+            end_time=end_time,
+            output=output,
+            created_at=created_at,
+            error=error,
+            provider_latency=provider_latency,
+            stdout=stdout,
+            provider_request=provider_request,
+            provider_response=provider_response,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            log_status=log_status,
+            source_datapoint_id=source_datapoint_id,
+            trace_parent_id=trace_parent_id,
+            user=user,
+            create_evaluator_log_request_environment=create_evaluator_log_request_environment,
+            save=save,
+            log_id=log_id,
+            output_message=output_message,
+            judgment=judgment,
+            marked_completed=marked_completed,
+            spec=spec,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CreateEvaluatorLogResponse,
-                    construct_type(
-                        type_=CreateEvaluatorLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def list(
         self,
@@ -314,7 +286,7 @@ class EvaluatorsClient:
             yield page
         """
         page = page if page is not None else 1
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._raw_client._client_wrapper.httpx_client.request(
             "evaluators",
             method="GET",
             params={
@@ -369,7 +341,8 @@ class EvaluatorsClient:
         spec: EvaluatorRequestSpecParams,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluatorResponse:
         """
@@ -377,9 +350,9 @@ class EvaluatorsClient:
 
         Evaluators are identified by the `ID` or their `path`. The spec provided determines the version of the Evaluator.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+        You can provide `version_name` and `version_description` to identify and describe your versions.
+        Version names must be unique within an Evaluator - attempting to create a version with a name
+        that already exists will result in a 409 Conflict error.
 
         Parameters
         ----------
@@ -391,8 +364,11 @@ class EvaluatorsClient:
         id : typing.Optional[str]
             ID for an existing Evaluator.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
+        version_name : typing.Optional[str]
+            Unique name for the Evaluator version. Version names must be unique for a given Evaluator.
+
+        version_description : typing.Optional[str]
+            Description of the version, e.g., the changes made in this version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -417,49 +393,17 @@ class EvaluatorsClient:
                 "evaluator_type": "python",
                 "code": "def evaluate(answer, target):\n    return 0.5",
             },
-            commit_message="Initial commit",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "evaluators",
-            method="POST",
-            json={
-                "path": path,
-                "id": id,
-                "commit_message": commit_message,
-                "spec": convert_and_respect_annotation_metadata(
-                    object_=spec, annotation=EvaluatorRequestSpecParams, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.upsert(
+            spec=spec,
+            path=path,
+            id=id,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def get(
         self,
@@ -505,38 +449,10 @@ class EvaluatorsClient:
             id="ev_890bcd",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            request_options=request_options,
+        response = self._raw_client.get(
+            id, version_id=version_id, environment=environment, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -565,28 +481,8 @@ class EvaluatorsClient:
             id="ev_890bcd",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.delete(id, request_options=request_options)
+        return response.data
 
     def move(
         self,
@@ -630,48 +526,13 @@ class EvaluatorsClient:
             path="new directory/new name",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.move(id, path=path, name=name, request_options=request_options)
+        return response.data
 
     def list_versions(
         self,
         id: str,
         *,
-        status: typing.Optional[VersionStatus] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListEvaluators:
@@ -682,9 +543,6 @@ class EvaluatorsClient:
         ----------
         id : str
             Unique identifier for the Evaluator.
-
-        status : typing.Optional[VersionStatus]
-            Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         evaluator_aggregates : typing.Optional[bool]
             Whether to include Evaluator aggregate results for the versions in the response
@@ -708,111 +566,10 @@ class EvaluatorsClient:
             id="ev_890bcd",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions",
-            method="GET",
-            params={
-                "status": status,
-                "evaluator_aggregates": evaluator_aggregates,
-            },
-            request_options=request_options,
+        response = self._raw_client.list_versions(
+            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ListEvaluators,
-                    construct_type(
-                        type_=ListEvaluators,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def commit(
-        self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluatorResponse:
-        """
-        Commit a version of the Evaluator with a commit message.
-
-        If the version is already committed, an exception will be raised.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        version_id : str
-            Unique identifier for the specific version of the Evaluator.
-
-        commit_message : str
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EvaluatorResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.evaluators.commit(
-            id="ev_890bcd",
-            version_id="evv_012def",
-            commit_message="Initial commit",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
-            method="POST",
-            json={
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete_evaluator_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -847,28 +604,59 @@ class EvaluatorsClient:
             version_id="version_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
-            method="DELETE",
-            request_options=request_options,
+        response = self._raw_client.delete_evaluator_version(id, version_id, request_options=request_options)
+        return response.data
+
+    def update_evaluator_version(
+        self,
+        id: str,
+        version_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluatorResponse:
+        """
+        Update the name or description of the Evaluator version.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        version_id : str
+            Unique identifier for the specific version of the Evaluator.
+
+        name : typing.Optional[str]
+            Name of the version.
+
+        description : typing.Optional[str]
+            Description of the version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluatorResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        client.evaluators.update_evaluator_version(
+            id="id",
+            version_id="version_id",
+        )
+        """
+        response = self._raw_client.update_evaluator_version(
+            id, version_id, name=name, description=description, request_options=request_options
+        )
+        return response.data
 
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -911,37 +699,10 @@ class EvaluatorsClient:
             version_id="evv_012def",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={
-                "version_id": version_id,
-            },
-            request_options=request_options,
+        response = self._raw_client.set_deployment(
+            id, environment_id, version_id=version_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -979,28 +740,8 @@ class EvaluatorsClient:
             environment_id="staging",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
+        return response.data
 
     def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1032,34 +773,8 @@ class EvaluatorsClient:
             id="ev_890bcd",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/environments",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[FileEnvironmentResponse],
-                    construct_type(
-                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.list_environments(id, request_options=request_options)
+        return response.data
 
     def update_monitoring(
         self,
@@ -1104,52 +819,26 @@ class EvaluatorsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                    direction="write",
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                    direction="write",
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = self._raw_client.update_monitoring(
+            id, activate=activate, deactivate=deactivate, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
 
 class AsyncEvaluatorsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawEvaluatorsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawEvaluatorsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawEvaluatorsClient
+        """
+        return self._raw_client
 
     async def log(
         self,
@@ -1301,76 +990,38 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "evaluators/log",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            json={
-                "path": path,
-                "id": id,
-                "start_time": start_time,
-                "end_time": end_time,
-                "output": output,
-                "created_at": created_at,
-                "error": error,
-                "provider_latency": provider_latency,
-                "stdout": stdout,
-                "provider_request": provider_request,
-                "provider_response": provider_response,
-                "inputs": inputs,
-                "source": source,
-                "metadata": metadata,
-                "log_status": log_status,
-                "parent_id": parent_id,
-                "source_datapoint_id": source_datapoint_id,
-                "trace_parent_id": trace_parent_id,
-                "user": user,
-                "environment": create_evaluator_log_request_environment,
-                "save": save,
-                "log_id": log_id,
-                "output_message": convert_and_respect_annotation_metadata(
-                    object_=output_message, annotation=ChatMessageParams, direction="write"
-                ),
-                "judgment": convert_and_respect_annotation_metadata(
-                    object_=judgment, annotation=CreateEvaluatorLogRequestJudgmentParams, direction="write"
-                ),
-                "marked_completed": marked_completed,
-                "spec": convert_and_respect_annotation_metadata(
-                    object_=spec, annotation=CreateEvaluatorLogRequestSpecParams, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.log(
+            parent_id=parent_id,
+            version_id=version_id,
+            environment=environment,
+            path=path,
+            id=id,
+            start_time=start_time,
+            end_time=end_time,
+            output=output,
+            created_at=created_at,
+            error=error,
+            provider_latency=provider_latency,
+            stdout=stdout,
+            provider_request=provider_request,
+            provider_response=provider_response,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            log_status=log_status,
+            source_datapoint_id=source_datapoint_id,
+            trace_parent_id=trace_parent_id,
+            user=user,
+            create_evaluator_log_request_environment=create_evaluator_log_request_environment,
+            save=save,
+            log_id=log_id,
+            output_message=output_message,
+            judgment=judgment,
+            marked_completed=marked_completed,
+            spec=spec,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CreateEvaluatorLogResponse,
-                    construct_type(
-                        type_=CreateEvaluatorLogResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def list(
         self,
@@ -1439,7 +1090,7 @@ class AsyncEvaluatorsClient:
         asyncio.run(main())
         """
         page = page if page is not None else 1
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._raw_client._client_wrapper.httpx_client.request(
             "evaluators",
             method="GET",
             params={
@@ -1494,7 +1145,8 @@ class AsyncEvaluatorsClient:
         spec: EvaluatorRequestSpecParams,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EvaluatorResponse:
         """
@@ -1502,9 +1154,9 @@ class AsyncEvaluatorsClient:
 
         Evaluators are identified by the `ID` or their `path`. The spec provided determines the version of the Evaluator.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+        You can provide `version_name` and `version_description` to identify and describe your versions.
+        Version names must be unique within an Evaluator - attempting to create a version with a name
+        that already exists will result in a 409 Conflict error.
 
         Parameters
         ----------
@@ -1516,8 +1168,11 @@ class AsyncEvaluatorsClient:
         id : typing.Optional[str]
             ID for an existing Evaluator.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made.
+        version_name : typing.Optional[str]
+            Unique name for the Evaluator version. Version names must be unique for a given Evaluator.
+
+        version_description : typing.Optional[str]
+            Description of the version, e.g., the changes made in this version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1547,52 +1202,20 @@ class AsyncEvaluatorsClient:
                     "evaluator_type": "python",
                     "code": "def evaluate(answer, target):\n    return 0.5",
                 },
-                commit_message="Initial commit",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "evaluators",
-            method="POST",
-            json={
-                "path": path,
-                "id": id,
-                "commit_message": commit_message,
-                "spec": convert_and_respect_annotation_metadata(
-                    object_=spec, annotation=EvaluatorRequestSpecParams, direction="write"
-                ),
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.upsert(
+            spec=spec,
+            path=path,
+            id=id,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def get(
         self,
@@ -1646,38 +1269,10 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            request_options=request_options,
+        response = await self._raw_client.get(
+            id, version_id=version_id, environment=environment, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -1714,28 +1309,8 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.delete(id, request_options=request_options)
+        return response.data
 
     async def move(
         self,
@@ -1787,48 +1362,13 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.move(id, path=path, name=name, request_options=request_options)
+        return response.data
 
     async def list_versions(
         self,
         id: str,
         *,
-        status: typing.Optional[VersionStatus] = None,
         evaluator_aggregates: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListEvaluators:
@@ -1839,9 +1379,6 @@ class AsyncEvaluatorsClient:
         ----------
         id : str
             Unique identifier for the Evaluator.
-
-        status : typing.Optional[VersionStatus]
-            Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
 
         evaluator_aggregates : typing.Optional[bool]
             Whether to include Evaluator aggregate results for the versions in the response
@@ -1873,119 +1410,10 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions",
-            method="GET",
-            params={
-                "status": status,
-                "evaluator_aggregates": evaluator_aggregates,
-            },
-            request_options=request_options,
+        response = await self._raw_client.list_versions(
+            id, evaluator_aggregates=evaluator_aggregates, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ListEvaluators,
-                    construct_type(
-                        type_=ListEvaluators,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def commit(
-        self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> EvaluatorResponse:
-        """
-        Commit a version of the Evaluator with a commit message.
-
-        If the version is already committed, an exception will be raised.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Prompt.
-
-        version_id : str
-            Unique identifier for the specific version of the Evaluator.
-
-        commit_message : str
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EvaluatorResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.evaluators.commit(
-                id="ev_890bcd",
-                version_id="evv_012def",
-                commit_message="Initial commit",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
-            method="POST",
-            json={
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete_evaluator_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2028,28 +1456,67 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
-            method="DELETE",
-            request_options=request_options,
+        response = await self._raw_client.delete_evaluator_version(id, version_id, request_options=request_options)
+        return response.data
+
+    async def update_evaluator_version(
+        self,
+        id: str,
+        version_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> EvaluatorResponse:
+        """
+        Update the name or description of the Evaluator version.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Evaluator.
+
+        version_id : str
+            Unique identifier for the specific version of the Evaluator.
+
+        name : typing.Optional[str]
+            Name of the version.
+
+        description : typing.Optional[str]
+            Description of the version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        EvaluatorResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+
+        async def main() -> None:
+            await client.evaluators.update_evaluator_version(
+                id="id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.update_evaluator_version(
+            id, version_id, name=name, description=description, request_options=request_options
+        )
+        return response.data
 
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -2100,37 +1567,10 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={
-                "version_id": version_id,
-            },
-            request_options=request_options,
+        response = await self._raw_client.set_deployment(
+            id, environment_id, version_id=version_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2176,28 +1616,8 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
+        return response.data
 
     async def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2237,34 +1657,8 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/environments",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[FileEnvironmentResponse],
-                    construct_type(
-                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.list_environments(id, request_options=request_options)
+        return response.data
 
     async def update_monitoring(
         self,
@@ -2317,44 +1711,7 @@ class AsyncEvaluatorsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"evaluators/{jsonable_encoder(id)}/evaluators",
-            method="POST",
-            json={
-                "activate": convert_and_respect_annotation_metadata(
-                    object_=activate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams],
-                    direction="write",
-                ),
-                "deactivate": convert_and_respect_annotation_metadata(
-                    object_=deactivate,
-                    annotation=typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams],
-                    direction="write",
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
+        response = await self._raw_client.update_monitoring(
+            id, activate=activate, deactivate=deactivate, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EvaluatorResponse,
-                    construct_type(
-                        type_=EvaluatorResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data

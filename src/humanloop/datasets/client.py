@@ -2,6 +2,7 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from .raw_client import RawDatasetsClient
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
@@ -15,15 +16,17 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..requests.create_datapoint_request import CreateDatapointRequestParams
 from ..types.update_dateset_action import UpdateDatesetAction
-from ..core.serialization import convert_and_respect_annotation_metadata
-from ..core.jsonable_encoder import jsonable_encoder
 from ..types.datapoint_response import DatapointResponse
+from ..core.jsonable_encoder import jsonable_encoder
 from ..types.paginated_datapoint_response import PaginatedDatapointResponse
-from ..types.version_status import VersionStatus
+from .types.list_versions_datasets_id_versions_get_request_include_datapoints import (
+    ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints,
+)
 from ..types.list_datasets import ListDatasets
 from .. import core
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..core.client_wrapper import AsyncClientWrapper
+from .raw_client import AsyncRawDatasetsClient
 from ..core.pagination import AsyncPager
 
 # this is used as the default value for optional parameters
@@ -32,7 +35,18 @@ OMIT = typing.cast(typing.Any, ...)
 
 class DatasetsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = RawDatasetsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> RawDatasetsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        RawDatasetsClient
+        """
+        return self._raw_client
 
     def list(
         self,
@@ -93,7 +107,7 @@ class DatasetsClient:
             yield page
         """
         page = page if page is not None else 1
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._raw_client._client_wrapper.httpx_client.request(
             "datasets",
             method="GET",
             params={
@@ -153,7 +167,8 @@ class DatasetsClient:
         id: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
@@ -167,9 +182,9 @@ class DatasetsClient:
         the `version_id` or `environment` query parameters to identify the existing version to base
         the new version on. If neither is provided, the latest created version will be used.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+        You can provide `version_name` and `version_description` to identify and describe your versions.
+        Version names must be unique within a Dataset - attempting to create a version with a name
+        that already exists will result in a 409 Conflict error.
 
         Humanloop also deduplicates Datapoints. If you try to add a Datapoint that already
         exists, it will be ignored. If you intentionally want to add a duplicate Datapoint,
@@ -207,8 +222,11 @@ class DatasetsClient:
         attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
+        version_name : typing.Optional[str]
+            Unique name for the Dataset version. Version names must be unique for a given Dataset.
+
+        version_description : typing.Optional[str]
+            Description of the version, e.g., the changes made in this version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -238,56 +256,22 @@ class DatasetsClient:
                 },
             ],
             action="set",
-            commit_message="Add two new questions and answers",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            "datasets",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-                "include_datapoints": include_datapoints,
-            },
-            json={
-                "path": path,
-                "id": id,
-                "datapoints": convert_and_respect_annotation_metadata(
-                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams], direction="write"
-                ),
-                "action": action,
-                "attributes": attributes,
-                "commit_message": commit_message,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = self._raw_client.upsert(
+            datapoints=datapoints,
+            version_id=version_id,
+            environment=environment,
+            include_datapoints=include_datapoints,
+            path=path,
+            id=id,
+            action=action,
+            attributes=attributes,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def get(
         self,
@@ -344,39 +328,14 @@ class DatasetsClient:
             include_datapoints=True,
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-                "include_datapoints": include_datapoints,
-            },
+        response = self._raw_client.get(
+            id,
+            version_id=version_id,
+            environment=environment,
+            include_datapoints=include_datapoints,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -405,28 +364,8 @@ class DatasetsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.delete(id, request_options=request_options)
+        return response.data
 
     def move(
         self,
@@ -469,42 +408,8 @@ class DatasetsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.move(id, path=path, name=name, request_options=request_options)
+        return response.data
 
     def list_datapoints(
         self,
@@ -562,7 +467,7 @@ class DatasetsClient:
             yield page
         """
         page = page if page is not None else 1
-        _response = self._client_wrapper.httpx_client.request(
+        _response = self._raw_client._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/datapoints",
             method="GET",
             params={
@@ -612,8 +517,7 @@ class DatasetsClient:
         self,
         id: str,
         *,
-        status: typing.Optional[VersionStatus] = None,
-        include_datapoints: typing.Optional[typing.Literal["latest_committed"]] = None,
+        include_datapoints: typing.Optional[ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasets:
         """
@@ -624,11 +528,8 @@ class DatasetsClient:
         id : str
             Unique identifier for Dataset.
 
-        status : typing.Optional[VersionStatus]
-            Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-
-        include_datapoints : typing.Optional[typing.Literal["latest_committed"]]
-            If set to 'latest_committed', include the Datapoints for the latest committed version. Defaults to `None`.
+        include_datapoints : typing.Optional[ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints]
+            If set to 'latest_saved', include datapoints for the latest saved version. Alternatively, 'latest_committed' (deprecated) includes datapoints for the latest committed version only.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -647,114 +548,12 @@ class DatasetsClient:
         )
         client.datasets.list_versions(
             id="ds_b0baF1ca7652",
-            status="committed",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions",
-            method="GET",
-            params={
-                "status": status,
-                "include_datapoints": include_datapoints,
-            },
-            request_options=request_options,
+        response = self._raw_client.list_versions(
+            id, include_datapoints=include_datapoints, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ListDatasets,
-                    construct_type(
-                        type_=ListDatasets,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def commit(
-        self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DatasetResponse:
-        """
-        Commit a version of the Dataset with a commit message.
-
-        If the version is already committed, an exception will be raised.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Dataset.
-
-        version_id : str
-            Unique identifier for the specific version of the Dataset.
-
-        commit_message : str
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        DatasetResponse
-            Successful Response
-
-        Examples
-        --------
-        from humanloop import Humanloop
-
-        client = Humanloop(
-            api_key="YOUR_API_KEY",
-        )
-        client.datasets.commit(
-            id="ds_b0baF1ca7652",
-            version_id="dsv_6L78pqrdFi2xa",
-            commit_message="initial commit",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
-            method="POST",
-            json={
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def delete_dataset_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -789,48 +588,83 @@ class DatasetsClient:
             version_id="version_id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
-            method="DELETE",
-            request_options=request_options,
+        response = self._raw_client.delete_dataset_version(id, version_id, request_options=request_options)
+        return response.data
+
+    def update_dataset_version(
+        self,
+        id: str,
+        version_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Update the name or description of the Dataset version.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        version_id : str
+            Unique identifier for the specific version of the Dataset.
+
+        name : typing.Optional[str]
+            Name of the version.
+
+        description : typing.Optional[str]
+            Description of the version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        client.datasets.update_dataset_version(
+            id="id",
+            version_id="version_id",
+        )
+        """
+        response = self._raw_client.update_dataset_version(
+            id, version_id, name=name, description=description, request_options=request_options
+        )
+        return response.data
 
     def upload_csv(
         self,
         id: str,
         *,
         file: core.File,
-        commit_message: str,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
         Add Datapoints from a CSV file to a Dataset.
 
-        This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+        This will create a new version of the Dataset with the Datapoints from the CSV file.
 
         If either `version_id` or `environment` is provided, the new version will be based on the specified version,
         with the Datapoints from the CSV file added to the existing Datapoints in the version.
         If neither `version_id` nor `environment` is provided, the new version will be based on the version
         of the Dataset that is deployed to the default Environment.
+
+        You can optionally provide a name and description for the new version using `version_name`
+        and `version_description` parameters.
 
         Parameters
         ----------
@@ -840,14 +674,17 @@ class DatasetsClient:
         file : core.File
             See core.File for more documentation
 
-        commit_message : str
-            Commit message for the new Dataset version.
-
         version_id : typing.Optional[str]
             ID of the specific Dataset version to base the created Version on.
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed Version to base the created Version on.
+
+        version_name : typing.Optional[str]
+            Name for the new Dataset version.
+
+        version_description : typing.Optional[str]
+            Description for the new Dataset version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -866,48 +703,18 @@ class DatasetsClient:
         )
         client.datasets.upload_csv(
             id="id",
-            commit_message="commit_message",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/datapoints/csv",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            data={
-                "commit_message": commit_message,
-            },
-            files={
-                "file": file,
-            },
+        response = self._raw_client.upload_csv(
+            id,
+            file=file,
+            version_id=version_id,
+            environment=environment,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -949,37 +756,10 @@ class DatasetsClient:
             version_id="dsv_6L78pqrdFi2xa",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={
-                "version_id": version_id,
-            },
-            request_options=request_options,
+        response = self._raw_client.set_deployment(
+            id, environment_id, version_id=version_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1016,28 +796,8 @@ class DatasetsClient:
             environment_id="staging",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
+        return response.data
 
     def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1069,39 +829,24 @@ class DatasetsClient:
             id="id",
         )
         """
-        _response = self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/environments",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[FileEnvironmentResponse],
-                    construct_type(
-                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = self._raw_client.list_environments(id, request_options=request_options)
+        return response.data
 
 
 class AsyncDatasetsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
+        self._raw_client = AsyncRawDatasetsClient(client_wrapper=client_wrapper)
+
+    @property
+    def with_raw_response(self) -> AsyncRawDatasetsClient:
+        """
+        Retrieves a raw implementation of this client that returns raw responses.
+
+        Returns
+        -------
+        AsyncRawDatasetsClient
+        """
+        return self._raw_client
 
     async def list(
         self,
@@ -1170,7 +915,7 @@ class AsyncDatasetsClient:
         asyncio.run(main())
         """
         page = page if page is not None else 1
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._raw_client._client_wrapper.httpx_client.request(
             "datasets",
             method="GET",
             params={
@@ -1230,7 +975,8 @@ class AsyncDatasetsClient:
         id: typing.Optional[str] = OMIT,
         action: typing.Optional[UpdateDatesetAction] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        commit_message: typing.Optional[str] = OMIT,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
@@ -1244,9 +990,9 @@ class AsyncDatasetsClient:
         the `version_id` or `environment` query parameters to identify the existing version to base
         the new version on. If neither is provided, the latest created version will be used.
 
-        If you provide a commit message, then the new version will be committed;
-        otherwise it will be uncommitted. If you try to commit an already committed version,
-        an exception will be raised.
+        You can provide `version_name` and `version_description` to identify and describe your versions.
+        Version names must be unique within a Dataset - attempting to create a version with a name
+        that already exists will result in a 409 Conflict error.
 
         Humanloop also deduplicates Datapoints. If you try to add a Datapoint that already
         exists, it will be ignored. If you intentionally want to add a duplicate Datapoint,
@@ -1284,8 +1030,11 @@ class AsyncDatasetsClient:
         attributes : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Additional fields to describe the Dataset. Helpful to separate Dataset versions from each other with details on how they were created or used.
 
-        commit_message : typing.Optional[str]
-            Message describing the changes made. If provided, a committed version of the Dataset is created. Otherwise, an uncommitted version is created.
+        version_name : typing.Optional[str]
+            Unique name for the Dataset version. Version names must be unique for a given Dataset.
+
+        version_description : typing.Optional[str]
+            Description of the version, e.g., the changes made in this version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1320,59 +1069,25 @@ class AsyncDatasetsClient:
                     },
                 ],
                 action="set",
-                commit_message="Add two new questions and answers",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            "datasets",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-                "include_datapoints": include_datapoints,
-            },
-            json={
-                "path": path,
-                "id": id,
-                "datapoints": convert_and_respect_annotation_metadata(
-                    object_=datapoints, annotation=typing.Sequence[CreateDatapointRequestParams], direction="write"
-                ),
-                "action": action,
-                "attributes": attributes,
-                "commit_message": commit_message,
-            },
-            headers={
-                "content-type": "application/json",
-            },
+        response = await self._raw_client.upsert(
+            datapoints=datapoints,
+            version_id=version_id,
+            environment=environment,
+            include_datapoints=include_datapoints,
+            path=path,
+            id=id,
+            action=action,
+            attributes=attributes,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def get(
         self,
@@ -1437,39 +1152,14 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}",
-            method="GET",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-                "include_datapoints": include_datapoints,
-            },
+        response = await self._raw_client.get(
+            id,
+            version_id=version_id,
+            environment=environment,
+            include_datapoints=include_datapoints,
             request_options=request_options,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete(self, id: str, *, request_options: typing.Optional[RequestOptions] = None) -> None:
         """
@@ -1506,28 +1196,8 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.delete(id, request_options=request_options)
+        return response.data
 
     async def move(
         self,
@@ -1578,42 +1248,8 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}",
-            method="PATCH",
-            json={
-                "path": path,
-                "name": name,
-            },
-            headers={
-                "content-type": "application/json",
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.move(id, path=path, name=name, request_options=request_options)
+        return response.data
 
     async def list_datapoints(
         self,
@@ -1679,7 +1315,7 @@ class AsyncDatasetsClient:
         asyncio.run(main())
         """
         page = page if page is not None else 1
-        _response = await self._client_wrapper.httpx_client.request(
+        _response = await self._raw_client._client_wrapper.httpx_client.request(
             f"datasets/{jsonable_encoder(id)}/datapoints",
             method="GET",
             params={
@@ -1729,8 +1365,7 @@ class AsyncDatasetsClient:
         self,
         id: str,
         *,
-        status: typing.Optional[VersionStatus] = None,
-        include_datapoints: typing.Optional[typing.Literal["latest_committed"]] = None,
+        include_datapoints: typing.Optional[ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListDatasets:
         """
@@ -1741,11 +1376,8 @@ class AsyncDatasetsClient:
         id : str
             Unique identifier for Dataset.
 
-        status : typing.Optional[VersionStatus]
-            Filter versions by status: 'uncommitted', 'committed'. If no status is provided, all versions are returned.
-
-        include_datapoints : typing.Optional[typing.Literal["latest_committed"]]
-            If set to 'latest_committed', include the Datapoints for the latest committed version. Defaults to `None`.
+        include_datapoints : typing.Optional[ListVersionsDatasetsIdVersionsGetRequestIncludeDatapoints]
+            If set to 'latest_saved', include datapoints for the latest saved version. Alternatively, 'latest_committed' (deprecated) includes datapoints for the latest committed version only.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1769,125 +1401,15 @@ class AsyncDatasetsClient:
         async def main() -> None:
             await client.datasets.list_versions(
                 id="ds_b0baF1ca7652",
-                status="committed",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions",
-            method="GET",
-            params={
-                "status": status,
-                "include_datapoints": include_datapoints,
-            },
-            request_options=request_options,
+        response = await self._raw_client.list_versions(
+            id, include_datapoints=include_datapoints, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ListDatasets,
-                    construct_type(
-                        type_=ListDatasets,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def commit(
-        self, id: str, version_id: str, *, commit_message: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> DatasetResponse:
-        """
-        Commit a version of the Dataset with a commit message.
-
-        If the version is already committed, an exception will be raised.
-
-        Parameters
-        ----------
-        id : str
-            Unique identifier for Dataset.
-
-        version_id : str
-            Unique identifier for the specific version of the Dataset.
-
-        commit_message : str
-            Message describing the changes made.
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        DatasetResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from humanloop import AsyncHumanloop
-
-        client = AsyncHumanloop(
-            api_key="YOUR_API_KEY",
-        )
-
-
-        async def main() -> None:
-            await client.datasets.commit(
-                id="ds_b0baF1ca7652",
-                version_id="dsv_6L78pqrdFi2xa",
-                commit_message="initial commit",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}/commit",
-            method="POST",
-            json={
-                "commit_message": commit_message,
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def delete_dataset_version(
         self, id: str, version_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -1930,48 +1452,91 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/versions/{jsonable_encoder(version_id)}",
-            method="DELETE",
-            request_options=request_options,
+        response = await self._raw_client.delete_dataset_version(id, version_id, request_options=request_options)
+        return response.data
+
+    async def update_dataset_version(
+        self,
+        id: str,
+        version_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> DatasetResponse:
+        """
+        Update the name or description of the Dataset version.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Dataset.
+
+        version_id : str
+            Unique identifier for the specific version of the Dataset.
+
+        name : typing.Optional[str]
+            Name of the version.
+
+        description : typing.Optional[str]
+            Description of the version.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        DatasetResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+
+        async def main() -> None:
+            await client.datasets.update_dataset_version(
+                id="id",
+                version_id="version_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.update_dataset_version(
+            id, version_id, name=name, description=description, request_options=request_options
+        )
+        return response.data
 
     async def upload_csv(
         self,
         id: str,
         *,
         file: core.File,
-        commit_message: str,
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
+        version_name: typing.Optional[str] = OMIT,
+        version_description: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> DatasetResponse:
         """
         Add Datapoints from a CSV file to a Dataset.
 
-        This will create a new committed version of the Dataset with the Datapoints from the CSV file.
+        This will create a new version of the Dataset with the Datapoints from the CSV file.
 
         If either `version_id` or `environment` is provided, the new version will be based on the specified version,
         with the Datapoints from the CSV file added to the existing Datapoints in the version.
         If neither `version_id` nor `environment` is provided, the new version will be based on the version
         of the Dataset that is deployed to the default Environment.
+
+        You can optionally provide a name and description for the new version using `version_name`
+        and `version_description` parameters.
 
         Parameters
         ----------
@@ -1981,14 +1546,17 @@ class AsyncDatasetsClient:
         file : core.File
             See core.File for more documentation
 
-        commit_message : str
-            Commit message for the new Dataset version.
-
         version_id : typing.Optional[str]
             ID of the specific Dataset version to base the created Version on.
 
         environment : typing.Optional[str]
             Name of the Environment identifying a deployed Version to base the created Version on.
+
+        version_name : typing.Optional[str]
+            Name for the new Dataset version.
+
+        version_description : typing.Optional[str]
+            Description for the new Dataset version.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2012,51 +1580,21 @@ class AsyncDatasetsClient:
         async def main() -> None:
             await client.datasets.upload_csv(
                 id="id",
-                commit_message="commit_message",
             )
 
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/datapoints/csv",
-            method="POST",
-            params={
-                "version_id": version_id,
-                "environment": environment,
-            },
-            data={
-                "commit_message": commit_message,
-            },
-            files={
-                "file": file,
-            },
+        response = await self._raw_client.upload_csv(
+            id,
+            file=file,
+            version_id=version_id,
+            environment=environment,
+            version_name=version_name,
+            version_description=version_description,
             request_options=request_options,
-            omit=OMIT,
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def set_deployment(
         self, id: str, environment_id: str, *, version_id: str, request_options: typing.Optional[RequestOptions] = None
@@ -2106,37 +1644,10 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="POST",
-            params={
-                "version_id": version_id,
-            },
-            request_options=request_options,
+        response = await self._raw_client.set_deployment(
+            id, environment_id, version_id=version_id, request_options=request_options
         )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DatasetResponse,
-                    construct_type(
-                        type_=DatasetResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        return response.data
 
     async def remove_deployment(
         self, id: str, environment_id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2181,28 +1692,8 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/environments/{jsonable_encoder(environment_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.remove_deployment(id, environment_id, request_options=request_options)
+        return response.data
 
     async def list_environments(
         self, id: str, *, request_options: typing.Optional[RequestOptions] = None
@@ -2242,31 +1733,5 @@ class AsyncDatasetsClient:
 
         asyncio.run(main())
         """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"datasets/{jsonable_encoder(id)}/environments",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[FileEnvironmentResponse],
-                    construct_type(
-                        type_=typing.List[FileEnvironmentResponse],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        construct_type(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
+        response = await self._raw_client.list_environments(id, request_options=request_options)
+        return response.data

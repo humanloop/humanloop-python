@@ -8,7 +8,6 @@ import typing
 from .environment_response import EnvironmentResponseParams
 import datetime as dt
 from ..types.user_response import UserResponse
-from ..types.version_status import VersionStatus
 from .input_response import InputResponseParams
 from .evaluator_aggregate import EvaluatorAggregateParams
 import typing
@@ -37,9 +36,14 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
     ID of the directory that the file is in on Humanloop.
     """
 
-    commit_message: typing_extensions.NotRequired[str]
+    version_name: typing_extensions.NotRequired[str]
     """
-    Message describing the changes made.
+    Unique name for the Evaluator version. Version names must be unique for a given Evaluator.
+    """
+
+    version_description: typing_extensions.NotRequired[str]
+    """
+    Description of the version, e.g., the changes made in this version.
     """
 
     spec: EvaluatorResponseSpecParams
@@ -81,17 +85,6 @@ class EvaluatorResponseParams(typing_extensions.TypedDict):
     The user who created the Evaluator.
     """
 
-    committed_by: typing_extensions.NotRequired[UserResponse]
-    """
-    The user who committed the Evaluator Version.
-    """
-
-    committed_at: typing_extensions.NotRequired[dt.datetime]
-    """
-    The date and time the Evaluator Version was committed.
-    """
-
-    status: VersionStatus
     last_used_at: dt.datetime
     version_logs_count: int
     """

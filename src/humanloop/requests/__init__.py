@@ -6,7 +6,6 @@ from .chat_message import ChatMessageParams
 from .chat_message_content import ChatMessageContentParams
 from .chat_message_content_item import ChatMessageContentItemParams
 from .code_evaluator_request import CodeEvaluatorRequestParams
-from .commit_request import CommitRequestParams
 from .create_datapoint_request import CreateDatapointRequestParams
 from .create_datapoint_request_target_value import CreateDatapointRequestTargetValueParams
 from .create_evaluator_log_response import CreateEvaluatorLogResponseParams
@@ -123,6 +122,7 @@ from .tool_function import ToolFunctionParams
 from .tool_kernel_request import ToolKernelRequestParams
 from .tool_log_response import ToolLogResponseParams
 from .tool_response import ToolResponseParams
+from .update_version_request import UpdateVersionRequestParams
 from .validation_error import ValidationErrorParams
 from .validation_error_loc_item import ValidationErrorLocItemParams
 from .version_deployment_response import VersionDeploymentResponseParams
@@ -141,7 +141,6 @@ __all__ = [
     "ChatMessageContentParams",
     "ChatMessageParams",
     "CodeEvaluatorRequestParams",
-    "CommitRequestParams",
     "CreateDatapointRequestParams",
     "CreateDatapointRequestTargetValueParams",
     "CreateEvaluatorLogResponseParams",
@@ -248,6 +247,7 @@ __all__ = [
     "ToolKernelRequestParams",
     "ToolLogResponseParams",
     "ToolResponseParams",
+    "UpdateVersionRequestParams",
     "ValidationErrorLocItemParams",
     "ValidationErrorParams",
     "VersionDeploymentResponseFileParams",

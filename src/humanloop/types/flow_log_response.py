@@ -178,14 +178,4 @@ from .prompt_log_response import PromptLogResponse  # noqa: E402
 from .tool_log_response import ToolLogResponse  # noqa: E402
 from .log_response import LogResponse  # noqa: E402
 
-update_forward_refs(EvaluatorLogResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(EvaluatorResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(FlowResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(MonitoringEvaluatorResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(PromptLogResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(PromptResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(ToolLogResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(ToolResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(VersionDeploymentResponse, FlowLogResponse=FlowLogResponse)
-update_forward_refs(VersionIdResponse, FlowLogResponse=FlowLogResponse)
 update_forward_refs(FlowLogResponse)

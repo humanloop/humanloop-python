@@ -9,7 +9,6 @@ from .chat_message_content_item import ChatMessageContentItem
 from .chat_role import ChatRole
 from .chat_tool_type import ChatToolType
 from .code_evaluator_request import CodeEvaluatorRequest
-from .commit_request import CommitRequest
 from .config_tool_response import ConfigToolResponse
 from .create_datapoint_request import CreateDatapointRequest
 from .create_datapoint_request_target_value import CreateDatapointRequestTargetValue
@@ -152,6 +151,7 @@ from .tool_log_response import ToolLogResponse
 from .tool_response import ToolResponse
 from .update_dateset_action import UpdateDatesetAction
 from .update_evaluation_status_request import UpdateEvaluationStatusRequest
+from .update_version_request import UpdateVersionRequest
 from .user_response import UserResponse
 from .valence import Valence
 from .validation_error import ValidationError
@@ -176,7 +176,6 @@ __all__ = [
     "ChatRole",
     "ChatToolType",
     "CodeEvaluatorRequest",
-    "CommitRequest",
     "ConfigToolResponse",
     "CreateDatapointRequest",
     "CreateDatapointRequestTargetValue",
@@ -313,6 +312,7 @@ __all__ = [
     "ToolResponse",
     "UpdateDatesetAction",
     "UpdateEvaluationStatusRequest",
+    "UpdateVersionRequest",
     "UserResponse",
     "Valence",
     "ValidationError",

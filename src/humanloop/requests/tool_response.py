@@ -9,7 +9,6 @@ from ..types.files_tool_type import FilesToolType
 from .environment_response import EnvironmentResponseParams
 import datetime as dt
 from ..types.user_response import UserResponse
-from ..types.version_status import VersionStatus
 from .input_response import InputResponseParams
 from .evaluator_aggregate import EvaluatorAggregateParams
 import typing
@@ -66,9 +65,14 @@ class ToolResponseParams(typing_extensions.TypedDict):
     Type of Tool.
     """
 
-    commit_message: typing_extensions.NotRequired[str]
+    version_name: typing_extensions.NotRequired[str]
     """
-    Message describing the changes made.
+    Unique identifier for this Tool version. Each Tool can only have one version with a given name.
+    """
+
+    version_description: typing_extensions.NotRequired[str]
+    """
+    Description of the Version.
     """
 
     name: str
@@ -107,21 +111,6 @@ class ToolResponseParams(typing_extensions.TypedDict):
     created_by: typing_extensions.NotRequired[UserResponse]
     """
     The user who created the Tool.
-    """
-
-    committed_by: typing_extensions.NotRequired[UserResponse]
-    """
-    The user who committed the Tool Version.
-    """
-
-    committed_at: typing_extensions.NotRequired[dt.datetime]
-    """
-    The date and time the Tool Version was committed.
-    """
-
-    status: VersionStatus
-    """
-    The status of the Tool Version.
     """
 
     last_used_at: dt.datetime
