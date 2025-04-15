@@ -127,6 +127,7 @@ class Humanloop(BaseHumanloop):
         self.prompts = overload_call(client=self.prompts)
         self.flows = overload_log(client=self.flows)
         self.tools = overload_log(client=self.tools)
+        self.agents = overload_log(client=self.agents)
 
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider
@@ -144,9 +145,7 @@ class Humanloop(BaseHumanloop):
         )
 
         if opentelemetry_tracer is None:
-            self._opentelemetry_tracer = self._tracer_provider.get_tracer(
-                "humanloop.sdk"
-            )
+            self._opentelemetry_tracer = self._tracer_provider.get_tracer("humanloop.sdk")
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
 

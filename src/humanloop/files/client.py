@@ -7,8 +7,8 @@ from ..types.file_type import FileType
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
-from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response import (
-    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
+from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response_agent_response import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,
 )
 from .types.retrieve_by_path_files_retrieve_by_path_post_response import RetrieveByPathFilesRetrieveByPathPostResponse
 from ..core.client_wrapper import AsyncClientWrapper
@@ -45,7 +45,7 @@ class FilesClient:
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse:
+    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse:
         """
         Get a paginated list of files.
 
@@ -80,7 +80,7 @@ class FilesClient:
 
         Returns
         -------
-        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
             Successful Response
 
         Examples
@@ -175,7 +175,7 @@ class AsyncFilesClient:
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse:
+    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse:
         """
         Get a paginated list of files.
 
@@ -210,7 +210,7 @@ class AsyncFilesClient:
 
         Returns
         -------
-        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
             Successful Response
 
         Examples

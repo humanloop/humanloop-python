@@ -3,5 +3,5 @@
 import typing
 
 FilesToolType = typing.Union[
-    typing.Literal["pinecone_search", "google", "mock", "snippet", "json_schema", "get_api_call"], typing.Any
+    typing.Literal["pinecone_search", "google", "mock", "snippet", "json_schema", "get_api_call", "python"], typing.Any
 ]

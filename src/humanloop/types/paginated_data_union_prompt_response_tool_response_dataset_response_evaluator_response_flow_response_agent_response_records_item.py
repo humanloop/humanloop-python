@@ -6,7 +6,8 @@ from .tool_response import ToolResponse
 from .dataset_response import DatasetResponse
 from .evaluator_response import EvaluatorResponse
 from .flow_response import FlowResponse
+from .agent_response import AgentResponse
 
-PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseRecordsItem = typing.Union[
-    PromptResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse
-]
+PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponseRecordsItem = (
+    typing.Union[PromptResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse, AgentResponse]
+)
