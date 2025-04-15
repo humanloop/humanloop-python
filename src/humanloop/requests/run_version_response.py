@@ -5,7 +5,8 @@ from .prompt_response import PromptResponseParams
 from .tool_response import ToolResponseParams
 from .evaluator_response import EvaluatorResponseParams
 from .flow_response import FlowResponseParams
+from .agent_response import AgentResponseParams
 
 RunVersionResponseParams = typing.Union[
-    PromptResponseParams, ToolResponseParams, EvaluatorResponseParams, FlowResponseParams
+    PromptResponseParams, ToolResponseParams, EvaluatorResponseParams, FlowResponseParams, AgentResponseParams
 ]

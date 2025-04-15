@@ -2,6 +2,7 @@
 
 from .prompt_log_request_tool_choice import PromptLogRequestToolChoice
 from .prompt_log_update_request_tool_choice import PromptLogUpdateRequestToolChoice
+from .prompt_request_reasoning_effort import PromptRequestReasoningEffort
 from .prompt_request_stop import PromptRequestStop
 from .prompt_request_template import PromptRequestTemplate
 from .prompts_call_request_tool_choice import PromptsCallRequestToolChoice
@@ -10,6 +11,7 @@ from .prompts_call_stream_request_tool_choice import PromptsCallStreamRequestToo
 __all__ = [
     "PromptLogRequestToolChoice",
     "PromptLogUpdateRequestToolChoice",
+    "PromptRequestReasoningEffort",
     "PromptRequestStop",
     "PromptRequestTemplate",
     "PromptsCallRequestToolChoice",

@@ -6,7 +6,13 @@ from ...requests.tool_response import ToolResponseParams
 from ...requests.dataset_response import DatasetResponseParams
 from ...requests.evaluator_response import EvaluatorResponseParams
 from ...requests.flow_response import FlowResponseParams
+from ...requests.agent_response import AgentResponseParams
 
 RetrieveByPathFilesRetrieveByPathPostResponseParams = typing.Union[
-    PromptResponseParams, ToolResponseParams, DatasetResponseParams, EvaluatorResponseParams, FlowResponseParams
+    PromptResponseParams,
+    ToolResponseParams,
+    DatasetResponseParams,
+    EvaluatorResponseParams,
+    FlowResponseParams,
+    AgentResponseParams,
 ]

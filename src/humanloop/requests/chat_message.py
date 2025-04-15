@@ -6,6 +6,7 @@ from .chat_message_content import ChatMessageContentParams
 from ..types.chat_role import ChatRole
 import typing
 from .tool_call import ToolCallParams
+from .chat_message_thinking_item import ChatMessageThinkingItemParams
 
 
 class ChatMessageParams(typing_extensions.TypedDict):
@@ -32,4 +33,9 @@ class ChatMessageParams(typing_extensions.TypedDict):
     tool_calls: typing_extensions.NotRequired[typing.Sequence[ToolCallParams]]
     """
     A list of tool calls requested by the assistant.
+    """
+
+    thinking: typing_extensions.NotRequired[typing.Sequence[ChatMessageThinkingItemParams]]
+    """
+    Model's chain-of-thought for providing the response. Present on assistant messages if model supports it.
     """

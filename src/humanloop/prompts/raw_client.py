@@ -32,7 +32,7 @@ from ..types.template_language import TemplateLanguage
 from ..types.model_providers import ModelProviders
 from .requests.prompt_request_stop import PromptRequestStopParams
 from ..requests.response_format import ResponseFormatParams
-from ..types.reasoning_effort import ReasoningEffort
+from .requests.prompt_request_reasoning_effort import PromptRequestReasoningEffortParams
 from ..requests.tool_function import ToolFunctionParams
 from ..types.prompt_response import PromptResponse
 from ..types.populate_template_response import PopulateTemplateResponse
@@ -915,7 +915,7 @@ class RawPromptsClient:
         other: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         seed: typing.Optional[int] = OMIT,
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
-        reasoning_effort: typing.Optional[ReasoningEffort] = OMIT,
+        reasoning_effort: typing.Optional[PromptRequestReasoningEffortParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -990,8 +990,8 @@ class RawPromptsClient:
         response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        reasoning_effort : typing.Optional[ReasoningEffort]
-            Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+        reasoning_effort : typing.Optional[PromptRequestReasoningEffortParams]
+            Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
 
         tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
@@ -1051,7 +1051,9 @@ class RawPromptsClient:
                 "response_format": convert_and_respect_annotation_metadata(
                     object_=response_format, annotation=ResponseFormatParams, direction="write"
                 ),
-                "reasoning_effort": reasoning_effort,
+                "reasoning_effort": convert_and_respect_annotation_metadata(
+                    object_=reasoning_effort, annotation=PromptRequestReasoningEffortParams, direction="write"
+                ),
                 "tools": convert_and_respect_annotation_metadata(
                     object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
                 ),
@@ -2609,7 +2611,7 @@ class AsyncRawPromptsClient:
         other: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         seed: typing.Optional[int] = OMIT,
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
-        reasoning_effort: typing.Optional[ReasoningEffort] = OMIT,
+        reasoning_effort: typing.Optional[PromptRequestReasoningEffortParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2684,8 +2686,8 @@ class AsyncRawPromptsClient:
         response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        reasoning_effort : typing.Optional[ReasoningEffort]
-            Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+        reasoning_effort : typing.Optional[PromptRequestReasoningEffortParams]
+            Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
 
         tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
@@ -2745,7 +2747,9 @@ class AsyncRawPromptsClient:
                 "response_format": convert_and_respect_annotation_metadata(
                     object_=response_format, annotation=ResponseFormatParams, direction="write"
                 ),
-                "reasoning_effort": reasoning_effort,
+                "reasoning_effort": convert_and_respect_annotation_metadata(
+                    object_=reasoning_effort, annotation=PromptRequestReasoningEffortParams, direction="write"
+                ),
                 "tools": convert_and_respect_annotation_metadata(
                     object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
                 ),

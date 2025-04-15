@@ -42,6 +42,11 @@ class DatasetResponseParams(typing_extensions.TypedDict):
     Description of the Dataset.
     """
 
+    schema: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    The JSON schema for the File.
+    """
+
     readme: typing_extensions.NotRequired[str]
     """
     Long description of the file.

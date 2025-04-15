@@ -6,7 +6,8 @@ from .tool_response import ToolResponse
 from .evaluator_response import EvaluatorResponse
 from .dataset_response import DatasetResponse
 from .flow_response import FlowResponse
+from .agent_response import AgentResponse
 
 DirectoryWithParentsAndChildrenResponseFilesItem = typing.Union[
-    PromptResponse, ToolResponse, EvaluatorResponse, DatasetResponse, FlowResponse
+    PromptResponse, ToolResponse, EvaluatorResponse, DatasetResponse, FlowResponse, AgentResponse
 ]

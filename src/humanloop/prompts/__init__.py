@@ -3,6 +3,7 @@
 from .types import (
     PromptLogRequestToolChoice,
     PromptLogUpdateRequestToolChoice,
+    PromptRequestReasoningEffort,
     PromptRequestStop,
     PromptRequestTemplate,
     PromptsCallRequestToolChoice,
@@ -11,6 +12,7 @@ from .types import (
 from .requests import (
     PromptLogRequestToolChoiceParams,
     PromptLogUpdateRequestToolChoiceParams,
+    PromptRequestReasoningEffortParams,
     PromptRequestStopParams,
     PromptRequestTemplateParams,
     PromptsCallRequestToolChoiceParams,
@@ -22,6 +24,8 @@ __all__ = [
     "PromptLogRequestToolChoiceParams",
     "PromptLogUpdateRequestToolChoice",
     "PromptLogUpdateRequestToolChoiceParams",
+    "PromptRequestReasoningEffort",
+    "PromptRequestReasoningEffortParams",
     "PromptRequestStop",
     "PromptRequestStopParams",
     "PromptRequestTemplate",

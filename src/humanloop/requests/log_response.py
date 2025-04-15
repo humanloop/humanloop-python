@@ -9,6 +9,11 @@ if typing.TYPE_CHECKING:
     from .tool_log_response import ToolLogResponseParams
     from .evaluator_log_response import EvaluatorLogResponseParams
     from .flow_log_response import FlowLogResponseParams
+    from .agent_log_response import AgentLogResponseParams
 LogResponseParams = typing.Union[
-    "PromptLogResponseParams", "ToolLogResponseParams", "EvaluatorLogResponseParams", "FlowLogResponseParams"
+    "PromptLogResponseParams",
+    "ToolLogResponseParams",
+    "EvaluatorLogResponseParams",
+    "FlowLogResponseParams",
+    "AgentLogResponseParams",
 ]

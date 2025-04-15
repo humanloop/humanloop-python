@@ -4,6 +4,8 @@ from __future__ import annotations
 from ..core.unchecked_base_model import UncheckedBaseModel
 import pydantic
 import typing
+import typing_extensions
+from ..core.serialization import FieldMetadata
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
@@ -55,6 +57,13 @@ class FlowResponse(UncheckedBaseModel):
     description: typing.Optional[str] = pydantic.Field(default=None)
     """
     Description of the Flow.
+    """
+
+    schema_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="schema")
+    ] = pydantic.Field(default=None)
+    """
+    The JSON schema for the File.
     """
 
     readme: typing.Optional[str] = pydantic.Field(default=None)
@@ -111,6 +120,8 @@ class FlowResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .agent_linked_file_response import AgentLinkedFileResponse  # noqa: E402
+from .agent_response import AgentResponse  # noqa: E402
 from .evaluator_response import EvaluatorResponse  # noqa: E402
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402
 from .prompt_response import PromptResponse  # noqa: E402
