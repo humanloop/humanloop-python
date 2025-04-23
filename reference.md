@@ -35,40 +35,11 @@ in the case where you are storing or deriving your Prompt details in code.
 <dd>
 
 ```python
-import datetime
-
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.log(
-    path="persona",
-    prompt={
-        "model": "gpt-4",
-        "template": [
-            {
-                "role": "system",
-                "content": "You are {{person}}. Answer questions as this person. Do not break character.",
-            }
-        ],
-    },
-    messages=[{"role": "user", "content": "What really happened at Roswell?"}],
-    inputs={"person": "Trump"},
-    created_at=datetime.datetime.fromisoformat(
-        "2024-07-18 23:29:35.178000+00:00",
-    ),
-    provider_latency=6.5931549072265625,
-    output_message={
-        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
-        "role": "assistant",
-    },
-    prompt_tokens=100,
-    output_tokens=220,
-    prompt_cost=1e-05,
-    output_cost=0.0002,
-    finish_reason="stop",
-)
+import datetime
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.log(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are {{person}}. Answer questions as this person. Do not break character.'}]}, messages=[{'role': "user", 'content': 'What really happened at Roswell?'}], inputs={'person': 'Trump'
+}, created_at=datetime.datetime.fromisoformat("2024-07-18 21:29:35.178000+00:00", ), provider_latency=6.5931549072265625, output_message={'content': "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.", 'role': "assistant"}, prompt_tokens=100, output_tokens=220, prompt_cost=1e-05, output_cost=0.0002, finish_reason='stop', )
 
 ```
 </dd>
@@ -404,14 +375,8 @@ Update the details of a Log with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.update_log(
-    id="id",
-    log_id="log_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.update_log(id='id', log_id='log_id', )
 
 ```
 </dd>
@@ -676,10 +641,7 @@ in the case where you are storing or deriving your Prompt details in code.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
 response = client.prompts.call_stream()
 for chunk in response.data:
     yield chunk
@@ -947,16 +909,9 @@ in the case where you are storing or deriving your Prompt details in code.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.call(
-    version_id="prv_Wu6zx1lAWJRqOyL8nWuZk",
-    path="persona",
-    messages=[{"role": "user", "content": "What really happened at Roswell?"}],
-    inputs={"person": "Trump"},
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.call(version_id='prv_Wu6zx1lAWJRqOyL8nWuZk', path='persona', messages=[{'role': "user", 'content': 'What really happened at Roswell?'}], inputs={'person': 'Trump'
+}, )
 
 ```
 </dd>
@@ -1210,13 +1165,8 @@ Get a list of all Prompts.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.prompts.list(
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.prompts.list(size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -1331,24 +1281,8 @@ that already exists will result in a 409 Conflict error.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.upsert(
-    path="Personal Projects/Coding Assistant",
-    model="gpt-4o",
-    endpoint="chat",
-    template=[
-        {
-            "content": "You are a helpful coding assistant specialising in {{language}}",
-            "role": "system",
-        }
-    ],
-    provider="openai",
-    max_tokens=-1,
-    temperature=0.7,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.upsert(path='Personal Projects/Coding Assistant', model='gpt-4o', endpoint="chat", template=[{'content': 'You are a helpful coding assistant specialising in {{language}}', 'role': "system"}], provider="openai", max_tokens=-1, temperature=0.7, version_name='coding-assistant-v1', version_description='Initial version', )
 
 ```
 </dd>
@@ -1614,13 +1548,8 @@ By default, the deployed version of the Prompt is returned. Use the query parame
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.get(
-    id="pr_30gco7dx6JDq4200GVOHa",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.get(id='pr_30gco7dx6JDq4200GVOHa', )
 
 ```
 </dd>
@@ -1700,13 +1629,8 @@ Delete the Prompt with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.delete(
-    id="pr_30gco7dx6JDq4200GVOHa",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.delete(id='pr_30gco7dx6JDq4200GVOHa', )
 
 ```
 </dd>
@@ -1770,14 +1694,8 @@ Move the Prompt to a different path or change the name.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.move(
-    id="pr_30gco7dx6JDq4200GVOHa",
-    path="new directory/new name",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.move(id='pr_30gco7dx6JDq4200GVOHa', path='new directory/new name', )
 
 ```
 </dd>
@@ -1860,14 +1778,9 @@ By default, the deployed version of the Prompt is returned. Use the query parame
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.populate(
-    id="id",
-    request={"key": "value"},
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.populate(id='id', request={'key': 'value'
+}, )
 
 ```
 </dd>
@@ -1955,13 +1868,8 @@ Get a list of all the versions of a Prompt.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.list_versions(
-    id="pr_30gco7dx6JDq4200GVOHa",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.list_versions(id='pr_30gco7dx6JDq4200GVOHa', )
 
 ```
 </dd>
@@ -2033,14 +1941,8 @@ Delete a version of the Prompt.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.delete_prompt_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.delete_prompt_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -2112,14 +2014,8 @@ Update the name or description of the Prompt version.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.patch_prompt_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.patch_prompt_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -2210,15 +2106,8 @@ will be used for calls made to the Prompt in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.set_deployment(
-    id="id",
-    environment_id="environment_id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.set_deployment(id='id', environment_id='environment_id', version_id='version_id', )
 
 ```
 </dd>
@@ -2301,14 +2190,8 @@ will no longer be used for calls made to the Prompt in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.remove_deployment(
-    id="id",
-    environment_id="environment_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.remove_deployment(id='id', environment_id='environment_id', )
 
 ```
 </dd>
@@ -2380,13 +2263,8 @@ List all Environments and their deployed versions for the Prompt.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.list_environments(
-    id="pr_30gco7dx6JDq4200GVOHa",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.list_environments(id='pr_30gco7dx6JDq4200GVOHa', )
 
 ```
 </dd>
@@ -2453,14 +2331,8 @@ within the Prompt for monitoring purposes.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.prompts.update_monitoring(
-    id="pr_30gco7dx6JDq4200GVOHa",
-    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.prompts.update_monitoring(id='pr_30gco7dx6JDq4200GVOHa', activate=[{'evaluator_version_id': 'evv_1abc4308abd'}], )
 
 ```
 </dd>
@@ -2484,9 +2356,7 @@ client.prompts.update_monitoring(
 <dl>
 <dd>
 
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+**activate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -2494,9 +2364,7 @@ client.prompts.update_monitoring(
 <dl>
 <dd>
 
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
+**deactivate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -2553,29 +2421,13 @@ in the case where you are storing or deriving your Tool details in code.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.log(
-    path="math-tool",
-    tool={
-        "function": {
-            "name": "multiply",
-            "description": "Multiply two numbers",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "a": {"type": "number"},
-                    "b": {"type": "number"},
-                },
-                "required": ["a", "b"],
-            },
-        }
-    },
-    inputs={"a": 5, "b": 7},
-    output="35",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.log(path='math-tool', tool={'function': {'name': 'multiply', 'description': 'Multiply two numbers', 'parameters': {'type': 'object'
+, 'properties': {'a': {'type': 'number'}, 'b': {'type': 'number'}}
+, 'required': ['a', 'b']
+}}}, inputs={'a': 5
+, 'b': 7
+}, output='35', )
 
 ```
 </dd>
@@ -2825,14 +2677,8 @@ Update the details of a Log with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.update(
-    id="id",
-    log_id="log_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.update(id='id', log_id='log_id', )
 
 ```
 </dd>
@@ -3008,13 +2854,8 @@ Get a list of all Tools.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.tools.list(
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.tools.list(size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -3129,22 +2970,11 @@ that already exists will result in a 409 Conflict error.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.upsert(
-    path="math-tool",
-    function={
-        "name": "multiply",
-        "description": "Multiply two numbers",
-        "parameters": {
-            "type": "object",
-            "properties": {"a": {"type": "number"}, "b": {"type": "number"}},
-            "required": ["a", "b"],
-        },
-    },
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.upsert(path='math-tool', function={'name': 'multiply', 'description': 'Multiply two numbers', 'parameters': {'type': 'object'
+, 'properties': {'a': {'type': 'number'}, 'b': {'type': 'number'}}
+, 'required': ['a', 'b']
+}}, version_name='math-tool-v1', version_description='Simple math tool that multiplies two numbers', )
 
 ```
 </dd>
@@ -3275,13 +3105,8 @@ By default, the deployed version of the Tool is returned. Use the query paramete
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.get(
-    id="tl_789ghi",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.get(id='tl_789ghi', )
 
 ```
 </dd>
@@ -3361,13 +3186,8 @@ Delete the Tool with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.delete(
-    id="tl_789ghi",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.delete(id='tl_789ghi', )
 
 ```
 </dd>
@@ -3431,14 +3251,8 @@ Move the Tool to a different path or change the name.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.move(
-    id="tl_789ghi",
-    path="new directory/new name",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.move(id='tl_789ghi', path='new directory/new name', )
 
 ```
 </dd>
@@ -3518,13 +3332,8 @@ Get a list of all the versions of a Tool.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.list_versions(
-    id="tl_789ghi",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.list_versions(id='tl_789ghi', )
 
 ```
 </dd>
@@ -3596,14 +3405,8 @@ Delete a version of the Tool.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.delete_tool_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.delete_tool_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -3675,14 +3478,8 @@ Update the name or description of the Tool version.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.update_tool_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.update_tool_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -3773,15 +3570,8 @@ will be used for calls made to the Tool in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.set_deployment(
-    id="tl_789ghi",
-    environment_id="staging",
-    version_id="tv_012jkl",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.set_deployment(id='tl_789ghi', environment_id='staging', version_id='tv_012jkl', )
 
 ```
 </dd>
@@ -3864,14 +3654,8 @@ will no longer be used for calls made to the Tool in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.remove_deployment(
-    id="tl_789ghi",
-    environment_id="staging",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.remove_deployment(id='tl_789ghi', environment_id='staging', )
 
 ```
 </dd>
@@ -3943,13 +3727,8 @@ List all Environments and their deployed versions for the Tool.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.list_environments(
-    id="tl_789ghi",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.list_environments(id='tl_789ghi', )
 
 ```
 </dd>
@@ -4016,14 +3795,8 @@ within the Tool for monitoring purposes.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.tools.update_monitoring(
-    id="tl_789ghi",
-    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.tools.update_monitoring(id='tl_789ghi', activate=[{'evaluator_version_id': 'evv_1abc4308abd'}], )
 
 ```
 </dd>
@@ -4047,9 +3820,7 @@ client.tools.update_monitoring(
 <dl>
 <dd>
 
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+**activate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -4057,9 +3828,7 @@ client.tools.update_monitoring(
 <dl>
 <dd>
 
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
+**deactivate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -4108,13 +3877,8 @@ List all Datasets.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.datasets.list(
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.datasets.list(size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -4239,37 +4003,8 @@ you can add a unique identifier to the Datapoint's inputs such as `{_dedupe_id: 
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.upsert(
-    path="datasets/support-queries",
-    datapoints=[
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "How do i manage my organizations API keys?\n",
-                }
-            ],
-            "target": {
-                "response": 'Hey, thanks for your questions. Here are steps for how to achieve: 1. Log in to the Humanloop Dashboard \n\n2. Click on "Organization Settings."\n If you do not see this option, you might need to contact your organization admin to gain the necessary permissions.\n\n3. Within the settings or organization settings, select the option labeled "API Keys" on the left. Here you will be able to view and manage your API keys.\n\n4. You will see a list of existing API keys. You can perform various actions, such as:\n     - **Generate New API Key:** Click on the "Generate New Key" button if you need a new API key.\n     - **Revoke an API Key:** If you need to disable an existing key, find the key in the list and click the "Revoke" or "Delete" button.\n     - **Copy an API Key:** If you need to use an existing key, you can copy it to your clipboard by clicking the "Copy" button next to the key.\n\n5. **Save and Secure API Keys:** Make sure to securely store any new or existing API keys you are using. Treat them like passwords and do not share them publicly.\n\nIf you encounter any issues or need further assistance, it might be helpful to engage with an engineer or your IT department to ensure you have the necessary permissions and support.\n\nWould you need help with anything else?'
-            },
-        },
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "Hey, can do I use my code evaluator for monitoring my legal-copilot prompt?",
-                }
-            ],
-            "target": {
-                "response": "Hey, thanks for your questions. Here are steps for how to achieve: 1. Navigate to your Prompt dashboard. \n 2. Select the `Monitoring` button on the top right of the Prompt dashboard \n 3. Within the model select the Version of the Evaluator you want to turn on for monitoring. \n\nWould you need help with anything else?"
-            },
-        },
-    ],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.upsert(path='datasets/support-queries', datapoints=[{'messages': [{'role': "user", 'content': 'How do i manage my organizations API keys?\n'}], 'target': {'response': 'Hey, thanks for your questions. Here are steps for how to achieve: 1. Log in to the Humanloop Dashboard \n\n2. Click on "Organization Settings."\n If you do not see this option, you might need to contact your organization admin to gain the necessary permissions.\n\n3. Within the settings or organization settings, select the option labeled "API Keys" on the left. Here you will be able to view and manage your API keys.\n\n4. You will see a list of existing API keys. You can perform various actions, such as:\n     - **Generate New API Key:** Click on the "Generate New Key" button if you need a new API key.\n     - **Revoke an API Key:** If you need to disable an existing key, find the key in the list and click the "Revoke" or "Delete" button.\n     - **Copy an API Key:** If you need to use an existing key, you can copy it to your clipboard by clicking the "Copy" button next to the key.\n\n5. **Save and Secure API Keys:** Make sure to securely store any new or existing API keys you are using. Treat them like passwords and do not share them publicly.\n\nIf you encounter any issues or need further assistance, it might be helpful to engage with an engineer or your IT department to ensure you have the necessary permissions and support.\n\nWould you need help with anything else?'}}, {'messages': [{'role': "user", 'content': 'Hey, can do I use my code evaluator for monitoring my legal-copilot prompt?'}], 'target': {'response': 'Hey, thanks for your questions. Here are steps for how to achieve: 1. Navigate to your Prompt dashboard. \n 2. Select the `Monitoring` button on the top right of the Prompt dashboard \n 3. Within the model select the Version of the Evaluator you want to turn on for monitoring. \n\nWould you need help with anything else?'}}], version_name='Initial version', version_description='Add two new questions and answers', )
 
 ```
 </dd>
@@ -4421,15 +4156,8 @@ By default, the deployed version of the Dataset is returned. Use the query param
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.get(
-    id="ds_b0baF1ca7652",
-    version_id="dsv_6L78pqrdFi2xa",
-    include_datapoints=True,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.get(id='ds_b0baF1ca7652', version_id='dsv_6L78pqrdFi2xa', include_datapoints=True, )
 
 ```
 </dd>
@@ -4517,13 +4245,8 @@ Delete the Dataset with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.delete(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.delete(id='id', )
 
 ```
 </dd>
@@ -4587,13 +4310,8 @@ Move the Dataset to a different path or change the name.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.move(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.move(id='id', )
 
 ```
 </dd>
@@ -4673,14 +4391,8 @@ List all Datapoints for the Dataset with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.datasets.list_datapoints(
-    id="ds_b0baF1ca7652",
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.datasets.list_datapoints(id='ds_b0baF1ca7652', size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -4781,13 +4493,8 @@ Get a list of the versions for a Dataset.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.list_versions(
-    id="ds_b0baF1ca7652",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.list_versions(id='ds_b0baF1ca7652', )
 
 ```
 </dd>
@@ -4859,14 +4566,8 @@ Delete a version of the Dataset.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.delete_dataset_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.delete_dataset_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -4938,14 +4639,8 @@ Update the name or description of the Dataset version.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.update_dataset_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.update_dataset_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -5043,13 +4738,8 @@ and `version_description` parameters.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.upload_csv(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.upload_csv(id='id', )
 
 ```
 </dd>
@@ -5074,7 +4764,6 @@ client.datasets.upload_csv(
 <dd>
 
 **file:** `from __future__ import annotations
-
 core.File` — See core.File for more documentation
     
 </dd>
@@ -5157,15 +4846,8 @@ Set the deployed version for the specified Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.set_deployment(
-    id="ds_b0baF1ca7652",
-    environment_id="staging",
-    version_id="dsv_6L78pqrdFi2xa",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.set_deployment(id='ds_b0baF1ca7652', environment_id='staging', version_id='dsv_6L78pqrdFi2xa', )
 
 ```
 </dd>
@@ -5247,14 +4929,8 @@ Remove the deployed version for the specified Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.remove_deployment(
-    id="ds_b0baF1ca7652",
-    environment_id="staging",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.remove_deployment(id='ds_b0baF1ca7652', environment_id='staging', )
 
 ```
 </dd>
@@ -5326,13 +5002,8 @@ List all Environments and their deployed versions for the Dataset.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.datasets.list_environments(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.datasets.list_environments(id='id', )
 
 ```
 </dd>
@@ -5399,13 +5070,8 @@ Creates a new Log. The evaluated Log will be set as the parent of the created Lo
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.log(
-    parent_id="parent_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.log(parent_id='parent_id', )
 
 ```
 </dd>
@@ -5685,13 +5351,8 @@ Get a list of all Evaluators.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.evaluators.list(
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.evaluators.list(size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -5806,19 +5467,8 @@ that already exists will result in a 409 Conflict error.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.upsert(
-    path="Shared Evaluators/Accuracy Evaluator",
-    spec={
-        "arguments_type": "target_required",
-        "return_type": "number",
-        "evaluator_type": "python",
-        "code": "def evaluate(answer, target):\n    return 0.5",
-    },
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.upsert(path='Shared Evaluators/Accuracy Evaluator', spec={'arguments_type': "target_required", 'return_type': "number", 'evaluator_type': 'python', 'code': 'def evaluate(answer, target):\n    return 0.5'}, version_name='simple-evaluator', version_description='Simple evaluator that returns 0.5', )
 
 ```
 </dd>
@@ -5917,13 +5567,8 @@ By default, the deployed version of the Evaluator is returned. Use the query par
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.get(
-    id="ev_890bcd",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.get(id='ev_890bcd', )
 
 ```
 </dd>
@@ -6003,13 +5648,8 @@ Delete the Evaluator with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.delete(
-    id="ev_890bcd",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.delete(id='ev_890bcd', )
 
 ```
 </dd>
@@ -6073,14 +5713,8 @@ Move the Evaluator to a different path or change the name.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.move(
-    id="ev_890bcd",
-    path="new directory/new name",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.move(id='ev_890bcd', path='new directory/new name', )
 
 ```
 </dd>
@@ -6160,13 +5794,8 @@ Get a list of all the versions of an Evaluator.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.list_versions(
-    id="ev_890bcd",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.list_versions(id='ev_890bcd', )
 
 ```
 </dd>
@@ -6238,14 +5867,8 @@ Delete a version of the Evaluator.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.delete_evaluator_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.delete_evaluator_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -6317,14 +5940,8 @@ Update the name or description of the Evaluator version.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.update_evaluator_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.update_evaluator_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -6415,15 +6032,8 @@ will be used for calls made to the Evaluator in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.set_deployment(
-    id="ev_890bcd",
-    environment_id="staging",
-    version_id="evv_012def",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.set_deployment(id='ev_890bcd', environment_id='staging', version_id='evv_012def', )
 
 ```
 </dd>
@@ -6506,14 +6116,8 @@ will no longer be used for calls made to the Evaluator in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.remove_deployment(
-    id="ev_890bcd",
-    environment_id="staging",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.remove_deployment(id='ev_890bcd', environment_id='staging', )
 
 ```
 </dd>
@@ -6585,13 +6189,8 @@ List all Environments and their deployed versions for the Evaluator.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.list_environments(
-    id="ev_890bcd",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.list_environments(id='ev_890bcd', )
 
 ```
 </dd>
@@ -6658,13 +6257,8 @@ within the Evaluator for monitoring purposes.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluators.update_monitoring(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluators.update_monitoring(id='id', )
 
 ```
 </dd>
@@ -6688,9 +6282,7 @@ client.evaluators.update_monitoring(
 <dl>
 <dd>
 
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+**activate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -6698,9 +6290,7 @@ client.evaluators.update_monitoring(
 <dl>
 <dd>
 
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
+**deactivate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -6754,41 +6344,13 @@ in order to trigger Evaluators.
 <dd>
 
 ```python
-import datetime
-
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.log(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-    flow={
-        "attributes": {
-            "prompt": {
-                "template": "You are a helpful assistant helping with medical anamnesis",
-                "model": "gpt-4o",
-                "temperature": 0.8,
-            },
-            "tool": {
-                "name": "retrieval_tool_v3",
-                "description": "Retrieval tool for MedQA.",
-                "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
-            },
-        }
-    },
-    inputs={
-        "question": "Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath."
-    },
-    output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-    log_status="incomplete",
-    start_time=datetime.datetime.fromisoformat(
-        "2024-07-08 21:40:35+00:00",
-    ),
-    end_time=datetime.datetime.fromisoformat(
-        "2024-07-08 21:40:39+00:00",
-    ),
-)
+import datetime
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.log(id='fl_6o701g4jmcanPVHxdqD0O', flow={'attributes': {'prompt': {'template': 'You are a helpful assistant helping with medical anamnesis', 'model': 'gpt-4o', 'temperature': 0.8}
+, 'tool': {'name': 'retrieval_tool_v3', 'description': 'Retrieval tool for MedQA.', 'source_code': 'def retrieval_tool(question: str) -> str:\n    pass\n'}
+}}, inputs={'question': 'Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath.'
+}, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 19:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 19:40:39+00:00", ), )
 
 ```
 </dd>
@@ -7065,18 +6627,9 @@ The end_time log attribute will be set to match the time the log is marked as co
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.update_log(
-    log_id="medqa_experiment_0001",
-    inputs={
-        "question": "Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath."
-    },
-    output="The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.",
-    log_status="complete",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.update_log(log_id='medqa_experiment_0001', inputs={'question': 'Patient with a history of diabetes and normal tension presents with chest pain and shortness of breath.'
+}, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="complete", )
 
 ```
 </dd>
@@ -7191,13 +6744,8 @@ By default, the deployed version of the Flow is returned. Use the query paramete
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.get(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.get(id='fl_6o701g4jmcanPVHxdqD0O', )
 
 ```
 </dd>
@@ -7277,13 +6825,8 @@ Delete the Flow with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.delete(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.delete(id='fl_6o701g4jmcanPVHxdqD0O', )
 
 ```
 </dd>
@@ -7347,14 +6890,8 @@ Move the Flow to a different path or change the name.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.move(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-    path="new directory/new name",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.move(id='fl_6o701g4jmcanPVHxdqD0O', path='new directory/new name', )
 
 ```
 </dd>
@@ -7442,13 +6979,8 @@ Get a list of Flows.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.flows.list(
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.flows.list(size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -7563,25 +7095,12 @@ that already exists will result in a 409 Conflict error.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.upsert(
-    path="Personal Projects/MedQA Flow",
-    attributes={
-        "prompt": {
-            "template": "You are a helpful medical assistant helping with medical anamnesis. Answer {{question}}",
-            "model": "gpt-4o",
-            "temperature": 0.8,
-        },
-        "tool": {
-            "name": "retrieval_tool_v3",
-            "description": "Retrieval tool for MedQA.",
-            "source_code": "def retrieval_tool(question: str) -> str:\n    pass\n",
-        },
-    },
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.upsert(path='Personal Projects/MedQA Flow', attributes={'prompt': {'template': 'You are a helpful medical assistant helping with medical anamnesis. Answer {{question}}', 'model': 'gpt-4o', 'temperature': 0.8}
+, 'tool': {'name': 'retrieval_tool_v3', 'description': 'Retrieval tool for MedQA.', 'source_code': 'def retrieval_tool(question: str) -> str:\n    pass\n'}
+, 'version_name': 'medqa-flow-v1'
+, 'version_description': 'Initial version'
+}, )
 
 ```
 </dd>
@@ -7677,13 +7196,8 @@ Get a list of all the versions of a Flow.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.list_versions(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.list_versions(id='fl_6o701g4jmcanPVHxdqD0O', )
 
 ```
 </dd>
@@ -7755,14 +7269,8 @@ Delete a version of the Flow.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.delete_flow_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.delete_flow_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -7834,14 +7342,8 @@ Update the name or description of the Flow version.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.update_flow_version(
-    id="id",
-    version_id="version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.update_flow_version(id='id', version_id='version_id', )
 
 ```
 </dd>
@@ -7932,15 +7434,8 @@ will be used for calls made to the Flow in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.set_deployment(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-    environment_id="staging",
-    version_id="flv_6o701g4jmcanPVHxdqD0O",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.set_deployment(id='fl_6o701g4jmcanPVHxdqD0O', environment_id='staging', version_id='flv_6o701g4jmcanPVHxdqD0O', )
 
 ```
 </dd>
@@ -8023,14 +7518,8 @@ will no longer be used for calls made to the Flow in this Environment.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.remove_deployment(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-    environment_id="staging",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.remove_deployment(id='fl_6o701g4jmcanPVHxdqD0O', environment_id='staging', )
 
 ```
 </dd>
@@ -8102,13 +7591,8 @@ List all Environments and their deployed versions for the Flow.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.list_environments(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.list_environments(id='fl_6o701g4jmcanPVHxdqD0O', )
 
 ```
 </dd>
@@ -8175,14 +7659,8 @@ within the Flow for monitoring purposes.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.flows.update_monitoring(
-    id="fl_6o701g4jmcanPVHxdqD0O",
-    activate=[{"evaluator_version_id": "evv_1abc4308abd"}],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.flows.update_monitoring(id='fl_6o701g4jmcanPVHxdqD0O', activate=[{'evaluator_version_id': 'evv_1abc4308abd'}], )
 
 ```
 </dd>
@@ -8206,9 +7684,7 @@ client.flows.update_monitoring(
 <dl>
 <dd>
 
-**activate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]
-]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
+**activate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestActivateItemParams]]` — Evaluators to activate for Monitoring. These will be automatically run on new Logs.
     
 </dd>
 </dl>
@@ -8216,9 +7692,7 @@ client.flows.update_monitoring(
 <dl>
 <dd>
 
-**deactivate:** `typing.Optional[
-    typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]
-]` — Evaluators to deactivate. These will not be run on new Logs.
+**deactivate:** `typing.Optional[typing.Sequence[EvaluatorActivationDeactivationRequestDeactivateItemParams]]` — Evaluators to deactivate. These will not be run on new Logs.
     
 </dd>
 </dl>
@@ -8267,10 +7741,7 @@ Retrieve a list of all Directories.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
 client.directories.list()
 
 ```
@@ -8327,10 +7798,7 @@ Creates a Directory.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
 client.directories.create()
 
 ```
@@ -8411,13 +7879,8 @@ Fetches a directory by ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.get(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.directories.get(id='id', )
 
 ```
 </dd>
@@ -8483,13 +7946,8 @@ The Directory must be empty (i.e. contain no Directories or Files).
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.delete(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.directories.delete(id='id', )
 
 ```
 </dd>
@@ -8553,13 +8011,8 @@ Update the Directory with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.directories.update(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.directories.update(id='id', )
 
 ```
 </dd>
@@ -8648,10 +8101,7 @@ Get a paginated list of files.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
 client.files.list_files()
 
 ```
@@ -8772,13 +8222,8 @@ Retrieve a File by path.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.files.retrieve_by_path(
-    path="path",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.files.retrieve_by_path(path='path', )
 
 ```
 </dd>
@@ -8851,14 +8296,8 @@ Retrieve a list of Evaluations for the specified File.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.evaluations.list(
-    file_id="pr_30gco7dx6JDq4200GVOHa",
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.evaluations.list(file_id='pr_30gco7dx6JDq4200GVOHa', size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -8947,13 +8386,8 @@ You can then add Runs to this Evaluation using the `POST /evaluations/{id}/runs`
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.create(
-    evaluators=[{"version_id": "version_id"}],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.create(evaluators=[{'version_id': 'version_id'}], )
 
 ```
 </dd>
@@ -9035,14 +8469,8 @@ The Evaluators will be run on the Logs generated for the Evaluation.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.add_evaluators(
-    id="id",
-    evaluators=[{"version_id": "version_id"}],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.add_evaluators(id='id', evaluators=[{'version_id': 'version_id'}], )
 
 ```
 </dd>
@@ -9116,14 +8544,8 @@ The Evaluator will no longer be run on the Logs in the Evaluation.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.remove_evaluator(
-    id="id",
-    evaluator_version_id="evaluator_version_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.remove_evaluator(id='id', evaluator_version_id='evaluator_version_id', )
 
 ```
 </dd>
@@ -9201,13 +8623,8 @@ To retrieve stats for the Evaluation, use the `GET /evaluations/{id}/stats` endp
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.get(
-    id="ev_567yza",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.get(id='ev_567yza', )
 
 ```
 </dd>
@@ -9273,13 +8690,8 @@ The Runs and Evaluators in the Evaluation will not be deleted.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.delete(
-    id="ev_567yza",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.delete(id='ev_567yza', )
 
 ```
 </dd>
@@ -9343,13 +8755,8 @@ List all Runs for an Evaluation.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.list_runs_for_evaluation(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.list_runs_for_evaluation(id='id', )
 
 ```
 </dd>
@@ -9426,13 +8833,8 @@ the `GET /evaluations/{id}/runs` endpoint and check its status.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.create_run(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.create_run(id='id', )
 
 ```
 </dd>
@@ -9531,14 +8933,8 @@ that exists within another Evaluation.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.add_existing_run(
-    id="id",
-    run_id="run_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.add_existing_run(id='id', run_id='run_id', )
 
 ```
 </dd>
@@ -9613,14 +9009,8 @@ If this Run is used in any other Evaluations, it will still be available in thos
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.remove_run(
-    id="id",
-    run_id="run_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.remove_run(id='id', run_id='run_id', )
 
 ```
 </dd>
@@ -9695,14 +9085,8 @@ You can cancel a running/pending Run, or mark a Run that uses external or human 
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.update_evaluation_run(
-    id="id",
-    run_id="run_id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.update_evaluation_run(id='id', run_id='run_id', )
 
 ```
 </dd>
@@ -9790,15 +9174,8 @@ Add the specified Logs to a Run.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.add_logs_to_run(
-    id="id",
-    run_id="run_id",
-    log_ids=["log_ids"],
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.add_logs_to_run(id='id', run_id='run_id', log_ids=['log_ids'], )
 
 ```
 </dd>
@@ -9881,13 +9258,8 @@ corresponding Evaluator statistics (such as the mean and percentiles).
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.get_stats(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.get_stats(id='id', )
 
 ```
 </dd>
@@ -9953,13 +9325,8 @@ This returns the Logs associated to all Runs within with the Evaluation.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.evaluations.get_logs(
-    id="id",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.evaluations.get_logs(id='id', )
 
 ```
 </dd>
@@ -10048,14 +9415,8 @@ List all Logs for the given filter criteria.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-response = client.logs.list(
-    file_id="file_123abc",
-    size=1,
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+response = client.logs.list(file_id='file_123abc', size=1, )
 for item in response:
     yield item
 # alternatively, you can paginate page-by-page
@@ -10228,13 +9589,8 @@ Delete Logs with the given IDs.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.logs.delete(
-    id="prv_Wu6zx1lAWJRqOyL8nWuZk",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.logs.delete(id='prv_Wu6zx1lAWJRqOyL8nWuZk', )
 
 ```
 </dd>
@@ -10298,13 +9654,8 @@ Retrieve the Log with the given ID.
 
 ```python
 from humanloop import Humanloop
-
-client = Humanloop(
-    api_key="YOUR_API_KEY",
-)
-client.logs.get(
-    id="prv_Wu6zx1lAWJRqOyL8nWuZk",
-)
+client = Humanloop(api_key="YOUR_API_KEY", )
+client.logs.get(id='prv_Wu6zx1lAWJRqOyL8nWuZk', )
 
 ```
 </dd>
