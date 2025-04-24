@@ -146,9 +146,7 @@ class Humanloop(BaseHumanloop):
         )
 
         if opentelemetry_tracer is None:
-            self._opentelemetry_tracer = self._tracer_provider.get_tracer(
-                "humanloop.sdk"
-            )
+            self._opentelemetry_tracer = self._tracer_provider.get_tracer("humanloop.sdk")
         else:
             self._opentelemetry_tracer = opentelemetry_tracer
 
@@ -349,18 +347,18 @@ class Humanloop(BaseHumanloop):
             path=path,
             attributes=attributes,
         )
-    
+
     def sync(self) -> List[str]:
         """Sync prompt and agent files from Humanloop to local filesystem.
-        
+
         This method will:
         1. Fetch all prompt and agent files from your Humanloop workspace
         2. Save them to the local filesystem in a 'humanloop/' directory
         3. Maintain the same directory structure as in Humanloop
         4. Add appropriate file extensions (.prompt or .agent)
-        
+
         Currently only supports syncing prompt and agent files. Other file types will be skipped.
-        
+
         The files will be saved with the following structure:
         ```
         humanloop/
@@ -371,7 +369,7 @@ class Humanloop(BaseHumanloop):
         └── agents/
             └── my_agent.agent
         ```
-        
+
         :return: List of successfully processed file paths
         """
         return sync(self)
