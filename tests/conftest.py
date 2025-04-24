@@ -192,7 +192,10 @@ def api_keys() -> APIKeys:
 
 @pytest.fixture(scope="session")
 def humanloop_client(api_keys: APIKeys) -> Humanloop:
-    return Humanloop(api_key=api_keys.humanloop)
+    return Humanloop(
+        api_key=api_keys.humanloop,
+        base_url="http://localhost:80/v5",
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
