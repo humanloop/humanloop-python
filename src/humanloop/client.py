@@ -24,6 +24,7 @@ from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
+from humanloop.sync import sync
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -82,8 +83,9 @@ class Humanloop(BaseHumanloop):
     """
     See docstring of :class:`BaseHumanloop`.
 
-    This class extends the base client with custom evaluation utilities
-    and decorators for declaring Files in code.
+    This class extends the base client with custom evaluation utilities,
+    decorators for declaring Files in code, and utilities for syncing
+    files between Humanloop and local filesystem.
     """
 
     def __init__(
@@ -348,8 +350,31 @@ class Humanloop(BaseHumanloop):
             attributes=attributes,
         )
     
-    def sync(self):
-        return "Hello world"
+    def sync(self) -> List[str]:
+        """Sync prompt and agent files from Humanloop to local filesystem.
+        
+        This method will:
+        1. Fetch all prompt and agent files from your Humanloop workspace
+        2. Save them to the local filesystem in a 'humanloop/' directory
+        3. Maintain the same directory structure as in Humanloop
+        4. Add appropriate file extensions (.prompt or .agent)
+        
+        Currently only supports syncing prompt and agent files. Other file types will be skipped.
+        
+        The files will be saved with the following structure:
+        ```
+        humanloop/
+        ├── prompts/
+        │   ├── my_prompt.prompt
+        │   └── nested/
+        │       └── another_prompt.prompt
+        └── agents/
+            └── my_agent.agent
+        ```
+        
+        :return: List of successfully processed file paths
+        """
+        return sync(self)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):

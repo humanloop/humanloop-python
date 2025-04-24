@@ -217,8 +217,8 @@ def directory_cleanup(directory_id: str, humanloop_client: Humanloop):
             client = humanloop_client.evaluators  # type: ignore [assignment]
         elif file.type == "flow":
             client = humanloop_client.flows  # type: ignore [assignment]
-        else:
-            raise NotImplementedError(f"Unknown HL file type {file.type}")
+        elif file.type == "agent":
+            client = humanloop_client.agents  # type: ignore [assignment]
         client.delete(file_id)
 
     for subdirectory in response.subdirectories:
