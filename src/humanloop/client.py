@@ -347,6 +347,9 @@ class Humanloop(BaseHumanloop):
             path=path,
             attributes=attributes,
         )
+    
+    def sync(self):
+        return "Hello world"
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):
