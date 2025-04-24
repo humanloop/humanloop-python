@@ -10,7 +10,7 @@ from ..types.model_providers import ModelProviders
 from .prompt_response_stop import PromptResponseStopParams
 import typing
 from .response_format import ResponseFormatParams
-from ..types.reasoning_effort import ReasoningEffort
+from .prompt_response_reasoning_effort import PromptResponseReasoningEffortParams
 from .tool_function import ToolFunctionParams
 from .linked_tool_response import LinkedToolResponseParams
 from .environment_response import EnvironmentResponseParams
@@ -122,9 +122,9 @@ class PromptResponseParams(typing_extensions.TypedDict):
     The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
     """
 
-    reasoning_effort: typing_extensions.NotRequired[ReasoningEffort]
+    reasoning_effort: typing_extensions.NotRequired[PromptResponseReasoningEffortParams]
     """
-    Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+    Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
     """
 
     tools: typing_extensions.NotRequired[typing.Sequence[ToolFunctionParams]]
@@ -170,6 +170,11 @@ class PromptResponseParams(typing_extensions.TypedDict):
     name: str
     """
     Name of the Prompt.
+    """
+
+    schema: typing_extensions.NotRequired[typing.Dict[str, typing.Optional[typing.Any]]]
+    """
+    The JSON schema for the Prompt.
     """
 
     version_id: str
