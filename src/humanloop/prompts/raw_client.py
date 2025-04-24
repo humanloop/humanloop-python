@@ -1793,7 +1793,7 @@ class RawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return HttpResponse(response=_response, data=None)
+                return HttpResponse(response=_response, data=_response.text)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
