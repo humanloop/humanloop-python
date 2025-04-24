@@ -1,7 +1,7 @@
-import pytest
-from humanloop import Humanloop, FileType
+from typing import List, NamedTuple, Union
 from pathlib import Path
-from typing import List, NamedTuple
+import pytest
+from humanloop import Humanloop, FileType, AgentResponse, PromptResponse
 
 
 class SyncableFile(NamedTuple):
@@ -46,6 +46,7 @@ def test_file_structure(humanloop_client: Humanloop, get_test_path) -> List[Sync
     created_files = []
     for file in files:
         full_path = get_test_path(file.path)
+        response: Union[AgentResponse, PromptResponse]
         if file.type == "prompt":
             response = humanloop_client.prompts.upsert(
                 path=full_path,
