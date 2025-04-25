@@ -1,3 +1,3 @@
-from humanloop.sync.sync_utils import sync
+from humanloop.sync.sync_client import SyncClient
 
-__all__ = ["sync"]
+__all__ = ["SyncClient"]
