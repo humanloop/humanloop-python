@@ -74,10 +74,10 @@ def cleanup_local_files():
         shutil.rmtree(local_dir)
 
 
-def test_sync_basic(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+def test_pull_basic(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
     """Test that humanloop.sync() correctly syncs remote files to local filesystem"""
     # Run the sync
-    successful_files = humanloop_client.sync()
+    successful_files = humanloop_client.pull()
 
     # Verify each file was synced correctly
     for file in test_file_structure:
