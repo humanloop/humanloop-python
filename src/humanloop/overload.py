@@ -1,8 +1,8 @@
 import inspect
 import logging
 import types
-from typing import TypeVar, Union
-
+from typing import TypeVar, Union, Literal
+from pathlib import Path
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
@@ -13,6 +13,7 @@ from humanloop.evals.run import HumanloopRuntimeError
 from humanloop.evaluators.client import EvaluatorsClient
 from humanloop.flows.client import FlowsClient
 from humanloop.prompts.client import PromptsClient
+from humanloop.agents.client import AgentsClient
 from humanloop.tools.client import ToolsClient
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
@@ -112,6 +113,7 @@ def overload_call(client: PromptsClient) -> PromptsClient:
             }
 
         try:
+            logger.info(f"Calling inner overload")
             response = self._call(**kwargs)
         except Exception as e:
             # Re-raising as HumanloopDecoratorError so the decorators don't catch it
@@ -121,4 +123,44 @@ def overload_call(client: PromptsClient) -> PromptsClient:
 
     # Replace the original log method with the overloaded one
     client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
+    return client
+
+def overload_call_with_local_files(
+    client: Union[PromptsClient, AgentsClient], 
+    use_local_files: bool,
+    file_type: Literal["prompt", "agent"]
+) -> Union[PromptsClient, AgentsClient]:
+    """Overload call to handle local files when use_local_files is True.
+    
+    Args:
+        client: The client to overload (PromptsClient or AgentsClient)
+        use_local_files: Whether to use local files
+        file_type: Type of file ("prompt" or "agent")
+    """
+    original_call = client._call if hasattr(client, '_call') else client.call
+
+    def _overload_call(self, **kwargs) -> PromptCallResponse:
+        if use_local_files and "path" in kwargs:
+            try:
+                # Construct path to local file
+                local_path = Path("humanloop") / kwargs["path"]
+                # Add appropriate extension
+                local_path = local_path.parent / f"{local_path.stem}.{file_type}"
+                
+                if local_path.exists():
+                    # Read the file content
+                    with open(local_path) as f:
+                        file_content = f.read()
+                    
+                    kwargs[file_type] = file_content  # "prompt" or "agent"
+                    
+                    logger.debug(f"Using local file content from {local_path}")
+                else:
+                    logger.warning(f"Local file not found: {local_path}, falling back to API")
+            except Exception as e:
+                logger.error(f"Error reading local file: {e}, falling back to API")
+
+        return original_call(**kwargs)
+
+    client.call = types.MethodType(_overload_call, client)
     return client

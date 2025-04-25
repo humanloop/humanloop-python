@@ -13,7 +13,7 @@ from humanloop.evals import run_eval
 from humanloop.evals.types import Dataset, Evaluator, EvaluatorCheck, File
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.overload import overload_call, overload_log
+from humanloop.overload import overload_call, overload_log, overload_call_with_local_files
 from humanloop.decorators.flow import flow as flow_decorator_factory
 from humanloop.decorators.prompt import prompt_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
@@ -99,6 +99,7 @@ class Humanloop(BaseHumanloop):
         httpx_client: typing.Optional[httpx.Client] = None,
         opentelemetry_tracer_provider: Optional[TracerProvider] = None,
         opentelemetry_tracer: Optional[Tracer] = None,
+        use_local_files: bool = False,
     ):
         """
         Extends the base client with custom evaluation utilities and
@@ -118,6 +119,7 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
+        self.use_local_files = use_local_files
         self.sync_client = SyncClient(client=self)
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
@@ -128,6 +130,16 @@ class Humanloop(BaseHumanloop):
         # and the @flow decorator providing the trace_id
         self.prompts = overload_log(client=self.prompts)
         self.prompts = overload_call(client=self.prompts)
+        self.prompts = overload_call_with_local_files(
+            client=self.prompts, 
+            use_local_files=self.use_local_files, 
+            file_type="prompt"
+        )
+        self.agents = overload_call_with_local_files(
+            client=self.agents, 
+            use_local_files=self.use_local_files, 
+            file_type="agent"
+        )
         self.flows = overload_log(client=self.flows)
         self.tools = overload_log(client=self.tools)
 
