@@ -24,7 +24,7 @@ from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
-from humanloop.sync import sync
+from humanloop.sync.sync_client import SyncClient
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -118,6 +118,7 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
+        self.sync_client = SyncClient(client=self)
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
@@ -348,8 +349,8 @@ class Humanloop(BaseHumanloop):
             attributes=attributes,
         )
 
-    def sync(self) -> List[str]:
-        """Sync prompt and agent files from Humanloop to local filesystem.
+    def pull(self) -> List[str]:
+        """Pull prompt and agent files from Humanloop to local filesystem.
 
         This method will:
         1. Fetch all prompt and agent files from your Humanloop workspace
@@ -372,7 +373,7 @@ class Humanloop(BaseHumanloop):
 
         :return: List of successfully processed file paths
         """
-        return sync(self)
+        return self.sync_client.pull()
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):
