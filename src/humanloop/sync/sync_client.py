@@ -65,53 +65,6 @@ class SyncClient:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
             raise
 
-    def _process_file(
-        self, 
-        file: Union[PromptResponse, AgentResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse]
-    ) -> None:
-        """Process a single file by serializing and saving it.
-
-        Args:
-            file: The file to process (must be a PromptResponse or AgentResponse)
-        """
-        try:
-            # Skip if not a prompt or agent
-            if file.type not in ["prompt", "agent"]:
-                logger.warning(f"Skipping unsupported file type: {file.type}")
-                return
-
-            # Cast to the correct type for type checking
-            if file.type == "prompt":
-                file = cast(PromptResponse, file)
-            elif file.type == "agent":
-                file = cast(AgentResponse, file)
-
-            # Serialize the file based on its type
-            try:
-                if file.type == "prompt":
-                    serialized = self.client.prompts.serialize(id=file.id)
-                elif file.type == "agent":
-                    serialized = self.client.agents.serialize(id=file.id)
-                else:
-                    logger.warning(f"Skipping unsupported file type: {file.type}")
-                    return
-            except ApiError as e:
-                # The SDK returns the YAML content in the error body when it can't parse as JSON
-                if e.status_code == 200:
-                    serialized = e.body
-                else:
-                    raise
-            except Exception as e:
-                logger.error(f"Failed to serialize {file.type} {file.id}: {str(e)}")
-                raise
-
-            # Save to local filesystem
-            self._save_serialized_file(serialized, file.path, file.type)
-
-        except Exception as e:
-            logger.error(f"Error processing file {file.path}: {str(e)}")
-            raise
-
     def pull(self) -> List[str]:
         """Sync prompt and agent files from Humanloop to local filesystem.
 
@@ -120,37 +73,42 @@ class SyncClient:
         """
         successful_files = []
         failed_files = []
+        page = 1
 
-        # Create a thread pool for processing files
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            futures = []
-            page = 1
+        while True:
+            try:
+                response = self.client.files.list_files(
+                    type=["prompt", "agent"], 
+                    page=page,
+                    include_content=True
+                )
 
-            while True:
-                try:
-                    response = self.client.files.list_files(type=["prompt", "agent"], page=page)
-
-                    if len(response.records) == 0:
-                        break
-
-                    # Submit each file for processing
-                    for file in response.records:
-                        future = executor.submit(self._process_file, file)
-                        futures.append((file.path, future))
-
-                    page += 1
-                except Exception as e:
-                    logger.error(f"Failed to fetch page {page}: {str(e)}")
+                if len(response.records) == 0:
                     break
 
-            # Wait for all tasks to complete
-            for file_path, future in futures:
-                try:
-                    future.result()
-                    successful_files.append(file_path)
-                except Exception as e:
-                    failed_files.append(file_path)
-                    logger.error(f"Task failed for {file_path}: {str(e)}")
+                # Process each file
+                for file in response.records:
+                    # Skip if not a prompt or agent
+                    if file.type not in ["prompt", "agent"]:
+                        logger.warning(f"Skipping unsupported file type: {file.type}")
+                        continue
+
+                    # Skip if no content
+                    if not getattr(file, "content", None):
+                        logger.warning(f"No content found for {file.type} {getattr(file, 'id', '<unknown>')}")
+                        continue
+
+                    try:
+                        self._save_serialized_file(file.content, file.path, file.type)
+                        successful_files.append(file.path)
+                    except Exception as e:
+                        failed_files.append(file.path)
+                        logger.error(f"Task failed for {file.path}: {str(e)}")
+
+                page += 1
+            except Exception as e:
+                logger.error(f"Failed to fetch page {page}: {str(e)}")
+                break
 
         # Log summary
         if successful_files:
