@@ -2,4 +2,4 @@
 
 import typing
 
-FileType = typing.Union[typing.Literal["prompt", "tool", "dataset", "evaluator", "flow"], typing.Any]
+FileType = typing.Union[typing.Literal["prompt", "tool", "dataset", "evaluator", "flow", "agent"], typing.Any]

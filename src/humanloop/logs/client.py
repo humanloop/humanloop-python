@@ -99,7 +99,7 @@ class LogsClient:
             If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
 
         include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
+            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow or Agent Logs.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -338,7 +338,7 @@ class AsyncLogsClient:
             If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
 
         include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
+            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow or Agent Logs.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

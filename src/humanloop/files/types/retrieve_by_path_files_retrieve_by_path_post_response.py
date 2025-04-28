@@ -6,7 +6,8 @@ from ...types.tool_response import ToolResponse
 from ...types.dataset_response import DatasetResponse
 from ...types.evaluator_response import EvaluatorResponse
 from ...types.flow_response import FlowResponse
+from ...types.agent_response import AgentResponse
 
 RetrieveByPathFilesRetrieveByPathPostResponse = typing.Union[
-    PromptResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse
+    PromptResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse, AgentResponse
 ]

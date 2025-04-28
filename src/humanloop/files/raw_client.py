@@ -7,8 +7,8 @@ from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
 from ..core.http_response import HttpResponse
-from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response import (
-    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
+from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response_agent_response import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,
 )
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
@@ -38,8 +38,11 @@ class RawFilesClient:
         environment: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse]:
+    ) -> HttpResponse[
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
+    ]:
         """
         Get a paginated list of files.
 
@@ -69,12 +72,15 @@ class RawFilesClient:
         order : typing.Optional[SortOrder]
             Direction to sort by.
 
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        HttpResponse[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse]
+        HttpResponse[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse]
             Successful Response
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -89,15 +95,16 @@ class RawFilesClient:
                 "environment": environment,
                 "sort_by": sort_by,
                 "order": order,
+                "include_content": include_content,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
+                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,
                     construct_type(
-                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,  # type: ignore
+                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -199,8 +206,11 @@ class AsyncRawFilesClient:
         environment: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse]:
+    ) -> AsyncHttpResponse[
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
+    ]:
         """
         Get a paginated list of files.
 
@@ -230,12 +240,15 @@ class AsyncRawFilesClient:
         order : typing.Optional[SortOrder]
             Direction to sort by.
 
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        AsyncHttpResponse[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse]
+        AsyncHttpResponse[PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse]
             Successful Response
         """
         _response = await self._client_wrapper.httpx_client.request(
@@ -250,15 +263,16 @@ class AsyncRawFilesClient:
                 "environment": environment,
                 "sort_by": sort_by,
                 "order": order,
+                "include_content": include_content,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 _data = typing.cast(
-                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
+                    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,
                     construct_type(
-                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,  # type: ignore
+                        type_=PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

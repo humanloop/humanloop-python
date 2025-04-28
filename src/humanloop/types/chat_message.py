@@ -6,6 +6,7 @@ from .chat_message_content import ChatMessageContent
 import pydantic
 from .chat_role import ChatRole
 from .tool_call import ToolCall
+from .chat_message_thinking_item import ChatMessageThinkingItem
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -33,6 +34,11 @@ class ChatMessage(UncheckedBaseModel):
     tool_calls: typing.Optional[typing.List[ToolCall]] = pydantic.Field(default=None)
     """
     A list of tool calls requested by the assistant.
+    """
+
+    thinking: typing.Optional[typing.List[ChatMessageThinkingItem]] = pydantic.Field(default=None)
+    """
+    Model's chain-of-thought for providing the response. Present on assistant messages if model supports it.
     """
 
     if IS_PYDANTIC_V2:

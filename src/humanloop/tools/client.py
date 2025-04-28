@@ -3,10 +3,11 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from .raw_client import RawToolsClient
+from ..requests.tool_kernel_request import ToolKernelRequestParams
 import datetime as dt
 from ..types.log_status import LogStatus
-from ..requests.tool_kernel_request import ToolKernelRequestParams
 from ..core.request_options import RequestOptions
+from ..types.tool_call_response import ToolCallResponse
 from ..types.create_tool_log_response import CreateToolLogResponse
 from ..types.log_response import LogResponse
 from ..types.project_sort_by import ProjectSortBy
@@ -29,6 +30,8 @@ from ..requests.evaluator_activation_deactivation_request_activate_item import (
 from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
+from ..types.file_environment_variable_request import FileEnvironmentVariableRequest
+from ..requests.file_environment_variable_request import FileEnvironmentVariableRequestParams
 from ..core.client_wrapper import AsyncClientWrapper
 from .raw_client import AsyncRawToolsClient
 from ..core.pagination import AsyncPager
@@ -52,6 +55,133 @@ class ToolsClient:
         """
         return self._raw_client
 
+    def call(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_parent_id: typing.Optional[str] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        tool_call_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ToolCallResponse:
+        """
+        Call a Tool.
+
+        Calling a Tool with inputs runs the tool's source code and logs the result and metadata to Humanloop.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Tool. Otherwise, the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Tool details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Tool. If they do not, we will create a new version. This is helpful
+        in the case where you are storing or deriving your Tool details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Tool to call.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to call.
+
+        path : typing.Optional[str]
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_parent_id : typing.Optional[str]
+            The ID of the parent Log to nest this Log under in a Trace.
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        tool_call_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ToolCallResponse
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.call()
+        """
+        response = self._raw_client.call(
+            version_id=version_id,
+            environment=environment,
+            path=path,
+            id=id,
+            tool=tool,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            start_time=start_time,
+            end_time=end_time,
+            log_status=log_status,
+            source_datapoint_id=source_datapoint_id,
+            trace_parent_id=trace_parent_id,
+            user=user,
+            tool_call_request_environment=tool_call_request_environment,
+            save=save,
+            log_id=log_id,
+            request_options=request_options,
+        )
+        return response.data
+
     def log(
         self,
         *,
@@ -59,6 +189,7 @@ class ToolsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -78,7 +209,6 @@ class ToolsClient:
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
         """
@@ -105,6 +235,9 @@ class ToolsClient:
 
         id : typing.Optional[str]
             ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -163,9 +296,6 @@ class ToolsClient:
         log_id : typing.Optional[str]
             This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        tool : typing.Optional[ToolKernelRequestParams]
-            Details of your Tool. A new Tool version will be created if the provided details are new.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -206,6 +336,7 @@ class ToolsClient:
             environment=environment,
             path=path,
             id=id,
+            tool=tool,
             start_time=start_time,
             end_time=end_time,
             output=output,
@@ -225,7 +356,6 @@ class ToolsClient:
             tool_log_request_environment=tool_log_request_environment,
             save=save,
             log_id=log_id,
-            tool=tool,
             request_options=request_options,
         )
         return response.data
@@ -966,6 +1096,112 @@ class ToolsClient:
         )
         return response.data
 
+    def get_environment_variables(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentVariableRequest]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentVariableRequest]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.get_environment_variables(
+            id="id",
+        )
+        """
+        response = self._raw_client.get_environment_variables(id, request_options=request_options)
+        return response.data
+
+    def add_environment_variable(
+        self,
+        id: str,
+        *,
+        request: typing.Sequence[FileEnvironmentVariableRequestParams],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[FileEnvironmentVariableRequest]:
+        """
+        Add an environment variable to a Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request : typing.Sequence[FileEnvironmentVariableRequestParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentVariableRequest]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.add_environment_variable(
+            id="id",
+            request=[{"name": "name", "value": "value"}],
+        )
+        """
+        response = self._raw_client.add_environment_variable(id, request=request, request_options=request_options)
+        return response.data
+
+    def delete_environment_variable(
+        self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentVariableRequest]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        name : str
+            Name of the Environment Variable to delete.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentVariableRequest]
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.tools.delete_environment_variable(
+            id="id",
+            name="name",
+        )
+        """
+        response = self._raw_client.delete_environment_variable(id, name, request_options=request_options)
+        return response.data
+
 
 class AsyncToolsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -982,6 +1218,141 @@ class AsyncToolsClient:
         """
         return self._raw_client
 
+    async def call(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_parent_id: typing.Optional[str] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        tool_call_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ToolCallResponse:
+        """
+        Call a Tool.
+
+        Calling a Tool with inputs runs the tool's source code and logs the result and metadata to Humanloop.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Tool. Otherwise, the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Tool details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Tool. If they do not, we will create a new version. This is helpful
+        in the case where you are storing or deriving your Tool details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Tool to call.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to call.
+
+        path : typing.Optional[str]
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_parent_id : typing.Optional[str]
+            The ID of the parent Log to nest this Log under in a Trace.
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        tool_call_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ToolCallResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.tools.call()
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.call(
+            version_id=version_id,
+            environment=environment,
+            path=path,
+            id=id,
+            tool=tool,
+            inputs=inputs,
+            source=source,
+            metadata=metadata,
+            start_time=start_time,
+            end_time=end_time,
+            log_status=log_status,
+            source_datapoint_id=source_datapoint_id,
+            trace_parent_id=trace_parent_id,
+            user=user,
+            tool_call_request_environment=tool_call_request_environment,
+            save=save,
+            log_id=log_id,
+            request_options=request_options,
+        )
+        return response.data
+
     async def log(
         self,
         *,
@@ -989,6 +1360,7 @@ class AsyncToolsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -1008,7 +1380,6 @@ class AsyncToolsClient:
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateToolLogResponse:
         """
@@ -1035,6 +1406,9 @@ class AsyncToolsClient:
 
         id : typing.Optional[str]
             ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -1093,9 +1467,6 @@ class AsyncToolsClient:
         log_id : typing.Optional[str]
             This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        tool : typing.Optional[ToolKernelRequestParams]
-            Details of your Tool. A new Tool version will be created if the provided details are new.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1144,6 +1515,7 @@ class AsyncToolsClient:
             environment=environment,
             path=path,
             id=id,
+            tool=tool,
             start_time=start_time,
             end_time=end_time,
             output=output,
@@ -1163,7 +1535,6 @@ class AsyncToolsClient:
             tool_log_request_environment=tool_log_request_environment,
             save=save,
             log_id=log_id,
-            tool=tool,
             request_options=request_options,
         )
         return response.data
@@ -2009,4 +2380,134 @@ class AsyncToolsClient:
         response = await self._raw_client.update_monitoring(
             id, activate=activate, deactivate=deactivate, request_options=request_options
         )
+        return response.data
+
+    async def get_environment_variables(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentVariableRequest]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentVariableRequest]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.tools.get_environment_variables(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.get_environment_variables(id, request_options=request_options)
+        return response.data
+
+    async def add_environment_variable(
+        self,
+        id: str,
+        *,
+        request: typing.Sequence[FileEnvironmentVariableRequestParams],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[FileEnvironmentVariableRequest]:
+        """
+        Add an environment variable to a Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request : typing.Sequence[FileEnvironmentVariableRequestParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentVariableRequest]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.tools.add_environment_variable(
+                id="id",
+                request=[{"name": "name", "value": "value"}],
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.add_environment_variable(id, request=request, request_options=request_options)
+        return response.data
+
+    async def delete_environment_variable(
+        self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[FileEnvironmentVariableRequest]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        name : str
+            Name of the Environment Variable to delete.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[FileEnvironmentVariableRequest]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.tools.delete_environment_variable(
+                id="id",
+                name="name",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.delete_environment_variable(id, name, request_options=request_options)
         return response.data
