@@ -35,6 +35,7 @@ from typing import (
 )
 
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
+from humanloop.agents.client import AgentsClient
 from humanloop.core.api_error import ApiError
 from humanloop.context import (
     EvaluationContext,
@@ -42,7 +43,12 @@ from humanloop.context import (
     set_evaluation_context,
 )
 from humanloop.error import HumanloopRuntimeError
-from humanloop.evals.types import Dataset, Evaluator, EvaluatorCheck, File
+from humanloop.evals.types import (
+    DatasetEvalConfig,
+    EvaluatorEvalConfig,
+    EvaluatorCheck,
+    FileEvalConfig,
+)
 
 # We use TypedDicts for requests, which is consistent with the rest of the SDK
 from humanloop.evaluators.client import EvaluatorsClient
@@ -65,10 +71,11 @@ from humanloop.types import FlowKernelRequest as Flow
 from humanloop.types import NumericEvaluatorStatsResponse as NumericStats
 from humanloop.types import PromptKernelRequest as Prompt
 from humanloop.types import ToolKernelRequest as Tool
+from humanloop.types.agent_response import AgentResponse
+from humanloop.types.agent_kernel_request import AgentKernelRequest as Agent
 from humanloop.types.datapoint_response import DatapointResponse
 from humanloop.types.dataset_response import DatasetResponse
 from humanloop.types.evaluation_run_response import EvaluationRunResponse
-from humanloop.types.flow_log_response import FlowLogResponse
 from humanloop.types.log_response import LogResponse
 from humanloop.types.run_stats_response import RunStatsResponse
 from pydantic import ValidationError
@@ -89,7 +96,7 @@ if not logger.hasHandlers():
 
 EvaluatorDict = Union[CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator]
 Version = Union[FlowDict, PromptDict, ToolDict, EvaluatorDict]
-FileType = Literal["flow", "prompt", "tool", "evaluator"]
+FileType = Literal["flow", "prompt", "agent"]
 
 
 # ANSI escape codes for logging colors
@@ -100,15 +107,37 @@ RED = "\033[91m"
 RESET = "\033[0m"
 
 
-CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, ToolsClient, FlowsClient, EvaluatorsClient)
+CLIENT_TYPE = TypeVar(
+    "CLIENT_TYPE",
+    PromptsClient,
+    ToolsClient,
+    FlowsClient,
+    EvaluatorsClient,
+    AgentsClient,
+)
+
+
+def print_error(message: str) -> None:
+    """Print a formatted error message to stdout."""
+    sys.stdout.write(f"{RED}{message}{RESET}")
+
+
+def print_warning(message: str) -> None:
+    """Print a formatted warning message to stdout."""
+    sys.stdout.write(f"{YELLOW}{message}{RESET}\n")
+
+
+def print_info(message: str) -> None:
+    """Print a formatted info message to stdout."""
+    sys.stdout.write(f"{CYAN}{message}{RESET}\n")
 
 
 def run_eval(
     client: "BaseHumanloop",
-    file: File,
+    file: FileEvalConfig,
     name: Optional[str],
-    dataset: Dataset,
-    evaluators: Optional[Sequence[Evaluator]] = None,
+    dataset: DatasetEvalConfig,
+    evaluators: Optional[Sequence[EvaluatorEvalConfig]] = None,
     workers: int = 4,
 ) -> List[EvaluatorCheck]:
     """
@@ -124,29 +153,13 @@ def run_eval(
     """
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
-    file_ = _file_or_file_inside_hl_utility(file)
-    type_ = _get_file_type(file_)
-    function_ = _get_file_callable(file_, type_)
-    if hasattr(function_, "file"):
-        decorator_type = function_.file["type"]  # type: ignore [attr-defined, union-attr]
-        if decorator_type != type_:
-            raise HumanloopRuntimeError(
-                "The type of the decorated function does not match the type of the file. Expected `%s`, got `%s`."
-                % (type_.capitalize(), decorator_type.capitalize())
-            )
-
-    try:
-        hl_file = _upsert_file(file=file_, type=type_, client=client)
-    except ValidationError as e:
-        sys.stdout.write(f"{RED}Error in your `file` argument:\n\n{e}{RESET}")
-        return []
-    except Exception as e:
-        sys.stdout.write(f"{RED}Error in your `file` argument:\n\n{e}{RESET}")
-        return []
+    hl_file, function_ = _get_hl_file(client=client, file_config=file)
+    # cast is safe, we can only fetch Files allowed by FileType
+    type_ = typing.cast(FileType, hl_file.type)
     try:
         hl_dataset = _upsert_dataset(dataset=dataset, client=client)
     except Exception as e:
-        sys.stdout.write(f"{RED}Error in your `dataset` argument:\n\n{e}{RESET}")
+        print_error(f"Error in your `dataset` argument:\n\n{e}")
         return []
     try:
         local_evaluators = _upsert_local_evaluators(
@@ -156,7 +169,7 @@ def run_eval(
             type=type_,
         )
     except Exception as e:
-        sys.stdout.write(f"{RED}Error in your `evaluators` argument:\n\n{e}{RESET}")
+        print_error(f"Error in your `evaluators` argument:\n\n{e}")
         return []
     _assert_dataset_evaluators_fit(hl_dataset, local_evaluators)
 
@@ -170,6 +183,7 @@ def run_eval(
     )
 
     def _cancel_evaluation():
+        """Mark current Evaluation run as cancelled."""
         client.evaluations.update_evaluation_run(
             id=evaluation.id,
             run_id=run.id,
@@ -178,6 +192,7 @@ def run_eval(
         evaluators_worker_pool.shutdown(wait=False)
 
     def handle_exit_signal(signum, frame):
+        """Handle user exit signal by cancelling the Run and shutting down threads."""
         sys.stderr.write(
             f"\n{RED}Received signal {signum}, cancelling Evaluation and shutting down threads...{RESET}\n"
         )
@@ -188,9 +203,9 @@ def run_eval(
     signal.signal(signal.SIGTERM, handle_exit_signal)
 
     # Header of the CLI Report
-    sys.stdout.write(f"\n{CYAN}Navigate to your Evaluation:{RESET}\n{evaluation.url}\n\n")
-    sys.stdout.write(f"{CYAN}{type_.capitalize()} Version ID: {hl_file.version_id}{RESET}\n")
-    sys.stdout.write(f"{CYAN}Run ID: {run.id}{RESET}\n")
+    print_info(f"\nNavigate to your Evaluation:\n{evaluation.url}\n")
+    print_info(f"{type_.capitalize()} Version ID: {hl_file.version_id}")
+    print_info(f"Run ID: {run.id}")
 
     # This will apply apply the local callable to each datapoint
     # and log the results to Humanloop
@@ -198,11 +213,11 @@ def run_eval(
     # Generate locally if a file `callable` is provided
     if function_ is None:
         # TODO: trigger run when updated API is available
-        sys.stdout.write(f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}'{RESET}\n")
+        print_info(f"\nRunning '{hl_file.name}' {type_.capitalize()} over the '{hl_dataset.name}' Dataset")
     else:
         # Running the evaluation locally
-        sys.stdout.write(
-            f"{CYAN}\nRunning '{hl_file.name}' over the Dataset '{hl_dataset.name}' using {workers} workers...{RESET}\n\n"
+        print_info(
+            f"\nRunning '{hl_file.name}' {type_.capitalize()} over the '{hl_dataset.name}' Dataset using {workers} workers...\n"
         )
 
     _PROGRESS_BAR = _SimpleProgressBar(len(hl_dataset.datapoints))
@@ -366,9 +381,132 @@ class _LocalEvaluator:
     function: Callable
 
 
-def _callable_is_hl_utility(file: File) -> bool:
+EvaluatedFile = Union[PromptResponse, FlowResponse, ToolResponse, EvaluatorResponse, AgentResponse]
+HumanloopSubclient = Union[PromptsClient, FlowsClient, ToolsClient, EvaluatorsClient, AgentsClient]
+
+
+def _get_subclient(client: "BaseHumanloop", file_config: FileEvalConfig) -> HumanloopSubclient:
+    """Get the appropriate subclient based on file type."""
+    type_ = file_config.get("type")
+    if type_ == "prompt":
+        return client.prompts
+    elif type_ == "flow":
+        return client.flows
+    elif type_ == "tool":
+        return client.tools
+    elif type_ == "evaluator":
+        return client.evaluators
+    elif type_ == "agent":
+        return client.agents
+    else:
+        raise HumanloopRuntimeError(f"Unsupported File type: {type_}")
+
+
+def _safe_get_default_file_version(client: "BaseHumanloop", file_config: FileEvalConfig) -> EvaluatedFile:
+    """Get default version of a File from remote workspace.
+
+    Uses either the File path or id from the config.
+
+    Raise error if the File is not of the expected type, or if the user has provided both a path and an id.
+    """
+    path = file_config.get("path")
+    type = file_config.get("type")
+    file_id = file_config.get("id")
+
+    if path is None and file_id is None:
+        raise HumanloopRuntimeError("You must provide a path or id in your `file`.")
+
+    if path is not None:
+        hl_file = client.files.retrieve_by_path(path=path)
+        if hl_file.type != type:
+            raise HumanloopRuntimeError(
+                f"File in Humanloop workspace at {path} is not of type {type}, but {hl_file.type}."
+            )
+        # cast is safe, we can only fetch Files that can be evaluated
+        return typing.cast(EvaluatedFile, hl_file)
+    elif file_id is not None:
+        subclient = _get_subclient(client=client, file_config=file_config)
+        return subclient.get(id=file_id)
+    else:
+        raise HumanloopRuntimeError("You must provide either the path or the id in your `file` config.")
+
+
+def _resolve_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[EvaluatedFile, Optional[Callable]]:
+    """Resolve the File to be evaluated. Will return a FileResponse and an optional callable.
+
+    If the callable is null, the File will be evaluated on Humanloop. Otherwise, the File will be evaluated locally.
+    """
+    file_id = file_config.get("id")
+    path = file_config.get("path")
+    version_id = file_config.get("version_id")
+    environment = file_config.get("environment")
+    callable = _get_file_callable(file_config=file_config)
+    version = file_config.get("version")
+
+    if callable and path is None and file_id is None:
+        raise HumanloopRuntimeError(
+            "You are trying to create a new version of the File by passing the `version` argument. "
+            "You must pass either the `file.path` or `file.id` argument and provider proper `file.version` for upserting the File."
+        )
+    try:
+        hl_file = _safe_get_default_file_version(client=client, file_config=file_config)
+    except ApiError:
+        if not version or not path or file_id:
+            raise HumanloopRuntimeError(
+                "File does not exist on Humanloop. Please provide a `file.path` and a version to create a new version.",
+            )
+        return _upsert_file(file_config=file_config, client=client), callable or None
+
+    if (version_id or environment) and (callable or version):
+        raise HumanloopRuntimeError(
+            "You are trying to create a local Evaluation while requesting a specific File version by version ID or environment."
+        )
+
+    if version:
+        # User responsibility to provide adequate file.version for upserting the file
+        print_info(
+            "Upserting a new File version based on `file.version`. Will use provided callable for generating Logs."
+        )
+        try:
+            return (_upsert_file(file_config=file_config, client=client), callable or None)
+        except Exception as e:
+            raise HumanloopRuntimeError(f"Error upserting the File. Please ensure `file.version` is valid: {e}") from e
+
+    if version_id is None and environment is None:
+        # Return default version of the File
+        return hl_file, callable
+
+    if file_id is None and (version_id or environment):
+        raise HumanloopRuntimeError(
+            "You must provide the `file.id` when addressing a file by version ID or environment"
+        )
+
+    # Use version_id or environment to retrieve specific version of the File
+    subclient = _get_subclient(client=client, file_config=file_config)
+    # Let backend handle case where both or none of version_id and environment are provided
+    return subclient.get(
+        # Earlier if checked that file_id is not None
+        id=file_id,  # type: ignore [arg-type]
+        version_id=version_id,
+        environment=environment,
+    ), None
+
+
+def _get_hl_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[EvaluatedFile, Optional[Callable]]:
+    """Check if the config object is valid, and resolve the File to be evaluated.
+
+    The callable will be null if the evaluation will happen on Humanloop runtime.
+    Otherwise, the evaluation will happen locally.
+    """
+    file_ = _file_or_file_inside_hl_decorator(file_config)
+    file_ = _check_file_type(file_)
+
+    return _resolve_file(client=client, file_config=file_)
+
+
+def _callable_is_hl_utility(file_config: FileEvalConfig) -> bool:
     """Check if a File is a decorated function."""
-    return hasattr(file.get("callable", {}), "file")
+    return hasattr(file_config.get("callable", {}), "file")
 
 
 def _wait_for_evaluation_to_complete(
@@ -404,7 +542,7 @@ def _get_checks(
     client: "BaseHumanloop",
     evaluation: EvaluationResponse,
     stats: EvaluationStats,
-    evaluators: list[Evaluator],
+    evaluators: list[EvaluatorEvalConfig],
     run: EvaluationRunResponse,
 ):
     checks: List[EvaluatorCheck] = []
@@ -445,29 +583,37 @@ def _get_checks(
     return checks
 
 
-def _file_or_file_inside_hl_utility(file: File) -> File:
-    if _callable_is_hl_utility(file):
-        inner_file: File = file["callable"].file  # type: ignore [misc, attr-defined]
-        if "path" in file and inner_file["path"] != file["path"]:
+def _file_or_file_inside_hl_decorator(file_config: FileEvalConfig) -> FileEvalConfig:
+    if _callable_is_hl_utility(file_config):
+        inner_file: FileEvalConfig = file_config["callable"].file  # type: ignore [misc, attr-defined]
+        function_ = file_config["callable"]
+        type_ = file_config["type"]
+        decorator_type = function_.file["type"]  # type: ignore [attr-defined, union-attr]
+        if decorator_type != type_:
+            raise HumanloopRuntimeError(
+                "The type of the decorated function does not match the type of the file. Expected `%s`, got `%s`."
+                % (type_.capitalize(), decorator_type.capitalize())
+            )
+        if "path" in file_config and inner_file["path"] != file_config["path"]:
             raise HumanloopRuntimeError(
                 "`path` attribute specified in the `file` does not match the path of the decorated function. "
-                f"Expected `{inner_file['path']}`, got `{file['path']}`."
+                f"Expected `{inner_file['path']}`, got `{file_config['path']}`."
             )
-        if "id" in file:
+        if "id" in file_config:
             raise HumanloopRuntimeError(
                 "Do not specify an `id` attribute in `file` argument when using a decorated function."
             )
-        if "version" in file:
+        if "version" in file_config:
             if inner_file["type"] != "prompt":
                 raise HumanloopRuntimeError(
                     f"Do not specify a `version` attribute in `file` argument when using a {inner_file['type'].capitalize()} decorated function."
                 )
-        if "type" in file and inner_file["type"] != file["type"]:
+        if "type" in file_config and inner_file["type"] != file_config["type"]:
             raise HumanloopRuntimeError(
                 "Attribute `type` of `file` argument does not match the file type of the decorated function. "
-                f"Expected `{inner_file['type']}`, got `{file['type']}`."
+                f"Expected `{inner_file['type']}`, got `{file_config['type']}`."
             )
-        if "id" in file:
+        if "id" in file_config:
             raise HumanloopRuntimeError(
                 "Do not specify an `id` attribute in `file` argument when using a decorated function."
             )
@@ -482,9 +628,9 @@ def _file_or_file_inside_hl_utility(file: File) -> File:
                 f"{RESET}"
             )
             # TODO: document this
-            file_["version"] = file["version"]
+            file_["version"] = file_config["version"]
     else:
-        file_ = copy.deepcopy(file)
+        file_ = copy.deepcopy(file_config)
 
     # Raise error if neither path nor id is provided
     if not file_.get("path") and not file_.get("id"):
@@ -493,69 +639,69 @@ def _file_or_file_inside_hl_utility(file: File) -> File:
     return file_
 
 
-def _get_file_type(file: File) -> FileType:
-    # Determine the `type` of the `file` to Evaluate - if not `type` provided, default to `flow`
+def _check_file_type(file_config: FileEvalConfig) -> FileEvalConfig:
+    """Check that the file type is provided, or set it to `flow` if not provided."""
     try:
-        type_ = typing.cast(FileType, file.pop("type"))  # type: ignore [arg-type, misc]
-        sys.stdout.write(
-            f"{CYAN}Evaluating your {type_} function corresponding to `{file.get('path') or file.get('id')}` on Humanloop{RESET}\n\n"
+        type_ = typing.cast(FileType, file_config.pop("type"))  # type: ignore [arg-type, misc]
+        print_info(
+            f"Evaluating your {type_} function corresponding to `{file_config.get('path') or file_config.get('id')}` on Humanloop\n\n"
         )
-        return type_ or "flow"
+        file_config["type"] = type_ or "flow"
     except KeyError as _:
         type_ = "flow"
-        sys.stdout.write(f"{YELLOW}No `file` type specified, defaulting to flow.{RESET}\n")
-        return type_
+        print_warning("No `file` type specified, defaulting to flow.")
+        file_config["type"] = type_
+    return file_config
 
 
-def _get_file_callable(file: File, type_: FileType) -> Optional[Callable]:
-    # Get the `callable` from the `file` to Evaluate
-    function_ = typing.cast(Optional[Callable], file.pop("callable", None))
+def _get_file_callable(file_config: FileEvalConfig) -> Optional[Callable]:
+    """Get the callable of the File to be evaluated, or throw if None was provided for Flows."""
+    type_ = file_config.get("type")
+    function_ = typing.cast(Optional[Callable], file_config.pop("callable", None))
     if function_ is None:
         if type_ == "flow":
-            raise ValueError("You must provide a `callable` for your Flow `file` to run a local eval.")
+            raise HumanloopRuntimeError("You must provide a `callable` for your Flow `file` to run a local eval.")
         else:
-            sys.stdout.write(
-                f"{CYAN}No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.\n\n{RESET}"
+            print_info(
+                f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.\n\n"
             )
+    elif type_ == "agent":
+        raise ValueError("Agent evaluation is only possible on the Humanloop runtime, do not provide a `callable`.")
     return function_
 
 
-def _upsert_file(
-    file: File, type: FileType, client: "BaseHumanloop"
-) -> Union[PromptResponse, FlowResponse, ToolResponse, EvaluatorResponse]:
+def _upsert_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> EvaluatedFile:
     # Get or create the file on Humanloop
-    version = file.pop("version", {})
-    file_dict = {**file, **version}
+    version = file_config.pop("version", {})
+    file_dict = {**file_config, **version}
+    del file_dict["type"]
+    type_ = file_config.get("type")
+    subclient = _get_subclient(client=client, file_config=file_config)
 
-    if type == "flow":
+    if type_ == "flow":
         # Be more lenient with Flow versions as they are arbitrary json
         try:
             Flow.model_validate(version)
         except ValidationError:
             flow_version = {"attributes": version}
-            file_dict = {**file, **flow_version}
-        hl_file = client.flows.upsert(**file_dict)  # type: ignore [arg-type, assignment]
-
-    elif type == "prompt":
+            file_dict = {**file_config, **flow_version}
+    elif type_ == "prompt":
         # Will throw error if version is invalid
         Prompt.model_validate(version)
-        hl_file = client.prompts.upsert(**file_dict)  # type: ignore [arg-type, assignment]
-
-    elif type == "tool":
+    elif type_ == "tool":
         # Will throw error if version is invalid
         Tool.model_validate(version)
-        hl_file = client.tools.upsert(**file_dict)  # type: ignore [arg-type, assignment]
-
-    elif type == "evaluator":
-        hl_file = client.evaluators.upsert(**file_dict)  # type: ignore [arg-type, assignment]
-
+    elif type_ == "agent":
+        # Will throw error if version is invalid
+        Agent.model_validate(version)
     else:
-        raise NotImplementedError(f"Unsupported File type: {type}")
+        raise NotImplementedError(f"Unsupported File type: {type_}")
 
-    return hl_file
+    # mypy complains about the polymorphic subclient
+    return subclient.upsert(**file_dict)  # type: ignore [arg-type]
 
 
-def _upsert_dataset(dataset: Dataset, client: "BaseHumanloop"):
+def _upsert_dataset(dataset: DatasetEvalConfig, client: "BaseHumanloop"):
     # Upsert the Dataset
     if "action" not in dataset:
         dataset["action"] = "set"
@@ -574,7 +720,7 @@ def _upsert_dataset(dataset: Dataset, client: "BaseHumanloop"):
 
 
 def _upsert_local_evaluators(
-    evaluators: list[Evaluator],
+    evaluators: list[EvaluatorEvalConfig],
     function: Optional[Callable],
     type: FileType,
     client: "BaseHumanloop",
@@ -639,8 +785,8 @@ def _assert_dataset_evaluators_fit(
 def _get_new_run(
     client: "BaseHumanloop",
     evaluation_name: Optional[str],
-    evaluators: list[Evaluator],
-    hl_file: Union[PromptResponse, FlowResponse, ToolResponse, EvaluatorResponse],
+    evaluators: list[EvaluatorEvalConfig],
+    hl_file: EvaluatedFile,
     hl_dataset: DatasetResponse,
     function: Optional[Callable],
 ):
@@ -691,7 +837,7 @@ def _call_function(
         try:
             output = json.dumps(output)
         except Exception:
-            # throw error if it fails to serialize
+            # throw error if output fails to serialize
             raise ValueError(f"Your {type}'s `callable` must return a string or a JSON serializable object.")
     return output
 

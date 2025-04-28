@@ -74,7 +74,7 @@ class HumanloopSpanExporter(SpanExporter):
 
         for span in spans:
             # only process spans that are relevant to Humanloop
-            if not is_humanloop_span(span) or not is_llm_provider_call(span):
+            if not is_humanloop_span(span) and not is_llm_provider_call(span):
                 continue
 
             file_type = span.attributes.get(HUMANLOOP_FILE_TYPE_KEY)  # type: ignore [union-attr]

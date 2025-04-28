@@ -23,9 +23,7 @@ from humanloop.types import (
     UpdateDatesetAction as UpdateDatasetAction,
 )  # TODO: fix original type typo
 
-EvaluatorDict = Union[
-    CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator
-]
+EvaluatorDict = Union[CodeEvaluatorDict, LLMEvaluatorDict, HumanEvaluatorDict, ExternalEvaluator]
 Version = Union[FlowDict, PromptDict, ToolDict, EvaluatorDict]
 FileType = Literal["flow", "prompt", "tool", "evaluator"]
 
@@ -37,12 +35,16 @@ class Identifiers(TypedDict):
     """The ID of the File on Humanloop."""
     path: NotRequired[str]
     """The path of the File on Humanloop."""
+    version_id: NotRequired[str]
+    """The ID of the version of the File on Humanloop."""
+    environment: NotRequired[str]
+    """The environment of the File on Humanloop."""
 
 
-class File(Identifiers):
+class FileEvalConfig(Identifiers):
     """A File on Humanloop (Flow, Prompt, Tool, Evaluator)."""
 
-    type: Literal["flow", "prompt"]
+    type: Literal["flow", "prompt", "agent"]
     """The type of File this callable relates to on Humanloop."""
     version: NotRequired[Version]
     """The contents uniquely define the version of the File on Humanloop."""
@@ -54,7 +56,7 @@ class File(Identifiers):
     """
 
 
-class Dataset(Identifiers):
+class DatasetEvalConfig(Identifiers):
     datapoints: NotRequired[Sequence[DatapointDict]]
     """The datapoints to map your function over to produce the outputs required by the evaluation."""
     action: NotRequired[UpdateDatasetAction]
@@ -62,7 +64,7 @@ class Dataset(Identifiers):
     `set` replaces the existing Datapoints and `add` appends to the existing Datapoints."""
 
 
-class Evaluator(Identifiers):
+class EvaluatorEvalConfig(Identifiers):
     """The Evaluator to provide judgments for this Evaluation."""
 
     args_type: NotRequired[EvaluatorArgumentsType]
