@@ -15,6 +15,7 @@ from humanloop.flows.client import FlowsClient
 from humanloop.prompts.client import PromptsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.tools.client import ToolsClient
+from humanloop.types import FileType
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
@@ -128,7 +129,6 @@ def overload_call(client: PromptsClient) -> PromptsClient:
 def overload_call_with_local_files(
     client: Union[PromptsClient, AgentsClient], 
     use_local_files: bool,
-    file_type: Literal["prompt", "agent"]
 ) -> Union[PromptsClient, AgentsClient]:
     """Overload call to handle local files when use_local_files is True.
     
@@ -138,6 +138,14 @@ def overload_call_with_local_files(
         file_type: Type of file ("prompt" or "agent")
     """
     original_call = client._call if hasattr(client, '_call') else client.call
+    # get file type from client type
+    file_type: FileType
+    if isinstance(client, PromptsClient):   
+        file_type = "prompt"    
+    elif isinstance(client, AgentsClient):
+        file_type = "agent"
+    else:
+        raise ValueError(f"Unsupported client type: {type(client)}")
 
     def _overload_call(self, **kwargs) -> PromptCallResponse:
         if use_local_files and "path" in kwargs:
@@ -152,7 +160,7 @@ def overload_call_with_local_files(
                     with open(local_path) as f:
                         file_content = f.read()
                     
-                    kwargs[file_type] = file_content  # "prompt" or "agent"
+                    kwargs[file_type] = file_content  # "prompt" or "agent" # TODO: raise warning if kernel passed in
                     
                     logger.debug(f"Using local file content from {local_path}")
                 else:
