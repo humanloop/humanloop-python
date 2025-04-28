@@ -132,13 +132,11 @@ class Humanloop(BaseHumanloop):
         self.prompts = overload_call(client=self.prompts)
         self.prompts = overload_call_with_local_files(
             client=self.prompts, 
-            use_local_files=self.use_local_files, 
-            file_type="prompt"
+            use_local_files=self.use_local_files
         )
         self.agents = overload_call_with_local_files(
             client=self.agents, 
-            use_local_files=self.use_local_files, 
-            file_type="agent"
+            use_local_files=self.use_local_files
         )
         self.flows = overload_log(client=self.flows)
         self.tools = overload_log(client=self.tools)
