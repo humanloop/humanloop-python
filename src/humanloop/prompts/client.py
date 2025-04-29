@@ -5,7 +5,7 @@ from ..core.client_wrapper import SyncClientWrapper
 from .raw_client import RawPromptsClient
 from ..requests.chat_message import ChatMessageParams
 from .requests.prompt_log_request_tool_choice import PromptLogRequestToolChoiceParams
-from ..requests.prompt_kernel_request import PromptKernelRequestParams
+from .requests.prompt_log_request_prompt import PromptLogRequestPromptParams
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..core.request_options import RequestOptions
@@ -13,9 +13,11 @@ from ..types.create_prompt_log_response import CreatePromptLogResponse
 from .requests.prompt_log_update_request_tool_choice import PromptLogUpdateRequestToolChoiceParams
 from ..types.log_response import LogResponse
 from .requests.prompts_call_stream_request_tool_choice import PromptsCallStreamRequestToolChoiceParams
+from .requests.prompts_call_stream_request_prompt import PromptsCallStreamRequestPromptParams
 from ..requests.provider_api_keys import ProviderApiKeysParams
 from ..types.prompt_call_stream_response import PromptCallStreamResponse
 from .requests.prompts_call_request_tool_choice import PromptsCallRequestToolChoiceParams
+from .requests.prompts_call_request_prompt import PromptsCallRequestPromptParams
 from ..types.prompt_call_response import PromptCallResponse
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
@@ -33,7 +35,7 @@ from ..types.template_language import TemplateLanguage
 from ..types.model_providers import ModelProviders
 from .requests.prompt_request_stop import PromptRequestStopParams
 from ..requests.response_format import ResponseFormatParams
-from ..types.reasoning_effort import ReasoningEffort
+from .requests.prompt_request_reasoning_effort import PromptRequestReasoningEffortParams
 from ..requests.tool_function import ToolFunctionParams
 from ..types.populate_template_response import PopulateTemplateResponse
 from ..types.list_prompts import ListPrompts
@@ -44,6 +46,7 @@ from ..requests.evaluator_activation_deactivation_request_activate_item import (
 from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
+from ..types.prompt_kernel_request import PromptKernelRequest
 from ..core.client_wrapper import AsyncClientWrapper
 from .raw_client import AsyncRawPromptsClient
 from ..core.pagination import AsyncPager
@@ -84,7 +87,7 @@ class PromptsClient:
         finish_reason: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptLogRequestPromptParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -165,8 +168,11 @@ class PromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptLogRequestPromptParams]
+            The prompt configuration to use. Two formats are supported:
+            - A `'PromptKernelRequest'` object containing the prompt configuration
+            - A string containing a serialized .prompt file
+            A new Prompt version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -256,7 +262,7 @@ class PromptsClient:
             messages=[{"role": "user", "content": "What really happened at Roswell?"}],
             inputs={"person": "Trump"},
             created_at=datetime.datetime.fromisoformat(
-                "2024-07-18 21:29:35.178000+00:00",
+                "2024-07-18 23:29:35.178000+00:00",
             ),
             provider_latency=6.5931549072265625,
             output_message={
@@ -479,7 +485,7 @@ class PromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallStreamRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallStreamRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -537,8 +543,11 @@ class PromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
+            The prompt configuration to use. Two formats are supported:
+            - A `'PromptKernelRequest'` object containing the prompt configuration
+            - A string containing a serialized .prompt file
+            A new Prompt version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -648,7 +657,7 @@ class PromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -706,8 +715,11 @@ class PromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallRequestPromptParams]
+            The prompt configuration to use. Two formats are supported:
+            - A `'PromptKernelRequest'` object containing the prompt configuration
+            - A string containing a serialized .prompt file
+            A new Prompt version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -962,7 +974,7 @@ class PromptsClient:
         other: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         seed: typing.Optional[int] = OMIT,
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
-        reasoning_effort: typing.Optional[ReasoningEffort] = OMIT,
+        reasoning_effort: typing.Optional[PromptRequestReasoningEffortParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -1037,8 +1049,8 @@ class PromptsClient:
         response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        reasoning_effort : typing.Optional[ReasoningEffort]
-            Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+        reasoning_effort : typing.Optional[PromptRequestReasoningEffortParams]
+            Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
 
         tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
@@ -1599,6 +1611,93 @@ class PromptsClient:
         )
         return response.data
 
+    def serialize(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> str:
+        """
+        Serialize a Prompt to the .prompt file format.
+
+        Useful for storing the Prompt with your code in a version control system,
+        or for editing with an AI tool.
+
+        By default, the deployed version of the Prompt is returned. Use the query parameters
+        `version_id` or `environment` to target a specific version of the Prompt.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        version_id : typing.Optional[str]
+            A specific Version ID of the Prompt to retrieve.
+
+        environment : typing.Optional[str]
+            Name of the Environment to retrieve a deployed Version from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        str
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.prompts.serialize(
+            id="id",
+        )
+        """
+        response = self._raw_client.serialize(
+            id, version_id=version_id, environment=environment, request_options=request_options
+        )
+        return response.data
+
+    def deserialize(
+        self, *, prompt: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> PromptKernelRequest:
+        """
+        Deserialize a Prompt from the .prompt file format.
+
+        This returns a subset of the attributes required by a Prompt.
+        This subset is the bit that defines the Prompt version (e.g. with `model` and `temperature` etc)
+
+        Parameters
+        ----------
+        prompt : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptKernelRequest
+            Successful Response
+
+        Examples
+        --------
+        from humanloop import Humanloop
+
+        client = Humanloop(
+            api_key="YOUR_API_KEY",
+        )
+        client.prompts.deserialize(
+            prompt="prompt",
+        )
+        """
+        response = self._raw_client.deserialize(prompt=prompt, request_options=request_options)
+        return response.data
+
 
 class AsyncPromptsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -1632,7 +1731,7 @@ class AsyncPromptsClient:
         finish_reason: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptLogRequestPromptParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -1713,8 +1812,11 @@ class AsyncPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptLogRequestPromptParams]
+            The prompt configuration to use. Two formats are supported:
+            - A `'PromptKernelRequest'` object containing the prompt configuration
+            - A string containing a serialized .prompt file
+            A new Prompt version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -1810,7 +1912,7 @@ class AsyncPromptsClient:
                 ],
                 inputs={"person": "Trump"},
                 created_at=datetime.datetime.fromisoformat(
-                    "2024-07-18 21:29:35.178000+00:00",
+                    "2024-07-18 23:29:35.178000+00:00",
                 ),
                 provider_latency=6.5931549072265625,
                 output_message={
@@ -2044,7 +2146,7 @@ class AsyncPromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallStreamRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallStreamRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2102,8 +2204,11 @@ class AsyncPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
+            The prompt configuration to use. Two formats are supported:
+            - A `'PromptKernelRequest'` object containing the prompt configuration
+            - A string containing a serialized .prompt file
+            A new Prompt version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2222,7 +2327,7 @@ class AsyncPromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2280,8 +2385,11 @@ class AsyncPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallRequestPromptParams]
+            The prompt configuration to use. Two formats are supported:
+            - A `'PromptKernelRequest'` object containing the prompt configuration
+            - A string containing a serialized .prompt file
+            A new Prompt version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2552,7 +2660,7 @@ class AsyncPromptsClient:
         other: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         seed: typing.Optional[int] = OMIT,
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
-        reasoning_effort: typing.Optional[ReasoningEffort] = OMIT,
+        reasoning_effort: typing.Optional[PromptRequestReasoningEffortParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2627,8 +2735,8 @@ class AsyncPromptsClient:
         response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        reasoning_effort : typing.Optional[ReasoningEffort]
-            Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+        reasoning_effort : typing.Optional[PromptRequestReasoningEffortParams]
+            Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
 
         tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
@@ -3283,4 +3391,107 @@ class AsyncPromptsClient:
         response = await self._raw_client.update_monitoring(
             id, activate=activate, deactivate=deactivate, request_options=request_options
         )
+        return response.data
+
+    async def serialize(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> str:
+        """
+        Serialize a Prompt to the .prompt file format.
+
+        Useful for storing the Prompt with your code in a version control system,
+        or for editing with an AI tool.
+
+        By default, the deployed version of the Prompt is returned. Use the query parameters
+        `version_id` or `environment` to target a specific version of the Prompt.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        version_id : typing.Optional[str]
+            A specific Version ID of the Prompt to retrieve.
+
+        environment : typing.Optional[str]
+            Name of the Environment to retrieve a deployed Version from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        str
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.prompts.serialize(
+                id="id",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.serialize(
+            id, version_id=version_id, environment=environment, request_options=request_options
+        )
+        return response.data
+
+    async def deserialize(
+        self, *, prompt: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> PromptKernelRequest:
+        """
+        Deserialize a Prompt from the .prompt file format.
+
+        This returns a subset of the attributes required by a Prompt.
+        This subset is the bit that defines the Prompt version (e.g. with `model` and `temperature` etc)
+
+        Parameters
+        ----------
+        prompt : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        PromptKernelRequest
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from humanloop import AsyncHumanloop
+
+        client = AsyncHumanloop(
+            api_key="YOUR_API_KEY",
+        )
+
+
+        async def main() -> None:
+            await client.prompts.deserialize(
+                prompt="prompt",
+            )
+
+
+        asyncio.run(main())
+        """
+        response = await self._raw_client.deserialize(prompt=prompt, request_options=request_options)
         return response.data

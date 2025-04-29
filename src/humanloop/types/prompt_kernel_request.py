@@ -9,12 +9,18 @@ from .template_language import TemplateLanguage
 from .model_providers import ModelProviders
 from .prompt_kernel_request_stop import PromptKernelRequestStop
 from .response_format import ResponseFormat
-from .reasoning_effort import ReasoningEffort
+from .prompt_kernel_request_reasoning_effort import PromptKernelRequestReasoningEffort
 from .tool_function import ToolFunction
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class PromptKernelRequest(UncheckedBaseModel):
+    """
+    Base class used by both PromptKernelRequest and AgentKernelRequest.
+
+    Contains the consistent Prompt-related fields.
+    """
+
     model: str = pydantic.Field()
     """
     The model instance used, e.g. `gpt-4`. See [supported models](https://humanloop.com/docs/reference/supported-models)
@@ -90,9 +96,9 @@ class PromptKernelRequest(UncheckedBaseModel):
     The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
     """
 
-    reasoning_effort: typing.Optional[ReasoningEffort] = pydantic.Field(default=None)
+    reasoning_effort: typing.Optional[PromptKernelRequestReasoningEffort] = pydantic.Field(default=None)
     """
-    Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+    Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
     """
 
     tools: typing.Optional[typing.List[ToolFunction]] = pydantic.Field(default=None)

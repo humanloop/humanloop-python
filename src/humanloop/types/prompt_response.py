@@ -10,9 +10,11 @@ from .template_language import TemplateLanguage
 from .model_providers import ModelProviders
 from .prompt_response_stop import PromptResponseStop
 from .response_format import ResponseFormat
-from .reasoning_effort import ReasoningEffort
+from .prompt_response_reasoning_effort import PromptResponseReasoningEffort
 from .tool_function import ToolFunction
 from .linked_tool_response import LinkedToolResponse
+import typing_extensions
+from ..core.serialization import FieldMetadata
 from .environment_response import EnvironmentResponse
 import datetime as dt
 from .user_response import UserResponse
@@ -120,9 +122,9 @@ class PromptResponse(UncheckedBaseModel):
     The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
     """
 
-    reasoning_effort: typing.Optional[ReasoningEffort] = pydantic.Field(default=None)
+    reasoning_effort: typing.Optional[PromptResponseReasoningEffort] = pydantic.Field(default=None)
     """
-    Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+    Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
     """
 
     tools: typing.Optional[typing.List[ToolFunction]] = pydantic.Field(default=None)
@@ -170,6 +172,13 @@ class PromptResponse(UncheckedBaseModel):
     Name of the Prompt.
     """
 
+    schema_: typing_extensions.Annotated[
+        typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]], FieldMetadata(alias="schema")
+    ] = pydantic.Field(default=None)
+    """
+    The JSON schema for the Prompt.
+    """
+
     version_id: str = pydantic.Field()
     """
     Unique identifier for the specific Prompt Version. If no query params provided, the default deployed Prompt Version is returned.
@@ -214,6 +223,11 @@ class PromptResponse(UncheckedBaseModel):
     Aggregation of Evaluator results for the Prompt Version.
     """
 
+    content: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    The serialized kernel for the Prompt. Corresponds to the .prompt file.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:
@@ -224,6 +238,8 @@ class PromptResponse(UncheckedBaseModel):
             extra = pydantic.Extra.allow
 
 
+from .agent_linked_file_response import AgentLinkedFileResponse  # noqa: E402
+from .agent_response import AgentResponse  # noqa: E402
 from .evaluator_response import EvaluatorResponse  # noqa: E402
 from .flow_response import FlowResponse  # noqa: E402
 from .monitoring_evaluator_response import MonitoringEvaluatorResponse  # noqa: E402

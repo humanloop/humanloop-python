@@ -10,6 +10,12 @@ if typing.TYPE_CHECKING:
     from .tool_response import ToolResponseParams
     from .evaluator_response import EvaluatorResponseParams
     from .flow_response import FlowResponseParams
+    from .agent_response import AgentResponseParams
 VersionIdResponseVersionParams = typing.Union[
-    "PromptResponseParams", "ToolResponseParams", DatasetResponseParams, "EvaluatorResponseParams", "FlowResponseParams"
+    "PromptResponseParams",
+    "ToolResponseParams",
+    DatasetResponseParams,
+    "EvaluatorResponseParams",
+    "FlowResponseParams",
+    "AgentResponseParams",
 ]

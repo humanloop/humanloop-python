@@ -7,8 +7,8 @@ from ..types.file_type import FileType
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
-from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response import (
-    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse,
+from ..types.paginated_data_union_prompt_response_tool_response_dataset_response_evaluator_response_flow_response_agent_response import (
+    PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse,
 )
 from .types.retrieve_by_path_files_retrieve_by_path_post_response import RetrieveByPathFilesRetrieveByPathPostResponse
 from ..core.client_wrapper import AsyncClientWrapper
@@ -44,8 +44,9 @@ class FilesClient:
         environment: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse:
+    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse:
         """
         Get a paginated list of files.
 
@@ -75,12 +76,15 @@ class FilesClient:
         order : typing.Optional[SortOrder]
             Direction to sort by.
 
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
             Successful Response
 
         Examples
@@ -101,6 +105,7 @@ class FilesClient:
             environment=environment,
             sort_by=sort_by,
             order=order,
+            include_content=include_content,
             request_options=request_options,
         )
         return response.data
@@ -174,8 +179,9 @@ class AsyncFilesClient:
         environment: typing.Optional[str] = None,
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse:
+    ) -> PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse:
         """
         Get a paginated list of files.
 
@@ -205,12 +211,15 @@ class AsyncFilesClient:
         order : typing.Optional[SortOrder]
             Direction to sort by.
 
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponse
+        PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
             Successful Response
 
         Examples
@@ -239,6 +248,7 @@ class AsyncFilesClient:
             environment=environment,
             sort_by=sort_by,
             order=order,
+            include_content=include_content,
             request_options=request_options,
         )
         return response.data
