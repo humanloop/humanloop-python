@@ -2,6 +2,7 @@ from typing import List, NamedTuple, Union
 from pathlib import Path
 import pytest
 from humanloop import Humanloop, FileType, AgentResponse, PromptResponse
+from humanloop.error import HumanloopRuntimeError
 
 
 class SyncableFile(NamedTuple):
@@ -94,3 +95,91 @@ def test_pull_basic(humanloop_client: Humanloop, test_file_structure: List[Synca
         # Verify it's not empty
         content = local_path.read_text()
         assert content, f"File at {local_path} should not be empty"
+
+@pytest.mark.parametrize("humanloop_client", [True], indirect=True)
+def test_overload_with_local_files(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+    """Test that overload_with_local_files correctly handles local files.
+    
+    Flow:
+    1. Create files in remote (via test_file_structure fixture)
+    2. Pull files locally
+    3. Test using the pulled files
+    """
+    # First pull the files locally
+    humanloop_client.pull()
+
+    # Test using the pulled files
+    test_file = test_file_structure[0]  # Use the first test file
+    extension = f".{test_file.type}"
+    local_path = Path("humanloop") / f"{test_file.path}{extension}"
+    
+    # Verify the file was pulled correctly
+    assert local_path.exists(), f"Expected pulled file at {local_path}"
+    assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
+
+    # Test call with pulled file
+    if test_file.type == "prompt":
+        response = humanloop_client.prompts.call(path=test_file.path, messages=[{"role": "user", "content": "Testing"}])
+        assert response is not None
+    elif test_file.type == "agent":
+        response = humanloop_client.agents.call(path=test_file.path, messages=[{"role": "user", "content": "Testing"}])
+        assert response is not None
+
+    # Test with invalid path
+    with pytest.raises(HumanloopRuntimeError):
+        if test_file.type == "prompt":
+            humanloop_client.prompts.call(path="invalid/path")
+        elif test_file.type == "agent":
+            humanloop_client.agents.call(path="invalid/path")
+
+@pytest.mark.parametrize("humanloop_client", [True], indirect=True)
+def test_overload_log_with_local_files(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+    """Test that overload_with_local_files correctly handles local files for log operations.
+    
+    Flow:
+    1. Create files in remote (via test_file_structure fixture)
+    2. Pull files locally
+    3. Test logging using the pulled files
+    """
+    # First pull the files locally
+    humanloop_client.pull()
+
+    # Test using the pulled files
+    test_file = test_file_structure[0]  # Use the first test file
+    extension = f".{test_file.type}"
+    local_path = Path("humanloop") / f"{test_file.path}{extension}"
+    
+    # Verify the file was pulled correctly
+    assert local_path.exists(), f"Expected pulled file at {local_path}"
+    assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
+
+    # Test log with pulled file
+    if test_file.type == "prompt":
+        response = humanloop_client.prompts.log(
+            path=test_file.path,
+            messages=[{"role": "user", "content": "Testing"}],
+            output="Test response"
+        )
+        assert response is not None
+    elif test_file.type == "agent":
+        response = humanloop_client.agents.log(
+            path=test_file.path,
+            messages=[{"role": "user", "content": "Testing"}],
+            output="Test response"
+        )
+        assert response is not None
+
+    # Test with invalid path
+    with pytest.raises(HumanloopRuntimeError):
+        if test_file.type == "prompt":
+            humanloop_client.prompts.log(
+                path="invalid/path",
+                messages=[{"role": "user", "content": "Testing"}],
+                output="Test response"
+            )
+        elif test_file.type == "agent":
+            humanloop_client.agents.log(
+                path="invalid/path",
+                messages=[{"role": "user", "content": "Testing"}],
+                output="Test response"
+            )

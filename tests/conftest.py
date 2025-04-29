@@ -191,10 +191,13 @@ def api_keys() -> APIKeys:
 
 
 @pytest.fixture(scope="session")
-def humanloop_client(api_keys: APIKeys) -> Humanloop:
+def humanloop_client(request, api_keys: APIKeys) -> Humanloop:
+    """Create a Humanloop client for testing."""
+    use_local_files = getattr(request, "param", False)
     return Humanloop(
         api_key=api_keys.humanloop,
         base_url="http://localhost:80/v5/",
+        use_local_files=use_local_files
     )
 
 
