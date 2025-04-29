@@ -13,7 +13,7 @@ from humanloop.evals import run_eval
 from humanloop.evals.types import Dataset, Evaluator, EvaluatorCheck, File
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.overload import overload_call, overload_log, overload_call_with_local_files
+from humanloop.overload import overload_call, overload_log, overload_with_local_files
 from humanloop.decorators.flow import flow as flow_decorator_factory
 from humanloop.decorators.prompt import prompt_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
@@ -77,6 +77,7 @@ class ExtendedPromptsClient(PromptsClient):
     """
 
     populate_template = staticmethod(populate_template)  # type: ignore [assignment]
+    load = staticmethod(load)
 
 
 class Humanloop(BaseHumanloop):
@@ -130,11 +131,11 @@ class Humanloop(BaseHumanloop):
         # and the @flow decorator providing the trace_id
         self.prompts = overload_log(client=self.prompts)
         self.prompts = overload_call(client=self.prompts)
-        self.prompts = overload_call_with_local_files(
+        self.prompts = overload_with_local_files(
             client=self.prompts, 
             use_local_files=self.use_local_files
         )
-        self.agents = overload_call_with_local_files(
+        self.agents = overload_with_local_files(
             client=self.agents, 
             use_local_files=self.use_local_files
         )

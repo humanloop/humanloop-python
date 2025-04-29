@@ -194,7 +194,7 @@ def api_keys() -> APIKeys:
 def humanloop_client(api_keys: APIKeys) -> Humanloop:
     return Humanloop(
         api_key=api_keys.humanloop,
-        base_url="https://neostaging.humanloop.ml/v5/",
+        base_url="http://localhost:80/v5/",
     )
 
 

@@ -126,7 +126,7 @@ def overload_call(client: PromptsClient) -> PromptsClient:
     client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
     return client
 
-def overload_call_with_local_files(
+def overload_with_local_files(
     client: Union[PromptsClient, AgentsClient], 
     use_local_files: bool,
 ) -> Union[PromptsClient, AgentsClient]:
@@ -138,6 +138,7 @@ def overload_call_with_local_files(
         file_type: Type of file ("prompt" or "agent")
     """
     original_call = client._call if hasattr(client, '_call') else client.call
+    original_log = client._log if hasattr(client, '_log') else client.log
     # get file type from client type
     file_type: FileType
     if isinstance(client, PromptsClient):   
@@ -147,11 +148,11 @@ def overload_call_with_local_files(
     else:
         raise ValueError(f"Unsupported client type: {type(client)}")
 
-    def _overload_call(self, **kwargs) -> PromptCallResponse:
+    def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
         if use_local_files and "path" in kwargs:
             try:
                 # Construct path to local file
-                local_path = Path("humanloop") / kwargs["path"]
+                local_path = Path("humanloop") / kwargs["path"] # FLAG: ensure that when passing the path back to remote, it's using forward slashes
                 # Add appropriate extension
                 local_path = local_path.parent / f"{local_path.stem}.{file_type}"
                 
@@ -160,7 +161,7 @@ def overload_call_with_local_files(
                     with open(local_path) as f:
                         file_content = f.read()
                     
-                    kwargs[file_type] = file_content  # "prompt" or "agent" # TODO: raise warning if kernel passed in
+                    kwargs[file_type] = file_content  # "prompt" or "agent" # TODO: raise warning if kernel passed in
                     
                     logger.debug(f"Using local file content from {local_path}")
                 else:
@@ -168,7 +169,19 @@ def overload_call_with_local_files(
             except Exception as e:
                 logger.error(f"Error reading local file: {e}, falling back to API")
 
-        return original_call(**kwargs)
+        if function_name == "call":
+            return original_call(**kwargs)
+        elif function_name == "log":
+            return original_log(**kwargs)
+        else:
+            raise ValueError(f"Unsupported function name: {function_name}")
+
+    def _overload_call(self, **kwargs) -> PromptCallResponse:
+        return _overload(self, "call", **kwargs)
+
+    def _overload_log(self, **kwargs) -> PromptCallResponse:
+        return _overload(self, "log", **kwargs)
 
     client.call = types.MethodType(_overload_call, client)
+    client.log = types.MethodType(_overload_log, client)
     return client
