@@ -1618,7 +1618,7 @@ class PromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> str:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -1644,7 +1644,8 @@ class PromptsClient:
 
         Returns
         -------
-        None
+        str
+            Successful Response
 
         Examples
         --------
@@ -3399,7 +3400,7 @@ class AsyncPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> str:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -3425,7 +3426,8 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        None
+        str
+            Successful Response
 
         Examples
         --------

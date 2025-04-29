@@ -1468,7 +1468,7 @@ class AgentsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> str:
         """
         Serialize an Agent to the .agent file format.
 
@@ -1494,7 +1494,8 @@ class AgentsClient:
 
         Returns
         -------
-        None
+        str
+            Successful Response
 
         Examples
         --------
@@ -3112,7 +3113,7 @@ class AsyncAgentsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> str:
         """
         Serialize an Agent to the .agent file format.
 
@@ -3138,7 +3139,8 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        None
+        str
+            Successful Response
 
         Examples
         --------

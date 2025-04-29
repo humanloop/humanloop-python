@@ -77,7 +77,6 @@ class ExtendedPromptsClient(PromptsClient):
     """
 
     populate_template = staticmethod(populate_template)  # type: ignore [assignment]
-    load = staticmethod(load)
 
 
 class Humanloop(BaseHumanloop):

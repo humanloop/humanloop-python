@@ -1765,7 +1765,7 @@ class RawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[None]:
+    ) -> HttpResponse[str]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -1791,7 +1791,8 @@ class RawPromptsClient:
 
         Returns
         -------
-        HttpResponse[None]
+        HttpResponse[str]
+            Successful Response
         """
         _response = self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -1804,7 +1805,7 @@ class RawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return HttpResponse(response=_response, data=_response.text)
+                return HttpResponse(response=_response, data=_response.text)  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -3592,7 +3593,7 @@ class AsyncRawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[None]:
+    ) -> AsyncHttpResponse[str]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -3618,7 +3619,8 @@ class AsyncRawPromptsClient:
 
         Returns
         -------
-        AsyncHttpResponse[None]
+        AsyncHttpResponse[str]
+            Successful Response
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -3631,7 +3633,7 @@ class AsyncRawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return AsyncHttpResponse(response=_response, data=None)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

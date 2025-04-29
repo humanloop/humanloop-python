@@ -1858,7 +1858,7 @@ class RawAgentsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[None]:
+    ) -> HttpResponse[str]:
         """
         Serialize an Agent to the .agent file format.
 
@@ -1884,7 +1884,8 @@ class RawAgentsClient:
 
         Returns
         -------
-        HttpResponse[None]
+        HttpResponse[str]
+            Successful Response
         """
         _response = self._client_wrapper.httpx_client.request(
             f"agents/{jsonable_encoder(id)}/serialize",
@@ -1897,7 +1898,7 @@ class RawAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return HttpResponse(response=_response, data=_response.text)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -3775,7 +3776,7 @@ class AsyncRawAgentsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[None]:
+    ) -> AsyncHttpResponse[str]:
         """
         Serialize an Agent to the .agent file format.
 
@@ -3801,7 +3802,8 @@ class AsyncRawAgentsClient:
 
         Returns
         -------
-        AsyncHttpResponse[None]
+        AsyncHttpResponse[str]
+            Successful Response
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"agents/{jsonable_encoder(id)}/serialize",
@@ -3814,7 +3816,7 @@ class AsyncRawAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return AsyncHttpResponse(response=_response, data=None)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
