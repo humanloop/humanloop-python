@@ -3,7 +3,6 @@
 from ..core.client_wrapper import SyncClientWrapper
 from .raw_client import RawLogsClient
 import typing
-from ..types.version_status import VersionStatus
 import datetime as dt
 from ..core.request_options import RequestOptions
 from ..core.pagination import SyncPager
@@ -42,7 +41,6 @@ class LogsClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         version_id: typing.Optional[str] = None,
-        version_status: typing.Optional[VersionStatus] = None,
         id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
@@ -71,9 +69,6 @@ class LogsClient:
         version_id : typing.Optional[str]
             If provided, only Logs belonging to the specified Version will be returned.
 
-        version_status : typing.Optional[VersionStatus]
-            If provided, only Logs belonging to Versions with the specified status will be returned.
-
         id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
             If provided, returns Logs whose IDs contain any of the specified values as substrings.
 
@@ -99,7 +94,7 @@ class LogsClient:
             If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
 
         include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
+            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow or Agent Logs.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -135,7 +130,6 @@ class LogsClient:
                 "page": page,
                 "size": size,
                 "version_id": version_id,
-                "version_status": version_status,
                 "id": id,
                 "search": search,
                 "metadata_search": metadata_search,
@@ -163,7 +157,6 @@ class LogsClient:
                     page=page + 1,
                     size=size,
                     version_id=version_id,
-                    version_status=version_status,
                     id=id,
                     search=search,
                     metadata_search=metadata_search,
@@ -281,7 +274,6 @@ class AsyncLogsClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         version_id: typing.Optional[str] = None,
-        version_status: typing.Optional[VersionStatus] = None,
         id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
@@ -310,9 +302,6 @@ class AsyncLogsClient:
         version_id : typing.Optional[str]
             If provided, only Logs belonging to the specified Version will be returned.
 
-        version_status : typing.Optional[VersionStatus]
-            If provided, only Logs belonging to Versions with the specified status will be returned.
-
         id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
             If provided, returns Logs whose IDs contain any of the specified values as substrings.
 
@@ -338,7 +327,7 @@ class AsyncLogsClient:
             If provided, limit the response to a random subset of logs from the filtered results. (This will be an approximate sample, not a strict limit.)
 
         include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow Logs.
+            If true, populate `trace_children` for the retrieved Logs. Only applicable when retrieving Flow or Agent Logs.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -382,7 +371,6 @@ class AsyncLogsClient:
                 "page": page,
                 "size": size,
                 "version_id": version_id,
-                "version_status": version_status,
                 "id": id,
                 "search": search,
                 "metadata_search": metadata_search,
@@ -410,7 +398,6 @@ class AsyncLogsClient:
                     page=page + 1,
                     size=size,
                     version_id=version_id,
-                    version_status=version_status,
                     id=id,
                     search=search,
                     metadata_search=metadata_search,

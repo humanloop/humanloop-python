@@ -32,7 +32,7 @@ from ..types.template_language import TemplateLanguage
 from ..types.model_providers import ModelProviders
 from .requests.prompt_request_stop import PromptRequestStopParams
 from ..requests.response_format import ResponseFormatParams
-from ..types.reasoning_effort import ReasoningEffort
+from .requests.prompt_request_reasoning_effort import PromptRequestReasoningEffortParams
 from ..requests.tool_function import ToolFunctionParams
 from ..types.prompt_response import PromptResponse
 from ..types.populate_template_response import PopulateTemplateResponse
@@ -44,6 +44,7 @@ from ..requests.evaluator_activation_deactivation_request_activate_item import (
 from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
+from ..types.prompt_kernel_request import PromptKernelRequest
 from ..core.client_wrapper import AsyncClientWrapper
 from ..core.http_response import AsyncHttpResponse
 
@@ -915,7 +916,7 @@ class RawPromptsClient:
         other: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         seed: typing.Optional[int] = OMIT,
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
-        reasoning_effort: typing.Optional[ReasoningEffort] = OMIT,
+        reasoning_effort: typing.Optional[PromptRequestReasoningEffortParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -990,8 +991,8 @@ class RawPromptsClient:
         response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        reasoning_effort : typing.Optional[ReasoningEffort]
-            Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+        reasoning_effort : typing.Optional[PromptRequestReasoningEffortParams]
+            Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
 
         tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
@@ -1051,7 +1052,9 @@ class RawPromptsClient:
                 "response_format": convert_and_respect_annotation_metadata(
                     object_=response_format, annotation=ResponseFormatParams, direction="write"
                 ),
-                "reasoning_effort": reasoning_effort,
+                "reasoning_effort": convert_and_respect_annotation_metadata(
+                    object_=reasoning_effort, annotation=PromptRequestReasoningEffortParams, direction="write"
+                ),
                 "tools": convert_and_respect_annotation_metadata(
                     object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
                 ),
@@ -1725,6 +1728,126 @@ class RawPromptsClient:
                     PromptResponse,
                     construct_type(
                         type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def serialize(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[None]:
+        """
+        Serialize a Prompt to the .prompt file format.
+
+        Useful for storing the Prompt with your code in a version control system,
+        or for editing with an AI tool.
+
+        By default, the deployed version of the Prompt is returned. Use the query parameters
+        `version_id` or `environment` to target a specific version of the Prompt.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        version_id : typing.Optional[str]
+            A specific Version ID of the Prompt to retrieve.
+
+        environment : typing.Optional[str]
+            Name of the Environment to retrieve a deployed Version from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[None]
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/serialize",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return HttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def deserialize(
+        self, *, prompt: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[PromptKernelRequest]:
+        """
+        Deserialize a Prompt from the .prompt file format.
+
+        This returns a subset of the attributes required by a Prompt.
+        This subset is the bit that defines the Prompt version (e.g. with `model` and `temperature` etc)
+
+        Parameters
+        ----------
+        prompt : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[PromptKernelRequest]
+            Successful Response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "prompts/deserialize",
+            method="POST",
+            json={
+                "prompt": prompt,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptKernelRequest,
+                    construct_type(
+                        type_=PromptKernelRequest,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2609,7 +2732,7 @@ class AsyncRawPromptsClient:
         other: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         seed: typing.Optional[int] = OMIT,
         response_format: typing.Optional[ResponseFormatParams] = OMIT,
-        reasoning_effort: typing.Optional[ReasoningEffort] = OMIT,
+        reasoning_effort: typing.Optional[PromptRequestReasoningEffortParams] = OMIT,
         tools: typing.Optional[typing.Sequence[ToolFunctionParams]] = OMIT,
         linked_tools: typing.Optional[typing.Sequence[str]] = OMIT,
         attributes: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2684,8 +2807,8 @@ class AsyncRawPromptsClient:
         response_format : typing.Optional[ResponseFormatParams]
             The format of the response. Only `{"type": "json_object"}` is currently supported for chat.
 
-        reasoning_effort : typing.Optional[ReasoningEffort]
-            Give model guidance on how many reasoning tokens it should generate before creating a response to the prompt. This is only supported for OpenAI reasoning (o1, o3-mini) models.
+        reasoning_effort : typing.Optional[PromptRequestReasoningEffortParams]
+            Guidance on how many reasoning tokens it should generate before creating a response to the prompt. OpenAI reasoning models (o1, o3-mini) expect a OpenAIReasoningEffort enum. Anthropic reasoning models expect an integer, which signifies the maximum token budget.
 
         tools : typing.Optional[typing.Sequence[ToolFunctionParams]]
             The tool specification that the model can choose to call if Tool calling is supported.
@@ -2745,7 +2868,9 @@ class AsyncRawPromptsClient:
                 "response_format": convert_and_respect_annotation_metadata(
                     object_=response_format, annotation=ResponseFormatParams, direction="write"
                 ),
-                "reasoning_effort": reasoning_effort,
+                "reasoning_effort": convert_and_respect_annotation_metadata(
+                    object_=reasoning_effort, annotation=PromptRequestReasoningEffortParams, direction="write"
+                ),
                 "tools": convert_and_respect_annotation_metadata(
                     object_=tools, annotation=typing.Sequence[ToolFunctionParams], direction="write"
                 ),
@@ -3421,6 +3546,126 @@ class AsyncRawPromptsClient:
                     PromptResponse,
                     construct_type(
                         type_=PromptResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def serialize(
+        self,
+        id: str,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[None]:
+        """
+        Serialize a Prompt to the .prompt file format.
+
+        Useful for storing the Prompt with your code in a version control system,
+        or for editing with an AI tool.
+
+        By default, the deployed version of the Prompt is returned. Use the query parameters
+        `version_id` or `environment` to target a specific version of the Prompt.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Prompt.
+
+        version_id : typing.Optional[str]
+            A specific Version ID of the Prompt to retrieve.
+
+        environment : typing.Optional[str]
+            Name of the Environment to retrieve a deployed Version from.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[None]
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"prompts/{jsonable_encoder(id)}/serialize",
+            method="GET",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return AsyncHttpResponse(response=_response, data=None)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def deserialize(
+        self, *, prompt: str, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[PromptKernelRequest]:
+        """
+        Deserialize a Prompt from the .prompt file format.
+
+        This returns a subset of the attributes required by a Prompt.
+        This subset is the bit that defines the Prompt version (e.g. with `model` and `temperature` etc)
+
+        Parameters
+        ----------
+        prompt : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[PromptKernelRequest]
+            Successful Response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "prompts/deserialize",
+            method="POST",
+            json={
+                "prompt": prompt,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    PromptKernelRequest,
+                    construct_type(
+                        type_=PromptKernelRequest,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
