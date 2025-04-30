@@ -21,6 +21,9 @@ console_handler.setFormatter(formatter)
 if not logger.hasHandlers():
     logger.addHandler(console_handler)
 
+# Default cache size for file content caching
+DEFAULT_CACHE_SIZE = 100
+
 class SyncClient:
     """Client for managing synchronization between local filesystem and Humanloop.
     
@@ -37,14 +40,14 @@ class SyncClient:
         self, 
         client: "BaseHumanloop",
         base_dir: str = "humanloop",
-        cache_size: int = 100
+        cache_size: int = DEFAULT_CACHE_SIZE
     ):
         """
         Parameters
         ----------
         client: Humanloop client instance
         base_dir: Base directory for synced files (default: "humanloop")
-        cache_size: Maximum number of files to cache (default: 100)
+        cache_size: Maximum number of files to cache (default: DEFAULT_CACHE_SIZE)
         """
         self.client = client
         self.base_dir = Path(base_dir)
