@@ -367,12 +367,17 @@ class Humanloop(BaseHumanloop):
         """Pull prompt and agent files from Humanloop to local filesystem.
 
         This method will:
-        1. Fetch all prompt and agent files from your Humanloop workspace
+        1. Fetch prompt and agent files from your Humanloop workspace
         2. Save them to the local filesystem using the client's files_directory (set during initialization)
         3. Maintain the same directory structure as in Humanloop
         4. Add appropriate file extensions (.prompt or .agent)
 
-        By default, the operation will overwrite existing files with the latest version from Humanlooop
+        The path parameter can be used in two ways:
+        - If it points to a specific file (e.g. "path/to/file.prompt" or "path/to/file.agent"), only that file will be pulled
+        - If it points to a directory (e.g. "path/to/directory"), all prompt and agent files in that directory will be pulled
+        - If no path is provided, all prompt and agent files will be pulled
+
+        The operation will overwrite existing files with the latest version from Humanloop
         but will not delete local files that don't exist in the remote workspace.
 
         Currently only supports syncing prompt and agent files. Other file types will be skipped.
@@ -389,7 +394,8 @@ class Humanloop(BaseHumanloop):
         ```
 
         :param environment: The environment to pull the files from.
-        :param path: The path to the files to pull on the Humanloop workspace. Can be a directory or a specific file.
+        :param path: Optional path to either a specific file (e.g. "path/to/file.prompt") or a directory (e.g. "path/to/directory").
+                    If not provided, all prompt and agent files will be pulled.
         :return: List of successfully processed file paths.
         """
         return self._sync_client.pull(

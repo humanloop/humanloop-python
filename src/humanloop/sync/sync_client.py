@@ -40,6 +40,46 @@ class SyncClient:
         self.base_dir = Path(base_dir)
         self.max_workers = max_workers or multiprocessing.cpu_count() * 2
 
+    def _normalize_path(self, path: str) -> str:
+        """Normalize the path by:
+        1. Removing any file extensions (.prompt, .agent)
+        2. Converting backslashes to forward slashes
+        3. Removing leading and trailing slashes
+        4. Removing leading and trailing whitespace
+        5. Normalizing multiple consecutive slashes into a single forward slash
+
+        Args:
+            path: The path to normalize
+
+        Returns:
+            The normalized path
+        """
+        # Remove any file extensions
+        path = path.rsplit('.', 1)[0] if '.' in path else path
+        
+        # Convert backslashes to forward slashes and normalize multiple slashes
+        path = path.replace('\\', '/')
+        
+        # Remove leading/trailing whitespace and slashes
+        path = path.strip().strip('/')
+        
+        # Normalize multiple consecutive slashes into a single forward slash
+        while '//' in path:
+            path = path.replace('//', '/')
+            
+        return path
+
+    def is_file(self, path: str) -> bool:
+        """Check if the path is a file by checking for .prompt or .agent extension.
+
+        Args:
+            path: The path to check
+
+        Returns:
+            True if the path ends with .prompt or .agent, False otherwise
+        """
+        return path.endswith('.prompt') or path.endswith('.agent')
+
     def _save_serialized_file(self, serialized_content: str, file_path: str, file_type: FileType) -> None:
         """Save serialized file to local filesystem.
 
@@ -47,6 +87,9 @@ class SyncClient:
             serialized_content: The content to save
             file_path: The path where to save the file
             file_type: The type of file (prompt or agent)
+
+        Raises:
+            Exception: If there is an error saving the file
         """
         try:
             # Create full path including base_dir prefix
@@ -65,26 +108,44 @@ class SyncClient:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
             raise
 
-    def pull(self, 
+    def _pull_file(self, path: str, environment: str | None = None) -> None:
+        """Pull a specific file from Humanloop to local filesystem.
+
+        Args:
+            path: The path of the file without the extension (e.g. "path/to/file")
+            environment: The environment to pull the file from
+
+        Raises:
+            ValueError: If the file type is not supported
+            Exception: If there is an error pulling the file
+        """
+        file = self.client.files.retrieve_by_path(
+            path, 
+            environment=environment,
+            include_content=True
+        )
+
+        if file.type not in ["prompt", "agent"]:
+            raise ValueError(f"Unsupported file type: {file.type}")
+
+        self._save_serialized_file(file.content, file.path, file.type)
+
+    def _pull_directory(self, 
+            path: str | None = None,    
             environment: str | None = None, 
-            directory: str | None = None,
-            path: str | None = None,
         ) -> List[str]:
         """Sync prompt and agent files from Humanloop to local filesystem.
 
-        If `path` is provided, only the file at that path will be pulled.
-        If `directory` is provided, all files in that directory will be pulled (if both `path` and `directory` are provided, `path` will take precedence).
+        If `path` is provided, only the files under that path will be pulled.
         If `environment` is provided, the files will be pulled from that environment.
 
         Args: 
-            environment: The environment to pull the files from.
-            directory: The directory to pull the files from.
-            path: The path of a specific file to pull from.
+            path: The path of the directory to pull from (e.g. "path/to/directory")
+            environment: The environment to pull the files from
 
         Returns:
             List of successfully processed file paths
         """
-
         successful_files = []
         failed_files = []
         page = 1
@@ -95,7 +156,8 @@ class SyncClient:
                     type=["prompt", "agent"], 
                     page=page,
                     include_content=True,
-                    environment=environment
+                    environment=environment,
+                    directory=path
                 )
 
                 if len(response.records) == 0:
@@ -109,7 +171,7 @@ class SyncClient:
                         continue
 
                     if not file.path.startswith(path):
-                        # Filter by path
+                        # Filter by path
                         continue
 
                     # Skip if no content
@@ -136,3 +198,23 @@ class SyncClient:
             logger.error(f"Failed to sync {len(failed_files)} files")
 
         return successful_files
+
+    def pull(self, path: str, environment: str | None = None) -> List[str]:
+        """Pull files from Humanloop to local filesystem.
+
+        If the path ends with .prompt or .agent, pulls that specific file.
+        Otherwise, pulls all files under the specified directory path.
+
+        Args:
+            path: The path to pull from (either a specific file or directory)
+            environment: The environment to pull from
+
+        Returns:
+            List of successfully processed file paths
+        """
+        normalized_path = self._normalize_path(path)
+        if self.is_file(path):
+            self._pull_file(normalized_path, environment)
+            return [path]
+        else:
+            return self._pull_directory(normalized_path, environment)
