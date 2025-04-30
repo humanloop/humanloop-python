@@ -7,6 +7,7 @@ import datetime as dt
 import typing
 from ..types.log_status import LogStatus
 from .tool_response import ToolResponseParams
+from .chat_message import ChatMessageParams
 import typing
 
 if typing.TYPE_CHECKING:
@@ -147,4 +148,9 @@ class ToolLogResponseParams(typing_extensions.TypedDict):
     tool: ToolResponseParams
     """
     Tool used to generate the Log.
+    """
+
+    output_message: typing_extensions.NotRequired[ChatMessageParams]
+    """
+    The message returned by the Tool.
     """
