@@ -65,12 +65,26 @@ class SyncClient:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
             raise
 
-    def pull(self) -> List[str]:
+    def pull(self, 
+            environment: str | None = None, 
+            directory: str | None = None,
+            path: str | None = None,
+        ) -> List[str]:
         """Sync prompt and agent files from Humanloop to local filesystem.
+
+        If `path` is provided, only the file at that path will be pulled.
+        If `directory` is provided, all files in that directory will be pulled (if both `path` and `directory` are provided, `path` will take precedence).
+        If `environment` is provided, the files will be pulled from that environment.
+
+        Args: 
+            environment: The environment to pull the files from.
+            directory: The directory to pull the files from.
+            path: The path of a specific file to pull from.
 
         Returns:
             List of successfully processed file paths
         """
+
         successful_files = []
         failed_files = []
         page = 1
@@ -80,7 +94,8 @@ class SyncClient:
                 response = self.client.files.list_files(
                     type=["prompt", "agent"], 
                     page=page,
-                    include_content=True
+                    include_content=True,
+                    environment=environment
                 )
 
                 if len(response.records) == 0:
@@ -91,6 +106,10 @@ class SyncClient:
                     # Skip if not a prompt or agent
                     if file.type not in ["prompt", "agent"]:
                         logger.warning(f"Skipping unsupported file type: {file.type}")
+                        continue
+
+                    if not file.path.startswith(path):
+                        # Filter by path
                         continue
 
                     # Skip if no content

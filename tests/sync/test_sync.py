@@ -140,6 +140,10 @@ def test_overload_log_with_local_files(humanloop_client: Humanloop, test_file_st
     1. Create files in remote (via test_file_structure fixture)
     2. Pull files locally
     3. Test logging using the pulled files
+
+    :param humanloop_client: The Humanloop client with local files enabled
+    :param test_file_structure: List of test files created in remote
+    :param cleanup_local_files: Fixture to clean up local files after test
     """
     # First pull the files locally
     humanloop_client.pull()
