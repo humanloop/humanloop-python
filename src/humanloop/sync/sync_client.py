@@ -3,7 +3,8 @@ import os
 import logging
 from pathlib import Path
 import concurrent.futures
-from typing import List, TYPE_CHECKING, Union, cast, Optional
+from typing import List, TYPE_CHECKING, Union, cast, Optional, Dict
+from functools import lru_cache
 
 from humanloop.types import FileType, PromptResponse, AgentResponse, ToolResponse, DatasetResponse, EvaluatorResponse, FlowResponse
 from humanloop.core.api_error import ApiError
@@ -21,24 +22,78 @@ if not logger.hasHandlers():
     logger.addHandler(console_handler)
 
 class SyncClient:
-    """Client for managing synchronization between local filesystem and Humanloop."""
+    """Client for managing synchronization between local filesystem and Humanloop.
+    
+    This client provides file synchronization between Humanloop and the local filesystem,
+    with built-in caching for improved performance. The cache uses Python's LRU (Least 
+    Recently Used) cache to automatically manage memory usage by removing least recently 
+    accessed files when the cache is full.
+    
+    The cache is automatically updated when files are pulled or saved, and can be
+    manually cleared using the clear_cache() method.
+    """
     
     def __init__(
         self, 
         client: "BaseHumanloop",
         base_dir: str = "humanloop",
-        max_workers: Optional[int] = None
+        cache_size: int = 100
     ):
         """
         Parameters
         ----------
         client: Humanloop client instance
         base_dir: Base directory for synced files (default: "humanloop")
-        max_workers: Maximum number of worker threads (default: CPU count * 2)
+        cache_size: Maximum number of files to cache (default: 100)
         """
         self.client = client
         self.base_dir = Path(base_dir)
-        self.max_workers = max_workers or multiprocessing.cpu_count() * 2
+        self._cache_size = cache_size
+        # Create a new cached version of get_file_content with the specified cache size
+        self.get_file_content = lru_cache(maxsize=cache_size)(self._get_file_content_impl)
+
+    def _get_file_content_impl(self, path: str, file_type: FileType) -> Optional[str]:
+        """Implementation of get_file_content without the cache decorator.
+        
+        This is the actual implementation that gets wrapped by lru_cache.
+        """
+        try:
+            # Construct path to local file
+            local_path = self.base_dir / path
+            # Add appropriate extension
+            local_path = local_path.parent / f"{local_path.stem}.{file_type}"
+            
+            if local_path.exists():
+                # Read the file content
+                with open(local_path) as f:
+                    file_content = f.read()
+                logger.debug(f"Using local file content from {local_path}")
+                return file_content
+            else:
+                logger.warning(f"Local file not found: {local_path}, falling back to API")
+                return None
+        except Exception as e:
+            logger.error(f"Error reading local file: {e}, falling back to API")
+            return None
+
+    def get_file_content(self, path: str, file_type: FileType) -> Optional[str]:
+        """Get the content of a file from cache or filesystem.
+        
+        This method uses an LRU cache to store file contents. When the cache is full,
+        the least recently accessed files are automatically removed to make space.
+        
+        Args:
+            path: The normalized path to the file (without extension)
+            file_type: The type of file (prompt or agent)
+            
+        Returns:
+            The file content if found, None otherwise
+        """
+        return self._get_file_content_impl(path, file_type)
+
+    def clear_cache(self) -> None:
+        """Clear the LRU cache."""
+        self.get_file_content.cache_clear()
 
     def _normalize_path(self, path: str) -> str:
         """Normalize the path by:
@@ -103,6 +158,10 @@ class SyncClient:
             # Write content to file
             with open(new_path, "w") as f:
                 f.write(serialized_content)
+            
+            # Clear the cache for this file to ensure we get fresh content next time
+            self.clear_cache()
+            
             logger.info(f"Syncing {file_type} {file_path}")
         except Exception as e:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")

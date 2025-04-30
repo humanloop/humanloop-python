@@ -15,6 +15,7 @@ from humanloop.flows.client import FlowsClient
 from humanloop.prompts.client import PromptsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.tools.client import ToolsClient
+from humanloop.sync.sync_client import SyncClient
 from humanloop.types import FileType
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
@@ -135,37 +136,9 @@ def _get_file_type_from_client(client: Union[PromptsClient, AgentsClient]) -> Fi
     else:
         raise ValueError(f"Unsupported client type: {type(client)}")
 
-def _handle_local_file(path: str, file_type: FileType) -> Optional[str]:
-    """Handle reading from a local file if it exists.
-    
-    Args:
-        path: The path to the file
-        file_type: The type of file ("prompt" or "agent")
-        
-    Returns:
-        The file content if found, None otherwise
-    """
-    try:
-        # Construct path to local file
-        local_path = Path("humanloop") / path  # FLAG: ensure that when passing the path back to remote, it's using forward slashes
-        # Add appropriate extension
-        local_path = local_path.parent / f"{local_path.stem}.{file_type}"
-        
-        if local_path.exists():
-            # Read the file content
-            with open(local_path) as f:
-                file_content = f.read()
-            logger.debug(f"Using local file content from {local_path}")
-            return file_content
-        else:
-            logger.warning(f"Local file not found: {local_path}, falling back to API")
-            return None
-    except Exception as e:
-        logger.error(f"Error reading local file: {e}, falling back to API")
-        return None
-
 def overload_with_local_files(
     client: Union[PromptsClient, AgentsClient], 
+    sync_client: SyncClient,
     use_local_files: bool,
 ) -> Union[PromptsClient, AgentsClient]:
     """Overload call and log methods to handle local files when use_local_files is True.
@@ -181,9 +154,11 @@ def overload_with_local_files(
     def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
-            file_content = _handle_local_file(kwargs["path"], file_type)
+            # Normalize the path and get file content
+            normalized_path = sync_client._normalize_path(kwargs["path"])
+            file_content = sync_client.get_file_content(normalized_path, file_type)
             if file_content is not None:
-                kwargs[file_type] = file_content
+                    kwargs[file_type] = file_content
 
         try:
             if function_name == "call":
