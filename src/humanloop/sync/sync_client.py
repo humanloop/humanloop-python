@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from typing import List, TYPE_CHECKING, Optional
 from functools import lru_cache
+from humanloop.types import FileType
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -176,7 +177,7 @@ class SyncClient:
             Exception: If there is an error pulling the file
         """
         file = self.client.files.retrieve_by_path(
-            path, 
+            path=path, 
             environment=environment,
             include_content=True
         )
