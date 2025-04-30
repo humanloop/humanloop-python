@@ -6,7 +6,13 @@ from .tool_response import ToolResponseParams
 from .dataset_response import DatasetResponseParams
 from .evaluator_response import EvaluatorResponseParams
 from .flow_response import FlowResponseParams
+from .agent_response import AgentResponseParams
 
 FileEnvironmentResponseFileParams = typing.Union[
-    PromptResponseParams, ToolResponseParams, DatasetResponseParams, EvaluatorResponseParams, FlowResponseParams
+    PromptResponseParams,
+    ToolResponseParams,
+    DatasetResponseParams,
+    EvaluatorResponseParams,
+    FlowResponseParams,
+    AgentResponseParams,
 ]

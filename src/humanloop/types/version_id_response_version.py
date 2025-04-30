@@ -10,6 +10,7 @@ if typing.TYPE_CHECKING:
     from .tool_response import ToolResponse
     from .evaluator_response import EvaluatorResponse
     from .flow_response import FlowResponse
+    from .agent_response import AgentResponse
 VersionIdResponseVersion = typing.Union[
-    "PromptResponse", "ToolResponse", DatasetResponse, "EvaluatorResponse", "FlowResponse"
+    "PromptResponse", "ToolResponse", DatasetResponse, "EvaluatorResponse", "FlowResponse", "AgentResponse"
 ]

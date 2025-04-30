@@ -2,18 +2,19 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from ..requests.tool_kernel_request import ToolKernelRequestParams
 import datetime as dt
 from ..types.log_status import LogStatus
-from ..requests.tool_kernel_request import ToolKernelRequestParams
 from ..core.request_options import RequestOptions
 from ..core.http_response import HttpResponse
-from ..types.create_tool_log_response import CreateToolLogResponse
+from ..types.tool_call_response import ToolCallResponse
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.unchecked_base_model import construct_type
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.create_tool_log_response import CreateToolLogResponse
 from ..types.log_response import LogResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from ..requests.tool_function import ToolFunctionParams
@@ -27,6 +28,8 @@ from ..requests.evaluator_activation_deactivation_request_activate_item import (
 from ..requests.evaluator_activation_deactivation_request_deactivate_item import (
     EvaluatorActivationDeactivationRequestDeactivateItemParams,
 )
+from ..types.file_environment_variable_request import FileEnvironmentVariableRequest
+from ..requests.file_environment_variable_request import FileEnvironmentVariableRequestParams
 from ..core.client_wrapper import AsyncClientWrapper
 from ..core.http_response import AsyncHttpResponse
 
@@ -38,6 +41,159 @@ class RawToolsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
+    def call(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_parent_id: typing.Optional[str] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        tool_call_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[ToolCallResponse]:
+        """
+        Call a Tool.
+
+        Calling a Tool with inputs runs the tool's source code and logs the result and metadata to Humanloop.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Tool. Otherwise, the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Tool details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Tool. If they do not, we will create a new version. This is helpful
+        in the case where you are storing or deriving your Tool details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Tool to call.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to call.
+
+        path : typing.Optional[str]
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_parent_id : typing.Optional[str]
+            The ID of the parent Log to nest this Log under in a Trace.
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        tool_call_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[ToolCallResponse]
+            Successful Response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "tools/call",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": tool_call_request_environment,
+                "save": save,
+                "log_id": log_id,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolCallResponse,
+                    construct_type(
+                        type_=ToolCallResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def log(
         self,
         *,
@@ -45,6 +201,7 @@ class RawToolsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -64,7 +221,6 @@ class RawToolsClient:
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[CreateToolLogResponse]:
         """
@@ -91,6 +247,9 @@ class RawToolsClient:
 
         id : typing.Optional[str]
             ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -149,9 +308,6 @@ class RawToolsClient:
         log_id : typing.Optional[str]
             This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        tool : typing.Optional[ToolKernelRequestParams]
-            Details of your Tool. A new Tool version will be created if the provided details are new.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -170,6 +326,9 @@ class RawToolsClient:
             json={
                 "path": path,
                 "id": id,
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
                 "start_time": start_time,
                 "end_time": end_time,
                 "output": output,
@@ -189,9 +348,6 @@ class RawToolsClient:
                 "environment": tool_log_request_environment,
                 "save": save,
                 "log_id": log_id,
-                "tool": convert_and_respect_annotation_metadata(
-                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
-                ),
             },
             headers={
                 "content-type": "application/json",
@@ -1038,10 +1194,319 @@ class RawToolsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def get_environment_variables(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[typing.List[FileEnvironmentVariableRequest]]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[typing.List[FileEnvironmentVariableRequest]]
+            Successful Response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environment-variables",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentVariableRequest],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentVariableRequest],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def add_environment_variable(
+        self,
+        id: str,
+        *,
+        request: typing.Sequence[FileEnvironmentVariableRequestParams],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> HttpResponse[typing.List[FileEnvironmentVariableRequest]]:
+        """
+        Add an environment variable to a Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request : typing.Sequence[FileEnvironmentVariableRequestParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[typing.List[FileEnvironmentVariableRequest]]
+            Successful Response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environment-variables",
+            method="POST",
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=typing.Sequence[FileEnvironmentVariableRequestParams], direction="write"
+            ),
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentVariableRequest],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentVariableRequest],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_environment_variable(
+        self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> HttpResponse[typing.List[FileEnvironmentVariableRequest]]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        name : str
+            Name of the Environment Variable to delete.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        HttpResponse[typing.List[FileEnvironmentVariableRequest]]
+            Successful Response
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environment-variables/{jsonable_encoder(name)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentVariableRequest],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentVariableRequest],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return HttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncRawToolsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    async def call(
+        self,
+        *,
+        version_id: typing.Optional[str] = None,
+        environment: typing.Optional[str] = None,
+        path: typing.Optional[str] = OMIT,
+        id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
+        inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        source: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        start_time: typing.Optional[dt.datetime] = OMIT,
+        end_time: typing.Optional[dt.datetime] = OMIT,
+        log_status: typing.Optional[LogStatus] = OMIT,
+        source_datapoint_id: typing.Optional[str] = OMIT,
+        trace_parent_id: typing.Optional[str] = OMIT,
+        user: typing.Optional[str] = OMIT,
+        tool_call_request_environment: typing.Optional[str] = OMIT,
+        save: typing.Optional[bool] = OMIT,
+        log_id: typing.Optional[str] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[ToolCallResponse]:
+        """
+        Call a Tool.
+
+        Calling a Tool with inputs runs the tool's source code and logs the result and metadata to Humanloop.
+
+        You can use query parameters `version_id`, or `environment`, to target
+        an existing version of the Tool. Otherwise, the default deployed version will be chosen.
+
+        Instead of targeting an existing version explicitly, you can instead pass in
+        Tool details in the request body. In this case, we will check if the details correspond
+        to an existing version of the Tool. If they do not, we will create a new version. This is helpful
+        in the case where you are storing or deriving your Tool details in code.
+
+        Parameters
+        ----------
+        version_id : typing.Optional[str]
+            A specific Version ID of the Tool to call.
+
+        environment : typing.Optional[str]
+            Name of the Environment identifying a deployed version to call.
+
+        path : typing.Optional[str]
+            Path of the Tool, including the name. This locates the Tool in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+
+        id : typing.Optional[str]
+            ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
+
+        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            The inputs passed to the prompt template.
+
+        source : typing.Optional[str]
+            Identifies where the model was called from.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Any additional metadata to record.
+
+        start_time : typing.Optional[dt.datetime]
+            When the logged event started.
+
+        end_time : typing.Optional[dt.datetime]
+            When the logged event ended.
+
+        log_status : typing.Optional[LogStatus]
+            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+
+        source_datapoint_id : typing.Optional[str]
+            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+
+        trace_parent_id : typing.Optional[str]
+            The ID of the parent Log to nest this Log under in a Trace.
+
+        user : typing.Optional[str]
+            End-user ID related to the Log.
+
+        tool_call_request_environment : typing.Optional[str]
+            The name of the Environment the Log is associated to.
+
+        save : typing.Optional[bool]
+            Whether the request/response payloads will be stored on Humanloop.
+
+        log_id : typing.Optional[str]
+            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[ToolCallResponse]
+            Successful Response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "tools/call",
+            method="POST",
+            params={
+                "version_id": version_id,
+                "environment": environment,
+            },
+            json={
+                "path": path,
+                "id": id,
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
+                "inputs": inputs,
+                "source": source,
+                "metadata": metadata,
+                "start_time": start_time,
+                "end_time": end_time,
+                "log_status": log_status,
+                "source_datapoint_id": source_datapoint_id,
+                "trace_parent_id": trace_parent_id,
+                "user": user,
+                "environment": tool_call_request_environment,
+                "save": save,
+                "log_id": log_id,
+            },
+            headers={
+                "content-type": "application/json",
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    ToolCallResponse,
+                    construct_type(
+                        type_=ToolCallResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def log(
         self,
@@ -1050,6 +1515,7 @@ class AsyncRawToolsClient:
         environment: typing.Optional[str] = None,
         path: typing.Optional[str] = OMIT,
         id: typing.Optional[str] = OMIT,
+        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -1069,7 +1535,6 @@ class AsyncRawToolsClient:
         tool_log_request_environment: typing.Optional[str] = OMIT,
         save: typing.Optional[bool] = OMIT,
         log_id: typing.Optional[str] = OMIT,
-        tool: typing.Optional[ToolKernelRequestParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[CreateToolLogResponse]:
         """
@@ -1096,6 +1561,9 @@ class AsyncRawToolsClient:
 
         id : typing.Optional[str]
             ID for an existing Tool.
+
+        tool : typing.Optional[ToolKernelRequestParams]
+            Details of your Tool. A new Tool version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -1154,9 +1622,6 @@ class AsyncRawToolsClient:
         log_id : typing.Optional[str]
             This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        tool : typing.Optional[ToolKernelRequestParams]
-            Details of your Tool. A new Tool version will be created if the provided details are new.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1175,6 +1640,9 @@ class AsyncRawToolsClient:
             json={
                 "path": path,
                 "id": id,
+                "tool": convert_and_respect_annotation_metadata(
+                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
+                ),
                 "start_time": start_time,
                 "end_time": end_time,
                 "output": output,
@@ -1194,9 +1662,6 @@ class AsyncRawToolsClient:
                 "environment": tool_log_request_environment,
                 "save": save,
                 "log_id": log_id,
-                "tool": convert_and_respect_annotation_metadata(
-                    object_=tool, annotation=ToolKernelRequestParams, direction="write"
-                ),
             },
             headers={
                 "content-type": "application/json",
@@ -2026,6 +2491,162 @@ class AsyncRawToolsClient:
                     ToolResponse,
                     construct_type(
                         type_=ToolResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def get_environment_variables(
+        self, id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[typing.List[FileEnvironmentVariableRequest]]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[typing.List[FileEnvironmentVariableRequest]]
+            Successful Response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environment-variables",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentVariableRequest],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentVariableRequest],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def add_environment_variable(
+        self,
+        id: str,
+        *,
+        request: typing.Sequence[FileEnvironmentVariableRequestParams],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> AsyncHttpResponse[typing.List[FileEnvironmentVariableRequest]]:
+        """
+        Add an environment variable to a Tool.
+
+        Parameters
+        ----------
+        id : str
+            Unique identifier for Tool.
+
+        request : typing.Sequence[FileEnvironmentVariableRequestParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[typing.List[FileEnvironmentVariableRequest]]
+            Successful Response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environment-variables",
+            method="POST",
+            json=convert_and_respect_annotation_metadata(
+                object_=request, annotation=typing.Sequence[FileEnvironmentVariableRequestParams], direction="write"
+            ),
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentVariableRequest],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentVariableRequest],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                return AsyncHttpResponse(response=_response, data=_data)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_environment_variable(
+        self, id: str, name: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> AsyncHttpResponse[typing.List[FileEnvironmentVariableRequest]]:
+        """
+        Parameters
+        ----------
+        id : str
+            Unique identifier for File.
+
+        name : str
+            Name of the Environment Variable to delete.
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        AsyncHttpResponse[typing.List[FileEnvironmentVariableRequest]]
+            Successful Response
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"tools/{jsonable_encoder(id)}/environment-variables/{jsonable_encoder(name)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                _data = typing.cast(
+                    typing.List[FileEnvironmentVariableRequest],
+                    construct_type(
+                        type_=typing.List[FileEnvironmentVariableRequest],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
