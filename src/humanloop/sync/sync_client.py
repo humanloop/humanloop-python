@@ -3,6 +3,8 @@ from pathlib import Path
 from typing import List, TYPE_CHECKING, Optional
 from functools import lru_cache
 from humanloop.types import FileType
+from .metadata_handler import MetadataHandler
+import time
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -49,6 +51,8 @@ class SyncClient:
         self._cache_size = cache_size
         # Create a new cached version of get_file_content with the specified cache size
         self.get_file_content = lru_cache(maxsize=cache_size)(self._get_file_content_impl)
+        # Initialize metadata handler
+        self.metadata = MetadataHandler(self.base_dir)
 
     def _get_file_content_impl(self, path: str, file_type: FileType) -> Optional[str]:
         """Implementation of get_file_content without the cache decorator.
@@ -227,10 +231,6 @@ class SyncClient:
                         logger.warning(f"Skipping unsupported file type: {file.type}")
                         continue
 
-                    if not file.path.startswith(path):
-                        # Filter by path
-                        continue
-
                     # Skip if no content
                     if not getattr(file, "content", None):
                         logger.warning(f"No content found for {file.type} {getattr(file, 'id', '<unknown>')}")
@@ -256,11 +256,12 @@ class SyncClient:
 
         return successful_files
 
-    def pull(self, path: str, environment: str | None = None) -> List[str]:
+    def pull(self, path: str | None = None, environment: str | None = None) -> List[str]:
         """Pull files from Humanloop to local filesystem.
 
         If the path ends with .prompt or .agent, pulls that specific file.
         Otherwise, pulls all files under the specified directory path.
+        If no path is provided, pulls all files from the root.
 
         Args:
             path: The path to pull from (either a specific file or directory)
@@ -269,9 +270,39 @@ class SyncClient:
         Returns:
             List of successfully processed file paths
         """
-        normalized_path = self._normalize_path(path)
-        if self.is_file(path):
-            self._pull_file(normalized_path, environment)
-            return [path]
-        else:
-            return self._pull_directory(normalized_path, environment)
+        start_time = time.time()
+        try:
+            if path is None:
+                successful_files = self._pull_directory(None, environment)
+                failed_files = []  # Failed files are already logged in _pull_directory
+            else:
+                normalized_path = self._normalize_path(path)
+                if self.is_file(path):
+                    self._pull_file(normalized_path, environment)
+                    successful_files = [path]
+                    failed_files = []
+                else:
+                    successful_files = self._pull_directory(normalized_path, environment)
+                    failed_files = []  # Failed files are already logged in _pull_directory
+            
+            # Log the successful operation
+            self.metadata.log_operation(
+                operation_type="pull",
+                path=path or "",  # Use empty string if path is None
+                environment=environment,
+                successful_files=successful_files,
+                failed_files=failed_files,
+                start_time=start_time
+            )
+            
+            return successful_files
+        except Exception as e:
+            # Log the failed operation
+            self.metadata.log_operation(
+                operation_type="pull",
+                path=path or "",  # Use empty string if path is None
+                environment=environment,
+                error=str(e),
+                start_time=start_time
+            )
+            raise
