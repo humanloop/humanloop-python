@@ -39,6 +39,7 @@ class FilesClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
+        directory: typing.Optional[str] = None,
         template: typing.Optional[bool] = None,
         type: typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]] = None,
         environment: typing.Optional[str] = None,
@@ -60,6 +61,9 @@ class FilesClient:
 
         name : typing.Optional[str]
             Case-insensitive filter for file name.
+
+        directory : typing.Optional[str]
+            Case-insensitive filter for directory name.
 
         template : typing.Optional[bool]
             Filter to include only template files.
@@ -100,6 +104,7 @@ class FilesClient:
             page=page,
             size=size,
             name=name,
+            directory=directory,
             template=template,
             type=type,
             environment=environment,
@@ -115,6 +120,7 @@ class FilesClient:
         *,
         path: str,
         environment: typing.Optional[str] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> RetrieveByPathFilesRetrieveByPathPostResponse:
         """
@@ -127,6 +133,9 @@ class FilesClient:
 
         environment : typing.Optional[str]
             Name of the Environment to retrieve a deployed Version from.
+
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -148,7 +157,7 @@ class FilesClient:
         )
         """
         response = self._raw_client.retrieve_by_path(
-            path=path, environment=environment, request_options=request_options
+            path=path, environment=environment, include_content=include_content, request_options=request_options
         )
         return response.data
 
@@ -174,6 +183,7 @@ class AsyncFilesClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
+        directory: typing.Optional[str] = None,
         template: typing.Optional[bool] = None,
         type: typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]] = None,
         environment: typing.Optional[str] = None,
@@ -195,6 +205,9 @@ class AsyncFilesClient:
 
         name : typing.Optional[str]
             Case-insensitive filter for file name.
+
+        directory : typing.Optional[str]
+            Case-insensitive filter for directory name.
 
         template : typing.Optional[bool]
             Filter to include only template files.
@@ -243,6 +256,7 @@ class AsyncFilesClient:
             page=page,
             size=size,
             name=name,
+            directory=directory,
             template=template,
             type=type,
             environment=environment,
@@ -258,6 +272,7 @@ class AsyncFilesClient:
         *,
         path: str,
         environment: typing.Optional[str] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> RetrieveByPathFilesRetrieveByPathPostResponse:
         """
@@ -270,6 +285,9 @@ class AsyncFilesClient:
 
         environment : typing.Optional[str]
             Name of the Environment to retrieve a deployed Version from.
+
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -299,6 +317,6 @@ class AsyncFilesClient:
         asyncio.run(main())
         """
         response = await self._raw_client.retrieve_by_path(
-            path=path, environment=environment, request_options=request_options
+            path=path, environment=environment, include_content=include_content, request_options=request_options
         )
         return response.data

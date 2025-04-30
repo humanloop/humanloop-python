@@ -11883,6 +11883,14 @@ client.files.list_files()
 <dl>
 <dd>
 
+**directory:** `typing.Optional[str]` — Case-insensitive filter for directory name.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
 **template:** `typing.Optional[bool]` — Filter to include only template files.
     
 </dd>
@@ -12002,6 +12010,14 @@ client.files.retrieve_by_path(
 <dd>
 
 **environment:** `typing.Optional[str]` — Name of the Environment to retrieve a deployed Version from.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**include_content:** `typing.Optional[bool]` — Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
     
 </dd>
 </dl>

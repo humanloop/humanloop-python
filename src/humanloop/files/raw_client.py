@@ -33,6 +33,7 @@ class RawFilesClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
+        directory: typing.Optional[str] = None,
         template: typing.Optional[bool] = None,
         type: typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]] = None,
         environment: typing.Optional[str] = None,
@@ -56,6 +57,9 @@ class RawFilesClient:
 
         name : typing.Optional[str]
             Case-insensitive filter for file name.
+
+        directory : typing.Optional[str]
+            Case-insensitive filter for directory name.
 
         template : typing.Optional[bool]
             Filter to include only template files.
@@ -90,6 +94,7 @@ class RawFilesClient:
                 "page": page,
                 "size": size,
                 "name": name,
+                "directory": directory,
                 "template": template,
                 "type": type,
                 "environment": environment,
@@ -129,6 +134,7 @@ class RawFilesClient:
         *,
         path: str,
         environment: typing.Optional[str] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[RetrieveByPathFilesRetrieveByPathPostResponse]:
         """
@@ -141,6 +147,9 @@ class RawFilesClient:
 
         environment : typing.Optional[str]
             Name of the Environment to retrieve a deployed Version from.
+
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -155,6 +164,7 @@ class RawFilesClient:
             method="POST",
             params={
                 "environment": environment,
+                "include_content": include_content,
             },
             json={
                 "path": path,
@@ -201,6 +211,7 @@ class AsyncRawFilesClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
+        directory: typing.Optional[str] = None,
         template: typing.Optional[bool] = None,
         type: typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]] = None,
         environment: typing.Optional[str] = None,
@@ -224,6 +235,9 @@ class AsyncRawFilesClient:
 
         name : typing.Optional[str]
             Case-insensitive filter for file name.
+
+        directory : typing.Optional[str]
+            Case-insensitive filter for directory name.
 
         template : typing.Optional[bool]
             Filter to include only template files.
@@ -258,6 +272,7 @@ class AsyncRawFilesClient:
                 "page": page,
                 "size": size,
                 "name": name,
+                "directory": directory,
                 "template": template,
                 "type": type,
                 "environment": environment,
@@ -297,6 +312,7 @@ class AsyncRawFilesClient:
         *,
         path: str,
         environment: typing.Optional[str] = None,
+        include_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[RetrieveByPathFilesRetrieveByPathPostResponse]:
         """
@@ -309,6 +325,9 @@ class AsyncRawFilesClient:
 
         environment : typing.Optional[str]
             Name of the Environment to retrieve a deployed Version from.
+
+        include_content : typing.Optional[bool]
+            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -323,6 +342,7 @@ class AsyncRawFilesClient:
             method="POST",
             params={
                 "environment": environment,
+                "include_content": include_content,
             },
             json={
                 "path": path,
