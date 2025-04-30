@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 import typing_extensions
-import typing_extensions
 import typing
 from humanloop.core.serialization import FieldMetadata
 

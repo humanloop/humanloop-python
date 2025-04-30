@@ -15,7 +15,7 @@ from humanloop.context import (
 from humanloop.evals.run import HumanloopRuntimeError
 from humanloop.types.chat_message import ChatMessage
 from humanloop.decorators.helpers import bind_args
-from humanloop.evals.types import File
+from humanloop.evals.types import FileEvalConfig
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
@@ -121,7 +121,7 @@ def flow(
                         # Return the output of the decorated function
                         return func_output  # type: ignore [return-value]
 
-        wrapper.file = File(  # type: ignore
+        wrapper.file = FileEvalConfig(  # type: ignore
             path=decorator_path,
             type=file_type,  # type: ignore [arg-type, typeddict-item]
             version=FlowDict(**flow_kernel),  # type: ignore

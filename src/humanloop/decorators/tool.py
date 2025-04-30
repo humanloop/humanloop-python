@@ -14,7 +14,7 @@ from opentelemetry.trace import Tracer
 
 from humanloop.context import get_evaluation_context, get_trace_id
 from humanloop.decorators.helpers import bind_args
-from humanloop.evals import File
+from humanloop.evals import FileEvalConfig
 from humanloop.evals.run import HumanloopRuntimeError
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
@@ -112,7 +112,7 @@ def tool_decorator_factory(
                 # Return the output of the decorated function
                 return func_output
 
-        wrapper.file = File(  # type: ignore
+        wrapper.file = FileEvalConfig(  # type: ignore
             path=path,
             type=file_type,  # type: ignore [arg-type, typeddict-item]
             version=tool_kernel,
