@@ -8,6 +8,7 @@ keywords = ["ai", "machine-learning", "llm", "sdk", "humanloop"]
 name = "humanloop"
 version = "0.8.36"
 description = "Humanloop Python SDK"
+readme = "README.md"
 keywords = []
 packages = [
     { include = "humanloop", from = "src" },
