@@ -7,6 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from humanloop import Humanloop
 from humanloop.sync.sync_client import SyncClient
+from datetime import datetime
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -132,10 +133,23 @@ def pull(path: Optional[str], environment: Optional[str], api_key: Optional[str]
             for file in metadata['failed_files']:
                 click.echo(f"  ✗ {file}")
 
+def format_timestamp(timestamp: str) -> str:
+    """Format timestamp to a more readable format."""
+    try:
+        dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
+    except (ValueError, AttributeError):
+        return timestamp
+
 @cli.command()
+@click.option(
+    "--oneline",
+    is_flag=True,
+    help="Display history in a single line per operation",
+)
 @common_options
 @handle_sync_errors
-def history(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str]):
+def history(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str], oneline: bool):
     """Show sync operation history."""
     client = get_client(api_key, env_file, base_url)
     sync_client = SyncClient(client, base_dir=base_dir)
@@ -145,23 +159,29 @@ def history(api_key: Optional[str], env_file: Optional[str], base_dir: str, base
         click.echo("No sync operations found in history.")
         return
         
-    click.echo("Sync Operation History:")
-    click.echo("======================")
+    if not oneline:
+        click.echo("Sync Operation History:")
+        click.echo("======================")
     
     for op in history:
-        click.echo(f"\nOperation: {op['operation_type']}")
-        click.echo(f"Timestamp: {op['timestamp']}")
-        click.echo(f"Path: {op['path'] or '(root)'}")
-        if op['environment']:
-            click.echo(f"Environment: {op['environment']}")
-        click.echo(f"Duration: {op['duration_ms']}ms")
-        if op['successful_files']:
-            click.echo(f"Successfully synced {len(op['successful_files'])} file{'' if len(op['successful_files']) == 1 else 's'}")
-        if op['failed_files']:
-            click.echo(f"Failed to sync {len(op['failed_files'])} file{'' if len(op['failed_files']) == 1 else 's'}")
-        if op['error']:
-            click.echo(f"Error: {op['error']}")
-        click.echo("----------------------")
+        if oneline:
+            # Format: timestamp | operation_type | path | environment | duration_ms | status
+            status = "✓" if not op['failed_files'] else "✗"
+            click.echo(f"{format_timestamp(op['timestamp'])} | {op['operation_type']} | {op['path'] or '(root)'} | {op['environment'] or '-'} | {op['duration_ms']}ms | {status}")
+        else:
+            click.echo(f"\nOperation: {op['operation_type']}")
+            click.echo(f"Timestamp: {format_timestamp(op['timestamp'])}")
+            click.echo(f"Path: {op['path'] or '(root)'}")
+            if op['environment']:
+                click.echo(f"Environment: {op['environment']}")
+            click.echo(f"Duration: {op['duration_ms']}ms")
+            if op['successful_files']:
+                click.echo(f"Successfully synced {len(op['successful_files'])} file{'' if len(op['successful_files']) == 1 else 's'}")
+            if op['failed_files']:
+                click.echo(f"Failed to sync {len(op['failed_files'])} file{'' if len(op['failed_files']) == 1 else 's'}")
+            if op['error']:
+                click.echo(f"Error: {op['error']}")
+            click.echo("----------------------")
 
 if __name__ == "__main__":
     cli() 
