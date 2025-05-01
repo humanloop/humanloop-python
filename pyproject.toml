@@ -6,9 +6,8 @@ keywords = ["ai", "machine-learning", "llm", "sdk", "humanloop"]
 
 [tool.poetry]
 name = "humanloop"
-version = "0.1.0"
+version = "0.8.36"
 description = "Humanloop Python SDK"
-authors = ["Your Name <your.email@example.com>"]
 keywords = []
 packages = [
     { include = "humanloop", from = "src" },
@@ -56,7 +55,6 @@ pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 typing_extensions = ">= 4.0.0"
 click = "^8.0.0"
-setuptools = "^80.1.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.0.1"
