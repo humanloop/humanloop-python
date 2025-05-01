@@ -6,11 +6,13 @@ keywords = ["ai", "machine-learning", "llm", "sdk", "humanloop"]
 
 [tool.poetry]
 name = "humanloop"
-version = "0.8.36"
-description = ""
-readme = "README.md"
-authors = []
+version = "0.1.0"
+description = "Humanloop Python SDK"
+authors = ["Your Name <your.email@example.com>"]
 keywords = []
+packages = [
+    { include = "humanloop", from = "src" },
+]
 
 classifiers = [
     "Intended Audience :: Developers",
@@ -28,9 +30,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed"
-]
-packages = [
-    { include = "humanloop", from = "src"}
 ]
 
 [project.urls]
@@ -56,6 +55,8 @@ protobuf = ">=5.29.3"
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 typing_extensions = ">= 4.0.0"
+click = "^8.0.0"
+setuptools = "^80.1.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "1.0.1"
@@ -72,7 +73,7 @@ openai = "^1.52.2"
 pandas = "^2.2.0"
 parse-type = ">=0.6.4"
 pyarrow = "^19.0.0"
-pytest-retry = "^1.6.3"
+pytest-retry = "1.6.3"
 python-dotenv = "^1.0.1"
 replicate = "^1.0.3"
 ruff = "^0.5.6"
@@ -89,7 +90,10 @@ plugins = ["pydantic.mypy"]
 [tool.ruff]
 line-length = 120
 
+[tool.poetry.scripts]
+humanloop = "humanloop.cli.__main__:cli"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+

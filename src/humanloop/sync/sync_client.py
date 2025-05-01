@@ -277,7 +277,7 @@ class SyncClient:
                 failed_files = []  # Failed files are already logged in _pull_directory
             else:
                 normalized_path = self._normalize_path(path)
-                if self.is_file(path):
+                if self.is_file(path.strip()):
                     self._pull_file(normalized_path, environment)
                     successful_files = [path]
                     failed_files = []
