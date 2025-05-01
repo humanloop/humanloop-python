@@ -54,31 +54,40 @@ class SyncClient:
         # Initialize metadata handler
         self.metadata = MetadataHandler(self.base_dir)
 
-    def _get_file_content_impl(self, path: str, file_type: FileType) -> Optional[str]:
+    def _get_file_content_impl(self, path: str, file_type: FileType) -> str:
         """Implementation of get_file_content without the cache decorator.
         
         This is the actual implementation that gets wrapped by lru_cache.
-        """
-        try:
-            # Construct path to local file
-            local_path = self.base_dir / path
-            # Add appropriate extension
-            local_path = local_path.parent / f"{local_path.stem}.{file_type}"
+        
+        Args:
+            path: The normalized path to the file (without extension)
+            file_type: The type of file (prompt or agent)
             
-            if local_path.exists():
-                # Read the file content
-                with open(local_path) as f:
-                    file_content = f.read()
-                logger.debug(f"Using local file content from {local_path}")
-                return file_content
-            else:
-                logger.warning(f"Local file not found: {local_path}, falling back to API")
-                return None
+        Returns:
+            The file content
+            
+        Raises:
+            FileNotFoundError: If the file doesn't exist
+            IOError: If there's an error reading the file
+        """
+        # Construct path to local file
+        local_path = self.base_dir / path
+        # Add appropriate extension
+        local_path = local_path.parent / f"{local_path.stem}.{file_type}"
+        
+        if not local_path.exists():
+            raise FileNotFoundError(f"Local file not found: {local_path}")
+            
+        try:
+            # Read the file content
+            with open(local_path) as f:
+                file_content = f.read()
+            logger.debug(f"Using local file content from {local_path}")
+            return file_content
         except Exception as e:
-            logger.error(f"Error reading local file: {e}, falling back to API")
-            return None
+            raise IOError(f"Error reading local file {local_path}: {str(e)}")
 
-    def get_file_content(self, path: str, file_type: FileType) -> Optional[str]:
+    def get_file_content(self, path: str, file_type: FileType) -> str:
         """Get the content of a file from cache or filesystem.
         
         This method uses an LRU cache to store file contents. When the cache is full,
@@ -89,7 +98,11 @@ class SyncClient:
             file_type: The type of file (prompt or agent)
             
         Returns:
-            The file content if found, None otherwise
+            The file content
+            
+        Raises:
+            FileNotFoundError: If the file doesn't exist
+            IOError: If there's an error reading the file
         """
         return self._get_file_content_impl(path, file_type)
 

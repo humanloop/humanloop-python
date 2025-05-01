@@ -143,9 +143,19 @@ def overload_with_local_files(
 ) -> Union[PromptsClient, AgentsClient]:
     """Overload call and log methods to handle local files when use_local_files is True.
     
+    When use_local_files is True:
+    - If only path is specified (no version_id or environment), attempts to use local file
+    - If local file is not found or cannot be read, raises an error
+    - If version_id or environment is specified, uses remote version with a warning
+    
     Args:
         client: The client to overload (PromptsClient or AgentsClient)
+        sync_client: The sync client for handling local files
         use_local_files: Whether to use local files
+        
+    Raises:
+        FileNotFoundError: If use_local_files is True and local file is not found
+        IOError: If use_local_files is True and local file cannot be read
     """
     original_call = client._call if hasattr(client, '_call') else client.call
     original_log = client._log if hasattr(client, '_log') else client.log
@@ -154,11 +164,24 @@ def overload_with_local_files(
     def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
-            # Normalize the path and get file content
-            normalized_path = sync_client._normalize_path(kwargs["path"])
-            file_content = sync_client.get_file_content(normalized_path, file_type)
-            if file_content is not None:
+            # Check if version_id or environment is specified
+            has_version_info = "version_id" in kwargs or "environment" in kwargs
+            
+            if has_version_info:
+                logger.warning(
+                    "Ignoring local file for %s as version_id or environment was specified. "
+                    "Using remote version instead.",
+                    kwargs["path"]
+                )
+            else:
+                # Only use local file if no version info is specified
+                normalized_path = sync_client._normalize_path(kwargs["path"])
+                try:
+                    file_content = sync_client.get_file_content(normalized_path, file_type)
                     kwargs[file_type] = file_content
+                except (FileNotFoundError, IOError) as e:
+                    # Re-raise with more context
+                    raise type(e)(f"Failed to use local file for {kwargs['path']}: {str(e)}")
 
         try:
             if function_name == "call":
