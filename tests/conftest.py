@@ -196,7 +196,7 @@ def humanloop_client(request, api_keys: APIKeys) -> Humanloop:
     use_local_files = getattr(request, "param", False)
     return Humanloop(
         api_key=api_keys.humanloop,
-        base_url="http://localhost:80/v5/",
+        base_url="http://localhost:80/v5",
         use_local_files=use_local_files
     )
 

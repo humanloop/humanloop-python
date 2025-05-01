@@ -5,6 +5,7 @@ from functools import lru_cache
 from humanloop.types import FileType
 from .metadata_handler import MetadataHandler
 import time
+from humanloop.error import HumanloopRuntimeError
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -67,8 +68,7 @@ class SyncClient:
             The file content
             
         Raises:
-            FileNotFoundError: If the file doesn't exist
-            IOError: If there's an error reading the file
+            HumanloopRuntimeError: If the file doesn't exist or can't be read
         """
         # Construct path to local file
         local_path = self.base_dir / path
@@ -76,7 +76,7 @@ class SyncClient:
         local_path = local_path.parent / f"{local_path.stem}.{file_type}"
         
         if not local_path.exists():
-            raise FileNotFoundError(f"Local file not found: {local_path}")
+            raise HumanloopRuntimeError(f"Local file not found: {local_path}")
             
         try:
             # Read the file content
@@ -85,7 +85,7 @@ class SyncClient:
             logger.debug(f"Using local file content from {local_path}")
             return file_content
         except Exception as e:
-            raise IOError(f"Error reading local file {local_path}: {str(e)}")
+            raise HumanloopRuntimeError(f"Error reading local file {local_path}: {str(e)}")
 
     def get_file_content(self, path: str, file_type: FileType) -> str:
         """Get the content of a file from cache or filesystem.
@@ -101,8 +101,7 @@ class SyncClient:
             The file content
             
         Raises:
-            FileNotFoundError: If the file doesn't exist
-            IOError: If there's an error reading the file
+            HumanloopRuntimeError: If the file doesn't exist or can't be read
         """
         return self._get_file_content_impl(path, file_type)
 
@@ -205,7 +204,7 @@ class SyncClient:
         self._save_serialized_file(file.content, file.path, file.type)
 
     def _pull_directory(self, 
-            path: str | None = None,    
+            directory: str | None = None,    
             environment: str | None = None, 
         ) -> List[str]:
         """Sync prompt and agent files from Humanloop to local filesystem.
@@ -219,6 +218,9 @@ class SyncClient:
 
         Returns:
             List of successfully processed file paths
+
+        Raises:
+            Exception: If there is an error fetching files from Humanloop
         """
         successful_files = []
         failed_files = []
@@ -231,7 +233,7 @@ class SyncClient:
                     page=page,
                     include_content=True,
                     environment=environment,
-                    directory=path
+                    directory=directory
                 )
 
                 if len(response.records) == 0:
@@ -258,14 +260,14 @@ class SyncClient:
 
                 page += 1
             except Exception as e:
-                logger.error(f"Failed to fetch page {page}: {str(e)}")
-                break
+                raise HumanloopRuntimeError(f"Failed to fetch page {page}: {str(e)}")
 
-        # Log summary
-        if successful_files:
-            logger.info(f"\nSynced {len(successful_files)} files")
-        if failed_files:
-            logger.error(f"Failed to sync {len(failed_files)} files")
+        # Log summary only if we have results
+        if successful_files or failed_files:
+            if successful_files:
+                logger.info(f"\nSynced {len(successful_files)} files")
+            if failed_files:
+                logger.error(f"Failed to sync {len(failed_files)} files")
 
         return successful_files
 
@@ -286,6 +288,7 @@ class SyncClient:
         start_time = time.time()
         try:
             if path is None:
+                # Pull all files from the root
                 successful_files = self._pull_directory(None, environment)
                 failed_files = []  # Failed files are already logged in _pull_directory
             else:

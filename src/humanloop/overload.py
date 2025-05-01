@@ -1,6 +1,7 @@
 import inspect
 import logging
 import types
+import warnings
 from typing import TypeVar, Union, Literal, Optional
 from pathlib import Path
 from humanloop.context import (
@@ -8,7 +9,7 @@ from humanloop.context import (
     get_evaluation_context,
     get_trace_id,
 )
-from humanloop.evals.run import HumanloopRuntimeError
+from humanloop.error import HumanloopRuntimeError
 
 from humanloop.evaluators.client import EvaluatorsClient
 from humanloop.flows.client import FlowsClient
@@ -154,24 +155,25 @@ def overload_with_local_files(
         use_local_files: Whether to use local files
         
     Raises:
-        FileNotFoundError: If use_local_files is True and local file is not found
-        IOError: If use_local_files is True and local file cannot be read
+        HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
     """
     original_call = client._call if hasattr(client, '_call') else client.call
     original_log = client._log if hasattr(client, '_log') else client.log
     file_type = _get_file_type_from_client(client)
 
     def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
+        if "id" and "path" in kwargs: 
+            raise HumanloopRuntimeError(f"Can only specify one of `id` or `path` when {function_name}ing a {file_type}")
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
             # Check if version_id or environment is specified
             has_version_info = "version_id" in kwargs or "environment" in kwargs
             
             if has_version_info:
-                logger.warning(
-                    "Ignoring local file for %s as version_id or environment was specified. "
+                warnings.warn(
+                    f"Ignoring local file for {kwargs['path']} as version_id or environment was specified. "
                     "Using remote version instead.",
-                    kwargs["path"]
+                    UserWarning
                 )
             else:
                 # Only use local file if no version info is specified
@@ -179,9 +181,9 @@ def overload_with_local_files(
                 try:
                     file_content = sync_client.get_file_content(normalized_path, file_type)
                     kwargs[file_type] = file_content
-                except (FileNotFoundError, IOError) as e:
+                except (HumanloopRuntimeError) as e:
                     # Re-raise with more context
-                    raise type(e)(f"Failed to use local file for {kwargs['path']}: {str(e)}")
+                    raise HumanloopRuntimeError(f"Failed to use local file for {kwargs['path']}: {str(e)}")
 
         try:
             if function_name == "call":

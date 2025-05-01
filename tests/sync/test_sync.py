@@ -10,6 +10,7 @@ class SyncableFile(NamedTuple):
     type: FileType
     model: str
     id: str = ""
+    version_id: str = ""
 
 
 @pytest.fixture
@@ -58,7 +59,13 @@ def test_file_structure(humanloop_client: Humanloop, get_test_path) -> List[Sync
                 path=full_path,
                 model=file.model,
             )
-        created_files.append(SyncableFile(path=full_path, type=file.type, model=file.model, id=response.id))
+        created_files.append(SyncableFile(
+            path=full_path, 
+            type=file.type, 
+            model=file.model, 
+            id=response.id, 
+            version_id=response.version_id
+        ))
 
     return created_files
 
@@ -187,3 +194,74 @@ def test_overload_log_with_local_files(humanloop_client: Humanloop, test_file_st
                 messages=[{"role": "user", "content": "Testing"}],
                 output="Test response"
             )
+
+@pytest.mark.parametrize("humanloop_client", [True], indirect=True)
+def test_overload_version_environment_handling(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+    """Test that overload_with_local_files correctly handles version_id and environment parameters.
+    
+    Flow:
+    1. Create files in remote (via test_file_structure fixture)
+    2. Pull files locally
+    3. Test that version_id/environment parameters cause remote usage with warning
+    """
+    # First pull the files locally
+    humanloop_client.pull()
+
+    # Test using the pulled files
+    test_file = test_file_structure[0]  # Use the first test file
+    extension = f".{test_file.type}"
+    local_path = Path("humanloop") / f"{test_file.path}{extension}"
+    
+    # Verify the file was pulled correctly
+    assert local_path.exists(), f"Expected pulled file at {local_path}"
+    assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
+
+    # Test with version_id - should use remote with warning
+    with pytest.warns(UserWarning, match="Ignoring local file.*as version_id or environment was specified"):
+        if test_file.type == "prompt":
+            response = humanloop_client.prompts.call(
+                path=test_file.path,
+                version_id=test_file.version_id,
+                messages=[{"role": "user", "content": "Testing"}]
+            )
+        elif test_file.type == "agent":
+            response = humanloop_client.agents.call(
+                path=test_file.path,
+                version_id=test_file.version_id,
+                messages=[{"role": "user", "content": "Testing"}]
+            )
+        assert response is not None
+
+    # Test with environment - should use remote with warning
+    with pytest.warns(UserWarning, match="Ignoring local file.*as version_id or environment was specified"):
+        if test_file.type == "prompt":
+            response = humanloop_client.prompts.call(
+                path=test_file.path,
+                environment="production",
+                messages=[{"role": "user", "content": "Testing"}]
+            )
+        elif test_file.type == "agent":
+            response = humanloop_client.agents.call(
+                path=test_file.path,
+                environment="production",
+                messages=[{"role": "user", "content": "Testing"}]
+            )
+        assert response is not None
+
+    # Test with both version_id and environment - should use remote with warning
+    with pytest.warns(UserWarning, match="Ignoring local file.*as version_id or environment was specified"):
+        if test_file.type == "prompt":
+            response = humanloop_client.prompts.call(
+                path=test_file.path,
+                version_id=test_file.version_id,
+                environment="staging",
+                messages=[{"role": "user", "content": "Testing"}]
+            )
+        elif test_file.type == "agent":
+            response = humanloop_client.agents.call(
+                path=test_file.path,
+                version_id=test_file.version_id,
+                environment="staging",
+                messages=[{"role": "user", "content": "Testing"}]
+            )
+        assert response is not None
