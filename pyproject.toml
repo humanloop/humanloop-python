@@ -1,16 +1,17 @@
+# This section is used by PyPI and follows PEP 621 for package metadata
 [project]
 name = "humanloop"
 description = "The Humanloop Python Library"
 authors = []
-keywords = ["ai", "machine-learning", "llm", "sdk", "humanloop"]
 
+# This section is used by Poetry for development and building
+# The metadata here is used during development but not published to PyPI
 [tool.poetry]
 name = "humanloop"
 version = "0.8.36b1"
 description = "Humanloop Python SDK"
 readme = "README.md"
 authors = []
-keywords = []
 packages = [
     { include = "humanloop", from = "src" },
 ]
