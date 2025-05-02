@@ -97,8 +97,7 @@ def handle_sync_errors(f: Callable) -> Callable:
         "max_content_width": 100,
     }
 )
-@common_options
-def cli(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str]):
+def cli():
     """Humanloop CLI for managing sync operations."""
     pass
 
@@ -106,8 +105,8 @@ def cli(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url
 @click.option(
     "--path",
     "-p",
-    help="Path to pull (file or directory). If not provided, pulls everything. "+
-    "To pull a specific file, ensure the extension for the file is included (e.g. .prompt or .agent). "+
+    help="Path to pull (file or directory). If not provided, pulls everything. "
+    "To pull a specific file, ensure the extension for the file is included (e.g. .prompt or .agent). "
     "To pull a directory, simply specify the path to the directory (e.g. abc/def to pull all files under abc/def and its subdirectories).",
     default=None,
 )
@@ -118,8 +117,31 @@ def cli(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url
     default=None,
 )
 @handle_sync_errors
+@common_options
 def pull(path: Optional[str], environment: Optional[str], api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str]):
-    """Pull files from Humanloop to your local filesystem."""
+    """Pull prompt and agent files from Humanloop to your local filesystem.
+
+    \b
+    This command will:
+    1. Fetch prompt and agent files from your Humanloop workspace
+    2. Save them to your local filesystem
+    3. Maintain the same directory structure as in Humanloop
+    4. Add appropriate file extensions (.prompt or .agent)
+
+    \b
+    The files will be saved with the following structure:
+    {base_dir}/
+    ├── prompts/
+    │   ├── my_prompt.prompt
+    │   └── nested/
+    │       └── another_prompt.prompt
+    └── agents/
+        └── my_agent.agent
+
+    The operation will overwrite existing files with the latest version from Humanloop
+    but will not delete local files that don't exist in the remote workspace.
+
+    Currently only supports syncing prompt and agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
     sync_client = SyncClient(client, base_dir=base_dir)
     
@@ -164,6 +186,7 @@ def format_timestamp(timestamp: str) -> str:
     help="Display history in a single line per operation",
 )
 @handle_sync_errors
+@common_options
 def history(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str], oneline: bool):
     """Show sync operation history."""
     client = get_client(api_key, env_file, base_url)
