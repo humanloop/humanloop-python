@@ -6,7 +6,7 @@ keywords = ["ai", "machine-learning", "llm", "sdk", "humanloop"]
 
 [tool.poetry]
 name = "humanloop"
-version = "0.8.36"
+version = "0.8.36b1"
 description = "Humanloop Python SDK"
 readme = "README.md"
 keywords = []

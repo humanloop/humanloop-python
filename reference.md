@@ -8873,7 +8873,52 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.agents.log()
+client.agents.log(
+    path="Banking/Teller Agent",
+    agent={
+        "provider": "anthropic",
+        "endpoint": "chat",
+        "model": "claude-3-7-sonnet-latest",
+        "reasoning_effort": 1024,
+        "template": [
+            {
+                "role": "system",
+                "content": "You are a helpful digital assistant, helping users navigate our digital banking platform.",
+            }
+        ],
+        "max_iterations": 3,
+        "tools": [
+            {
+                "type": "file",
+                "link": {
+                    "file_id": "pr_1234567890",
+                    "version_id": "prv_1234567890",
+                },
+                "on_agent_call": "continue",
+            },
+            {
+                "type": "inline",
+                "json_schema": {
+                    "name": "stop",
+                    "description": "Call this tool when you have finished your task.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "output": {
+                                "type": "string",
+                                "description": "The final output to return to the user.",
+                            }
+                        },
+                        "additionalProperties": False,
+                        "required": ["output"],
+                    },
+                    "strict": True,
+                },
+                "on_agent_call": "stop",
+            },
+        ],
+    },
+)
 
 ```
 </dd>
@@ -9007,12 +9052,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**agent:** `typing.Optional[AgentLogRequestAgentParams]` 
-
-The agent configuration to use. Two formats are supported:
-- An `AgentKernelRequest` object containing the agent configuration
-- A string containing a serialized .agent file
-A new Agent version will be created if the provided details are new.
+**agent:** `typing.Optional[AgentKernelRequestParams]` — Details of your Agent. A new Agent version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -9219,8 +9259,20 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.update_log(
-    id="id",
-    log_id="log_id",
+    id="ag_1234567890",
+    log_id="log_1234567890",
+    messages=[
+        {"role": "user", "content": "I need to withdraw $1000"},
+        {
+            "role": "assistant",
+            "content": "Of course! Would you like to use your savings or checking account?",
+        },
+    ],
+    output_message={
+        "role": "assistant",
+        "content": "I'm sorry, I can't help with that.",
+    },
+    log_status="complete",
 )
 
 ```
@@ -9325,18 +9377,21 @@ client.agents.update_log(
 <dl>
 <dd>
 
-Call an Agent.
+Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-Calling an Agent calls the model provider before logging
-the request, responses and metadata to Humanloop.
+If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+
+The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+according to its configuration.
 
 You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
 Instead of targeting an existing version explicitly, you can instead pass in
-Agent details in the request body. In this case, we will check if the details correspond
-to an existing version of the Agent. If they do not, we will create a new version. This is helpful
-in the case where you are storing or deriving your Agent details in code.
+Agent details in the request body. A new version is created if it does not match
+any existing ones. This is helpful in the case where you are storing or deriving
+your Agent details in code.
 </dd>
 </dl>
 </dd>
@@ -9428,12 +9483,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**agent:** `typing.Optional[AgentsCallStreamRequestAgentParams]` 
-
-The agent configuration to use. Two formats are supported:
-- An `AgentKernelRequest` object containing the agent configuration
-- A string containing a serialized .agent file
-A new Agent version will be created if the provided details are new.
+**agent:** `typing.Optional[AgentKernelRequestParams]` — Details of your Agent. A new Agent version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -9585,18 +9635,21 @@ A new Agent version will be created if the provided details are new.
 <dl>
 <dd>
 
-Call an Agent.
+Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-Calling an Agent calls the model provider before logging
-the request, responses and metadata to Humanloop.
+If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+
+The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+according to its configuration.
 
 You can use query parameters `version_id`, or `environment`, to target
 an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
 Instead of targeting an existing version explicitly, you can instead pass in
-Agent details in the request body. In this case, we will check if the details correspond
-to an existing version of the Agent. If they do not, we will create a new version. This is helpful
-in the case where you are storing or deriving your Agent details in code.
+Agent details in the request body. A new version is created if it does not match
+any existing ones. This is helpful in the case where you are storing or deriving
+your Agent details in code.
 </dd>
 </dl>
 </dd>
@@ -9616,7 +9669,15 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.agents.call()
+client.agents.call(
+    path="Banking/Teller Agent",
+    messages=[
+        {
+            "role": "user",
+            "content": "I'd like to deposit $1000 to my savings account from my checking account.",
+        }
+    ],
+)
 
 ```
 </dd>
@@ -9686,12 +9747,7 @@ Controls how the model uses tools. The following options are supported:
 <dl>
 <dd>
 
-**agent:** `typing.Optional[AgentsCallRequestAgentParams]` 
-
-The agent configuration to use. Two formats are supported:
-- An `AgentKernelRequest` object containing the agent configuration
-- A string containing a serialized .agent file
-A new Agent version will be created if the provided details are new.
+**agent:** `typing.Optional[AgentKernelRequestParams]` — Details of your Agent. A new Agent version will be created if the provided details are new.
     
 </dd>
 </dl>
@@ -9831,7 +9887,7 @@ A new Agent version will be created if the provided details are new.
 </dl>
 </details>
 
-<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">continue_stream</a>(...)</code></summary>
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">continue_call_stream</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -9845,13 +9901,13 @@ A new Agent version will be created if the provided details are new.
 
 Continue an incomplete Agent call.
 
-This endpoint allows continuing an existing incomplete Agent call, using the context
-from the previous interaction. The Agent will resume processing from where it left off.
+This endpoint allows continuing an existing incomplete Agent call, by passing the tool call
+requested by the Agent. The Agent will resume processing from where it left off.
+
+The messages in the request will be appended to the original messages in the Log. You do not
+have to provide the previous conversation history.
 
 The original log must be in an incomplete state to be continued.
-
-The messages in the request will be appended
-to the original messages in the log.
 </dd>
 </dl>
 </dd>
@@ -9871,7 +9927,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-response = client.agents.continue_stream(
+response = client.agents.continue_call_stream(
     log_id="log_id",
     messages=[{"role": "user"}],
 )
@@ -9936,7 +9992,7 @@ for chunk in response.data:
 </dl>
 </details>
 
-<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">continue_</a>(...)</code></summary>
+<details><summary><code>client.agents.<a href="src/humanloop/agents/client.py">continue_call</a>(...)</code></summary>
 <dl>
 <dd>
 
@@ -9950,13 +10006,13 @@ for chunk in response.data:
 
 Continue an incomplete Agent call.
 
-This endpoint allows continuing an existing incomplete Agent call, using the context
-from the previous interaction. The Agent will resume processing from where it left off.
+This endpoint allows continuing an existing incomplete Agent call, by passing the tool call
+requested by the Agent. The Agent will resume processing from where it left off.
+
+The messages in the request will be appended to the original messages in the Log. You do not
+have to provide the previous conversation history.
 
 The original log must be in an incomplete state to be continued.
-
-The messages in the request will be appended
-to the original messages in the log.
 </dd>
 </dl>
 </dd>
@@ -9976,9 +10032,15 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.agents.continue_(
-    log_id="log_id",
-    messages=[{"role": "user"}],
+client.agents.continue_call(
+    log_id="log_1234567890",
+    messages=[
+        {
+            "role": "tool",
+            "content": '{"type": "checking", "balance": 5200}',
+            "tool_call_id": "tc_1234567890",
+        }
+    ],
 )
 
 ```
@@ -10071,7 +10133,14 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.agents.list()
+response = client.agents.list(
+    size=1,
+)
+for item in response:
+    yield item
+# alternatively, you can paginate page-by-page
+for page in response.iter_pages():
+    yield page
 
 ```
 </dd>
@@ -10187,7 +10256,42 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.upsert(
-    model="model",
+    path="Banking/Teller Agent",
+    provider="anthropic",
+    endpoint="chat",
+    model="claude-3-7-sonnet-latest",
+    reasoning_effort=1024,
+    template=[
+        {
+            "role": "system",
+            "content": "You are a helpful digital assistant, helping users navigate our digital banking platform.",
+        }
+    ],
+    max_iterations=3,
+    tools=[
+        {
+            "type": "inline",
+            "json_schema": {
+                "name": "stop",
+                "description": "Call this tool when you have finished your task.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "output": {
+                            "type": "string",
+                            "description": "The final output to return to the user.",
+                        }
+                    },
+                    "additionalProperties": False,
+                    "required": ["output"],
+                },
+                "strict": True,
+            },
+            "on_agent_call": "stop",
+        }
+    ],
+    version_name="teller-agent-v1",
+    version_description="Initial version",
 )
 
 ```
@@ -10456,8 +10560,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.delete_agent_version(
-    id="id",
-    version_id="version_id",
+    id="ag_1234567890",
+    version_id="agv_1234567890",
 )
 
 ```
@@ -10535,8 +10639,10 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.patch_agent_version(
-    id="id",
-    version_id="version_id",
+    id="ag_1234567890",
+    version_id="agv_1234567890",
+    name="teller-agent-v2",
+    description="Updated version",
 )
 
 ```
@@ -10633,7 +10739,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.get(
-    id="id",
+    id="ag_1234567890",
 )
 
 ```
@@ -10719,7 +10825,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.delete(
-    id="id",
+    id="ag_1234567890",
 )
 
 ```
@@ -10789,7 +10895,8 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.move(
-    id="id",
+    id="ag_1234567890",
+    path="new directory/new name",
 )
 
 ```
@@ -10883,7 +10990,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.list_versions(
-    id="id",
+    id="ag_1234567890",
 )
 
 ```
@@ -11134,7 +11241,7 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.list_environments(
-    id="id",
+    id="ag_1234567890",
 )
 
 ```
@@ -11207,7 +11314,12 @@ client = Humanloop(
     api_key="YOUR_API_KEY",
 )
 client.agents.update_monitoring(
-    id="id",
+    id="ag_1234567890",
+    activate=[
+        {"evaluator_version_id": "ev_1234567890"},
+        {"evaluator_id": "ev_2345678901", "environment_id": "env_1234567890"},
+    ],
+    deactivate=[{"evaluator_version_id": "ev_0987654321"}],
 )
 
 ```
@@ -13316,14 +13428,6 @@ for page in response.iter_pages():
 <dd>
 
 **version_id:** `typing.Optional[str]` — If provided, only Logs belonging to the specified Version will be returned.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_status:** `typing.Optional[VersionStatus]` — If provided, only Logs belonging to Versions with the specified status will be returned.
     
 </dd>
 </dl>

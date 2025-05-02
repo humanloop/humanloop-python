@@ -42,7 +42,6 @@ class LogsClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         version_id: typing.Optional[str] = None,
-        version_status: typing.Optional[VersionStatus] = None,
         id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
@@ -70,9 +69,6 @@ class LogsClient:
 
         version_id : typing.Optional[str]
             If provided, only Logs belonging to the specified Version will be returned.
-
-        version_status : typing.Optional[VersionStatus]
-            If provided, only Logs belonging to Versions with the specified status will be returned.
 
         id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
             If provided, returns Logs whose IDs contain any of the specified values as substrings.
@@ -135,7 +131,6 @@ class LogsClient:
                 "page": page,
                 "size": size,
                 "version_id": version_id,
-                "version_status": version_status,
                 "id": id,
                 "search": search,
                 "metadata_search": metadata_search,
@@ -163,7 +158,6 @@ class LogsClient:
                     page=page + 1,
                     size=size,
                     version_id=version_id,
-                    version_status=version_status,
                     id=id,
                     search=search,
                     metadata_search=metadata_search,
@@ -281,7 +275,6 @@ class AsyncLogsClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         version_id: typing.Optional[str] = None,
-        version_status: typing.Optional[VersionStatus] = None,
         id: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         search: typing.Optional[str] = None,
         metadata_search: typing.Optional[str] = None,
@@ -309,9 +302,6 @@ class AsyncLogsClient:
 
         version_id : typing.Optional[str]
             If provided, only Logs belonging to the specified Version will be returned.
-
-        version_status : typing.Optional[VersionStatus]
-            If provided, only Logs belonging to Versions with the specified status will be returned.
 
         id : typing.Optional[typing.Union[str, typing.Sequence[str]]]
             If provided, returns Logs whose IDs contain any of the specified values as substrings.
@@ -382,7 +372,6 @@ class AsyncLogsClient:
                 "page": page,
                 "size": size,
                 "version_id": version_id,
-                "version_status": version_status,
                 "id": id,
                 "search": search,
                 "metadata_search": metadata_search,
@@ -410,7 +399,6 @@ class AsyncLogsClient:
                     page=page + 1,
                     size=size,
                     version_id=version_id,
-                    version_status=version_status,
                     id=id,
                     search=search,
                     metadata_search=metadata_search,

@@ -235,8 +235,3 @@ class AgentResponseParams(typing_extensions.TypedDict):
     """
     Aggregation of Evaluator results for the Agent Version.
     """
-
-    content: typing_extensions.NotRequired[str]
-    """
-    The serialized kernel for the Agent. Corresponds to the .agent file.
-    """

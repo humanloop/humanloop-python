@@ -3,7 +3,6 @@
 from __future__ import annotations
 import typing
 from .dataset_response import DatasetResponse
-import typing
 
 if typing.TYPE_CHECKING:
     from .prompt_response import PromptResponse
@@ -12,5 +11,10 @@ if typing.TYPE_CHECKING:
     from .flow_response import FlowResponse
     from .agent_response import AgentResponse
 VersionIdResponseVersion = typing.Union[
-    "PromptResponse", "ToolResponse", DatasetResponse, "EvaluatorResponse", "FlowResponse", "AgentResponse"
+    "PromptResponse",
+    "ToolResponse",
+    DatasetResponse,
+    "EvaluatorResponse",
+    "FlowResponse",
+    "AgentResponse",
 ]

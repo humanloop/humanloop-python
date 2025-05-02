@@ -5,7 +5,7 @@ from typing_extensions import ParamSpec
 from typing import Callable, TypeVar
 
 from humanloop.context import DecoratorContext, set_decorator_context
-from humanloop.evals.types import File
+from humanloop.evals.types import FileEvalConfig
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -30,7 +30,7 @@ def prompt_decorator_factory(path: str):
                 output = func(*args, **kwargs)
                 return output
 
-        wrapper.file = File(  # type: ignore [attr-defined]
+        wrapper.file = FileEvalConfig(  # type: ignore [attr-defined]
             path=path,
             type="prompt",
             version={  # type: ignore [typeddict-item]

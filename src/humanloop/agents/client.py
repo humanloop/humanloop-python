@@ -5,24 +5,29 @@ from ..core.client_wrapper import SyncClientWrapper
 from .raw_client import RawAgentsClient
 from ..requests.chat_message import ChatMessageParams
 from .requests.agent_log_request_tool_choice import AgentLogRequestToolChoiceParams
-from .requests.agent_log_request_agent import AgentLogRequestAgentParams
+from ..requests.agent_kernel_request import AgentKernelRequestParams
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..core.request_options import RequestOptions
 from ..types.create_agent_log_response import CreateAgentLogResponse
-from ..types.log_response import LogResponse
+from ..types.agent_log_response import AgentLogResponse
 from .requests.agents_call_stream_request_tool_choice import AgentsCallStreamRequestToolChoiceParams
-from .requests.agents_call_stream_request_agent import AgentsCallStreamRequestAgentParams
 from ..requests.provider_api_keys import ProviderApiKeysParams
 from ..types.agent_call_stream_response import AgentCallStreamResponse
 from .requests.agents_call_request_tool_choice import AgentsCallRequestToolChoiceParams
-from .requests.agents_call_request_agent import AgentsCallRequestAgentParams
 from ..types.agent_call_response import AgentCallResponse
-from ..types.agent_continue_stream_response import AgentContinueStreamResponse
-from ..types.agent_continue_response import AgentContinueResponse
+from ..types.agent_continue_call_stream_response import AgentContinueCallStreamResponse
+from ..types.agent_continue_call_response import AgentContinueCallResponse
 from ..types.project_sort_by import ProjectSortBy
 from ..types.sort_order import SortOrder
+from ..core.pagination import SyncPager
+from ..types.agent_response import AgentResponse
 from ..types.paginated_data_agent_response import PaginatedDataAgentResponse
+from ..core.unchecked_base_model import construct_type
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.http_validation_error import HttpValidationError
+from json.decoder import JSONDecodeError
+from ..core.api_error import ApiError
 from ..types.model_endpoints import ModelEndpoints
 from .requests.agent_request_template import AgentRequestTemplateParams
 from ..types.template_language import TemplateLanguage
@@ -31,7 +36,6 @@ from .requests.agent_request_stop import AgentRequestStopParams
 from ..requests.response_format import ResponseFormatParams
 from .requests.agent_request_reasoning_effort import AgentRequestReasoningEffortParams
 from .requests.agent_request_tools_item import AgentRequestToolsItemParams
-from ..types.agent_response import AgentResponse
 from ..types.list_agents import ListAgents
 from ..types.file_environment_response import FileEnvironmentResponse
 from ..requests.evaluator_activation_deactivation_request_activate_item import (
@@ -43,6 +47,7 @@ from ..requests.evaluator_activation_deactivation_request_deactivate_item import
 from ..types.agent_kernel_request import AgentKernelRequest
 from ..core.client_wrapper import AsyncClientWrapper
 from .raw_client import AsyncRawAgentsClient
+from ..core.pagination import AsyncPager
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
@@ -80,7 +85,7 @@ class AgentsClient:
         finish_reason: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[AgentLogRequestToolChoiceParams] = OMIT,
-        agent: typing.Optional[AgentLogRequestAgentParams] = OMIT,
+        agent: typing.Optional[AgentKernelRequestParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -159,11 +164,8 @@ class AgentsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentLogRequestAgentParams]
-            The agent configuration to use. Two formats are supported:
-            - An `AgentKernelRequest` object containing the agent configuration
-            - A string containing a serialized .agent file
-            A new Agent version will be created if the provided details are new.
+        agent : typing.Optional[AgentKernelRequestParams]
+            Details of your Agent. A new Agent version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -237,7 +239,52 @@ class AgentsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.agents.log()
+        client.agents.log(
+            path="Banking/Teller Agent",
+            agent={
+                "provider": "anthropic",
+                "endpoint": "chat",
+                "model": "claude-3-7-sonnet-latest",
+                "reasoning_effort": 1024,
+                "template": [
+                    {
+                        "role": "system",
+                        "content": "You are a helpful digital assistant, helping users navigate our digital banking platform.",
+                    }
+                ],
+                "max_iterations": 3,
+                "tools": [
+                    {
+                        "type": "file",
+                        "link": {
+                            "file_id": "pr_1234567890",
+                            "version_id": "prv_1234567890",
+                        },
+                        "on_agent_call": "continue",
+                    },
+                    {
+                        "type": "inline",
+                        "json_schema": {
+                            "name": "stop",
+                            "description": "Call this tool when you have finished your task.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "output": {
+                                        "type": "string",
+                                        "description": "The final output to return to the user.",
+                                    }
+                                },
+                                "additionalProperties": False,
+                                "required": ["output"],
+                            },
+                            "strict": True,
+                        },
+                        "on_agent_call": "stop",
+                    },
+                ],
+            },
+        )
         """
         response = self._raw_client.log(
             version_id=version_id,
@@ -290,7 +337,7 @@ class AgentsClient:
         error: typing.Optional[str] = OMIT,
         log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> LogResponse:
+    ) -> AgentLogResponse:
         """
         Update a Log.
 
@@ -327,7 +374,7 @@ class AgentsClient:
 
         Returns
         -------
-        LogResponse
+        AgentLogResponse
             Successful Response
 
         Examples
@@ -338,8 +385,20 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.update_log(
-            id="id",
-            log_id="log_id",
+            id="ag_1234567890",
+            log_id="log_1234567890",
+            messages=[
+                {"role": "user", "content": "I need to withdraw $1000"},
+                {
+                    "role": "assistant",
+                    "content": "Of course! Would you like to use your savings or checking account?",
+                },
+            ],
+            output_message={
+                "role": "assistant",
+                "content": "I'm sorry, I can't help with that.",
+            },
+            log_status="complete",
         )
         """
         response = self._raw_client.update_log(
@@ -364,7 +423,7 @@ class AgentsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[AgentsCallStreamRequestToolChoiceParams] = OMIT,
-        agent: typing.Optional[AgentsCallStreamRequestAgentParams] = OMIT,
+        agent: typing.Optional[AgentKernelRequestParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -383,18 +442,21 @@ class AgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[AgentCallStreamResponse]:
         """
-        Call an Agent.
+        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        Calling an Agent calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+
+        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+        according to its configuration.
 
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Agent. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Agent details in code.
+        Agent details in the request body. A new version is created if it does not match
+        any existing ones. This is helpful in the case where you are storing or deriving
+        your Agent details in code.
 
         Parameters
         ----------
@@ -420,11 +482,8 @@ class AgentsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallStreamRequestAgentParams]
-            The agent configuration to use. Two formats are supported:
-            - An `AgentKernelRequest` object containing the agent configuration
-            - A string containing a serialized .agent file
-            A new Agent version will be created if the provided details are new.
+        agent : typing.Optional[AgentKernelRequestParams]
+            Details of your Agent. A new Agent version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -526,7 +585,7 @@ class AgentsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[AgentsCallRequestToolChoiceParams] = OMIT,
-        agent: typing.Optional[AgentsCallRequestAgentParams] = OMIT,
+        agent: typing.Optional[AgentKernelRequestParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -545,18 +604,21 @@ class AgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AgentCallResponse:
         """
-        Call an Agent.
+        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        Calling an Agent calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+
+        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+        according to its configuration.
 
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Agent. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Agent details in code.
+        Agent details in the request body. A new version is created if it does not match
+        any existing ones. This is helpful in the case where you are storing or deriving
+        your Agent details in code.
 
         Parameters
         ----------
@@ -582,11 +644,8 @@ class AgentsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallRequestAgentParams]
-            The agent configuration to use. Two formats are supported:
-            - An `AgentKernelRequest` object containing the agent configuration
-            - A string containing a serialized .agent file
-            A new Agent version will be created if the provided details are new.
+        agent : typing.Optional[AgentKernelRequestParams]
+            Details of your Agent. A new Agent version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -648,7 +707,15 @@ class AgentsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.agents.call()
+        client.agents.call(
+            path="Banking/Teller Agent",
+            messages=[
+                {
+                    "role": "user",
+                    "content": "I'd like to deposit $1000 to my savings account from my checking account.",
+                }
+            ],
+        )
         """
         response = self._raw_client.call(
             version_id=version_id,
@@ -677,7 +744,7 @@ class AgentsClient:
         )
         return response.data
 
-    def continue_stream(
+    def continue_call_stream(
         self,
         *,
         log_id: str,
@@ -685,17 +752,17 @@ class AgentsClient:
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         include_trace_children: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Iterator[AgentContinueStreamResponse]:
+    ) -> typing.Iterator[AgentContinueCallStreamResponse]:
         """
         Continue an incomplete Agent call.
 
-        This endpoint allows continuing an existing incomplete Agent call, using the context
-        from the previous interaction. The Agent will resume processing from where it left off.
+        This endpoint allows continuing an existing incomplete Agent call, by passing the tool call
+        requested by the Agent. The Agent will resume processing from where it left off.
+
+        The messages in the request will be appended to the original messages in the Log. You do not
+        have to provide the previous conversation history.
 
         The original log must be in an incomplete state to be continued.
-
-        The messages in the request will be appended
-        to the original messages in the log.
 
         Parameters
         ----------
@@ -716,7 +783,7 @@ class AgentsClient:
 
         Yields
         ------
-        typing.Iterator[AgentContinueStreamResponse]
+        typing.Iterator[AgentContinueCallStreamResponse]
 
 
         Examples
@@ -726,14 +793,14 @@ class AgentsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        response = client.agents.continue_stream(
+        response = client.agents.continue_call_stream(
             log_id="log_id",
             messages=[{"role": "user"}],
         )
         for chunk in response:
             yield chunk
         """
-        with self._raw_client.continue_stream(
+        with self._raw_client.continue_call_stream(
             log_id=log_id,
             messages=messages,
             provider_api_keys=provider_api_keys,
@@ -742,7 +809,7 @@ class AgentsClient:
         ) as r:
             yield from r.data
 
-    def continue_(
+    def continue_call(
         self,
         *,
         log_id: str,
@@ -750,17 +817,17 @@ class AgentsClient:
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         include_trace_children: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AgentContinueResponse:
+    ) -> AgentContinueCallResponse:
         """
         Continue an incomplete Agent call.
 
-        This endpoint allows continuing an existing incomplete Agent call, using the context
-        from the previous interaction. The Agent will resume processing from where it left off.
+        This endpoint allows continuing an existing incomplete Agent call, by passing the tool call
+        requested by the Agent. The Agent will resume processing from where it left off.
+
+        The messages in the request will be appended to the original messages in the Log. You do not
+        have to provide the previous conversation history.
 
         The original log must be in an incomplete state to be continued.
-
-        The messages in the request will be appended
-        to the original messages in the log.
 
         Parameters
         ----------
@@ -781,7 +848,7 @@ class AgentsClient:
 
         Returns
         -------
-        AgentContinueResponse
+        AgentContinueCallResponse
 
 
         Examples
@@ -791,12 +858,18 @@ class AgentsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.agents.continue_(
-            log_id="log_id",
-            messages=[{"role": "user"}],
+        client.agents.continue_call(
+            log_id="log_1234567890",
+            messages=[
+                {
+                    "role": "tool",
+                    "content": '{"type": "checking", "balance": 5200}',
+                    "tool_call_id": "tc_1234567890",
+                }
+            ],
         )
         """
-        response = self._raw_client.continue_(
+        response = self._raw_client.continue_call(
             log_id=log_id,
             messages=messages,
             provider_api_keys=provider_api_keys,
@@ -815,7 +888,7 @@ class AgentsClient:
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataAgentResponse:
+    ) -> SyncPager[AgentResponse]:
         """
         Get a list of all Agents.
 
@@ -844,7 +917,7 @@ class AgentsClient:
 
         Returns
         -------
-        PaginatedDataAgentResponse
+        SyncPager[AgentResponse]
             Successful Response
 
         Examples
@@ -854,18 +927,64 @@ class AgentsClient:
         client = Humanloop(
             api_key="YOUR_API_KEY",
         )
-        client.agents.list()
+        response = client.agents.list(
+            size=1,
+        )
+        for item in response:
+            yield item
+        # alternatively, you can paginate page-by-page
+        for page in response.iter_pages():
+            yield page
         """
-        response = self._raw_client.list(
-            page=page,
-            size=size,
-            name=name,
-            user_filter=user_filter,
-            sort_by=sort_by,
-            order=order,
+        page = page if page is not None else 1
+        _response = self._raw_client._client_wrapper.httpx_client.request(
+            "agents",
+            method="GET",
+            params={
+                "page": page,
+                "size": size,
+                "name": name,
+                "user_filter": user_filter,
+                "sort_by": sort_by,
+                "order": order,
+            },
             request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(
+                    PaginatedDataAgentResponse,
+                    construct_type(
+                        type_=PaginatedDataAgentResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return SyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def upsert(
         self,
@@ -1004,7 +1123,42 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.upsert(
-            model="model",
+            path="Banking/Teller Agent",
+            provider="anthropic",
+            endpoint="chat",
+            model="claude-3-7-sonnet-latest",
+            reasoning_effort=1024,
+            template=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful digital assistant, helping users navigate our digital banking platform.",
+                }
+            ],
+            max_iterations=3,
+            tools=[
+                {
+                    "type": "inline",
+                    "json_schema": {
+                        "name": "stop",
+                        "description": "Call this tool when you have finished your task.",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "output": {
+                                    "type": "string",
+                                    "description": "The final output to return to the user.",
+                                }
+                            },
+                            "additionalProperties": False,
+                            "required": ["output"],
+                        },
+                        "strict": True,
+                    },
+                    "on_agent_call": "stop",
+                }
+            ],
+            version_name="teller-agent-v1",
+            version_description="Initial version",
         )
         """
         response = self._raw_client.upsert(
@@ -1066,8 +1220,8 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.delete_agent_version(
-            id="id",
-            version_id="version_id",
+            id="ag_1234567890",
+            version_id="agv_1234567890",
         )
         """
         response = self._raw_client.delete_agent_version(id, version_id, request_options=request_options)
@@ -1115,8 +1269,10 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.patch_agent_version(
-            id="id",
-            version_id="version_id",
+            id="ag_1234567890",
+            version_id="agv_1234567890",
+            name="teller-agent-v2",
+            description="Updated version",
         )
         """
         response = self._raw_client.patch_agent_version(
@@ -1165,7 +1321,7 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.get(
-            id="id",
+            id="ag_1234567890",
         )
         """
         response = self._raw_client.get(
@@ -1197,7 +1353,7 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.delete(
-            id="id",
+            id="ag_1234567890",
         )
         """
         response = self._raw_client.delete(id, request_options=request_options)
@@ -1245,7 +1401,8 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.move(
-            id="id",
+            id="ag_1234567890",
+            path="new directory/new name",
         )
         """
         response = self._raw_client.move(
@@ -1287,7 +1444,7 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.list_versions(
-            id="id",
+            id="ag_1234567890",
         )
         """
         response = self._raw_client.list_versions(
@@ -1407,7 +1564,7 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.list_environments(
-            id="id",
+            id="ag_1234567890",
         )
         """
         response = self._raw_client.list_environments(id, request_options=request_options)
@@ -1453,7 +1610,12 @@ class AgentsClient:
             api_key="YOUR_API_KEY",
         )
         client.agents.update_monitoring(
-            id="id",
+            id="ag_1234567890",
+            activate=[
+                {"evaluator_version_id": "ev_1234567890"},
+                {"evaluator_id": "ev_2345678901", "environment_id": "env_1234567890"},
+            ],
+            deactivate=[{"evaluator_version_id": "ev_0987654321"}],
         )
         """
         response = self._raw_client.update_monitoring(
@@ -1468,7 +1630,7 @@ class AgentsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> str:
+    ) -> None:
         """
         Serialize an Agent to the .agent file format.
 
@@ -1494,8 +1656,7 @@ class AgentsClient:
 
         Returns
         -------
-        str
-            Successful Response
+        None
 
         Examples
         --------
@@ -1579,7 +1740,7 @@ class AsyncAgentsClient:
         finish_reason: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[AgentLogRequestToolChoiceParams] = OMIT,
-        agent: typing.Optional[AgentLogRequestAgentParams] = OMIT,
+        agent: typing.Optional[AgentKernelRequestParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -1658,11 +1819,8 @@ class AsyncAgentsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentLogRequestAgentParams]
-            The agent configuration to use. Two formats are supported:
-            - An `AgentKernelRequest` object containing the agent configuration
-            - A string containing a serialized .agent file
-            A new Agent version will be created if the provided details are new.
+        agent : typing.Optional[AgentKernelRequestParams]
+            Details of your Agent. A new Agent version will be created if the provided details are new.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -1741,7 +1899,52 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.log()
+            await client.agents.log(
+                path="Banking/Teller Agent",
+                agent={
+                    "provider": "anthropic",
+                    "endpoint": "chat",
+                    "model": "claude-3-7-sonnet-latest",
+                    "reasoning_effort": 1024,
+                    "template": [
+                        {
+                            "role": "system",
+                            "content": "You are a helpful digital assistant, helping users navigate our digital banking platform.",
+                        }
+                    ],
+                    "max_iterations": 3,
+                    "tools": [
+                        {
+                            "type": "file",
+                            "link": {
+                                "file_id": "pr_1234567890",
+                                "version_id": "prv_1234567890",
+                            },
+                            "on_agent_call": "continue",
+                        },
+                        {
+                            "type": "inline",
+                            "json_schema": {
+                                "name": "stop",
+                                "description": "Call this tool when you have finished your task.",
+                                "parameters": {
+                                    "type": "object",
+                                    "properties": {
+                                        "output": {
+                                            "type": "string",
+                                            "description": "The final output to return to the user.",
+                                        }
+                                    },
+                                    "additionalProperties": False,
+                                    "required": ["output"],
+                                },
+                                "strict": True,
+                            },
+                            "on_agent_call": "stop",
+                        },
+                    ],
+                },
+            )
 
 
         asyncio.run(main())
@@ -1797,7 +2000,7 @@ class AsyncAgentsClient:
         error: typing.Optional[str] = OMIT,
         log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> LogResponse:
+    ) -> AgentLogResponse:
         """
         Update a Log.
 
@@ -1834,7 +2037,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        LogResponse
+        AgentLogResponse
             Successful Response
 
         Examples
@@ -1850,8 +2053,20 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.update_log(
-                id="id",
-                log_id="log_id",
+                id="ag_1234567890",
+                log_id="log_1234567890",
+                messages=[
+                    {"role": "user", "content": "I need to withdraw $1000"},
+                    {
+                        "role": "assistant",
+                        "content": "Of course! Would you like to use your savings or checking account?",
+                    },
+                ],
+                output_message={
+                    "role": "assistant",
+                    "content": "I'm sorry, I can't help with that.",
+                },
+                log_status="complete",
             )
 
 
@@ -1879,7 +2094,7 @@ class AsyncAgentsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[AgentsCallStreamRequestToolChoiceParams] = OMIT,
-        agent: typing.Optional[AgentsCallStreamRequestAgentParams] = OMIT,
+        agent: typing.Optional[AgentKernelRequestParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -1898,18 +2113,21 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AgentCallStreamResponse]:
         """
-        Call an Agent.
+        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        Calling an Agent calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+
+        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+        according to its configuration.
 
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Agent. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Agent details in code.
+        Agent details in the request body. A new version is created if it does not match
+        any existing ones. This is helpful in the case where you are storing or deriving
+        your Agent details in code.
 
         Parameters
         ----------
@@ -1935,11 +2153,8 @@ class AsyncAgentsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallStreamRequestAgentParams]
-            The agent configuration to use. Two formats are supported:
-            - An `AgentKernelRequest` object containing the agent configuration
-            - A string containing a serialized .agent file
-            A new Agent version will be created if the provided details are new.
+        agent : typing.Optional[AgentKernelRequestParams]
+            Details of your Agent. A new Agent version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2050,7 +2265,7 @@ class AsyncAgentsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[AgentsCallRequestToolChoiceParams] = OMIT,
-        agent: typing.Optional[AgentsCallRequestAgentParams] = OMIT,
+        agent: typing.Optional[AgentKernelRequestParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2069,18 +2284,21 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AgentCallResponse:
         """
-        Call an Agent.
+        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        Calling an Agent calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+
+        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+        according to its configuration.
 
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
         Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Agent. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Agent details in code.
+        Agent details in the request body. A new version is created if it does not match
+        any existing ones. This is helpful in the case where you are storing or deriving
+        your Agent details in code.
 
         Parameters
         ----------
@@ -2106,11 +2324,8 @@ class AsyncAgentsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallRequestAgentParams]
-            The agent configuration to use. Two formats are supported:
-            - An `AgentKernelRequest` object containing the agent configuration
-            - A string containing a serialized .agent file
-            A new Agent version will be created if the provided details are new.
+        agent : typing.Optional[AgentKernelRequestParams]
+            Details of your Agent. A new Agent version will be created if the provided details are new.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2177,7 +2392,15 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.call()
+            await client.agents.call(
+                path="Banking/Teller Agent",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": "I'd like to deposit $1000 to my savings account from my checking account.",
+                    }
+                ],
+            )
 
 
         asyncio.run(main())
@@ -2209,7 +2432,7 @@ class AsyncAgentsClient:
         )
         return response.data
 
-    async def continue_stream(
+    async def continue_call_stream(
         self,
         *,
         log_id: str,
@@ -2217,17 +2440,17 @@ class AsyncAgentsClient:
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         include_trace_children: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.AsyncIterator[AgentContinueStreamResponse]:
+    ) -> typing.AsyncIterator[AgentContinueCallStreamResponse]:
         """
         Continue an incomplete Agent call.
 
-        This endpoint allows continuing an existing incomplete Agent call, using the context
-        from the previous interaction. The Agent will resume processing from where it left off.
+        This endpoint allows continuing an existing incomplete Agent call, by passing the tool call
+        requested by the Agent. The Agent will resume processing from where it left off.
+
+        The messages in the request will be appended to the original messages in the Log. You do not
+        have to provide the previous conversation history.
 
         The original log must be in an incomplete state to be continued.
-
-        The messages in the request will be appended
-        to the original messages in the log.
 
         Parameters
         ----------
@@ -2248,7 +2471,7 @@ class AsyncAgentsClient:
 
         Yields
         ------
-        typing.AsyncIterator[AgentContinueStreamResponse]
+        typing.AsyncIterator[AgentContinueCallStreamResponse]
 
 
         Examples
@@ -2263,7 +2486,7 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            response = await client.agents.continue_stream(
+            response = await client.agents.continue_call_stream(
                 log_id="log_id",
                 messages=[{"role": "user"}],
             )
@@ -2273,7 +2496,7 @@ class AsyncAgentsClient:
 
         asyncio.run(main())
         """
-        async with self._raw_client.continue_stream(
+        async with self._raw_client.continue_call_stream(
             log_id=log_id,
             messages=messages,
             provider_api_keys=provider_api_keys,
@@ -2283,7 +2506,7 @@ class AsyncAgentsClient:
             async for data in r.data:
                 yield data
 
-    async def continue_(
+    async def continue_call(
         self,
         *,
         log_id: str,
@@ -2291,17 +2514,17 @@ class AsyncAgentsClient:
         provider_api_keys: typing.Optional[ProviderApiKeysParams] = OMIT,
         include_trace_children: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AgentContinueResponse:
+    ) -> AgentContinueCallResponse:
         """
         Continue an incomplete Agent call.
 
-        This endpoint allows continuing an existing incomplete Agent call, using the context
-        from the previous interaction. The Agent will resume processing from where it left off.
+        This endpoint allows continuing an existing incomplete Agent call, by passing the tool call
+        requested by the Agent. The Agent will resume processing from where it left off.
+
+        The messages in the request will be appended to the original messages in the Log. You do not
+        have to provide the previous conversation history.
 
         The original log must be in an incomplete state to be continued.
-
-        The messages in the request will be appended
-        to the original messages in the log.
 
         Parameters
         ----------
@@ -2322,7 +2545,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        AgentContinueResponse
+        AgentContinueCallResponse
 
 
         Examples
@@ -2337,15 +2560,21 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.continue_(
-                log_id="log_id",
-                messages=[{"role": "user"}],
+            await client.agents.continue_call(
+                log_id="log_1234567890",
+                messages=[
+                    {
+                        "role": "tool",
+                        "content": '{"type": "checking", "balance": 5200}',
+                        "tool_call_id": "tc_1234567890",
+                    }
+                ],
             )
 
 
         asyncio.run(main())
         """
-        response = await self._raw_client.continue_(
+        response = await self._raw_client.continue_call(
             log_id=log_id,
             messages=messages,
             provider_api_keys=provider_api_keys,
@@ -2364,7 +2593,7 @@ class AsyncAgentsClient:
         sort_by: typing.Optional[ProjectSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> PaginatedDataAgentResponse:
+    ) -> AsyncPager[AgentResponse]:
         """
         Get a list of all Agents.
 
@@ -2393,7 +2622,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        PaginatedDataAgentResponse
+        AsyncPager[AgentResponse]
             Successful Response
 
         Examples
@@ -2408,21 +2637,67 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.list()
+            response = await client.agents.list(
+                size=1,
+            )
+            async for item in response:
+                yield item
+            # alternatively, you can paginate page-by-page
+            async for page in response.iter_pages():
+                yield page
 
 
         asyncio.run(main())
         """
-        response = await self._raw_client.list(
-            page=page,
-            size=size,
-            name=name,
-            user_filter=user_filter,
-            sort_by=sort_by,
-            order=order,
+        page = page if page is not None else 1
+        _response = await self._raw_client._client_wrapper.httpx_client.request(
+            "agents",
+            method="GET",
+            params={
+                "page": page,
+                "size": size,
+                "name": name,
+                "user_filter": user_filter,
+                "sort_by": sort_by,
+                "order": order,
+            },
             request_options=request_options,
         )
-        return response.data
+        try:
+            if 200 <= _response.status_code < 300:
+                _parsed_response = typing.cast(
+                    PaginatedDataAgentResponse,
+                    construct_type(
+                        type_=PaginatedDataAgentResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+                _has_next = True
+                _get_next = lambda: self.list(
+                    page=page + 1,
+                    size=size,
+                    name=name,
+                    user_filter=user_filter,
+                    sort_by=sort_by,
+                    order=order,
+                    request_options=request_options,
+                )
+                _items = _parsed_response.records
+                return AsyncPager(has_next=_has_next, items=_items, get_next=_get_next)
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        construct_type(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def upsert(
         self,
@@ -2566,7 +2841,42 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.upsert(
-                model="model",
+                path="Banking/Teller Agent",
+                provider="anthropic",
+                endpoint="chat",
+                model="claude-3-7-sonnet-latest",
+                reasoning_effort=1024,
+                template=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful digital assistant, helping users navigate our digital banking platform.",
+                    }
+                ],
+                max_iterations=3,
+                tools=[
+                    {
+                        "type": "inline",
+                        "json_schema": {
+                            "name": "stop",
+                            "description": "Call this tool when you have finished your task.",
+                            "parameters": {
+                                "type": "object",
+                                "properties": {
+                                    "output": {
+                                        "type": "string",
+                                        "description": "The final output to return to the user.",
+                                    }
+                                },
+                                "additionalProperties": False,
+                                "required": ["output"],
+                            },
+                            "strict": True,
+                        },
+                        "on_agent_call": "stop",
+                    }
+                ],
+                version_name="teller-agent-v1",
+                version_description="Initial version",
             )
 
 
@@ -2636,8 +2946,8 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.delete_agent_version(
-                id="id",
-                version_id="version_id",
+                id="ag_1234567890",
+                version_id="agv_1234567890",
             )
 
 
@@ -2693,8 +3003,10 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.patch_agent_version(
-                id="id",
-                version_id="version_id",
+                id="ag_1234567890",
+                version_id="agv_1234567890",
+                name="teller-agent-v2",
+                description="Updated version",
             )
 
 
@@ -2751,7 +3063,7 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.get(
-                id="id",
+                id="ag_1234567890",
             )
 
 
@@ -2791,7 +3103,7 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.delete(
-                id="id",
+                id="ag_1234567890",
             )
 
 
@@ -2847,7 +3159,8 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.move(
-                id="id",
+                id="ag_1234567890",
+                path="new directory/new name",
             )
 
 
@@ -2897,7 +3210,7 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.list_versions(
-                id="id",
+                id="ag_1234567890",
             )
 
 
@@ -3041,7 +3354,7 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.list_environments(
-                id="id",
+                id="ag_1234567890",
             )
 
 
@@ -3095,7 +3408,15 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.update_monitoring(
-                id="id",
+                id="ag_1234567890",
+                activate=[
+                    {"evaluator_version_id": "ev_1234567890"},
+                    {
+                        "evaluator_id": "ev_2345678901",
+                        "environment_id": "env_1234567890",
+                    },
+                ],
+                deactivate=[{"evaluator_version_id": "ev_0987654321"}],
             )
 
 
@@ -3113,7 +3434,7 @@ class AsyncAgentsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> str:
+    ) -> None:
         """
         Serialize an Agent to the .agent file format.
 
@@ -3139,8 +3460,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        str
-            Successful Response
+        None
 
         Examples
         --------

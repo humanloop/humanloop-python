@@ -1765,7 +1765,7 @@ class RawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[str]:
+    ) -> HttpResponse[None]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -1791,8 +1791,7 @@ class RawPromptsClient:
 
         Returns
         -------
-        HttpResponse[str]
-            Successful Response
+        HttpResponse[None]
         """
         _response = self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -1805,7 +1804,7 @@ class RawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return _response.text  # type: ignore
+                return HttpResponse(response=_response, data=None)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -3593,7 +3592,7 @@ class AsyncRawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[str]:
+    ) -> AsyncHttpResponse[None]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -3619,8 +3618,7 @@ class AsyncRawPromptsClient:
 
         Returns
         -------
-        AsyncHttpResponse[str]
-            Successful Response
+        AsyncHttpResponse[None]
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -3633,7 +3631,7 @@ class AsyncRawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return _response.text  # type: ignore
+                return AsyncHttpResponse(response=_response, data=None)
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

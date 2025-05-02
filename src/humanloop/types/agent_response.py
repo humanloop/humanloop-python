@@ -237,11 +237,6 @@ class AgentResponse(UncheckedBaseModel):
     Aggregation of Evaluator results for the Agent Version.
     """
 
-    content: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    The serialized kernel for the Agent. Corresponds to the .agent file.
-    """
-
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

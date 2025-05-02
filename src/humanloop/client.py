@@ -10,7 +10,12 @@ from opentelemetry.trace import Tracer
 from humanloop.core.client_wrapper import SyncClientWrapper
 
 from humanloop.evals import run_eval
-from humanloop.evals.types import Dataset, Evaluator, EvaluatorCheck, File
+from humanloop.evals.types import (
+    DatasetEvalConfig,
+    EvaluatorEvalConfig,
+    EvaluatorCheck,
+    FileEvalConfig,
+)
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
 from humanloop.overload import overload_call, overload_log, overload_with_local_files
@@ -43,10 +48,10 @@ class ExtendedEvalsClient(EvaluationsClient):
 
     def run(
         self,
-        file: File,
+        file: FileEvalConfig,
         name: Optional[str],
-        dataset: Dataset,
-        evaluators: Optional[Sequence[Evaluator]] = None,
+        dataset: DatasetEvalConfig,
+        evaluators: Optional[Sequence[EvaluatorEvalConfig]] = None,
         workers: int = 4,
     ) -> List[EvaluatorCheck]:
         """Evaluate your function for a given `Dataset` and set of `Evaluators`.

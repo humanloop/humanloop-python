@@ -5,10 +5,10 @@ from .agent_call_response_tool_choice import AgentCallResponseToolChoice
 from .agent_call_stream_response import AgentCallStreamResponse
 from .agent_call_stream_response_payload import AgentCallStreamResponsePayload
 from .agent_config_response import AgentConfigResponse
-from .agent_continue_response import AgentContinueResponse
-from .agent_continue_response_tool_choice import AgentContinueResponseToolChoice
-from .agent_continue_stream_response import AgentContinueStreamResponse
-from .agent_continue_stream_response_payload import AgentContinueStreamResponsePayload
+from .agent_continue_call_response import AgentContinueCallResponse
+from .agent_continue_call_response_tool_choice import AgentContinueCallResponseToolChoice
+from .agent_continue_call_stream_response import AgentContinueCallStreamResponse
+from .agent_continue_call_stream_response_payload import AgentContinueCallStreamResponsePayload
 from .agent_inline_tool import AgentInlineTool
 from .agent_kernel_request import AgentKernelRequest
 from .agent_kernel_request_reasoning_effort import AgentKernelRequestReasoningEffort
@@ -212,10 +212,10 @@ __all__ = [
     "AgentCallStreamResponse",
     "AgentCallStreamResponsePayload",
     "AgentConfigResponse",
-    "AgentContinueResponse",
-    "AgentContinueResponseToolChoice",
-    "AgentContinueStreamResponse",
-    "AgentContinueStreamResponsePayload",
+    "AgentContinueCallResponse",
+    "AgentContinueCallResponseToolChoice",
+    "AgentContinueCallStreamResponse",
+    "AgentContinueCallStreamResponsePayload",
     "AgentInlineTool",
     "AgentKernelRequest",
     "AgentKernelRequestReasoningEffort",
