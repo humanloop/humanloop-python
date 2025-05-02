@@ -78,7 +78,7 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
             try:
                 response = self._log(**kwargs_eval)
             except Exception as e:
-                # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+                # Re-raising as HumanloopRuntimeError so the decorators don't catch it
                 raise HumanloopRuntimeError from e
             if eval_callback is not None:
                 eval_callback(response.id)
@@ -86,7 +86,7 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
             try:
                 response = self._log(**kwargs)
             except Exception as e:
-                # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+                # Re-raising as HumanloopRuntimeError so the decorators don't catch it
                 raise HumanloopRuntimeError from e
 
         return response
@@ -116,7 +116,6 @@ def overload_call(client: PromptsClient) -> PromptsClient:
             }
 
         try:
-            logger.info(f"Calling inner overload")
             response = self._call(**kwargs)
         except Exception as e:
             # Re-raising as HumanloopRuntimeError so the decorators don't catch it
@@ -147,12 +146,7 @@ def overload_with_local_files(
     When use_local_files is True:
     - If only path is specified (no version_id or environment), attempts to use local file
     - If local file is not found or cannot be read, raises an error
-    - If version_id or environment is specified, uses remote version with a warning
-    
-    Args:
-        client: The client to overload (PromptsClient or AgentsClient)
-        sync_client: The sync client for handling local files
-        use_local_files: Whether to use local files
+    - If version_id and/or environment is specified, uses remote version with a warning
         
     Raises:
         HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
