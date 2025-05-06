@@ -3,7 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..types.file_type import FileType
-from ..types.project_sort_by import ProjectSortBy
+from ..types.file_sort_by import FileSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
 from ..core.http_response import HttpResponse
@@ -33,13 +33,13 @@ class RawFilesClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
-        directory: typing.Optional[str] = None,
+        path: typing.Optional[str] = None,
         template: typing.Optional[bool] = None,
         type: typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]] = None,
         environment: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
-        include_content: typing.Optional[bool] = None,
+        include_raw_file_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[
         PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
@@ -58,8 +58,8 @@ class RawFilesClient:
         name : typing.Optional[str]
             Case-insensitive filter for file name.
 
-        directory : typing.Optional[str]
-            Case-insensitive filter for directory name.
+        path : typing.Optional[str]
+            Path of the directory to filter for. Returns files in this directory and all its subdirectories.
 
         template : typing.Optional[bool]
             Filter to include only template files.
@@ -70,14 +70,14 @@ class RawFilesClient:
         environment : typing.Optional[str]
             Case-sensitive filter for files with a deployment in the specified environment. Requires the environment name.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort files by
 
         order : typing.Optional[SortOrder]
             Direction to sort by.
 
-        include_content : typing.Optional[bool]
-            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+        include_raw_file_content : typing.Optional[bool]
+            Whether to include the raw file content in the response. Currently only supported for Agents and Prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -94,13 +94,13 @@ class RawFilesClient:
                 "page": page,
                 "size": size,
                 "name": name,
-                "directory": directory,
+                "path": path,
                 "template": template,
                 "type": type,
                 "environment": environment,
                 "sort_by": sort_by,
                 "order": order,
-                "include_content": include_content,
+                "include_raw_file_content": include_raw_file_content,
             },
             request_options=request_options,
         )
@@ -134,7 +134,7 @@ class RawFilesClient:
         *,
         path: str,
         environment: typing.Optional[str] = None,
-        include_content: typing.Optional[bool] = None,
+        include_raw_file_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[RetrieveByPathFilesRetrieveByPathPostResponse]:
         """
@@ -148,8 +148,8 @@ class RawFilesClient:
         environment : typing.Optional[str]
             Name of the Environment to retrieve a deployed Version from.
 
-        include_content : typing.Optional[bool]
-            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+        include_raw_file_content : typing.Optional[bool]
+            Whether to include the raw file content in the response. Currently only supported for Agents and Prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -164,7 +164,7 @@ class RawFilesClient:
             method="POST",
             params={
                 "environment": environment,
-                "include_content": include_content,
+                "include_raw_file_content": include_raw_file_content,
             },
             json={
                 "path": path,
@@ -211,13 +211,13 @@ class AsyncRawFilesClient:
         page: typing.Optional[int] = None,
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
-        directory: typing.Optional[str] = None,
+        path: typing.Optional[str] = None,
         template: typing.Optional[bool] = None,
         type: typing.Optional[typing.Union[FileType, typing.Sequence[FileType]]] = None,
         environment: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
-        include_content: typing.Optional[bool] = None,
+        include_raw_file_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[
         PaginatedDataUnionPromptResponseToolResponseDatasetResponseEvaluatorResponseFlowResponseAgentResponse
@@ -236,8 +236,8 @@ class AsyncRawFilesClient:
         name : typing.Optional[str]
             Case-insensitive filter for file name.
 
-        directory : typing.Optional[str]
-            Case-insensitive filter for directory name.
+        path : typing.Optional[str]
+            Path of the directory to filter for. Returns files in this directory and all its subdirectories.
 
         template : typing.Optional[bool]
             Filter to include only template files.
@@ -248,14 +248,14 @@ class AsyncRawFilesClient:
         environment : typing.Optional[str]
             Case-sensitive filter for files with a deployment in the specified environment. Requires the environment name.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort files by
 
         order : typing.Optional[SortOrder]
             Direction to sort by.
 
-        include_content : typing.Optional[bool]
-            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+        include_raw_file_content : typing.Optional[bool]
+            Whether to include the raw file content in the response. Currently only supported for Agents and Prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -272,13 +272,13 @@ class AsyncRawFilesClient:
                 "page": page,
                 "size": size,
                 "name": name,
-                "directory": directory,
+                "path": path,
                 "template": template,
                 "type": type,
                 "environment": environment,
                 "sort_by": sort_by,
                 "order": order,
-                "include_content": include_content,
+                "include_raw_file_content": include_raw_file_content,
             },
             request_options=request_options,
         )
@@ -312,7 +312,7 @@ class AsyncRawFilesClient:
         *,
         path: str,
         environment: typing.Optional[str] = None,
-        include_content: typing.Optional[bool] = None,
+        include_raw_file_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[RetrieveByPathFilesRetrieveByPathPostResponse]:
         """
@@ -326,8 +326,8 @@ class AsyncRawFilesClient:
         environment : typing.Optional[str]
             Name of the Environment to retrieve a deployed Version from.
 
-        include_content : typing.Optional[bool]
-            Whether to include the serialized file content in the response. Currently only supported for agents and prompts.
+        include_raw_file_content : typing.Optional[bool]
+            Whether to include the raw file content in the response. Currently only supported for Agents and Prompts.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -342,7 +342,7 @@ class AsyncRawFilesClient:
             method="POST",
             params={
                 "environment": environment,
-                "include_content": include_content,
+                "include_raw_file_content": include_raw_file_content,
             },
             json={
                 "path": path,

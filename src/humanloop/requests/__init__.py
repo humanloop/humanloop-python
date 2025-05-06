@@ -5,10 +5,10 @@ from .agent_call_response_tool_choice import AgentCallResponseToolChoiceParams
 from .agent_call_stream_response import AgentCallStreamResponseParams
 from .agent_call_stream_response_payload import AgentCallStreamResponsePayloadParams
 from .agent_config_response import AgentConfigResponseParams
-from .agent_continue_call_response import AgentContinueCallResponseParams
-from .agent_continue_call_response_tool_choice import AgentContinueCallResponseToolChoiceParams
-from .agent_continue_call_stream_response import AgentContinueCallStreamResponseParams
-from .agent_continue_call_stream_response_payload import AgentContinueCallStreamResponsePayloadParams
+from .agent_continue_response import AgentContinueResponseParams
+from .agent_continue_response_tool_choice import AgentContinueResponseToolChoiceParams
+from .agent_continue_stream_response import AgentContinueStreamResponseParams
+from .agent_continue_stream_response_payload import AgentContinueStreamResponsePayloadParams
 from .agent_inline_tool import AgentInlineToolParams
 from .agent_kernel_request import AgentKernelRequestParams
 from .agent_kernel_request_reasoning_effort import AgentKernelRequestReasoningEffortParams
@@ -178,10 +178,10 @@ __all__ = [
     "AgentCallStreamResponseParams",
     "AgentCallStreamResponsePayloadParams",
     "AgentConfigResponseParams",
-    "AgentContinueCallResponseParams",
-    "AgentContinueCallResponseToolChoiceParams",
-    "AgentContinueCallStreamResponseParams",
-    "AgentContinueCallStreamResponsePayloadParams",
+    "AgentContinueResponseParams",
+    "AgentContinueResponseToolChoiceParams",
+    "AgentContinueStreamResponseParams",
+    "AgentContinueStreamResponsePayloadParams",
     "AgentInlineToolParams",
     "AgentKernelRequestParams",
     "AgentKernelRequestReasoningEffortParams",

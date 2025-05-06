@@ -11,7 +11,7 @@ from ..core.request_options import RequestOptions
 from ..types.create_flow_log_response import CreateFlowLogResponse
 from ..types.flow_log_response import FlowLogResponse
 from ..types.flow_response import FlowResponse
-from ..types.project_sort_by import ProjectSortBy
+from ..types.file_sort_by import FileSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.paginated_data_flow_response import PaginatedDataFlowResponse
@@ -469,7 +469,7 @@ class FlowsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[FlowResponse]:
@@ -490,7 +490,7 @@ class FlowsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Flows by
 
         order : typing.Optional[SortOrder]
@@ -1418,7 +1418,7 @@ class AsyncFlowsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[FlowResponse]:
@@ -1439,7 +1439,7 @@ class AsyncFlowsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Flow. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Flows by
 
         order : typing.Optional[SortOrder]

@@ -157,10 +157,10 @@ class RawPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptLogRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -560,10 +560,10 @@ class RawPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -773,10 +773,10 @@ class RawPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -1765,7 +1765,7 @@ class RawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[None]:
+    ) -> HttpResponse[str]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -1791,7 +1791,8 @@ class RawPromptsClient:
 
         Returns
         -------
-        HttpResponse[None]
+        HttpResponse[str]
+            Successful Response
         """
         _response = self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -1804,7 +1805,7 @@ class RawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return HttpResponse(response=_response, data=None)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1982,10 +1983,10 @@ class AsyncRawPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptLogRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -2385,10 +2386,10 @@ class AsyncRawPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2598,10 +2599,10 @@ class AsyncRawPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -3592,7 +3593,7 @@ class AsyncRawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[None]:
+    ) -> AsyncHttpResponse[str]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -3618,7 +3619,8 @@ class AsyncRawPromptsClient:
 
         Returns
         -------
-        AsyncHttpResponse[None]
+        AsyncHttpResponse[str]
+            Successful Response
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -3631,7 +3633,7 @@ class AsyncRawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return AsyncHttpResponse(response=_response, data=None)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

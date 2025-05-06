@@ -10,7 +10,7 @@ from ..core.request_options import RequestOptions
 from ..types.tool_call_response import ToolCallResponse
 from ..types.create_tool_log_response import CreateToolLogResponse
 from ..types.log_response import LogResponse
-from ..types.project_sort_by import ProjectSortBy
+from ..types.file_sort_by import FileSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.tool_response import ToolResponse
@@ -479,7 +479,7 @@ class ToolsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[ToolResponse]:
@@ -500,7 +500,7 @@ class ToolsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Tool. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Tools by
 
         order : typing.Optional[SortOrder]
@@ -1666,7 +1666,7 @@ class AsyncToolsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[ToolResponse]:
@@ -1687,7 +1687,7 @@ class AsyncToolsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Tool. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Tools by
 
         order : typing.Optional[SortOrder]

@@ -19,7 +19,7 @@ from ..types.prompt_call_stream_response import PromptCallStreamResponse
 from .requests.prompts_call_request_tool_choice import PromptsCallRequestToolChoiceParams
 from .requests.prompts_call_request_prompt import PromptsCallRequestPromptParams
 from ..types.prompt_call_response import PromptCallResponse
-from ..types.project_sort_by import ProjectSortBy
+from ..types.file_sort_by import FileSortBy
 from ..types.sort_order import SortOrder
 from ..core.pagination import SyncPager
 from ..types.prompt_response import PromptResponse
@@ -169,10 +169,10 @@ class PromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptLogRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -544,10 +544,10 @@ class PromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -716,10 +716,10 @@ class PromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -854,7 +854,7 @@ class PromptsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[PromptResponse]:
@@ -875,7 +875,7 @@ class PromptsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Prompt. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Prompts by
 
         order : typing.Optional[SortOrder]
@@ -1618,7 +1618,7 @@ class PromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> str:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -1644,7 +1644,8 @@ class PromptsClient:
 
         Returns
         -------
-        None
+        str
+            Successful Response
 
         Examples
         --------
@@ -1812,10 +1813,10 @@ class AsyncPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptLogRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -2204,10 +2205,10 @@ class AsyncPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2385,10 +2386,10 @@ class AsyncPromptsClient:
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
         prompt : typing.Optional[PromptsCallRequestPromptParams]
-            The prompt configuration to use. Two formats are supported:
-            - A `'PromptKernelRequest'` object containing the prompt configuration
-            - A string containing a serialized .prompt file
-            A new Prompt version will be created if the provided details are new.
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2531,7 +2532,7 @@ class AsyncPromptsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[PromptResponse]:
@@ -2552,7 +2553,7 @@ class AsyncPromptsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Prompt. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Prompts by
 
         order : typing.Optional[SortOrder]
@@ -3399,7 +3400,7 @@ class AsyncPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> str:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -3425,7 +3426,8 @@ class AsyncPromptsClient:
 
         Returns
         -------
-        None
+        str
+            Successful Response
 
         Examples
         --------
