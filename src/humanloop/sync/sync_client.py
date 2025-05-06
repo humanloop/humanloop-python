@@ -65,7 +65,7 @@ class SyncClient:
             file_type: The type of file (Prompt or Agent)
             
         Returns:
-            The file content
+            The raw file content
             
         Raises:
             HumanloopRuntimeError: If the file doesn't exist or can't be read
@@ -79,7 +79,7 @@ class SyncClient:
             raise HumanloopRuntimeError(f"Local file not found: {local_path}")
             
         try:
-            # Read the file content
+            # Read the raw file content
             with open(local_path) as f:
                 file_content = f.read()
             logger.debug(f"Using local file content from {local_path}")
@@ -88,7 +88,7 @@ class SyncClient:
             raise HumanloopRuntimeError(f"Error reading local file {local_path}: {str(e)}")
 
     def get_file_content(self, path: str, file_type: FileType) -> str:
-        """Get the content of a file from cache or filesystem.
+        """Get the raw file content of a file from cache or filesystem.
         
         This method uses an LRU cache to store file contents. When the cache is full,
         the least recently accessed files are automatically removed to make space.
@@ -98,7 +98,7 @@ class SyncClient:
             file_type: The type of file (Prompt or Agent)
             
         Returns:
-            The file content
+            The raw file content
             
         Raises:
             HumanloopRuntimeError: If the file doesn't exist or can't be read
@@ -153,7 +153,7 @@ class SyncClient:
         """Save serialized file to local filesystem.
 
         Args:
-            serialized_content: The content to save
+            serialized_content: The raw file content to save
             file_path: The path to save the file to
             file_type: The type of file (Prompt or Agent)
 
@@ -169,7 +169,7 @@ class SyncClient:
             # Add file type extension
             new_path = full_path.parent / f"{full_path.stem}.{file_type}"
 
-            # Write content to file
+            # Write raw file content to file
             with open(new_path, "w") as f:
                 f.write(serialized_content)
             
@@ -195,16 +195,16 @@ class SyncClient:
         file = self.client.files.retrieve_by_path(
             path=path, 
             environment=environment,
-            include_content=True
+            include_raw_file_content=True
         )
 
         if file.type not in ["prompt", "agent"]:
             raise ValueError(f"Unsupported file type: {file.type}")
 
-        self._save_serialized_file(file.content, file.path, file.type)
+        self._save_serialized_file(file.raw_file_content, file.path, file.type)
 
     def _pull_directory(self, 
-            directory: str | None = None,    
+            path: str | None = None,    
             environment: str | None = None, 
         ) -> List[str]:
         """Sync Prompt and Agent files from Humanloop to local filesystem.
@@ -231,9 +231,9 @@ class SyncClient:
                 response = self.client.files.list_files(
                     type=["prompt", "agent"], 
                     page=page,
-                    include_content=True,
+                    include_raw_file_content=True,
                     environment=environment,
-                    directory=directory
+                    path=path
                 )
 
                 if len(response.records) == 0:
@@ -246,13 +246,13 @@ class SyncClient:
                         logger.warning(f"Skipping unsupported file type: {file.type}")
                         continue
 
-                    # Skip if no content
-                    if not getattr(file, "content", None):
+                    # Skip if no raw file content
+                    if not getattr(file, "raw_file_content", None):
                         logger.warning(f"No content found for {file.type} {getattr(file, 'id', '<unknown>')}")
                         continue
 
                     try:
-                        self._save_serialized_file(file.content, file.path, file.type)
+                        self._save_serialized_file(file.raw_file_content, file.path, file.type)
                         successful_files.append(file.path)
                     except Exception as e:
                         failed_files.append(file.path)
@@ -275,7 +275,7 @@ class SyncClient:
         """Pull files from Humanloop to local filesystem.
 
         If the path ends with .prompt or .agent, pulls that specific file.
-        Otherwise, pulls all files under the specified directory path.
+        Otherwise, pulls all files under the specified path.
         If no path is provided, pulls all files from the root.
 
         Args:

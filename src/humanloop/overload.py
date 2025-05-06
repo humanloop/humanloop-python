@@ -2,7 +2,7 @@ import inspect
 import logging
 import types
 import warnings
-from typing import TypeVar, Union, Literal, Optional
+from typing import TypeVar, Union
 from pathlib import Path
 from humanloop.context import (
     get_decorator_context,
@@ -143,10 +143,25 @@ def overload_with_local_files(
 ) -> Union[PromptsClient, AgentsClient]:
     """Overload call and log methods to handle local files when use_local_files is True.
     
-    When use_local_files is True:
-    - If only path is specified (no version_id or environment), attempts to use local file
-    - If local file is not found or cannot be read, raises an error
-    - If version_id and/or environment is specified, uses remote version with a warning
+    When use_local_files is True, the following prioritization strategy is used:
+    1. Direct Parameters: If {file_type} parameters are provided directly (as a PromptKernelRequestParams or AgentKernelRequestParams object),
+       these take precedence and the local file is ignored.
+    2. Version/Environment: If version_id or environment is specified, the remote version is used instead
+       of the local file.
+    3. Local File: If neither of the above are specified, attempts to use the local file at the given path.
+    
+    For example, with a prompt client:
+    - If prompt={model: "gpt-4", ...} is provided, uses those parameters directly
+    - If version_id="123" is provided, uses that remote version
+    - Otherwise, tries to load from the local file at the given path
+    
+    Args:
+        client: The client to overload (PromptsClient or AgentsClient)
+        sync_client: The sync client used for file operations
+        use_local_files: Whether to enable local file handling
+        
+    Returns:
+        The client with overloaded methods
         
     Raises:
         HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
@@ -156,28 +171,34 @@ def overload_with_local_files(
     file_type = _get_file_type_from_client(client)
 
     def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
-        if "id" and "path" in kwargs: 
+        if "id" in kwargs and "path" in kwargs: 
             raise HumanloopRuntimeError(f"Can only specify one of `id` or `path` when {function_name}ing a {file_type}")
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
             # Check if version_id or environment is specified
             has_version_info = "version_id" in kwargs or "environment" in kwargs
+            normalized_path = sync_client._normalize_path(kwargs["path"])
             
             if has_version_info:
-                warnings.warn(
-                    f"Ignoring local file for {kwargs['path']} as version_id or environment was specified. "
-                    "Using remote version instead.",
-                    UserWarning
+                logger.warning(
+                    f"Ignoring local file for `{normalized_path}` as version_id or environment was specified. "
+                    "Using remote version instead."
                 )
             else:
                 # Only use local file if no version info is specified
-                normalized_path = sync_client._normalize_path(kwargs["path"])
                 try:
-                    file_content = sync_client.get_file_content(normalized_path, file_type)
-                    kwargs[file_type] = file_content
+                    # If file_type is already specified in kwargs, it means user provided a PromptKernelRequestParams object
+                    if file_type in kwargs and not isinstance(kwargs[file_type], str):
+                        logger.warning(
+                            f"Ignoring local file for `{normalized_path}` as {file_type} parameters were directly provided. "
+                            "Using provided parameters instead."
+                        )
+                    else:
+                        file_content = sync_client.get_file_content(normalized_path, file_type)
+                        kwargs[file_type] = file_content
                 except (HumanloopRuntimeError) as e:
                     # Re-raise with more context
-                    raise HumanloopRuntimeError(f"Failed to use local file for {kwargs['path']}: {str(e)}")
+                    raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
 
         try:
             if function_name == "call":
