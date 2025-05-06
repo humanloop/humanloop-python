@@ -56,6 +56,49 @@ client.prompts.log(
 )
 ```
 
+## Decorators
+
+The SDK provides decorators that version Files for you and create Logs from calls made to the decorated function. See this [how-to guide](/TODO) for a complete guide on how to integrate Humanloop in your codebase through decorators.
+
+```python
+from openai import OpenAI
+from humanloop import Humanloop
+
+openai = OpenAI(api_key=os.getenv("OPENAI_KEY"))
+humanloop = Humanloop(api_key="YOUR_API_KEY")
+
+
+@humanloop.prompt(
+    path="persona",
+    template="You are {{person}}. Answer questions as this person. Do not break character.",
+)
+def call_model(person: str, question: str) -> str:
+    # The @prompt decorator will pick up that you're calling OpenAI
+    # inside the function and will version the Prompt with
+    # information it collects from the call
+    output = openai.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "assistant",
+                "content": f"You are {person}. Answer questions as this person. Do not break character."
+            },
+            {
+                "role": "user",
+                "content": question
+            }
+        ],
+        # Hyper-parameters are also picked up
+        temperature=0.8,
+        presence_penalty=0.5,
+    )
+
+    # A function call will create a Log for the
+    # Prompt from the input arguments and
+    # the output value
+    return output.choices[0].message.content
+```
+
 ## Async Client
 
 The SDK also exports an `async` client so that you can make non-blocking calls to our API.
@@ -253,6 +296,7 @@ client.prompts.log(..., request_options={
 
 You can override the `httpx` client to customize it for your use-case. Some common use-cases include support for proxies
 and transports.
+
 ```python
 import httpx
 from humanloop import Humanloop
