@@ -4,7 +4,7 @@ import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..requests.chat_message import ChatMessageParams
 from .requests.prompt_log_request_tool_choice import PromptLogRequestToolChoiceParams
-from ..requests.prompt_kernel_request import PromptKernelRequestParams
+from .requests.prompt_log_request_prompt import PromptLogRequestPromptParams
 import datetime as dt
 from ..types.log_status import LogStatus
 from ..core.request_options import RequestOptions
@@ -20,11 +20,13 @@ from .requests.prompt_log_update_request_tool_choice import PromptLogUpdateReque
 from ..types.log_response import LogResponse
 from ..core.jsonable_encoder import jsonable_encoder
 from .requests.prompts_call_stream_request_tool_choice import PromptsCallStreamRequestToolChoiceParams
+from .requests.prompts_call_stream_request_prompt import PromptsCallStreamRequestPromptParams
 from ..requests.provider_api_keys import ProviderApiKeysParams
 from ..types.prompt_call_stream_response import PromptCallStreamResponse
 import httpx_sse
 import contextlib
 from .requests.prompts_call_request_tool_choice import PromptsCallRequestToolChoiceParams
+from .requests.prompts_call_request_prompt import PromptsCallRequestPromptParams
 from ..types.prompt_call_response import PromptCallResponse
 from ..types.model_endpoints import ModelEndpoints
 from .requests.prompt_request_template import PromptRequestTemplateParams
@@ -73,7 +75,7 @@ class RawPromptsClient:
         finish_reason: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptLogRequestPromptParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -154,8 +156,11 @@ class RawPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptLogRequestPromptParams]
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -249,7 +254,7 @@ class RawPromptsClient:
                     object_=tool_choice, annotation=PromptLogRequestToolChoiceParams, direction="write"
                 ),
                 "prompt": convert_and_respect_annotation_metadata(
-                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                    object_=prompt, annotation=PromptLogRequestPromptParams, direction="write"
                 ),
                 "start_time": start_time,
                 "end_time": end_time,
@@ -496,7 +501,7 @@ class RawPromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallStreamRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallStreamRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -554,8 +559,11 @@ class RawPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -633,7 +641,7 @@ class RawPromptsClient:
                     object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams, direction="write"
                 ),
                 "prompt": convert_and_respect_annotation_metadata(
-                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                    object_=prompt, annotation=PromptsCallStreamRequestPromptParams, direction="write"
                 ),
                 "inputs": inputs,
                 "source": source,
@@ -706,7 +714,7 @@ class RawPromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -764,8 +772,11 @@ class RawPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallRequestPromptParams]
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -843,7 +854,7 @@ class RawPromptsClient:
                     object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams, direction="write"
                 ),
                 "prompt": convert_and_respect_annotation_metadata(
-                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                    object_=prompt, annotation=PromptsCallRequestPromptParams, direction="write"
                 ),
                 "inputs": inputs,
                 "source": source,
@@ -1754,7 +1765,7 @@ class RawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> HttpResponse[None]:
+    ) -> HttpResponse[str]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -1780,7 +1791,8 @@ class RawPromptsClient:
 
         Returns
         -------
-        HttpResponse[None]
+        HttpResponse[str]
+            Successful Response
         """
         _response = self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -1793,7 +1805,7 @@ class RawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return HttpResponse(response=_response, data=None)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1889,7 +1901,7 @@ class AsyncRawPromptsClient:
         finish_reason: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptLogRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptLogRequestPromptParams] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
         output: typing.Optional[str] = OMIT,
@@ -1970,8 +1982,11 @@ class AsyncRawPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptLogRequestPromptParams]
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
             When the logged event started.
@@ -2065,7 +2080,7 @@ class AsyncRawPromptsClient:
                     object_=tool_choice, annotation=PromptLogRequestToolChoiceParams, direction="write"
                 ),
                 "prompt": convert_and_respect_annotation_metadata(
-                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                    object_=prompt, annotation=PromptLogRequestPromptParams, direction="write"
                 ),
                 "start_time": start_time,
                 "end_time": end_time,
@@ -2312,7 +2327,7 @@ class AsyncRawPromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallStreamRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallStreamRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2370,8 +2385,11 @@ class AsyncRawPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2449,7 +2467,7 @@ class AsyncRawPromptsClient:
                     object_=tool_choice, annotation=PromptsCallStreamRequestToolChoiceParams, direction="write"
                 ),
                 "prompt": convert_and_respect_annotation_metadata(
-                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                    object_=prompt, annotation=PromptsCallStreamRequestPromptParams, direction="write"
                 ),
                 "inputs": inputs,
                 "source": source,
@@ -2522,7 +2540,7 @@ class AsyncRawPromptsClient:
         id: typing.Optional[str] = OMIT,
         messages: typing.Optional[typing.Sequence[ChatMessageParams]] = OMIT,
         tool_choice: typing.Optional[PromptsCallRequestToolChoiceParams] = OMIT,
-        prompt: typing.Optional[PromptKernelRequestParams] = OMIT,
+        prompt: typing.Optional[PromptsCallRequestPromptParams] = OMIT,
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
@@ -2580,8 +2598,11 @@ class AsyncRawPromptsClient:
             - `'required'` means the model must call one or more of the provided tools.
             - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptKernelRequestParams]
-            Details of your Prompt. A new Prompt version will be created if the provided details are new.
+        prompt : typing.Optional[PromptsCallRequestPromptParams]
+            The Prompt configuration to use. Two formats are supported:
+            - An object representing the details of the Prompt configuration
+            - A string representing the raw contents of a .prompt file
+            A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             The inputs passed to the prompt template.
@@ -2659,7 +2680,7 @@ class AsyncRawPromptsClient:
                     object_=tool_choice, annotation=PromptsCallRequestToolChoiceParams, direction="write"
                 ),
                 "prompt": convert_and_respect_annotation_metadata(
-                    object_=prompt, annotation=PromptKernelRequestParams, direction="write"
+                    object_=prompt, annotation=PromptsCallRequestPromptParams, direction="write"
                 ),
                 "inputs": inputs,
                 "source": source,
@@ -3572,7 +3593,7 @@ class AsyncRawPromptsClient:
         version_id: typing.Optional[str] = None,
         environment: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AsyncHttpResponse[None]:
+    ) -> AsyncHttpResponse[str]:
         """
         Serialize a Prompt to the .prompt file format.
 
@@ -3598,7 +3619,8 @@ class AsyncRawPromptsClient:
 
         Returns
         -------
-        AsyncHttpResponse[None]
+        AsyncHttpResponse[str]
+            Successful Response
         """
         _response = await self._client_wrapper.httpx_client.request(
             f"prompts/{jsonable_encoder(id)}/serialize",
@@ -3611,7 +3633,7 @@ class AsyncRawPromptsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return AsyncHttpResponse(response=_response, data=None)
+                return _response.text  # type: ignore
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

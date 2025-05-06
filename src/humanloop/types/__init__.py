@@ -5,10 +5,10 @@ from .agent_call_response_tool_choice import AgentCallResponseToolChoice
 from .agent_call_stream_response import AgentCallStreamResponse
 from .agent_call_stream_response_payload import AgentCallStreamResponsePayload
 from .agent_config_response import AgentConfigResponse
-from .agent_continue_call_response import AgentContinueCallResponse
-from .agent_continue_call_response_tool_choice import AgentContinueCallResponseToolChoice
-from .agent_continue_call_stream_response import AgentContinueCallStreamResponse
-from .agent_continue_call_stream_response_payload import AgentContinueCallStreamResponsePayload
+from .agent_continue_response import AgentContinueResponse
+from .agent_continue_response_tool_choice import AgentContinueResponseToolChoice
+from .agent_continue_stream_response import AgentContinueStreamResponse
+from .agent_continue_stream_response_payload import AgentContinueStreamResponsePayload
 from .agent_inline_tool import AgentInlineTool
 from .agent_kernel_request import AgentKernelRequest
 from .agent_kernel_request_reasoning_effort import AgentKernelRequestReasoningEffort
@@ -94,6 +94,7 @@ from .file_environment_variable_request import FileEnvironmentVariableRequest
 from .file_id import FileId
 from .file_path import FilePath
 from .file_request import FileRequest
+from .file_sort_by import FileSortBy
 from .file_type import FileType
 from .files_tool_type import FilesToolType
 from .flow_kernel_request import FlowKernelRequest
@@ -155,7 +156,6 @@ from .populate_template_response_populated_template import PopulateTemplateRespo
 from .populate_template_response_reasoning_effort import PopulateTemplateResponseReasoningEffort
 from .populate_template_response_stop import PopulateTemplateResponseStop
 from .populate_template_response_template import PopulateTemplateResponseTemplate
-from .project_sort_by import ProjectSortBy
 from .prompt_call_log_response import PromptCallLogResponse
 from .prompt_call_response import PromptCallResponse
 from .prompt_call_response_tool_choice import PromptCallResponseToolChoice
@@ -212,10 +212,10 @@ __all__ = [
     "AgentCallStreamResponse",
     "AgentCallStreamResponsePayload",
     "AgentConfigResponse",
-    "AgentContinueCallResponse",
-    "AgentContinueCallResponseToolChoice",
-    "AgentContinueCallStreamResponse",
-    "AgentContinueCallStreamResponsePayload",
+    "AgentContinueResponse",
+    "AgentContinueResponseToolChoice",
+    "AgentContinueStreamResponse",
+    "AgentContinueStreamResponsePayload",
     "AgentInlineTool",
     "AgentKernelRequest",
     "AgentKernelRequestReasoningEffort",
@@ -299,6 +299,7 @@ __all__ = [
     "FileId",
     "FilePath",
     "FileRequest",
+    "FileSortBy",
     "FileType",
     "FilesToolType",
     "FlowKernelRequest",
@@ -356,7 +357,6 @@ __all__ = [
     "PopulateTemplateResponseReasoningEffort",
     "PopulateTemplateResponseStop",
     "PopulateTemplateResponseTemplate",
-    "ProjectSortBy",
     "PromptCallLogResponse",
     "PromptCallResponse",
     "PromptCallResponseToolChoice",
