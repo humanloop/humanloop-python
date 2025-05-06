@@ -62,7 +62,7 @@ class SyncClient:
         
         Args:
             path: The normalized path to the file (without extension)
-            file_type: The type of file (prompt or agent)
+            file_type: The type of file (Prompt or Agent)
             
         Returns:
             The file content
@@ -95,7 +95,7 @@ class SyncClient:
         
         Args:
             path: The normalized path to the file (without extension)
-            file_type: The type of file (prompt or agent)
+            file_type: The type of file (Prompt or Agent)
             
         Returns:
             The file content
@@ -154,8 +154,8 @@ class SyncClient:
 
         Args:
             serialized_content: The content to save
-            file_path: The path where to save the file
-            file_type: The type of file (prompt or agent)
+            file_path: The path to save the file to
+            file_type: The type of file (Prompt or Agent)
 
         Raises:
             Exception: If there is an error saving the file
@@ -207,7 +207,7 @@ class SyncClient:
             directory: str | None = None,    
             environment: str | None = None, 
         ) -> List[str]:
-        """Sync prompt and agent files from Humanloop to local filesystem.
+        """Sync Prompt and Agent files from Humanloop to local filesystem.
 
         If `path` is provided, only the files under that path will be pulled.
         If `environment` is provided, the files will be pulled from that environment.
@@ -241,7 +241,7 @@ class SyncClient:
 
                 # Process each file
                 for file in response.records:
-                    # Skip if not a prompt or agent
+                    # Skip if not a Prompt or Agent
                     if file.type not in ["prompt", "agent"]:
                         logger.warning(f"Skipping unsupported file type: {file.type}")
                         continue
