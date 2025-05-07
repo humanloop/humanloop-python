@@ -16,7 +16,7 @@ class OperationData(TypedDict):
     successful_files: List[str]
     failed_files: List[str]
     error: NotRequired[Optional[str]]
-    duration_ms: NotRequired[Optional[float]]
+    duration_ms: float
 
 class Metadata(TypedDict):
     """Type definition for the metadata structure."""
@@ -73,22 +73,22 @@ class MetadataHandler:
         self,
         operation_type: str,
         path: str,
+        duration_ms: float,
         environment: Optional[str] = None,
         successful_files: Optional[List[str]] = None,
         failed_files: Optional[List[str]] = None,
         error: Optional[str] = None,
-        duration_ms: Optional[float] = None
     ) -> None:
         """Log a sync operation.
         
         Args:
             operation_type: Type of operation (e.g., "pull", "push")
             path: The path that was synced
+            duration_ms: Duration of the operation in milliseconds
             environment: Optional environment name
             successful_files: List of successfully processed files
             failed_files: List of files that failed to process
             error: Any error message if the operation failed
-            duration_ms: Optional duration of the operation in milliseconds
         """
         current_time = datetime.now().isoformat()
         
