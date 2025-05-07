@@ -2,10 +2,26 @@ import json
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TypedDict, NotRequired
 import logging
 
 logger = logging.getLogger(__name__)
+
+class OperationData(TypedDict):
+    """Type definition for operation data structure."""
+    timestamp: str
+    operation_type: str
+    path: str
+    environment: NotRequired[Optional[str]]
+    successful_files: List[str]
+    failed_files: List[str]
+    error: NotRequired[Optional[str]]
+    duration_ms: NotRequired[Optional[float]]
+
+class Metadata(TypedDict):
+    """Type definition for the metadata structure."""
+    last_operation: Optional[OperationData]
+    history: List[OperationData]
 
 class MetadataHandler:
     """Handles metadata storage and retrieval for sync operations.
@@ -14,7 +30,7 @@ class MetadataHandler:
     and maintains a record of the most recent operation with detailed information.
     """
     
-    def __init__(self, base_dir: Path, max_history: int = 5):
+    def __init__(self, base_dir: Path, max_history: int = 5) -> None:
         """Initialize the metadata handler.
         
         Args:
@@ -29,13 +45,13 @@ class MetadataHandler:
     def _ensure_metadata_file(self) -> None:
         """Ensure the metadata file exists with proper structure."""
         if not self.metadata_file.exists():
-            initial_data = {
+            initial_data: Metadata = {
                 "last_operation": None,
                 "history": []
             }
             self._write_metadata(initial_data)
     
-    def _read_metadata(self) -> Dict:
+    def _read_metadata(self) -> Metadata:
         """Read the current metadata from file."""
         try:
             with open(self.metadata_file, 'r') as f:
@@ -44,7 +60,7 @@ class MetadataHandler:
             logger.error(f"Error reading metadata file: {e}")
             return {"last_operation": None, "history": []}
     
-    def _write_metadata(self, data: Dict) -> None:
+    def _write_metadata(self, data: Metadata) -> None:
         """Write metadata to file."""
         try:
             self.metadata_file.parent.mkdir(parents=True, exist_ok=True)
@@ -72,11 +88,11 @@ class MetadataHandler:
             successful_files: List of successfully processed files
             failed_files: List of files that failed to process
             error: Any error message if the operation failed
-            start_time: Optional timestamp when the operation started (from time.time())
+            duration_ms: Optional duration of the operation in milliseconds
         """
         current_time = datetime.now().isoformat()
         
-        operation_data = {
+        operation_data: OperationData = {
             "timestamp": current_time,
             "operation_type": operation_type,
             "path": path,
@@ -98,12 +114,12 @@ class MetadataHandler:
         
         self._write_metadata(metadata)
     
-    def get_last_operation(self) -> Optional[Dict]:
+    def get_last_operation(self) -> Optional[OperationData]:
         """Get the most recent operation details."""
         metadata = self._read_metadata()
         return metadata.get("last_operation")
     
-    def get_history(self) -> List[Dict]:
+    def get_history(self) -> List[OperationData]:
         """Get the operation history."""
         metadata = self._read_metadata()
         return metadata.get("history", []) 

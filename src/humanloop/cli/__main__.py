@@ -123,7 +123,7 @@ def cli():
     "--verbose",
     "-v",
     is_flag=True,
-    help="Show detailed progress information",
+    help="Show detailed information about the operation",
 )
 @handle_sync_errors
 @common_options
