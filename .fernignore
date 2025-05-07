@@ -14,11 +14,11 @@ README.md
 src/humanloop/decorators
 src/humanloop/otel
 src/humanloop/sync
-src/humanloop/cli/
+src/humanloop/cli
 
 ## Tests
 
-tests/
+tests
 
 ## CI
 
