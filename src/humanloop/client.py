@@ -18,7 +18,7 @@ from humanloop.evals.types import (
 )
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.overload import overload_call, overload_log
+from humanloop.overload import overload_call, overload_log, overload_with_local_files
 from humanloop.decorators.flow import flow as flow_decorator_factory
 from humanloop.decorators.prompt import prompt_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
@@ -29,6 +29,7 @@ from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
+from humanloop.sync.sync_client import SyncClient, DEFAULT_CACHE_SIZE
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -87,8 +88,9 @@ class Humanloop(BaseHumanloop):
     """
     See docstring of :class:`BaseHumanloop`.
 
-    This class extends the base client with custom evaluation utilities
-    and decorators for declaring Files in code.
+    This class extends the base client with custom evaluation utilities,
+    decorators for declaring Files in code, and utilities for syncing
+    files between Humanloop and local filesystem.
     """
 
     def __init__(
@@ -102,6 +104,9 @@ class Humanloop(BaseHumanloop):
         httpx_client: typing.Optional[httpx.Client] = None,
         opentelemetry_tracer_provider: Optional[TracerProvider] = None,
         opentelemetry_tracer: Optional[Tracer] = None,
+        use_local_files: bool = False,
+        files_directory: str = "humanloop",
+        cache_size: int = DEFAULT_CACHE_SIZE,
     ):
         """
         Extends the base client with custom evaluation utilities and
@@ -111,6 +116,21 @@ class Humanloop(BaseHumanloop):
         You can provide a TracerProvider and a Tracer to integrate
         with your existing telemetry system. If not provided,
         an internal TracerProvider will be used.
+
+        Parameters
+        ----------
+        base_url: Optional base URL for the API
+        environment: The environment to use (default: DEFAULT)
+        api_key: Your Humanloop API key (default: from HUMANLOOP_API_KEY env var)
+        timeout: Optional timeout for API requests
+        follow_redirects: Whether to follow redirects
+        httpx_client: Optional custom httpx client
+        opentelemetry_tracer_provider: Optional tracer provider for telemetry
+        opentelemetry_tracer: Optional tracer for telemetry
+        use_local_files: Whether to use local files for prompts and agents
+        files_directory: Directory for local files (default: "humanloop")
+        cache_size: Maximum number of files to cache when use_local_files is True (default: DEFAULT_CACHE_SIZE).
+                   This parameter has no effect if use_local_files is False.
         """
         super().__init__(
             base_url=base_url,
@@ -121,6 +141,12 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
+        self.use_local_files = use_local_files
+        self._sync_client = SyncClient(
+            client=self, 
+            base_dir=files_directory,
+            cache_size=cache_size
+        )
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
@@ -130,6 +156,16 @@ class Humanloop(BaseHumanloop):
         # and the @flow decorator providing the trace_id
         self.prompts = overload_log(client=self.prompts)
         self.prompts = overload_call(client=self.prompts)
+        self.prompts = overload_with_local_files(
+            client=self.prompts, 
+            sync_client=self._sync_client,
+            use_local_files=self.use_local_files
+        )
+        self.agents = overload_with_local_files(
+            client=self.agents, 
+            sync_client=self._sync_client,
+            use_local_files=self.use_local_files
+        )
         self.flows = overload_log(client=self.flows)
         self.tools = overload_log(client=self.tools)
 
@@ -351,7 +387,50 @@ class Humanloop(BaseHumanloop):
             attributes=attributes,
         )
 
+    def pull(self, 
+        environment: str | None = None, 
+        path: str | None = None
+    ) -> List[str]:
+        """Pull Prompt and Agent files from Humanloop to local filesystem.
 
+        This method will:
+        1. Fetch Prompt and Agent files from your Humanloop workspace
+        2. Save them to the local filesystem using the client's files_directory (set during initialization)
+        3. Maintain the same directory structure as in Humanloop
+        4. Add appropriate file extensions (.prompt or .agent)
+
+        The path parameter can be used in two ways:
+        - If it points to a specific file (e.g. "path/to/file.prompt" or "path/to/file.agent"), only that file will be pulled
+        - If it points to a directory (e.g. "path/to/directory"), all Prompt and Agent files in that directory will be pulled
+        - If no path is provided, all Prompt and Agent files will be pulled
+
+        The operation will overwrite existing files with the latest version from Humanloop
+        but will not delete local files that don't exist in the remote workspace.
+
+        Currently only supports syncing prompt and agent files. Other file types will be skipped.
+
+        The files will be saved with the following structure:
+        ```
+        {files_directory}/
+        ├── prompts/
+        │   ├── my_prompt.prompt
+        │   └── nested/
+        │       └── another_prompt.prompt
+        └── agents/
+            └── my_agent.agent
+        ```
+
+        :param environment: The environment to pull the files from.
+        :param path: Optional path to either a specific file (e.g. "path/to/file.prompt") or a directory (e.g. "path/to/directory").
+                    If not provided, all Prompt and Agent files will be pulled.
+        :return: List of successfully processed file paths.
+        """
+        return self._sync_client.pull(
+            environment=environment,
+            path=path
+        )
+
+ 
 class AsyncHumanloop(AsyncBaseHumanloop):
     """
     See docstring of AsyncBaseHumanloop.

@@ -1,13 +1,20 @@
+# This section is used by PyPI and follows PEP 621 for package metadata
 [project]
 name = "humanloop"
+description = "The Humanloop Python Library"
+authors = []
 
+# This section is used by Poetry for development and building
+# The metadata here is used during development but not published to PyPI
 [tool.poetry]
 name = "humanloop"
-version = "0.8.36"
-description = ""
+version = "0.8.36b1"
+description = "Humanloop Python SDK"
 readme = "README.md"
 authors = []
-keywords = []
+packages = [
+    { include = "humanloop", from = "src" },
+]
 
 classifiers = [
     "Intended Audience :: Developers",
@@ -25,9 +32,6 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Typing :: Typed"
-]
-packages = [
-    { include = "humanloop", from = "src"}
 ]
 
 [project.urls]
@@ -53,8 +57,9 @@ protobuf = ">=5.29.3"
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
 typing_extensions = ">= 4.0.0"
+click = "^8.0.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 mypy = "1.0.1"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.23.5"
@@ -86,7 +91,10 @@ plugins = ["pydantic.mypy"]
 [tool.ruff]
 line-length = 120
 
+[tool.poetry.scripts]
+humanloop = "humanloop.cli.__main__:cli"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+

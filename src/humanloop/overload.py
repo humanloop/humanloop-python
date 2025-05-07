@@ -1,19 +1,23 @@
 import inspect
 import logging
 import types
+import warnings
 from typing import TypeVar, Union
-
+from pathlib import Path
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
     get_trace_id,
 )
-from humanloop.evals.run import HumanloopRuntimeError
+from humanloop.error import HumanloopRuntimeError
 
 from humanloop.evaluators.client import EvaluatorsClient
 from humanloop.flows.client import FlowsClient
 from humanloop.prompts.client import PromptsClient
+from humanloop.agents.client import AgentsClient
 from humanloop.tools.client import ToolsClient
+from humanloop.sync.sync_client import SyncClient
+from humanloop.types import FileType
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
@@ -74,7 +78,7 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
             try:
                 response = self._log(**kwargs_eval)
             except Exception as e:
-                # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+                # Re-raising as HumanloopRuntimeError so the decorators don't catch it
                 raise HumanloopRuntimeError from e
             if eval_callback is not None:
                 eval_callback(response.id)
@@ -82,7 +86,7 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
             try:
                 response = self._log(**kwargs)
             except Exception as e:
-                # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+                # Re-raising as HumanloopRuntimeError so the decorators don't catch it
                 raise HumanloopRuntimeError from e
 
         return response
@@ -114,11 +118,105 @@ def overload_call(client: PromptsClient) -> PromptsClient:
         try:
             response = self._call(**kwargs)
         except Exception as e:
-            # Re-raising as HumanloopDecoratorError so the decorators don't catch it
+            # Re-raising as HumanloopRuntimeError so the decorators don't catch it
             raise HumanloopRuntimeError from e
 
         return response
 
     # Replace the original log method with the overloaded one
     client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
+    return client
+
+def _get_file_type_from_client(client: Union[PromptsClient, AgentsClient]) -> FileType:
+    """Get the file type based on the client type."""
+    if isinstance(client, PromptsClient):   
+        return "prompt"    
+    elif isinstance(client, AgentsClient):
+        return "agent"
+    else:
+        raise ValueError(f"Unsupported client type: {type(client)}")
+
+def overload_with_local_files(
+    client: Union[PromptsClient, AgentsClient], 
+    sync_client: SyncClient,
+    use_local_files: bool,
+) -> Union[PromptsClient, AgentsClient]:
+    """Overload call and log methods to handle local files when use_local_files is True.
+    
+    When use_local_files is True, the following prioritization strategy is used:
+    1. Direct Parameters: If {file_type} parameters are provided directly (as a PromptKernelRequestParams or AgentKernelRequestParams object),
+       these take precedence and the local file is ignored.
+    2. Version/Environment: If version_id or environment is specified, the remote version is used instead
+       of the local file.
+    3. Local File: If neither of the above are specified, attempts to use the local file at the given path.
+    
+    For example, with a prompt client:
+    - If prompt={model: "gpt-4", ...} is provided, uses those parameters directly
+    - If version_id="123" is provided, uses that remote version
+    - Otherwise, tries to load from the local file at the given path
+    
+    Args:
+        client: The client to overload (PromptsClient or AgentsClient)
+        sync_client: The sync client used for file operations
+        use_local_files: Whether to enable local file handling
+        
+    Returns:
+        The client with overloaded methods
+        
+    Raises:
+        HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
+    """
+    original_call = client._call if hasattr(client, '_call') else client.call
+    original_log = client._log if hasattr(client, '_log') else client.log
+    file_type = _get_file_type_from_client(client)
+
+    def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
+        if "id" in kwargs and "path" in kwargs: 
+            raise HumanloopRuntimeError(f"Can only specify one of `id` or `path` when {function_name}ing a {file_type}")
+        # Handle local files if enabled
+        if use_local_files and "path" in kwargs:
+            # Check if version_id or environment is specified
+            has_version_info = "version_id" in kwargs or "environment" in kwargs
+            normalized_path = sync_client._normalize_path(kwargs["path"])
+            
+            if has_version_info:
+                logger.warning(
+                    f"Ignoring local file for `{normalized_path}` as version_id or environment was specified. "
+                    "Using remote version instead."
+                )
+            else:
+                # Only use local file if no version info is specified
+                try:
+                    # If file_type is already specified in kwargs, it means user provided a PromptKernelRequestParams object
+                    if file_type in kwargs and not isinstance(kwargs[file_type], str):
+                        logger.warning(
+                            f"Ignoring local file for `{normalized_path}` as {file_type} parameters were directly provided. "
+                            "Using provided parameters instead."
+                        )
+                    else:
+                        file_content = sync_client.get_file_content(normalized_path, file_type)
+                        kwargs[file_type] = file_content
+                except (HumanloopRuntimeError) as e:
+                    # Re-raise with more context
+                    raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
+
+        try:
+            if function_name == "call":
+                return original_call(**kwargs)
+            elif function_name == "log":
+                return original_log(**kwargs)
+            else:
+                raise ValueError(f"Unsupported function name: {function_name}")
+        except Exception as e:
+            # Re-raising as HumanloopRuntimeError so the decorators don't catch it
+            raise HumanloopRuntimeError from e
+
+    def _overload_call(self, **kwargs) -> PromptCallResponse:
+        return _overload(self, "call", **kwargs)
+
+    def _overload_log(self, **kwargs) -> PromptCallResponse:
+        return _overload(self, "log", **kwargs)
+
+    client.call = types.MethodType(_overload_call, client)
+    client.log = types.MethodType(_overload_log, client)
     return client

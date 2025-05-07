@@ -1,0 +1,327 @@
+import logging
+from pathlib import Path
+from typing import List, TYPE_CHECKING, Optional
+from functools import lru_cache
+from humanloop.types import FileType
+from .metadata_handler import MetadataHandler
+import time
+from humanloop.error import HumanloopRuntimeError
+import json
+
+if TYPE_CHECKING:
+    from humanloop.base_client import BaseHumanloop
+
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
+formatter = logging.Formatter("%(message)s")
+console_handler.setFormatter(formatter)
+if not logger.hasHandlers():
+    logger.addHandler(console_handler)
+
+# Default cache size for file content caching
+DEFAULT_CACHE_SIZE = 100
+
+def format_api_error(error: Exception) -> str:
+    """Format API error messages to be more user-friendly."""
+    error_msg = str(error)
+    if "status_code" not in error_msg or "body" not in error_msg:
+        return error_msg
+        
+    try:
+        # Extract the body part and parse as JSON
+        body_str = error_msg.split("body: ")[1]
+        # Convert Python dict string to valid JSON by replacing single quotes with double quotes
+        body_str = body_str.replace("'", '"')
+        body = json.loads(body_str)
+        
+        # Get the detail from the body
+        detail = body.get("detail", {})
+        
+        # Prefer description, fall back to msg
+        return detail.get("description") or detail.get("msg") or error_msg
+    except Exception as e:
+        logger.debug(f"Failed to parse error message: {str(e)}")
+        return error_msg
+
+class SyncClient:
+    """Client for managing synchronization between local filesystem and Humanloop.
+    
+    This client provides file synchronization between Humanloop and the local filesystem,
+    with built-in caching for improved performance. The cache uses Python's LRU (Least 
+    Recently Used) cache to automatically manage memory usage by removing least recently 
+    accessed files when the cache is full.
+    
+    The cache is automatically updated when files are pulled or saved, and can be
+    manually cleared using the clear_cache() method.
+    """
+    
+    def __init__(
+        self, 
+        client: "BaseHumanloop",
+        base_dir: str = "humanloop",
+        cache_size: int = DEFAULT_CACHE_SIZE,
+        log_level: int = logging.WARNING
+    ):
+        """
+        Parameters
+        ----------
+        client: Humanloop client instance
+        base_dir: Base directory for synced files (default: "humanloop")
+        cache_size: Maximum number of files to cache (default: DEFAULT_CACHE_SIZE)
+        log_level: Log level for logging (default: WARNING)
+        """
+        self.client = client
+        self.base_dir = Path(base_dir)
+        self._cache_size = cache_size
+
+        global logger 
+        logger.setLevel(log_level)
+
+        # Create a new cached version of get_file_content with the specified cache size
+        self.get_file_content = lru_cache(maxsize=cache_size)(self._get_file_content_impl)
+        # Initialize metadata handler
+        self.metadata = MetadataHandler(self.base_dir)
+
+    def _get_file_content_impl(self, path: str, file_type: FileType) -> str:
+        """Implementation of get_file_content without the cache decorator.
+        
+        This is the actual implementation that gets wrapped by lru_cache.
+        
+        Args:
+            path: The normalized path to the file (without extension)
+            file_type: The type of file (Prompt or Agent)
+            
+        Returns:
+            The raw file content
+            
+        Raises:
+            HumanloopRuntimeError: If the file doesn't exist or can't be read
+        """
+        # Construct path to local file
+        local_path = self.base_dir / path
+        # Add appropriate extension
+        local_path = local_path.parent / f"{local_path.stem}.{file_type}"
+        
+        if not local_path.exists():
+            raise HumanloopRuntimeError(f"Local file not found: {local_path}")
+            
+        try:
+            # Read the raw file content
+            with open(local_path) as f:
+                file_content = f.read()
+            logger.debug(f"Using local file content from {local_path}")
+            return file_content
+        except Exception as e:
+            raise HumanloopRuntimeError(f"Error reading local file {local_path}: {str(e)}")
+
+    def get_file_content(self, path: str, file_type: FileType) -> str:
+        """Get the raw file content of a file from cache or filesystem.
+        
+        This method uses an LRU cache to store file contents. When the cache is full,
+        the least recently accessed files are automatically removed to make space.
+        
+        Args:
+            path: The normalized path to the file (without extension)
+            file_type: The type of file (Prompt or Agent)
+            
+        Returns:
+            The raw file content
+            
+        Raises:
+            HumanloopRuntimeError: If the file doesn't exist or can't be read
+        """
+        return self._get_file_content_impl(path, file_type)
+
+    def clear_cache(self) -> None:
+        """Clear the LRU cache."""
+        self.get_file_content.cache_clear()
+
+    def _normalize_path(self, path: str) -> str:
+        """Normalize the path by:
+        1. Removing any file extensions (.prompt, .agent)
+        2. Converting backslashes to forward slashes
+        3. Removing leading and trailing slashes
+        4. Removing leading and trailing whitespace
+        5. Normalizing multiple consecutive slashes into a single forward slash
+
+        Args:
+            path: The path to normalize
+
+        Returns:
+            The normalized path
+        """
+        # Remove any file extensions
+        path = path.rsplit('.', 1)[0] if '.' in path else path
+        
+        # Convert backslashes to forward slashes and normalize multiple slashes
+        path = path.replace('\\', '/')
+        
+        # Remove leading/trailing whitespace and slashes
+        path = path.strip().strip('/')
+        
+        # Normalize multiple consecutive slashes into a single forward slash
+        while '//' in path:
+            path = path.replace('//', '/')
+            
+        return path
+
+    def is_file(self, path: str) -> bool:
+        """Check if the path is a file by checking for .prompt or .agent extension."""
+        return path.endswith('.prompt') or path.endswith('.agent')
+
+    def _save_serialized_file(self, serialized_content: str, file_path: str, file_type: FileType) -> None:
+        """Save serialized file to local filesystem."""
+        try:
+            # Create full path including base_dir prefix
+            full_path = self.base_dir / file_path
+            # Create directory if it doesn't exist
+            full_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Add file type extension
+            new_path = full_path.parent / f"{full_path.stem}.{file_type}"
+
+            # Write raw file content to file
+            with open(new_path, "w") as f:
+                f.write(serialized_content)
+            
+            # Clear the cache for this file to ensure we get fresh content next time
+            self.clear_cache()
+        except Exception as e:
+            logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
+            raise
+
+    def _pull_file(self, path: str, environment: str | None = None) -> None:
+        """Pull a specific file from Humanloop to local filesystem."""
+        file = self.client.files.retrieve_by_path(
+            path=path, 
+            environment=environment,
+            include_raw_file_content=True
+        )
+
+        if file.type not in ["prompt", "agent"]:
+            raise ValueError(f"Unsupported file type: {file.type}")
+
+        self._save_serialized_file(file.raw_file_content, file.path, file.type)
+
+    def _pull_directory(self, 
+            path: str | None = None,    
+            environment: str | None = None, 
+        ) -> List[str]:
+        """Sync Prompt and Agent files from Humanloop to local filesystem."""
+        successful_files = []
+        failed_files = []
+        page = 1
+
+        logger.debug(f"Fetching files from directory: {path or '(root)'} in environment: {environment or '(default)'}")
+
+        while True:
+            try:
+                logger.debug(f"Requesting page {page} of files")
+                response = self.client.files.list_files(
+                    type=["prompt", "agent"], 
+                    page=page,
+                    include_raw_file_content=True,
+                    environment=environment,
+                    path=path
+                )
+
+                if len(response.records) == 0:
+                    logger.debug("No more files found")
+                    break
+
+                logger.debug(f"Found {len(response.records)} files from page {page}")
+
+                # Process each file
+                for file in response.records:
+                    # Skip if not a Prompt or Agent
+                    if file.type not in ["prompt", "agent"]:
+                        logger.warning(f"Skipping unsupported file type: {file.type}")
+                        continue
+
+                    # Skip if no raw file content
+                    if not getattr(file, "raw_file_content", None):
+                        logger.warning(f"No content found for {file.type} {getattr(file, 'id', '<unknown>')}")
+                        continue
+
+                    try:
+                        logger.debug(f"Saving {file.type} {file.path}")
+                        self._save_serialized_file(file.raw_file_content, file.path, file.type)
+                        successful_files.append(file.path)
+                    except Exception as e:
+                        failed_files.append(file.path)
+                        logger.error(f"Task failed for {file.path}: {str(e)}")
+
+                page += 1
+            except Exception as e:
+                formatted_error = format_api_error(e)
+                raise HumanloopRuntimeError(f"Failed to pull files: {formatted_error}")
+
+        if successful_files:
+            logger.info(f"Successfully pulled {len(successful_files)} files")
+        if failed_files:
+            logger.warning(f"Failed to pull {len(failed_files)} files")
+
+        return successful_files
+
+    def pull(self, path: str | None = None, environment: str | None = None) -> List[str]:
+        """Pull files from Humanloop to local filesystem.
+
+        If the path ends with .prompt or .agent, pulls that specific file.
+        Otherwise, pulls all files under the specified path.
+        If no path is provided, pulls all files from the root.
+
+        Args:
+            path: The path to pull from (either a specific file or directory)
+            environment: The environment to pull from
+
+        Returns:
+            List of successfully processed file paths
+        """
+        start_time = time.time()
+        normalized_path = self._normalize_path(path) if path else None
+
+        logger.info(f"Starting pull operation: path={normalized_path or '(root)'}, environment={environment or '(default)'}")
+        try:
+            if path is None:
+                # Pull all files from the root
+                logger.debug("Pulling all files from root")
+                successful_files = self._pull_directory(None, environment)
+                failed_files = []  # Failed files are already logged in _pull_directory
+            else:
+                if self.is_file(path.strip()):
+                    logger.debug(f"Pulling specific file: {normalized_path}")
+                    self._pull_file(normalized_path, environment)
+                    successful_files = [path]
+                    failed_files = []
+                else:
+                    logger.debug(f"Pulling directory: {normalized_path}")
+                    successful_files = self._pull_directory(normalized_path, environment)
+                    failed_files = []  # Failed files are already logged in _pull_directory
+
+            duration_ms = int((time.time() - start_time) * 1000)
+            logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
+
+            # Log the successful operation
+            self.metadata.log_operation(
+                operation_type="pull",
+                path=normalized_path or "",  # Use empty string if path is None
+                environment=environment,
+                successful_files=successful_files,
+                failed_files=failed_files,
+                duration_ms=duration_ms
+            )
+            
+            return successful_files
+        except Exception as e:
+            duration_ms = int((time.time() - start_time) * 1000)
+            # Log the failed operation
+            self.metadata.log_operation(
+                operation_type="pull",
+                path=normalized_path or "",  # Use empty string if path is None
+                environment=environment,
+                error=str(e),
+                duration_ms=duration_ms
+            )
+            raise

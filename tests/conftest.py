@@ -191,8 +191,14 @@ def api_keys() -> APIKeys:
 
 
 @pytest.fixture(scope="session")
-def humanloop_client(api_keys: APIKeys) -> Humanloop:
-    return Humanloop(api_key=api_keys.humanloop)
+def humanloop_client(request, api_keys: APIKeys) -> Humanloop:
+    """Create a Humanloop client for testing."""
+    use_local_files = getattr(request, "param", False)
+    return Humanloop(
+        api_key=api_keys.humanloop,
+        base_url="http://localhost:80/v5",
+        use_local_files=use_local_files
+    )
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -214,8 +220,8 @@ def directory_cleanup(directory_id: str, humanloop_client: Humanloop):
             client = humanloop_client.evaluators  # type: ignore [assignment]
         elif file.type == "flow":
             client = humanloop_client.flows  # type: ignore [assignment]
-        else:
-            raise NotImplementedError(f"Unknown HL file type {file.type}")
+        elif file.type == "agent":
+            client = humanloop_client.agents  # type: ignore [assignment]
         client.delete(file_id)
 
     for subdirectory in response.subdirectories:
