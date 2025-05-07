@@ -9,6 +9,7 @@ import sys
 from humanloop import Humanloop
 from humanloop.sync.sync_client import SyncClient
 from datetime import datetime
+from humanloop.cli.progress import progress_context
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -24,6 +25,8 @@ SUCCESS_COLOR = "green"
 ERROR_COLOR = "red"
 INFO_COLOR = "blue"
 WARNING_COLOR = "yellow"
+
+MAX_FILES_TO_DISPLAY = 10
 
 def get_client(api_key: Optional[str] = None, env_file: Optional[str] = None, base_url: Optional[str] = None) -> Humanloop:
     """Get a Humanloop client instance."""
@@ -65,7 +68,7 @@ def common_options(f: Callable) -> Callable:
     )
     @click.option(
         "--base-dir",
-        help="Base directory for synced files",
+        help="Base directory for pulled files",
         default="humanloop",
         type=click.Path(),
     )
@@ -116,9 +119,23 @@ def cli():
     help="Environment to pull from (e.g. 'production', 'staging')",
     default=None,
 )
+@click.option(
+    "--verbose",
+    "-v",
+    is_flag=True,
+    help="Show detailed progress information",
+)
 @handle_sync_errors
 @common_options
-def pull(path: Optional[str], environment: Optional[str], api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str]):
+def pull(
+    path: Optional[str], 
+    environment: Optional[str], 
+    api_key: Optional[str], 
+    env_file: Optional[str], 
+    base_dir: str, 
+    base_url: Optional[str], 
+    verbose: bool
+):
     """Pull prompt and agent files from Humanloop to your local filesystem.
 
     \b
@@ -143,14 +160,18 @@ def pull(path: Optional[str], environment: Optional[str], api_key: Optional[str]
 
     Currently only supports syncing prompt and agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
-    sync_client = SyncClient(client, base_dir=base_dir)
+    sync_client = SyncClient(client, base_dir=base_dir, log_level=logging.DEBUG if verbose else logging.WARNING)
     
     click.echo(click.style("Pulling files from Humanloop...", fg=INFO_COLOR))
-    
     click.echo(click.style(f"Path: {path or '(root)'}", fg=INFO_COLOR))
     click.echo(click.style(f"Environment: {environment or '(default)'}", fg=INFO_COLOR))
-        
-    successful_files = sync_client.pull(path, environment)
+    
+    if verbose: 
+        # Don't use the spinner in verbose mode as the spinner and sync client logging compete
+        successful_files = sync_client.pull(path, environment)
+    else:
+        with progress_context("Pulling files..."):
+            successful_files = sync_client.pull(path, environment)
     
     # Get metadata about the operation
     metadata = sync_client.metadata.get_last_operation()
@@ -158,14 +179,24 @@ def pull(path: Optional[str], environment: Optional[str], api_key: Optional[str]
         # Determine if the operation was successful based on failed_files
         is_successful = not metadata.get('failed_files') and not metadata.get('error')
         duration_color = SUCCESS_COLOR if is_successful else ERROR_COLOR
-        click.echo(click.style(f"\nSync completed in {metadata['duration_ms']}ms", fg=duration_color))
+        click.echo(click.style(f"Pull completed in {metadata['duration_ms']}ms", fg=duration_color))
         
         if metadata['successful_files']:
-            click.echo(click.style(f"\nSuccessfully synced {len(metadata['successful_files'])} files:", fg=SUCCESS_COLOR))
-            for file in metadata['successful_files']:
-                click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
+            click.echo(click.style(f"\nSuccessfully pulled {len(metadata['successful_files'])} files:", fg=SUCCESS_COLOR))
+            
+            if verbose: 
+                for file in metadata['successful_files']:   
+                    click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
+            else:
+                files_to_display = metadata['successful_files'][:MAX_FILES_TO_DISPLAY]
+                for file in files_to_display:
+                    click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
+
+                if len(metadata['successful_files']) > MAX_FILES_TO_DISPLAY:
+                    remaining = len(metadata['successful_files']) - MAX_FILES_TO_DISPLAY
+                    click.echo(click.style(f"  ...and {remaining} more", fg=SUCCESS_COLOR))
         if metadata['failed_files']:
-            click.echo(click.style(f"\nFailed to sync {len(metadata['failed_files'])} files:", fg=ERROR_COLOR))
+            click.echo(click.style(f"\nFailed to pull {len(metadata['failed_files'])} files:", fg=ERROR_COLOR))
             for file in metadata['failed_files']:
                 click.echo(click.style(f"  ✗ {file}", fg=ERROR_COLOR))
         if metadata.get('error'):
@@ -214,9 +245,9 @@ def history(api_key: Optional[str], env_file: Optional[str], base_dir: str, base
                 click.echo(f"Environment: {op['environment']}")
             click.echo(f"Duration: {op['duration_ms']}ms")
             if op['successful_files']:
-                click.echo(click.style(f"Successfully synced {len(op['successful_files'])} file{'' if len(op['successful_files']) == 1 else 's'}", fg=SUCCESS_COLOR))
+                click.echo(click.style(f"Successfully {op['operation_type']}ed {len(op['successful_files'])} file{'' if len(op['successful_files']) == 1 else 's'}", fg=SUCCESS_COLOR))
             if op['failed_files']:
-                click.echo(click.style(f"Failed to sync {len(op['failed_files'])} file{'' if len(op['failed_files']) == 1 else 's'}", fg=ERROR_COLOR))
+                click.echo(click.style(f"Failed to {op['operation_type']}ed {len(op['failed_files'])} file{'' if len(op['failed_files']) == 1 else 's'}", fg=ERROR_COLOR))
             if op['error']:
                 click.echo(click.style(f"Error: {op['error']}", fg=ERROR_COLOR))
             click.echo(click.style("----------------------", fg=INFO_COLOR))

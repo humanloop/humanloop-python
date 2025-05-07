@@ -61,7 +61,8 @@ class SyncClient:
         self, 
         client: "BaseHumanloop",
         base_dir: str = "humanloop",
-        cache_size: int = DEFAULT_CACHE_SIZE
+        cache_size: int = DEFAULT_CACHE_SIZE,
+        log_level: int = logging.WARNING
     ):
         """
         Parameters
@@ -69,10 +70,15 @@ class SyncClient:
         client: Humanloop client instance
         base_dir: Base directory for synced files (default: "humanloop")
         cache_size: Maximum number of files to cache (default: DEFAULT_CACHE_SIZE)
+        log_level: Log level for logging (default: WARNING)
         """
         self.client = client
         self.base_dir = Path(base_dir)
         self._cache_size = cache_size
+
+        global logger 
+        logger.setLevel(log_level)
+
         # Create a new cached version of get_file_content with the specified cache size
         self.get_file_content = lru_cache(maxsize=cache_size)(self._get_file_content_impl)
         # Initialize metadata handler
@@ -162,27 +168,11 @@ class SyncClient:
         return path
 
     def is_file(self, path: str) -> bool:
-        """Check if the path is a file by checking for .prompt or .agent extension.
-
-        Args:
-            path: The path to check
-
-        Returns:
-            True if the path ends with .prompt or .agent, False otherwise
-        """
+        """Check if the path is a file by checking for .prompt or .agent extension."""
         return path.endswith('.prompt') or path.endswith('.agent')
 
     def _save_serialized_file(self, serialized_content: str, file_path: str, file_type: FileType) -> None:
-        """Save serialized file to local filesystem.
-
-        Args:
-            serialized_content: The raw file content to save
-            file_path: The path to save the file to
-            file_type: The type of file (Prompt or Agent)
-
-        Raises:
-            Exception: If there is an error saving the file
-        """
+        """Save serialized file to local filesystem."""
         try:
             # Create full path including base_dir prefix
             full_path = self.base_dir / file_path
@@ -198,23 +188,12 @@ class SyncClient:
             
             # Clear the cache for this file to ensure we get fresh content next time
             self.clear_cache()
-            
-            logger.info(f"Syncing {file_type} {file_path}")
         except Exception as e:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
             raise
 
     def _pull_file(self, path: str, environment: str | None = None) -> None:
-        """Pull a specific file from Humanloop to local filesystem.
-
-        Args:
-            path: The path of the file without the extension (e.g. "path/to/file")
-            environment: The environment to pull the file from
-
-        Raises:
-            ValueError: If the file type is not supported
-            Exception: If there is an error pulling the file
-        """
+        """Pull a specific file from Humanloop to local filesystem."""
         file = self.client.files.retrieve_by_path(
             path=path, 
             environment=environment,
@@ -230,27 +209,16 @@ class SyncClient:
             path: str | None = None,    
             environment: str | None = None, 
         ) -> List[str]:
-        """Sync Prompt and Agent files from Humanloop to local filesystem.
-
-        If `path` is provided, only the files under that path will be pulled.
-        If `environment` is provided, the files will be pulled from that environment.
-
-        Args: 
-            path: The path of the directory to pull from (e.g. "path/to/directory")
-            environment: The environment to pull the files from
-
-        Returns:
-            List of successfully processed file paths
-
-        Raises:
-            Exception: If there is an error fetching files from Humanloop
-        """
+        """Sync Prompt and Agent files from Humanloop to local filesystem."""
         successful_files = []
         failed_files = []
         page = 1
 
+        logger.debug(f"Fetching files from directory: {path or '(root)'} in environment: {environment or '(default)'}")
+
         while True:
             try:
+                logger.debug(f"Requesting page {page} of files")
                 response = self.client.files.list_files(
                     type=["prompt", "agent"], 
                     page=page,
@@ -260,7 +228,10 @@ class SyncClient:
                 )
 
                 if len(response.records) == 0:
+                    logger.debug("No more files found")
                     break
+
+                logger.debug(f"Found {len(response.records)} files from page {page}")
 
                 # Process each file
                 for file in response.records:
@@ -275,6 +246,7 @@ class SyncClient:
                         continue
 
                     try:
+                        logger.debug(f"Saving {file.type} {file.path}")
                         self._save_serialized_file(file.raw_file_content, file.path, file.type)
                         successful_files.append(file.path)
                     except Exception as e:
@@ -286,12 +258,10 @@ class SyncClient:
                 formatted_error = format_api_error(e)
                 raise HumanloopRuntimeError(f"Failed to pull files: {formatted_error}")
 
-        # Log summary only if we have results
-        if successful_files or failed_files:
-            if successful_files:
-                logger.info(f"\nSynced {len(successful_files)} files")
-            if failed_files:
-                logger.error(f"Failed to sync {len(failed_files)} files")
+        if successful_files:
+            logger.info(f"Successfully pulled {len(successful_files)} files")
+        if failed_files:
+            logger.warning(f"Failed to pull {len(failed_files)} files")
 
         return successful_files
 
@@ -310,39 +280,48 @@ class SyncClient:
             List of successfully processed file paths
         """
         start_time = time.time()
+        normalized_path = self._normalize_path(path) if path else None
+
+        logger.info(f"Starting pull operation: path={normalized_path or '(root)'}, environment={environment or '(default)'}")
         try:
             if path is None:
                 # Pull all files from the root
+                logger.debug("Pulling all files from root")
                 successful_files = self._pull_directory(None, environment)
                 failed_files = []  # Failed files are already logged in _pull_directory
             else:
-                normalized_path = self._normalize_path(path)
                 if self.is_file(path.strip()):
+                    logger.debug(f"Pulling specific file: {normalized_path}")
                     self._pull_file(normalized_path, environment)
                     successful_files = [path]
                     failed_files = []
                 else:
+                    logger.debug(f"Pulling directory: {normalized_path}")
                     successful_files = self._pull_directory(normalized_path, environment)
                     failed_files = []  # Failed files are already logged in _pull_directory
-            
+
+            duration_ms = int((time.time() - start_time) * 1000)
+            logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
+
             # Log the successful operation
             self.metadata.log_operation(
                 operation_type="pull",
-                path=path or "",  # Use empty string if path is None
+                path=normalized_path or "",  # Use empty string if path is None
                 environment=environment,
                 successful_files=successful_files,
                 failed_files=failed_files,
-                start_time=start_time
+                duration_ms=duration_ms
             )
             
             return successful_files
         except Exception as e:
+            duration_ms = int((time.time() - start_time) * 1000)
             # Log the failed operation
             self.metadata.log_operation(
                 operation_type="pull",
-                path=path or "",  # Use empty string if path is None
+                path=normalized_path or "",  # Use empty string if path is None
                 environment=environment,
                 error=str(e),
-                start_time=start_time
+                duration_ms=duration_ms
             )
             raise

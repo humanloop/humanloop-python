@@ -61,7 +61,7 @@ class MetadataHandler:
         successful_files: Optional[List[str]] = None,
         failed_files: Optional[List[str]] = None,
         error: Optional[str] = None,
-        start_time: Optional[float] = None
+        duration_ms: Optional[float] = None
     ) -> None:
         """Log a sync operation.
         
@@ -75,7 +75,6 @@ class MetadataHandler:
             start_time: Optional timestamp when the operation started (from time.time())
         """
         current_time = datetime.now().isoformat()
-        duration_ms = int((time.time() - (start_time or time.time())) * 1000) if start_time else 0
         
         operation_data = {
             "timestamp": current_time,
