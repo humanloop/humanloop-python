@@ -6,6 +6,7 @@ from humanloop.types import FileType
 from .metadata_handler import MetadataHandler
 import time
 from humanloop.error import HumanloopRuntimeError
+import json
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -21,6 +22,28 @@ if not logger.hasHandlers():
 
 # Default cache size for file content caching
 DEFAULT_CACHE_SIZE = 100
+
+def format_api_error(error: Exception) -> str:
+    """Format API error messages to be more user-friendly."""
+    error_msg = str(error)
+    if "status_code" not in error_msg or "body" not in error_msg:
+        return error_msg
+        
+    try:
+        # Extract the body part and parse as JSON
+        body_str = error_msg.split("body: ")[1]
+        # Convert Python dict string to valid JSON by replacing single quotes with double quotes
+        body_str = body_str.replace("'", '"')
+        body = json.loads(body_str)
+        
+        # Get the detail from the body
+        detail = body.get("detail", {})
+        
+        # Prefer description, fall back to msg
+        return detail.get("description") or detail.get("msg") or error_msg
+    except Exception as e:
+        logger.debug(f"Failed to parse error message: {str(e)}")
+        return error_msg
 
 class SyncClient:
     """Client for managing synchronization between local filesystem and Humanloop.
@@ -260,7 +283,8 @@ class SyncClient:
 
                 page += 1
             except Exception as e:
-                raise HumanloopRuntimeError(f"Failed to fetch page {page}: {str(e)}")
+                formatted_error = format_api_error(e)
+                raise HumanloopRuntimeError(f"Failed to pull files: {formatted_error}")
 
         # Log summary only if we have results
         if successful_files or failed_files:
