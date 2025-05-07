@@ -231,6 +231,11 @@ class PopulateTemplateResponse(UncheckedBaseModel):
     Aggregation of Evaluator results for the Prompt Version.
     """
 
+    raw_file_content: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    The raw content of the Prompt. Corresponds to the .prompt file.
+    """
+
     populated_template: typing.Optional[PopulateTemplateResponsePopulatedTemplate] = pydantic.Field(default=None)
     """
     The template populated with the input values you provided in the request. Returns None if no template exists.
