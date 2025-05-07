@@ -27,8 +27,8 @@ import contextlib
 from .requests.agents_call_request_tool_choice import AgentsCallRequestToolChoiceParams
 from .requests.agents_call_request_agent import AgentsCallRequestAgentParams
 from ..types.agent_call_response import AgentCallResponse
-from ..types.agent_continue_stream_response import AgentContinueStreamResponse
-from ..types.agent_continue_response import AgentContinueResponse
+from ..types.agent_continue_call_stream_response import AgentContinueCallStreamResponse
+from ..types.agent_continue_call_response import AgentContinueCallResponse
 from ..types.file_sort_by import FileSortBy
 from ..types.sort_order import SortOrder
 from ..types.paginated_data_agent_response import PaginatedDataAgentResponse
@@ -968,7 +968,7 @@ class RawAgentsClient:
                 _data = typing.cast(
                     AgentContinueResponse,
                     construct_type(
-                        type_=AgentContinueResponse,  # type: ignore
+                        type_=AgentContinueCallResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2884,7 +2884,7 @@ class AsyncRawAgentsClient:
                 _data = typing.cast(
                     AgentContinueResponse,
                     construct_type(
-                        type_=AgentContinueResponse,  # type: ignore
+                        type_=AgentContinueCallResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

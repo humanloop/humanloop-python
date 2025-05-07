@@ -221,7 +221,7 @@ class PromptResponseParams(typing_extensions.TypedDict):
     Aggregation of Evaluator results for the Prompt Version.
     """
 
-    content: typing_extensions.NotRequired[str]
+    raw_file_content: typing_extensions.NotRequired[str]
     """
-    The serialized kernel for the Prompt. Corresponds to the .prompt file.
+    The raw content of the Prompt. Corresponds to the .prompt file.
     """

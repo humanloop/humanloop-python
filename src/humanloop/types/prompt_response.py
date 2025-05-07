@@ -223,9 +223,9 @@ class PromptResponse(UncheckedBaseModel):
     Aggregation of Evaluator results for the Prompt Version.
     """
 
-    content: typing.Optional[str] = pydantic.Field(default=None)
+    raw_file_content: typing.Optional[str] = pydantic.Field(default=None)
     """
-    The serialized kernel for the Prompt. Corresponds to the .prompt file.
+    The raw content of the Prompt. Corresponds to the .prompt file.
     """
 
     if IS_PYDANTIC_V2:

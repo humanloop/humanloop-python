@@ -235,3 +235,8 @@ class AgentResponseParams(typing_extensions.TypedDict):
     """
     Aggregation of Evaluator results for the Agent Version.
     """
+
+    raw_file_content: typing_extensions.NotRequired[str]
+    """
+    The raw content of the Agent. Corresponds to the .agent file.
+    """

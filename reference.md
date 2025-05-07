@@ -10077,7 +10077,7 @@ from humanloop import Humanloop
 client = Humanloop(
     api_key="YOUR_API_KEY",
 )
-client.agents.continue_(
+client.agents.continue_call(
     log_id="log_id",
     messages=[{"role": "user"}],
 )
