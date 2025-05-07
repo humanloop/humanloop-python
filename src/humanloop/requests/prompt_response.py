@@ -220,3 +220,8 @@ class PromptResponseParams(typing_extensions.TypedDict):
     """
     Aggregation of Evaluator results for the Prompt Version.
     """
+
+    raw_file_content: typing_extensions.NotRequired[str]
+    """
+    The raw content of the Prompt. Corresponds to the .prompt file.
+    """

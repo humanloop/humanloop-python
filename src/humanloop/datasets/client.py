@@ -3,7 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from .raw_client import RawDatasetsClient
-from ..types.project_sort_by import ProjectSortBy
+from ..types.file_sort_by import FileSortBy
 from ..types.sort_order import SortOrder
 from ..core.request_options import RequestOptions
 from ..core.pagination import SyncPager
@@ -55,7 +55,7 @@ class DatasetsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> SyncPager[DatasetResponse]:
@@ -76,7 +76,7 @@ class DatasetsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Dataset. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Datasets by
 
         order : typing.Optional[SortOrder]
@@ -857,7 +857,7 @@ class AsyncDatasetsClient:
         size: typing.Optional[int] = None,
         name: typing.Optional[str] = None,
         user_filter: typing.Optional[str] = None,
-        sort_by: typing.Optional[ProjectSortBy] = None,
+        sort_by: typing.Optional[FileSortBy] = None,
         order: typing.Optional[SortOrder] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncPager[DatasetResponse]:
@@ -878,7 +878,7 @@ class AsyncDatasetsClient:
         user_filter : typing.Optional[str]
             Case-insensitive filter for users in the Dataset. This filter matches against both email address and name of users.
 
-        sort_by : typing.Optional[ProjectSortBy]
+        sort_by : typing.Optional[FileSortBy]
             Field to sort Datasets by
 
         order : typing.Optional[SortOrder]

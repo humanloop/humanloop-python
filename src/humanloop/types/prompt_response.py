@@ -223,6 +223,11 @@ class PromptResponse(UncheckedBaseModel):
     Aggregation of Evaluator results for the Prompt Version.
     """
 
+    raw_file_content: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    The raw content of the Prompt. Corresponds to the .prompt file.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2
     else:

@@ -3,7 +3,6 @@
 from ..core.client_wrapper import SyncClientWrapper
 from .raw_client import RawLogsClient
 import typing
-from ..types.version_status import VersionStatus
 import datetime as dt
 from ..core.request_options import RequestOptions
 from ..core.pagination import SyncPager
