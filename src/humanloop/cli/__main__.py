@@ -147,7 +147,7 @@ def pull(
 
     \b
     This command will:
-    1. Fetch prompt and agent files from your Humanloop workspace
+    1. Fetch Prompt and Agent files from your Humanloop workspace
     2. Save them to your local filesystem
     3. Maintain the same directory structure as in Humanloop
     4. Add appropriate file extensions (.prompt or .agent)
@@ -155,17 +155,21 @@ def pull(
     \b
     The files will be saved with the following structure:
     {base_dir}/
-    ├── prompts/
-    │   ├── my_prompt.prompt
-    │   └── nested/
-    │       └── another_prompt.prompt
-    └── agents/
-        └── my_agent.agent
+    ├── my_project/
+    │   ├── prompts/
+    │   │   ├── my_prompt.prompt
+    │   │   └── nested/
+    │   │       └── another_prompt.prompt
+    │   └── agents/
+    │       └── my_agent.agent
+    └── another_project/
+        └── prompts/
+            └── other_prompt.prompt
 
-    The operation will overwrite existing files with the latest version from Humanloop
-    but will not delete local files that don't exist in the remote workspace.
+    If a file exists both locally and in the Humanloop workspace, the local file will be overwritten
+    with the version from Humanloop. Files that only exist locally will not be affected.
 
-    Currently only supports syncing prompt and agent files. Other file types will be skipped."""
+    Currently only supports syncing Prompt and Agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
     sync_client = SyncClient(client, base_dir=base_dir, log_level=logging.DEBUG if verbose else logging.WARNING)
     
