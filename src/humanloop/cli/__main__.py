@@ -28,7 +28,13 @@ WARNING_COLOR = "yellow"
 MAX_FILES_TO_DISPLAY = 10
 
 def get_client(api_key: Optional[str] = None, env_file: Optional[str] = None, base_url: Optional[str] = None) -> Humanloop:
-    """Get a Humanloop client instance."""
+    """Get a Humanloop client instance.
+    
+    If no API key is provided, it will be loaded from the .env file, or the environment variable HUMANLOOP_API_KEY.
+
+    Raises:
+        click.ClickException: If no API key is found.
+    """
     if not api_key:
         if env_file:
             load_dotenv(env_file)
