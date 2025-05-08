@@ -116,9 +116,8 @@ def cli(): # Does nothing because used as a group for other subcommands (pull, p
 @click.option(
     "--path",
     "-p",
-    help="Path to pull (file or directory). If not provided, pulls everything. "
-    "To pull a specific file, ensure the extension for the file is included (e.g. .prompt or .agent). "
-    "To pull a directory, simply specify the path to the directory (e.g. abc/def to pull all files under abc/def and its subdirectories).",
+    help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory') "
+    "or a specific file (e.g. 'my/directory/my_prompt.prompt'). When pulling a directory, all files within that directory and its subdirectories will be included.",
     default=None,
 )
 @click.option(
