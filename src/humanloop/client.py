@@ -1,6 +1,6 @@
 import os
 import typing
-from typing import Any, List, Optional, Sequence
+from typing import Any, List, Optional, Sequence, Tuple
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -390,7 +390,7 @@ class Humanloop(BaseHumanloop):
     def pull(self, 
         environment: str | None = None, 
         path: str | None = None
-    ) -> List[str]:
+    ) -> Tuple[List[str], List[str]]:
         """Pull Prompt and Agent files from Humanloop to local filesystem.
 
         This method will:

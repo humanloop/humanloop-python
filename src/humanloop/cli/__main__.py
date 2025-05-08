@@ -9,6 +9,7 @@ import sys
 from humanloop import Humanloop
 from humanloop.sync.sync_client import SyncClient
 from datetime import datetime
+import time
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -132,6 +133,12 @@ def cli(): # Does nothing because used as a group for other subcommands (pull, p
     is_flag=True,
     help="Show detailed information about the operation",
 )
+@click.option(
+    "--quiet",
+    "-q",
+    is_flag=True,
+    help="Suppress output of successful files",
+)
 @handle_sync_errors
 @common_options
 def pull(
@@ -141,7 +148,8 @@ def pull(
     env_file: Optional[str], 
     base_dir: str, 
     base_url: Optional[str], 
-    verbose: bool
+    verbose: bool,
+    quiet: bool
 ):
     """Pull prompt and agent files from Humanloop to your local filesystem.
 
@@ -177,37 +185,24 @@ def pull(
     click.echo(click.style(f"Path: {path or '(root)'}", fg=INFO_COLOR))
     click.echo(click.style(f"Environment: {environment or '(default)'}", fg=INFO_COLOR))
     
-    successful_files = sync_client.pull(path, environment)
+    start_time = time.time()
+    successful_files, failed_files = sync_client.pull(path, environment)
+    duration_ms = int((time.time() - start_time) * 1000)
     
-    # Get metadata about the operation
-    metadata = sync_client.metadata.get_last_operation()
-    if metadata:
-        # Determine if the operation was successful based on failed_files
-        is_successful = not metadata.get('failed_files') and not metadata.get('error')
-        duration_color = SUCCESS_COLOR if is_successful else ERROR_COLOR
-        click.echo(click.style(f"Pull completed in {metadata['duration_ms']}ms", fg=duration_color))
-        
-        if metadata['successful_files']:
-            click.echo(click.style(f"\nSuccessfully pulled {len(metadata['successful_files'])} files:", fg=SUCCESS_COLOR))
+    # Determine if the operation was successful based on failed_files
+    is_successful = not failed_files
+    duration_color = SUCCESS_COLOR if is_successful else ERROR_COLOR
+    click.echo(click.style(f"Pull completed in {duration_ms}ms", fg=duration_color))
+    
+    if successful_files and not quiet:
+        click.echo(click.style(f"\nSuccessfully pulled {len(successful_files)} files:", fg=SUCCESS_COLOR))
+        for file in successful_files:   
+            click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
             
-            if verbose: 
-                for file in metadata['successful_files']:   
-                    click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
-            else:
-                files_to_display = metadata['successful_files'][:MAX_FILES_TO_DISPLAY]
-                for file in files_to_display:
-                    click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
-
-                if len(metadata['successful_files']) > MAX_FILES_TO_DISPLAY:
-                    remaining = len(metadata['successful_files']) - MAX_FILES_TO_DISPLAY
-                    click.echo(click.style(f"  ...and {remaining} more", fg=SUCCESS_COLOR))
-        if metadata['failed_files']:
-            click.echo(click.style(f"\nFailed to pull {len(metadata['failed_files'])} files:", fg=ERROR_COLOR))
-            for file in metadata['failed_files']:
-                click.echo(click.style(f"  ✗ {file}", fg=ERROR_COLOR))
-        if metadata.get('error'):
-            click.echo(click.style(f"\nError: {metadata['error']}", fg=ERROR_COLOR))
-            
+    if failed_files:
+        click.echo(click.style(f"\nFailed to pull {len(failed_files)} files:", fg=ERROR_COLOR))
+        for file in failed_files:
+            click.echo(click.style(f"  ✗ {file}", fg=ERROR_COLOR))
 
 if __name__ == "__main__":
     cli() 
