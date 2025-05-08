@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, TYPE_CHECKING, Optional
+from typing import List, Tuple, TYPE_CHECKING
 from functools import lru_cache
 from humanloop.types import FileType
 import time
@@ -189,24 +189,49 @@ class SyncClient:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
             raise
 
-    def _pull_file(self, path: str, environment: str | None = None) -> None:
-        """Pull a specific file from Humanloop to local filesystem."""
-        file = self.client.files.retrieve_by_path(
-            path=path, 
-            environment=environment,
-            include_raw_file_content=True
-        )
+    def _pull_file(self, path: str, environment: str | None = None) -> bool:
+        """Pull a specific file from Humanloop to local filesystem.
+        
+        Returns:
+            True if the file was successfully pulled, False otherwise
+            
+        Raises:
+            HumanloopRuntimeError: If there's an error communicating with the API
+        """
+        try:
+            file = self.client.files.retrieve_by_path(
+                path=path, 
+                environment=environment,
+                include_raw_file_content=True
+            ) 
+        except Exception as e:
+            logger.error(f"Failed to pull file {path}: {format_api_error(e)}")
+            return False
 
         if file.type not in ["prompt", "agent"]:
             raise ValueError(f"Unsupported file type: {file.type}")
 
-        self._save_serialized_file(file.raw_file_content, file.path, file.type)
+        try:
+            self._save_serialized_file(file.raw_file_content, file.path, file.type)
+            return True
+        except Exception as e:
+            logger.error(f"Failed to save file {path}: {str(e)}")
+            return False
 
     def _pull_directory(self, 
             path: str | None = None,    
             environment: str | None = None, 
-        ) -> List[str]:
-        """Sync Prompt and Agent files from Humanloop to local filesystem."""
+        ) -> Tuple[List[str], List[str]]:
+        """Sync Prompt and Agent files from Humanloop to local filesystem.
+        
+        Returns:
+            Tuple of two lists:
+            - First list contains paths of successfully synced files
+            - Second list contains paths of files that failed to sync
+            
+        Raises:
+            HumanloopRuntimeError: If there's an error communicating with the API
+        """
         successful_files = []
         failed_files = []
         page = 1
@@ -248,21 +273,21 @@ class SyncClient:
                         successful_files.append(file.path)
                     except Exception as e:
                         failed_files.append(file.path)
-                        logger.error(f"Task failed for {file.path}: {str(e)}")
+                        logger.error(f"Failed to save {file.path}: {str(e)}")
 
                 page += 1
             except Exception as e:
                 formatted_error = format_api_error(e)
-                raise HumanloopRuntimeError(f"Failed to pull files: {formatted_error}")
+                raise HumanloopRuntimeError(f"Failed to fetch page {page}: {formatted_error}")
 
         if successful_files:
             logger.info(f"Successfully pulled {len(successful_files)} files")
         if failed_files:
             logger.warning(f"Failed to pull {len(failed_files)} files")
 
-        return successful_files
+        return successful_files, failed_files
 
-    def pull(self, path: str | None = None, environment: str | None = None) -> List[str]:
+    def pull(self, path: str | None = None, environment: str | None = None) -> Tuple[List[str], List[str]]:
         """Pull files from Humanloop to local filesystem.
 
         If the path ends with .prompt or .agent, pulls that specific file.
@@ -274,31 +299,40 @@ class SyncClient:
             environment: The environment to pull from
 
         Returns:
-            List of successfully processed file paths
+            Tuple of two lists:
+            - First list contains paths of successfully synced files
+            - Second list contains paths of files that failed to sync
+            
+        Raises:
+            HumanloopRuntimeError: If there's an error communicating with the API
         """
         start_time = time.time()
         normalized_path = self._normalize_path(path) if path else None
 
         logger.info(f"Starting pull operation: path={normalized_path or '(root)'}, environment={environment or '(default)'}")
 
-        if path is None:
-            # Pull all files from the root
-            logger.debug("Pulling all files from root")
-            successful_files = self._pull_directory(None, environment)
-            failed_files = []  # Failed files are already logged in _pull_directory
-        else:
-            if self.is_file(path.strip()):
-                logger.debug(f"Pulling specific file: {normalized_path}")
-                self._pull_file(normalized_path, environment)
-                successful_files = [path]
-                failed_files = []
+        try:
+            if path is None:
+                # Pull all files from the root
+                logger.debug("Pulling all files from root")
+                successful_files, failed_files = self._pull_directory(None, environment)
             else:
-                logger.debug(f"Pulling directory: {normalized_path}")
-                successful_files = self._pull_directory(normalized_path, environment)
-                failed_files = []  # Failed files are already logged in _pull_directory
+                if self.is_file(path.strip()):
+                    logger.debug(f"Pulling specific file: {normalized_path}")
+                    if self._pull_file(normalized_path, environment):
+                        successful_files = [path]
+                        failed_files = []
+                    else:
+                        successful_files = []
+                        failed_files = [path]
+                else:
+                    logger.debug(f"Pulling directory: {normalized_path}")
+                    successful_files, failed_files = self._pull_directory(normalized_path, environment)
 
-        duration_ms = int((time.time() - start_time) * 1000)
-        logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
-        
-        return successful_files
+            duration_ms = int((time.time() - start_time) * 1000)
+            logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
+            
+            return successful_files, failed_files
+        except Exception as e:
+            raise HumanloopRuntimeError(f"Pull operation failed: {str(e)}")
 
