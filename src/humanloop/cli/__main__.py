@@ -108,7 +108,7 @@ def handle_sync_errors(f: Callable) -> Callable:
         "max_content_width": 100,
     }
 )
-def cli():
+def cli(): # Does nothing because used as a group for other subcommands (pull, push, etc.)
     """Humanloop CLI for managing sync operations."""
     pass
 
