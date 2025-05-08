@@ -18,7 +18,7 @@ src/humanloop/cli
 
 ## Tests
 
-tests
+tests/internal
 
 ## CI
 

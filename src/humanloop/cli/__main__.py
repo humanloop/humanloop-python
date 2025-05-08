@@ -9,7 +9,6 @@ import sys
 from humanloop import Humanloop
 from humanloop.sync.sync_client import SyncClient
 from datetime import datetime
-from humanloop.cli.progress import progress_context
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -166,12 +165,7 @@ def pull(
     click.echo(click.style(f"Path: {path or '(root)'}", fg=INFO_COLOR))
     click.echo(click.style(f"Environment: {environment or '(default)'}", fg=INFO_COLOR))
     
-    if verbose: 
-        # Don't use the spinner in verbose mode as the spinner and sync client logging compete
-        successful_files = sync_client.pull(path, environment)
-    else:
-        with progress_context("Pulling files..."):
-            successful_files = sync_client.pull(path, environment)
+    successful_files = sync_client.pull(path, environment)
     
     # Get metadata about the operation
     metadata = sync_client.metadata.get_last_operation()
@@ -201,56 +195,7 @@ def pull(
                 click.echo(click.style(f"  ✗ {file}", fg=ERROR_COLOR))
         if metadata.get('error'):
             click.echo(click.style(f"\nError: {metadata['error']}", fg=ERROR_COLOR))
-
-def format_timestamp(timestamp: str) -> str:
-    """Format timestamp to a more readable format."""
-    try:
-        dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
-        return dt.strftime('%Y-%m-%d %H:%M:%S')
-    except (ValueError, AttributeError):
-        return timestamp
-
-@cli.command()
-@click.option(
-    "--oneline",
-    is_flag=True,
-    help="Display history in a single line per operation",
-)
-@handle_sync_errors
-@common_options
-def history(api_key: Optional[str], env_file: Optional[str], base_dir: str, base_url: Optional[str], oneline: bool):
-    """Show sync operation history."""
-    client = get_client(api_key, env_file, base_url)
-    sync_client = SyncClient(client, base_dir=base_dir)
-    
-    history = sync_client.metadata.get_history()
-    if not history:
-        click.echo(click.style("No sync operations found in history.", fg=WARNING_COLOR))
-        return
-        
-    if not oneline:
-        click.echo(click.style("Sync Operation History:", fg=INFO_COLOR))
-        click.echo(click.style("======================", fg=INFO_COLOR))
-    
-    for op in history:
-        if oneline:
-            # Format: timestamp | operation_type | path | environment | duration_ms | status
-            status = click.style("✓", fg=SUCCESS_COLOR) if not op['failed_files'] else click.style("✗", fg=ERROR_COLOR)
-            click.echo(f"{format_timestamp(op['timestamp'])} | {op['operation_type']} | {op['path'] or '(root)'} | {op['environment'] or '-'} | {op['duration_ms']}ms | {status}")
-        else:
-            click.echo(click.style(f"\nOperation: {op['operation_type']}", fg=INFO_COLOR))
-            click.echo(f"Timestamp: {format_timestamp(op['timestamp'])}")
-            click.echo(f"Path: {op['path'] or '(root)'}")
-            if op['environment']:
-                click.echo(f"Environment: {op['environment']}")
-            click.echo(f"Duration: {op['duration_ms']}ms")
-            if op['successful_files']:
-                click.echo(click.style(f"Successfully {op['operation_type']}ed {len(op['successful_files'])} file{'' if len(op['successful_files']) == 1 else 's'}", fg=SUCCESS_COLOR))
-            if op['failed_files']:
-                click.echo(click.style(f"Failed to {op['operation_type']}ed {len(op['failed_files'])} file{'' if len(op['failed_files']) == 1 else 's'}", fg=ERROR_COLOR))
-            if op['error']:
-                click.echo(click.style(f"Error: {op['error']}", fg=ERROR_COLOR))
-            click.echo(click.style("----------------------", fg=INFO_COLOR))
+            
 
 if __name__ == "__main__":
     cli() 

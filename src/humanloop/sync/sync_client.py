@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, TYPE_CHECKING, Optional
 from functools import lru_cache
 from humanloop.types import FileType
-from .metadata_handler import MetadataHandler
 import time
 from humanloop.error import HumanloopRuntimeError
 import json
@@ -81,8 +80,6 @@ class SyncClient:
 
         # Create a new cached version of get_file_content with the specified cache size
         self.get_file_content = lru_cache(maxsize=cache_size)(self._get_file_content_impl)
-        # Initialize metadata handler
-        self.metadata = MetadataHandler(self.base_dir)
 
     def _get_file_content_impl(self, path: str, file_type: FileType) -> str:
         """Implementation of get_file_content without the cache decorator.
@@ -283,45 +280,25 @@ class SyncClient:
         normalized_path = self._normalize_path(path) if path else None
 
         logger.info(f"Starting pull operation: path={normalized_path or '(root)'}, environment={environment or '(default)'}")
-        try:
-            if path is None:
-                # Pull all files from the root
-                logger.debug("Pulling all files from root")
-                successful_files = self._pull_directory(None, environment)
-                failed_files = []  # Failed files are already logged in _pull_directory
+
+        if path is None:
+            # Pull all files from the root
+            logger.debug("Pulling all files from root")
+            successful_files = self._pull_directory(None, environment)
+            failed_files = []  # Failed files are already logged in _pull_directory
+        else:
+            if self.is_file(path.strip()):
+                logger.debug(f"Pulling specific file: {normalized_path}")
+                self._pull_file(normalized_path, environment)
+                successful_files = [path]
+                failed_files = []
             else:
-                if self.is_file(path.strip()):
-                    logger.debug(f"Pulling specific file: {normalized_path}")
-                    self._pull_file(normalized_path, environment)
-                    successful_files = [path]
-                    failed_files = []
-                else:
-                    logger.debug(f"Pulling directory: {normalized_path}")
-                    successful_files = self._pull_directory(normalized_path, environment)
-                    failed_files = []  # Failed files are already logged in _pull_directory
+                logger.debug(f"Pulling directory: {normalized_path}")
+                successful_files = self._pull_directory(normalized_path, environment)
+                failed_files = []  # Failed files are already logged in _pull_directory
 
-            duration_ms = int((time.time() - start_time) * 1000)
-            logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
+        duration_ms = int((time.time() - start_time) * 1000)
+        logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
+        
+        return successful_files
 
-            # Log the successful operation
-            self.metadata.log_operation(
-                operation_type="pull",
-                path=normalized_path or "",  # Use empty string if path is None
-                environment=environment,
-                successful_files=successful_files,
-                failed_files=failed_files,
-                duration_ms=duration_ms
-            )
-            
-            return successful_files
-        except Exception as e:
-            duration_ms = int((time.time() - start_time) * 1000)
-            # Log the failed operation
-            self.metadata.log_operation(
-                operation_type="pull",
-                path=normalized_path or "",  # Use empty string if path is None
-                environment=environment,
-                error=str(e),
-                duration_ms=duration_ms
-            )
-            raise
