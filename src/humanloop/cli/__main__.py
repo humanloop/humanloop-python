@@ -88,7 +88,10 @@ def common_options(f: Callable) -> Callable:
     return wrapper
 
 def handle_sync_errors(f: Callable) -> Callable:
-    """Decorator for handling sync operation errors."""
+    """Decorator for handling sync operation errors.
+    
+    If an error occurs in any operation that uses this decorator, it will be logged and the program will exit with a non-zero exit code.
+    """
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
