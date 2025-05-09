@@ -26,8 +26,6 @@ ERROR_COLOR = "red"
 INFO_COLOR = "blue"
 WARNING_COLOR = "yellow"
 
-MAX_FILES_TO_DISPLAY = 10
-
 def get_client(api_key: Optional[str] = None, env_file: Optional[str] = None, base_url: Optional[str] = None) -> Humanloop:
     """Get a Humanloop client instance.
     
@@ -74,7 +72,7 @@ def common_options(f: Callable) -> Callable:
     )
     @click.option(
         "--base-dir",
-        help="Base directory for pulled files",
+        help="Base directory for pulled files (default: humanloop/)",
         default="humanloop",
         type=click.Path(),
     )
@@ -117,7 +115,7 @@ def cli(): # Does nothing because used as a group for other subcommands (pull, p
 @click.option(
     "--path",
     "-p",
-    help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory') "
+    help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory/') "
     "or a specific file (e.g. 'my/directory/my_prompt.prompt'). When pulling a directory, all files within that directory and its subdirectories will be included.",
     default=None,
 )
@@ -151,18 +149,18 @@ def pull(
     verbose: bool,
     quiet: bool
 ):
-    """Pull prompt and agent files from Humanloop to your local filesystem.
+    """Pull Prompt and Agent files from Humanloop to your local filesystem.
 
     \b
     This command will:
     1. Fetch Prompt and Agent files from your Humanloop workspace
-    2. Save them to your local filesystem
+    2. Save them to your local filesystem (default: humanloop/)
     3. Maintain the same directory structure as in Humanloop
     4. Add appropriate file extensions (.prompt or .agent)
 
     \b
     The files will be saved with the following structure:
-    {base_dir}/
+    humanloop/
     ├── my_project/
     │   ├── prompts/
     │   │   ├── my_prompt.prompt

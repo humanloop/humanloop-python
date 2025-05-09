@@ -176,13 +176,13 @@ def overload_with_local_files(
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
             # Check if version_id or environment is specified
-            has_version_info = "version_id" in kwargs or "environment" in kwargs
+            use_remote = any(["version_id" in kwargs, "environment" in kwargs])
             normalized_path = sync_client._normalize_path(kwargs["path"])
             
-            if has_version_info:
-                logger.warning(
-                    f"Ignoring local file for `{normalized_path}` as version_id or environment was specified. "
-                    "Using remote version instead."
+            if use_remote:
+                raise HumanloopRuntimeError(
+                    f"Cannot use local file for `{normalized_path}` as version_id or environment was specified. "
+                    "Please either remove version_id/environment to use local files, or set use_local_files=False to use remote files."
                 )
             else:
                 # Only use local file if no version info is specified

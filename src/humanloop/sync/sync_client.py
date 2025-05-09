@@ -6,6 +6,7 @@ from humanloop.types import FileType
 import time
 from humanloop.error import HumanloopRuntimeError
 import json
+import re
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -56,6 +57,9 @@ class SyncClient:
     manually cleared using the clear_cache() method.
     """
     
+    # File types that can be serialized to/from the filesystem
+    SERIALIZABLE_FILE_TYPES = ["prompt", "agent"]
+    
     def __init__(
         self, 
         client: "BaseHumanloop",
@@ -75,7 +79,6 @@ class SyncClient:
         self.base_dir = Path(base_dir)
         self._cache_size = cache_size
 
-        global logger 
         logger.setLevel(log_level)
 
         # Create a new cached version of get_file_content with the specified cache size
@@ -94,7 +97,10 @@ class SyncClient:
             The raw file content
             
         Raises:
-            HumanloopRuntimeError: If the file doesn't exist or can't be read
+            HumanloopRuntimeError: In two cases:
+                1. If the file doesn't exist at the expected location
+                2. If there's a filesystem error when trying to read the file
+                   (e.g., permission denied, file is locked, etc.)
         """
         # Construct path to local file
         local_path = self.base_dir / path
@@ -137,32 +143,17 @@ class SyncClient:
 
     def _normalize_path(self, path: str) -> str:
         """Normalize the path by:
-        1. Removing any file extensions (.prompt, .agent)
-        2. Converting backslashes to forward slashes
-        3. Removing leading and trailing slashes
-        4. Removing leading and trailing whitespace
-        5. Normalizing multiple consecutive slashes into a single forward slash
-
-        Args:
-            path: The path to normalize
-
-        Returns:
-            The normalized path
+        1. Converting to a Path object to handle platform-specific separators
+        2. Removing any file extensions
+        3. Converting to a string with forward slashes and no leading/trailing slashes
         """
-        # Remove any file extensions
-        path = path.rsplit('.', 1)[0] if '.' in path else path
+        # Convert to Path object to handle platform-specific separators
+        path_obj = Path(path)
         
-        # Convert backslashes to forward slashes and normalize multiple slashes
-        path = path.replace('\\', '/')
-        
-        # Remove leading/trailing whitespace and slashes
-        path = path.strip().strip('/')
-        
-        # Normalize multiple consecutive slashes into a single forward slash
-        while '//' in path:
-            path = path.replace('//', '/')
-            
-        return path
+        # Remove extension, convert to string with forward slashes, and remove leading/trailing slashes
+        normalized = str(path_obj.with_suffix(''))
+        # Replace all backslashes and normalize multiple forward slashes
+        return '/'.join(part for part in normalized.replace('\\', '/').split('/') if part)
 
     def is_file(self, path: str) -> bool:
         """Check if the path is a file by checking for .prompt or .agent extension."""
@@ -183,7 +174,7 @@ class SyncClient:
             with open(new_path, "w") as f:
                 f.write(serialized_content)
             
-            # Clear the cache for this file to ensure we get fresh content next time
+            # Clear the cache when a file is saved
             self.clear_cache()
         except Exception as e:
             logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
@@ -208,7 +199,7 @@ class SyncClient:
             logger.error(f"Failed to pull file {path}: {format_api_error(e)}")
             return False
 
-        if file.type not in ["prompt", "agent"]:
+        if file.type not in self.SERIALIZABLE_FILE_TYPES:
             raise ValueError(f"Unsupported file type: {file.type}")
 
         try:
@@ -240,7 +231,7 @@ class SyncClient:
 
         while True:
             try:
-                logger.debug(f"Requesting page {page} of files")
+                logger.debug(f"`{path}`: Requesting page {page} of files")
                 response = self.client.files.list_files(
                     type=["prompt", "agent"], 
                     page=page,
@@ -250,15 +241,15 @@ class SyncClient:
                 )
 
                 if len(response.records) == 0:
-                    logger.debug("No more files found")
+                    logger.debug(f"Finished reading files for path `{path}`")
                     break
 
-                logger.debug(f"Found {len(response.records)} files from page {page}")
+                logger.debug(f"`{path}`: Read page {page} containing {len(response.records)} files")
 
                 # Process each file
                 for file in response.records:
                     # Skip if not a Prompt or Agent
-                    if file.type not in ["prompt", "agent"]:
+                    if file.type not in self.SERIALIZABLE_FILE_TYPES:
                         logger.warning(f"Skipping unsupported file type: {file.type}")
                         continue
 
@@ -268,7 +259,7 @@ class SyncClient:
                         continue
 
                     try:
-                        logger.debug(f"Saving {file.type} {file.path}")
+                        logger.debug(f"Writing {file.type} {file.path} to disk")
                         self._save_serialized_file(file.raw_file_content, file.path, file.type)
                         successful_files.append(file.path)
                     except Exception as e:
@@ -318,7 +309,7 @@ class SyncClient:
                 successful_files, failed_files = self._pull_directory(None, environment)
             else:
                 if self.is_file(path.strip()):
-                    logger.debug(f"Pulling specific file: {normalized_path}")
+                    logger.debug(f"Pulling file: {normalized_path}")
                     if self._pull_file(normalized_path, environment):
                         successful_files = [path]
                         failed_files = []
