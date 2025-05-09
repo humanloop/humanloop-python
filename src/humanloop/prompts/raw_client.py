@@ -673,7 +673,7 @@ class RawPromptsClient:
                                 if _sse.data == None:
                                     return
                                 try:
-                                    yield _sse.data()
+                                    yield _sse.data
                                 except Exception:
                                     pass
                             return
@@ -2489,7 +2489,7 @@ class AsyncRawPromptsClient:
                                 if _sse.data == None:
                                     return
                                 try:
-                                    yield _sse.data()
+                                    yield _sse.data
                                 except Exception:
                                     pass
                             return
