@@ -1,13 +1,14 @@
+import io
+import os
+import uuid
 from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
-import os
-from typing import Any, ContextManager, Generator
-import io
-from typing import TextIO
-import uuid
-import pytest
+from typing import Any, ContextManager, Generator, TextIO
+
 import dotenv
+import pytest
 from humanloop.client import Humanloop
+from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
 
 
 @dataclass
@@ -55,7 +56,7 @@ def sdk_test_dir(humanloop_test_client: Humanloop) -> Generator[str, None, None]
 
 
 @pytest.fixture(scope="function")
-def test_prompt_config() -> dict[str, Any]:
+def test_prompt_config() -> PromptKernelRequestParams:
     return {
         "provider": "openai",
         "model": "gpt-4o-mini",
@@ -108,6 +109,22 @@ def eval_prompt(
     humanloop_test_client: Humanloop, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
 ) -> Generator[TestIdentifiers, None, None]:
     prompt_path = f"{sdk_test_dir}/eval_prompt"
+    try:
+        response = humanloop_test_client.prompts.upsert(
+            path=prompt_path,
+            **test_prompt_config,
+        )
+        yield TestIdentifiers(file_id=response.id, file_path=response.path)
+        humanloop_test_client.prompts.delete(id=response.id)
+    except Exception as e:
+        pytest.fail(f"Failed to create prompt {prompt_path}: {e}")
+
+
+@pytest.fixture(scope="function")
+def prompt(
+    humanloop_test_client: Humanloop, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
+) -> Generator[TestIdentifiers, None, None]:
+    prompt_path = f"{sdk_test_dir}/prompt"
     try:
         response = humanloop_test_client.prompts.upsert(
             path=prompt_path,
