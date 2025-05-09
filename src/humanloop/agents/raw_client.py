@@ -2,6 +2,7 @@
 
 import contextlib
 import datetime as dt
+import json
 import typing
 from json.decoder import JSONDecodeError
 
@@ -591,7 +592,13 @@ class RawAgentsClient:
                                 if _sse.data == None:
                                     return
                                 try:
-                                    yield _sse.data
+                                    yield typing.cast(
+                                        AgentCallStreamResponse,
+                                        construct_type(
+                                            type_=AgentCallStreamResponse,  # type: ignore
+                                            object_=json.loads(_sse.data),
+                                        ),
+                                    )
                                 except Exception:
                                     pass
                             return
@@ -889,7 +896,13 @@ class RawAgentsClient:
                                 if _sse.data == None:
                                     return
                                 try:
-                                    yield _sse.data
+                                    yield typing.cast(
+                                        AgentContinueCallStreamResponse,
+                                        construct_type(
+                                            type_=AgentContinueCallStreamResponse,  # type: ignore
+                                            object_=json.loads(_sse.data),
+                                        ),
+                                    )
                                 except Exception:
                                     pass
                             return
@@ -2558,7 +2571,13 @@ class AsyncRawAgentsClient:
                                 if _sse.data == None:
                                     return
                                 try:
-                                    yield _sse.data
+                                    yield typing.cast(
+                                        AgentCallStreamResponse,
+                                        construct_type(
+                                            type_=AgentCallStreamResponse,  # type: ignore
+                                            object_=json.loads(_sse.data),
+                                        ),
+                                    )
                                 except Exception:
                                     pass
                             return
@@ -2856,7 +2875,13 @@ class AsyncRawAgentsClient:
                                 if _sse.data == None:
                                     return
                                 try:
-                                    yield _sse.data
+                                    yield typing.cast(
+                                        AgentContinueCallStreamResponse,
+                                        construct_type(
+                                            type_=AgentContinueCallStreamResponse,  # type: ignore
+                                            object_=json.loads(_sse.data),
+                                        ),
+                                    )
                                 except Exception:
                                     pass
                             return
