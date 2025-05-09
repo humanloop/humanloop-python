@@ -120,6 +120,22 @@ def eval_prompt(
 
 
 @pytest.fixture(scope="function")
+def prompt(
+    humanloop_test_client: Humanloop, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
+) -> Generator[TestIdentifiers, None, None]:
+    prompt_path = f"{sdk_test_dir}/prompt"
+    try:
+        response = humanloop_test_client.prompts.upsert(
+            path=prompt_path,
+            **test_prompt_config,
+        )
+        yield TestIdentifiers(file_id=response.id, file_path=response.path)
+        humanloop_test_client.prompts.delete(id=response.id)
+    except Exception as e:
+        pytest.fail(f"Failed to create prompt {prompt_path}: {e}")
+
+
+@pytest.fixture(scope="function")
 def output_not_null_evaluator(
     humanloop_test_client: Humanloop, sdk_test_dir: str
 ) -> Generator[TestIdentifiers, None, None]:
