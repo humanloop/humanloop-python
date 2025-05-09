@@ -1,13 +1,14 @@
+import io
+import os
+import uuid
 from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
-import os
-from typing import Any, ContextManager, Generator
-import io
-from typing import TextIO
-import uuid
-import pytest
+from typing import Any, ContextManager, Generator, TextIO
+
 import dotenv
+import pytest
 from humanloop.client import Humanloop
+from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
 
 
 @dataclass
@@ -55,7 +56,7 @@ def sdk_test_dir(humanloop_test_client: Humanloop) -> Generator[str, None, None]
 
 
 @pytest.fixture(scope="function")
-def test_prompt_config() -> dict[str, Any]:
+def test_prompt_config() -> PromptKernelRequestParams:
     return {
         "provider": "openai",
         "model": "gpt-4o-mini",
