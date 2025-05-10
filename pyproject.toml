@@ -8,7 +8,7 @@ authors = []
 # The metadata here is used during development but not published to PyPI
 [tool.poetry]
 name = "humanloop"
-version = "0.8.36b2"
+version = "0.8.39"
 description = "Humanloop Python SDK"
 readme = "README.md"
 authors = []
