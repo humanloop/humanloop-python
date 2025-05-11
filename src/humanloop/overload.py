@@ -127,58 +127,60 @@ def overload_call(client: PromptsClient) -> PromptsClient:
     client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
     return client
 
+
 def _get_file_type_from_client(client: Union[PromptsClient, AgentsClient]) -> FileType:
     """Get the file type based on the client type."""
-    if isinstance(client, PromptsClient):   
-        return "prompt"    
+    if isinstance(client, PromptsClient):
+        return "prompt"
     elif isinstance(client, AgentsClient):
         return "agent"
     else:
         raise ValueError(f"Unsupported client type: {type(client)}")
 
+
 def overload_with_local_files(
-    client: Union[PromptsClient, AgentsClient], 
+    client: Union[PromptsClient, AgentsClient],
     sync_client: SyncClient,
     use_local_files: bool,
 ) -> Union[PromptsClient, AgentsClient]:
     """Overload call and log methods to handle local files when use_local_files is True.
-    
+
     When use_local_files is True, the following prioritization strategy is used:
     1. Direct Parameters: If {file_type} parameters are provided directly (as a PromptKernelRequestParams or AgentKernelRequestParams object),
        these take precedence and the local file is ignored.
     2. Version/Environment: If version_id or environment is specified, the remote version is used instead
        of the local file.
     3. Local File: If neither of the above are specified, attempts to use the local file at the given path.
-    
+
     For example, with a prompt client:
     - If prompt={model: "gpt-4", ...} is provided, uses those parameters directly
     - If version_id="123" is provided, uses that remote version
     - Otherwise, tries to load from the local file at the given path
-    
+
     Args:
         client: The client to overload (PromptsClient or AgentsClient)
         sync_client: The sync client used for file operations
         use_local_files: Whether to enable local file handling
-        
+
     Returns:
         The client with overloaded methods
-        
+
     Raises:
         HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
     """
-    original_call = client._call if hasattr(client, '_call') else client.call
-    original_log = client._log if hasattr(client, '_log') else client.log
+    original_call = client._call if hasattr(client, "_call") else client.call
+    original_log = client._log if hasattr(client, "_log") else client.log
     file_type = _get_file_type_from_client(client)
 
     def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
-        if "id" in kwargs and "path" in kwargs: 
+        if "id" in kwargs and "path" in kwargs:
             raise HumanloopRuntimeError(f"Can only specify one of `id` or `path` when {function_name}ing a {file_type}")
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
             # Check if version_id or environment is specified
             use_remote = any(["version_id" in kwargs, "environment" in kwargs])
             normalized_path = sync_client._normalize_path(kwargs["path"])
-            
+
             if use_remote:
                 raise HumanloopRuntimeError(
                     f"Cannot use local file for `{normalized_path}` as version_id or environment was specified. "
@@ -196,7 +198,7 @@ def overload_with_local_files(
                     else:
                         file_content = sync_client.get_file_content(normalized_path, file_type)
                         kwargs[file_type] = file_content
-                except (HumanloopRuntimeError) as e:
+                except HumanloopRuntimeError as e:
                     # Re-raise with more context
                     raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
 
@@ -217,6 +219,6 @@ def overload_with_local_files(
     def _overload_log(self, **kwargs) -> PromptCallResponse:
         return _overload(self, "log", **kwargs)
 
-    client.call = types.MethodType(_overload_call, client)
-    client.log = types.MethodType(_overload_log, client)
+    client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
+    client.log = types.MethodType(_overload_log, client)  # type: ignore [assignment]
     return client

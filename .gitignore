@@ -8,3 +8,4 @@ poetry.toml
 .env.test
 tests/assets/*.jsonl
 tests/assets/*.parquet
+humanloop

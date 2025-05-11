@@ -1,6 +1,7 @@
 from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
 import os
+import time
 from typing import Any, ContextManager, Generator
 import io
 from typing import TextIO
@@ -40,18 +41,42 @@ def humanloop_test_client() -> Humanloop:
     dotenv.load_dotenv()
     if not os.getenv("HUMANLOOP_API_KEY"):
         pytest.fail("HUMANLOOP_API_KEY is not set for integration tests")
-    return Humanloop(api_key=os.getenv("HUMANLOOP_API_KEY"))  # type: ignore [return-value]
+    return Humanloop(api_key=os.getenv("HUMANLOOP_API_KEY"))
 
 
 @pytest.fixture(scope="function")
 def sdk_test_dir(humanloop_test_client: Humanloop) -> Generator[str, None, None]:
+    def cleanup_directory(directory_id: str):
+        directory_response = humanloop_test_client.directories.get(id=directory_id)
+        for subdirectory in directory_response.subdirectories:
+            cleanup_directory(subdirectory.id)
+        for file in directory_response.files:
+            match file.type:
+                case "prompt":
+                    humanloop_test_client.prompts.delete(id=file.id)
+                case "agent":
+                    humanloop_test_client.agents.delete(id=file.id)
+                case "dataset":
+                    humanloop_test_client.datasets.delete(id=file.id)
+                case "evaluator":
+                    humanloop_test_client.evaluators.delete(id=file.id)
+                case "flow":
+                    humanloop_test_client.flows.delete(id=file.id)
+                case _:
+                    raise ValueError(f"Unknown file type: {file.type}")
+        humanloop_test_client.directories.delete(id=directory_response.id)
+
     path = f"SDK_INTEGRATION_TEST_{uuid.uuid4()}"
+    response = None
     try:
         response = humanloop_test_client.directories.create(path=path)
         yield response.path
-        humanloop_test_client.directories.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create directory {path}: {e}")
+    finally:
+        if response:
+            time.sleep(5)
+            cleanup_directory(response.id)
 
 
 @pytest.fixture(scope="function")

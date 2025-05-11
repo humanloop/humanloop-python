@@ -1,4 +1,4 @@
-from typing import List, NamedTuple, Union
+from typing import Generator, List, NamedTuple, Union
 from pathlib import Path
 import pytest
 from humanloop import Humanloop, FileType, AgentResponse, PromptResponse
@@ -14,7 +14,9 @@ class SyncableFile(NamedTuple):
 
 
 @pytest.fixture
-def test_file_structure(humanloop_client: Humanloop, get_test_path) -> List[SyncableFile]:
+def test_file_structure(
+    humanloop_test_client: Humanloop, sdk_test_dir: str
+) -> Generator[list[SyncableFile], None, None]:
     """Creates a predefined structure of files in Humanloop for testing sync"""
     files: List[SyncableFile] = [
         SyncableFile(
@@ -47,27 +49,25 @@ def test_file_structure(humanloop_client: Humanloop, get_test_path) -> List[Sync
     # Create the files in Humanloop
     created_files = []
     for file in files:
-        full_path = get_test_path(file.path)
+        full_path = f"{sdk_test_dir}/{file.path}"
         response: Union[AgentResponse, PromptResponse]
         if file.type == "prompt":
-            response = humanloop_client.prompts.upsert(
+            response = humanloop_test_client.prompts.upsert(
                 path=full_path,
                 model=file.model,
             )
         elif file.type == "agent":
-            response = humanloop_client.agents.upsert(
+            response = humanloop_test_client.agents.upsert(
                 path=full_path,
                 model=file.model,
             )
-        created_files.append(SyncableFile(
-            path=full_path, 
-            type=file.type, 
-            model=file.model, 
-            id=response.id, 
-            version_id=response.version_id
-        ))
+        created_files.append(
+            SyncableFile(
+                path=full_path, type=file.type, model=file.model, id=response.id, version_id=response.version_id
+            )
+        )
 
-    return created_files
+    yield created_files
 
 
 @pytest.fixture
@@ -82,10 +82,10 @@ def cleanup_local_files():
         shutil.rmtree(local_dir)
 
 
-def test_pull_basic(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+def test_pull_basic(humanloop_test_client: Humanloop, test_file_structure: List[SyncableFile]):
     """Test that humanloop.sync() correctly syncs remote files to local filesystem"""
     # Run the sync
-    successful_files = humanloop_client.pull()
+    successful_files = humanloop_test_client.pull()
 
     # Verify each file was synced correctly
     for file in test_file_structure:
@@ -103,115 +103,129 @@ def test_pull_basic(humanloop_client: Humanloop, test_file_structure: List[Synca
         content = local_path.read_text()
         assert content, f"File at {local_path} should not be empty"
 
-@pytest.mark.parametrize("humanloop_client", [True], indirect=True)
-def test_overload_with_local_files(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+
+def test_overload_with_local_files(
+    humanloop_test_client: Humanloop,
+    test_file_structure: List[SyncableFile],
+):
     """Test that overload_with_local_files correctly handles local files.
-    
+
     Flow:
     1. Create files in remote (via test_file_structure fixture)
     2. Pull files locally
     3. Test using the pulled files
     """
     # First pull the files locally
-    humanloop_client.pull()
+    humanloop_test_client.pull()
 
     # Test using the pulled files
     test_file = test_file_structure[0]  # Use the first test file
     extension = f".{test_file.type}"
     local_path = Path("humanloop") / f"{test_file.path}{extension}"
-    
+
     # Verify the file was pulled correctly
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
     # Test call with pulled file
+    response: Union[AgentResponse, PromptResponse]
     if test_file.type == "prompt":
-        response = humanloop_client.prompts.call(path=test_file.path, messages=[{"role": "user", "content": "Testing"}])
+        response = humanloop_test_client.prompts.call(  # type: ignore [assignment]
+            path=test_file.path, messages=[{"role": "user", "content": "Testing"}]
+        )
         assert response is not None
     elif test_file.type == "agent":
-        response = humanloop_client.agents.call(path=test_file.path, messages=[{"role": "user", "content": "Testing"}])
+        response = humanloop_test_client.agents.call(  # type: ignore [assignment]
+            path=test_file.path, messages=[{"role": "user", "content": "Testing"}]
+        )
         assert response is not None
 
     # Test with invalid path
     with pytest.raises(HumanloopRuntimeError):
-        if test_file.type == "prompt":
-            humanloop_client.prompts.call(path="invalid/path")
-        elif test_file.type == "agent":
-            humanloop_client.agents.call(path="invalid/path")
+        match test_file.type:
+            case "prompt":
+                sub_agent = humanloop_test_client.agents
+            case "agent":
+                sub_agent = humanloop_test_client.agents
+            case _:
+                raise ValueError(f"Invalid file type: {test_file.type}")
+        sub_agent.call(path="invalid/path")
 
-@pytest.mark.parametrize("humanloop_client", [True], indirect=True)
-def test_overload_log_with_local_files(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+
+def test_overload_log_with_local_files(
+    humanloop_test_client: Humanloop,
+    test_file_structure: List[SyncableFile],
+    sdk_test_dir: str,
+):
     """Test that overload_with_local_files correctly handles local files for log operations.
-    
+
     Flow:
     1. Create files in remote (via test_file_structure fixture)
     2. Pull files locally
     3. Test logging using the pulled files
 
-    :param humanloop_client: The Humanloop client with local files enabled
+    :param humanloop_test_client: The Humanloop client with local files enabled
     :param test_file_structure: List of test files created in remote
     :param cleanup_local_files: Fixture to clean up local files after test
     """
     # First pull the files locally
-    humanloop_client.pull()
+    humanloop_test_client.pull()
 
     # Test using the pulled files
     test_file = test_file_structure[0]  # Use the first test file
     extension = f".{test_file.type}"
     local_path = Path("humanloop") / f"{test_file.path}{extension}"
-    
+
     # Verify the file was pulled correctly
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
     # Test log with pulled file
     if test_file.type == "prompt":
-        response = humanloop_client.prompts.log(
-            path=test_file.path,
-            messages=[{"role": "user", "content": "Testing"}],
-            output="Test response"
+        response = humanloop_test_client.prompts.log(  # type: ignore [assignment]
+            path=test_file.path, messages=[{"role": "user", "content": "Testing"}], output="Test response"
         )
         assert response is not None
     elif test_file.type == "agent":
-        response = humanloop_client.agents.log(
-            path=test_file.path,
-            messages=[{"role": "user", "content": "Testing"}],
-            output="Test response"
+        response = humanloop_test_client.agents.log(  # type: ignore [assignment]
+            path=test_file.path, messages=[{"role": "user", "content": "Testing"}], output="Test response"
         )
         assert response is not None
 
     # Test with invalid path
     with pytest.raises(HumanloopRuntimeError):
         if test_file.type == "prompt":
-            humanloop_client.prompts.log(
-                path="invalid/path",
+            humanloop_test_client.prompts.log(
+                path=f"{sdk_test_dir}/invalid/path",
                 messages=[{"role": "user", "content": "Testing"}],
-                output="Test response"
+                output="Test response",
             )
         elif test_file.type == "agent":
-            humanloop_client.agents.log(
-                path="invalid/path",
+            humanloop_test_client.agents.log(
+                path=f"{sdk_test_dir}/invalid/path",
                 messages=[{"role": "user", "content": "Testing"}],
-                output="Test response"
+                output="Test response",
             )
 
-@pytest.mark.parametrize("humanloop_client", [True], indirect=True)
-def test_overload_version_environment_handling(humanloop_client: Humanloop, test_file_structure: List[SyncableFile], cleanup_local_files):
+
+def test_overload_version_environment_handling(
+    humanloop_test_client: Humanloop, test_file_structure: List[SyncableFile]
+):
     """Test that overload_with_local_files correctly handles version_id and environment parameters.
-    
+
     Flow:
     1. Create files in remote (via test_file_structure fixture)
     2. Pull files locally
     3. Test that version_id/environment parameters cause remote usage with warning
     """
     # First pull the files locally
-    humanloop_client.pull()
+    humanloop_test_client.pull()
 
     # Test using the pulled files
     test_file = test_file_structure[0]  # Use the first test file
     extension = f".{test_file.type}"
     local_path = Path("humanloop") / f"{test_file.path}{extension}"
-    
+
     # Verify the file was pulled correctly
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
@@ -219,49 +233,45 @@ def test_overload_version_environment_handling(humanloop_client: Humanloop, test
     # Test with version_id - should use remote with warning
     with pytest.warns(UserWarning, match="Ignoring local file.*as version_id or environment was specified"):
         if test_file.type == "prompt":
-            response = humanloop_client.prompts.call(
+            response = humanloop_test_client.prompts.call(  # type: ignore [assignment]
                 path=test_file.path,
                 version_id=test_file.version_id,
-                messages=[{"role": "user", "content": "Testing"}]
+                messages=[{"role": "user", "content": "Testing"}],
             )
         elif test_file.type == "agent":
-            response = humanloop_client.agents.call(
+            response = humanloop_test_client.agents.call(  # type: ignore [assignment]
                 path=test_file.path,
                 version_id=test_file.version_id,
-                messages=[{"role": "user", "content": "Testing"}]
+                messages=[{"role": "user", "content": "Testing"}],
             )
         assert response is not None
 
     # Test with environment - should use remote with warning
     with pytest.warns(UserWarning, match="Ignoring local file.*as version_id or environment was specified"):
         if test_file.type == "prompt":
-            response = humanloop_client.prompts.call(
-                path=test_file.path,
-                environment="production",
-                messages=[{"role": "user", "content": "Testing"}]
+            response = humanloop_test_client.prompts.call(  # type: ignore [assignment]
+                path=test_file.path, environment="production", messages=[{"role": "user", "content": "Testing"}]
             )
         elif test_file.type == "agent":
-            response = humanloop_client.agents.call(
-                path=test_file.path,
-                environment="production",
-                messages=[{"role": "user", "content": "Testing"}]
+            response = humanloop_test_client.agents.call(  # type: ignore [assignment]
+                path=test_file.path, environment="production", messages=[{"role": "user", "content": "Testing"}]
             )
         assert response is not None
 
     # Test with both version_id and environment - should use remote with warning
     with pytest.warns(UserWarning, match="Ignoring local file.*as version_id or environment was specified"):
         if test_file.type == "prompt":
-            response = humanloop_client.prompts.call(
+            response = humanloop_test_client.prompts.call(  # type: ignore [assignment]
                 path=test_file.path,
                 version_id=test_file.version_id,
                 environment="staging",
-                messages=[{"role": "user", "content": "Testing"}]
+                messages=[{"role": "user", "content": "Testing"}],
             )
         elif test_file.type == "agent":
-            response = humanloop_client.agents.call(
+            response = humanloop_test_client.agents.call(  # type: ignore [assignment]
                 path=test_file.path,
                 version_id=test_file.version_id,
                 environment="staging",
-                messages=[{"role": "user", "content": "Testing"}]
+                messages=[{"role": "user", "content": "Testing"}],
             )
         assert response is not None

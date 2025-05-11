@@ -132,7 +132,7 @@ class RawFilesClient:
     def retrieve_by_path(
         self,
         *,
-        path: str,
+        path: str | None = None,
         environment: typing.Optional[str] = None,
         include_raw_file_content: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,

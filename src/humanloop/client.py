@@ -142,11 +142,7 @@ class Humanloop(BaseHumanloop):
         )
 
         self.use_local_files = use_local_files
-        self._sync_client = SyncClient(
-            client=self, 
-            base_dir=files_directory,
-            cache_size=cache_size
-        )
+        self._sync_client = SyncClient(client=self, base_dir=files_directory, cache_size=cache_size)
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
@@ -156,15 +152,15 @@ class Humanloop(BaseHumanloop):
         # and the @flow decorator providing the trace_id
         self.prompts = overload_log(client=self.prompts)
         self.prompts = overload_call(client=self.prompts)
-        self.prompts = overload_with_local_files(
-            client=self.prompts, 
+        self.prompts = overload_with_local_files(  # type: ignore [assignment]
+            client=self.prompts,
             sync_client=self._sync_client,
-            use_local_files=self.use_local_files
+            use_local_files=self.use_local_files,
         )
-        self.agents = overload_with_local_files(
-            client=self.agents, 
+        self.agents = overload_with_local_files(  # type: ignore [assignment]
+            client=self.agents,
             sync_client=self._sync_client,
-            use_local_files=self.use_local_files
+            use_local_files=self.use_local_files,
         )
         self.flows = overload_log(client=self.flows)
         self.tools = overload_log(client=self.tools)
@@ -387,10 +383,7 @@ class Humanloop(BaseHumanloop):
             attributes=attributes,
         )
 
-    def pull(self, 
-        environment: str | None = None, 
-        path: str | None = None
-    ) -> Tuple[List[str], List[str]]:
+    def pull(self, environment: str | None = None, path: str | None = None) -> Tuple[List[str], List[str]]:
         """Pull Prompt and Agent files from Humanloop to local filesystem.
 
         This method will:
@@ -425,12 +418,9 @@ class Humanloop(BaseHumanloop):
                     If not provided, all Prompt and Agent files will be pulled.
         :return: List of successfully processed file paths.
         """
-        return self._sync_client.pull(
-            environment=environment,
-            path=path
-        )
+        return self._sync_client.pull(environment=environment, path=path)
 
- 
+
 class AsyncHumanloop(AsyncBaseHumanloop):
     """
     See docstring of AsyncBaseHumanloop.
