@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 from humanloop.client import Humanloop
 from humanloop.error import HumanloopRuntimeError
-from tests.integration.conftest import TestIdentifiers
+from tests.custom.integration.conftest import TestIdentifiers
 
 
 def test_eval_run_works_on_online_files(
