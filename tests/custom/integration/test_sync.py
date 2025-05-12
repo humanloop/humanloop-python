@@ -6,7 +6,6 @@ from humanloop.prompts.client import PromptsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.error import HumanloopRuntimeError
 from tests.custom.types import GetHumanloopClientFn
-import logging
 
 
 class SyncableFile(NamedTuple):
@@ -223,7 +222,6 @@ def test_overload_log_with_local_files(
 
 
 def test_overload_version_environment_handling(
-    caplog: pytest.LogCaptureFixture,
     get_humanloop_client: GetHumanloopClientFn,
     test_file_structure: List[SyncableFile],
 ):
@@ -232,7 +230,7 @@ def test_overload_version_environment_handling(
     Flow:
     1. Create files in remote (via test_file_structure fixture)
     2. Pull files locally
-    3. Test that version_id/environment parameters cause remote usage with warning
+    3. Test that specifying path + version_id/environment raises HumanloopRuntimeError
     """
     # First pull the files locally
     humanloop_client = get_humanloop_client(use_local_files=True)
@@ -247,47 +245,49 @@ def test_overload_version_environment_handling(
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
-    # Test with version_id - should use remote with warning
-    # Check that the warning was logged
-    with caplog.at_level(level=logging.WARNING, logger="humanloop.sdk"):
+    # Test with version_id - should raise HumanloopRuntimeError
+    with pytest.raises(HumanloopRuntimeError, match="Cannot use local file.*version_id or environment was specified"):
         if test_file.type == "prompt":
-            response = humanloop_client.prompts.call(
+            humanloop_client.prompts.call(
                 path=test_file.path,
                 version_id=test_file.version_id,
                 messages=[{"role": "user", "content": "Testing"}],
             )
         elif test_file.type == "agent":
-            response = humanloop_client.agents.call(  # type: ignore [assignment]
+            humanloop_client.agents.call(
                 path=test_file.path,
                 version_id=test_file.version_id,
                 messages=[{"role": "user", "content": "Testing"}],
             )
-        assert response is not None
-        assert any(["Ignoring local file" in record.message for record in caplog.records])
 
-    # Test with environment - should use remote with warning
-    if test_file.type == "prompt":
-        response = humanloop_client.prompts.call(  # type: ignore [assignment]
-            path=test_file.path, environment="production", messages=[{"role": "user", "content": "Testing"}]
-        )
-    elif test_file.type == "agent":
-        response = humanloop_client.agents.call(  # type: ignore [assignment]
-            path=test_file.path, environment="production", messages=[{"role": "user", "content": "Testing"}]
-        )
-    assert response is not None
+    # Test with environment - should raise HumanloopRuntimeError
+    with pytest.raises(HumanloopRuntimeError, match="Cannot use local file.*version_id or environment was specified"):
+        if test_file.type == "prompt":
+            humanloop_client.prompts.call(
+                path=test_file.path,
+                environment="production",
+                messages=[{"role": "user", "content": "Testing"}],
+            )
+        elif test_file.type == "agent":
+            humanloop_client.agents.call(
+                path=test_file.path,
+                environment="production",
+                messages=[{"role": "user", "content": "Testing"}],
+            )
 
-    if test_file.type == "prompt":
-        response = humanloop_client.prompts.call(  # type: ignore [assignment]
-            path=test_file.path,
-            version_id=test_file.version_id,
-            environment="staging",
-            messages=[{"role": "user", "content": "Testing"}],
-        )
-    elif test_file.type == "agent":
-        response = humanloop_client.agents.call(  # type: ignore [assignment]
-            path=test_file.path,
-            version_id=test_file.version_id,
-            environment="staging",
-            messages=[{"role": "user", "content": "Testing"}],
-        )
-    assert response is not None
+    # Test with both version_id and environment - should raise HumanloopRuntimeError
+    with pytest.raises(HumanloopRuntimeError, match="Cannot use local file.*version_id or environment was specified"):
+        if test_file.type == "prompt":
+            humanloop_client.prompts.call(
+                path=test_file.path,
+                version_id=test_file.version_id,
+                environment="staging",
+                messages=[{"role": "user", "content": "Testing"}],
+            )
+        elif test_file.type == "agent":
+            humanloop_client.agents.call(
+                path=test_file.path,
+                version_id=test_file.version_id,
+                environment="staging",
+                messages=[{"role": "user", "content": "Testing"}],
+            )

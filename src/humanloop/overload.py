@@ -206,6 +206,7 @@ def overload_with_local_files(
             normalized_path = sync_client._normalize_path(kwargs["path"])
 
             if use_remote:
+                # Don't allow user to specify path + version_id/environment because it's ambiguous
                 raise HumanloopRuntimeError(
                     f"Cannot use local file for `{normalized_path}` as version_id or environment was specified. "
                     "Please either remove version_id/environment to use local files, or set use_local_files=False to use remote files."

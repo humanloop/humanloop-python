@@ -1,4 +1,3 @@
-from typing import Callable
 from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
 import os
@@ -10,13 +9,13 @@ import uuid
 import pytest
 import dotenv
 from humanloop.client import Humanloop
+from tests.custom.types import GetHumanloopClientFn
 
 
 @dataclass
 class TestIdentifiers:
     file_id: str
     file_path: str
-
 
 
 @pytest.fixture()
@@ -39,31 +38,32 @@ def openai_key() -> str:
 
 
 @pytest.fixture(scope="function")
-def sdk_test_dir(humanloop_test_client: Humanloop) -> Generator[str, None, None]:
+def sdk_test_dir(get_humanloop_client: GetHumanloopClientFn) -> Generator[str, None, None]:
+    humanloop_client = get_humanloop_client()
     def cleanup_directory(directory_id: str):
-        directory_response = humanloop_test_client.directories.get(id=directory_id)
+        directory_response = humanloop_client.directories.get(id=directory_id)
         for subdirectory in directory_response.subdirectories:
             cleanup_directory(subdirectory.id)
         for file in directory_response.files:
             match file.type:
                 case "prompt":
-                    humanloop_test_client.prompts.delete(id=file.id)
+                    humanloop_client.prompts.delete(id=file.id)
                 case "agent":
-                    humanloop_test_client.agents.delete(id=file.id)
+                    humanloop_client.agents.delete(id=file.id)
                 case "dataset":
-                    humanloop_test_client.datasets.delete(id=file.id)
+                    humanloop_client.datasets.delete(id=file.id)
                 case "evaluator":
-                    humanloop_test_client.evaluators.delete(id=file.id)
+                    humanloop_client.evaluators.delete(id=file.id)
                 case "flow":
-                    humanloop_test_client.flows.delete(id=file.id)
+                    humanloop_client.flows.delete(id=file.id)
                 case _:
                     raise ValueError(f"Unknown file type: {file.type}")
-        humanloop_test_client.directories.delete(id=directory_response.id)
+        humanloop_client.directories.delete(id=directory_response.id)
 
     path = f"SDK_INTEGRATION_TEST_{uuid.uuid4()}"
     response = None
     try:
-        response = humanloop_test_client.directories.create(path=path)
+        response = humanloop_client.directories.create(path=path)
         yield response.path
     except Exception as e:
         pytest.fail(f"Failed to create directory {path}: {e}")
@@ -93,10 +93,11 @@ def test_prompt_config() -> dict[str, Any]:
 
 
 @pytest.fixture(scope="function")
-def eval_dataset(humanloop_test_client: Humanloop, sdk_test_dir: str) -> Generator[TestIdentifiers, None, None]:
+def eval_dataset(get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str) -> Generator[TestIdentifiers, None, None]:
+    humanloop_client = get_humanloop_client()
     dataset_path = f"{sdk_test_dir}/eval_dataset"
     try:
-        response = humanloop_test_client.datasets.upsert(
+        response = humanloop_client.datasets.upsert(
             path=dataset_path,
             datapoints=[
                 {
@@ -117,34 +118,36 @@ def eval_dataset(humanloop_test_client: Humanloop, sdk_test_dir: str) -> Generat
             ],
         )
         yield TestIdentifiers(file_id=response.id, file_path=response.path)
-        humanloop_test_client.datasets.delete(id=response.id)
+        humanloop_client.datasets.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create dataset {dataset_path}: {e}")
 
 
 @pytest.fixture(scope="function")
 def eval_prompt(
-    humanloop_test_client: Humanloop, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
+    get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
 ) -> Generator[TestIdentifiers, None, None]:
+    humanloop_client = get_humanloop_client()
     prompt_path = f"{sdk_test_dir}/eval_prompt"
     try:
-        response = humanloop_test_client.prompts.upsert(
+        response = humanloop_client.prompts.upsert(
             path=prompt_path,
             **test_prompt_config,
         )
         yield TestIdentifiers(file_id=response.id, file_path=response.path)
-        humanloop_test_client.prompts.delete(id=response.id)
+        humanloop_client.prompts.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create prompt {prompt_path}: {e}")
 
 
 @pytest.fixture(scope="function")
 def output_not_null_evaluator(
-    humanloop_test_client: Humanloop, sdk_test_dir: str
+    get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str
 ) -> Generator[TestIdentifiers, None, None]:
+    humanloop_client = get_humanloop_client()
     evaluator_path = f"{sdk_test_dir}/output_not_null_evaluator"
     try:
-        response = humanloop_test_client.evaluators.upsert(
+        response = humanloop_client.evaluators.upsert(
             path=evaluator_path,
             spec={
                 "arguments_type": "target_required",
@@ -157,14 +160,15 @@ def output_not_null(log: dict) -> bool:
             },
         )
         yield TestIdentifiers(file_id=response.id, file_path=response.path)
-        humanloop_test_client.evaluators.delete(id=response.id)
+        humanloop_client.evaluators.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create evaluator {evaluator_path}: {e}")
 
 
 @pytest.fixture(scope="function")
-def id_for_staging_environment(humanloop_test_client: Humanloop, eval_prompt: TestIdentifiers) -> str:
-    response = humanloop_test_client.prompts.list_environments(id=eval_prompt.file_id)
+def id_for_staging_environment(get_humanloop_client: GetHumanloopClientFn, eval_prompt: TestIdentifiers) -> str:
+    humanloop_client = get_humanloop_client()
+    response = humanloop_client.prompts.list_environments(id=eval_prompt.file_id)
     for environment in response:
         if environment.name == "staging":
             return environment.id

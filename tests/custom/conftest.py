@@ -1,10 +1,10 @@
 from typing import Generator
-import typing
 import os
 from dotenv import load_dotenv
 from unittest.mock import MagicMock
 
 import pytest
+from humanloop.client import Humanloop
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
@@ -20,9 +20,6 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import Tracer
 from tests.custom.types import GetHumanloopClientFn
-
-if typing.TYPE_CHECKING:
-    from humanloop.client import Humanloop
 
 
 @pytest.fixture(scope="function")
@@ -82,7 +79,6 @@ def opentelemetry_test_configuration(
         instrumentor.uninstrument()
 
 
-
 @pytest.fixture(scope="session")
 def get_humanloop_client() -> GetHumanloopClientFn:
     load_dotenv()
@@ -92,6 +88,7 @@ def get_humanloop_client() -> GetHumanloopClientFn:
     def _get_humanloop_test_client(use_local_files: bool = False) -> Humanloop:
         return Humanloop(
             api_key=os.getenv("HUMANLOOP_API_KEY"),
+            base_url="http://localhost:80/v5",
             use_local_files=use_local_files,
         )
 
