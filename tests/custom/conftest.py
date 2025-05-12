@@ -88,7 +88,6 @@ def get_humanloop_client() -> GetHumanloopClientFn:
     def _get_humanloop_client(use_local_files: bool = False) -> Humanloop:
         return Humanloop(
             api_key=os.getenv("HUMANLOOP_API_KEY"),
-            base_url="http://localhost:80/v5",
             use_local_files=use_local_files,
         )
 

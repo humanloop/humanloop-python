@@ -2,13 +2,15 @@ from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
 import os
 import time
-from typing import Any, ContextManager, Generator
+from typing import Any, ContextManager, Generator, List, Union
 import io
 from typing import TextIO
 import uuid
 import pytest
 import dotenv
-from tests.custom.types import GetHumanloopClientFn
+from humanloop import AgentResponse, PromptResponse
+from tests.custom.types import GetHumanloopClientFn, SyncableFile
+from click.testing import CliRunner
 
 
 @dataclass
@@ -177,3 +179,81 @@ def id_for_staging_environment(get_humanloop_client: GetHumanloopClientFn, eval_
         if environment.name == "staging":
             return environment.id
     pytest.fail("Staging environment not found")
+
+
+@pytest.fixture
+def syncable_files_fixture(
+    get_humanloop_client: GetHumanloopClientFn,
+    sdk_test_dir: str,
+) -> Generator[list[SyncableFile], None, None]:
+    """Creates a predefined structure of files in Humanloop for testing sync."""
+    files: List[SyncableFile] = [
+        SyncableFile(
+            path="prompts/gpt-4",
+            type="prompt",
+            model="gpt-4",
+        ),
+        SyncableFile(
+            path="prompts/gpt-4o",
+            type="prompt",
+            model="gpt-4o",
+        ),
+        SyncableFile(
+            path="prompts/nested/complex/gpt-4o",
+            type="prompt",
+            model="gpt-4o",
+        ),
+        SyncableFile(
+            path="agents/gpt-4",
+            type="agent",
+            model="gpt-4",
+        ),
+        SyncableFile(
+            path="agents/gpt-4o",
+            type="agent",
+            model="gpt-4o",
+        ),
+    ]
+
+    humanloop_client = get_humanloop_client()
+    created_files = []
+    for file in files:
+        full_path = f"{sdk_test_dir}/{file.path}"
+        response: Union[AgentResponse, PromptResponse]
+        if file.type == "prompt":
+            response = humanloop_client.prompts.upsert(
+                path=full_path,
+                model=file.model,
+            )
+        elif file.type == "agent":
+            response = humanloop_client.agents.upsert(
+                path=full_path,
+                model=file.model,
+            )
+        created_files.append(
+            SyncableFile(
+                path=full_path, type=file.type, model=file.model, id=response.id, version_id=response.version_id
+            )
+        )
+
+    yield created_files
+
+
+@pytest.fixture
+def cli_runner() -> CliRunner:
+    """GIVEN a CLI runner
+    THEN it should be configured to catch exceptions
+    """
+    return CliRunner(mix_stderr=False)
+
+
+@pytest.fixture
+def no_humanloop_api_key_in_env(monkeypatch):
+    """Fixture that removes HUMANLOOP_API_KEY from environment variables.
+
+    Use this fixture in tests that verify behavior when no API key is available
+    in the environment (but could still be loaded from .env files).
+    """
+    # Remove API key from environment
+    monkeypatch.delenv("HUMANLOOP_API_KEY", raising=False)
+    yield

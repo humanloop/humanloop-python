@@ -7,7 +7,6 @@ from humanloop.types import FileType
 import time
 from humanloop.error import HumanloopRuntimeError
 import json
-import re
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -41,8 +40,13 @@ def format_api_error(error: Exception) -> str:
         # Get the detail from the body
         detail = body.get("detail", {})
 
-        # Prefer description, fall back to msg
-        return detail.get("description") or detail.get("msg") or error_msg
+        # Handle both string and dictionary types for detail
+        if isinstance(detail, str):
+            return detail
+        elif isinstance(detail, dict):
+            return detail.get("description") or detail.get("msg") or error_msg
+        else:
+            return error_msg
     except Exception as e:
         logger.debug(f"Failed to parse error message: {str(e)}")
         return error_msg

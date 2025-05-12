@@ -1,79 +1,11 @@
-from typing import Generator, List, NamedTuple, Union
+from typing import List, Union
 from pathlib import Path
 import pytest
-from humanloop import FileType, AgentResponse, PromptResponse
+from humanloop import AgentResponse, PromptResponse
 from humanloop.prompts.client import PromptsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.error import HumanloopRuntimeError
-from tests.custom.types import GetHumanloopClientFn
-
-
-class SyncableFile(NamedTuple):
-    path: str
-    type: FileType
-    model: str
-    id: str = ""
-    version_id: str = ""
-
-
-@pytest.fixture
-def syncable_files_fixture(
-    get_humanloop_client: GetHumanloopClientFn,
-    sdk_test_dir: str,
-) -> Generator[list[SyncableFile], None, None]:
-    """Creates a predefined structure of files in Humanloop for testing sync."""
-    files: List[SyncableFile] = [
-        SyncableFile(
-            path="prompts/gpt-4",
-            type="prompt",
-            model="gpt-4",
-        ),
-        SyncableFile(
-            path="prompts/gpt-4o",
-            type="prompt",
-            model="gpt-4o",
-        ),
-        SyncableFile(
-            path="prompts/nested/complex/gpt-4o",
-            type="prompt",
-            model="gpt-4o",
-        ),
-        SyncableFile(
-            path="agents/gpt-4",
-            type="agent",
-            model="gpt-4",
-        ),
-        SyncableFile(
-            path="agents/gpt-4o",
-            type="agent",
-            model="gpt-4o",
-        ),
-    ]
-
-    humanloop_client = get_humanloop_client()
-    created_files = []
-    for file in files:
-        full_path = f"{sdk_test_dir}/{file.path}"
-        response: Union[AgentResponse, PromptResponse]
-        if file.type == "prompt":
-            response = humanloop_client.prompts.upsert(
-                path=full_path,
-                model=file.model,
-            )
-        elif file.type == "agent":
-            response = humanloop_client.agents.upsert(
-                path=full_path,
-                model=file.model,
-            )
-        created_files.append(
-            SyncableFile(
-                path=full_path, type=file.type, model=file.model, id=response.id, version_id=response.version_id
-            )
-        )
-
-    humanloop_client.pull()
-
-    yield created_files
+from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 
 @pytest.fixture
@@ -96,7 +28,7 @@ def test_pull_basic(
     humanloop_client = get_humanloop_client()
 
     # WHEN running the sync
-    successful_files = humanloop_client.pull()
+    humanloop_client.pull()
 
     # THEN our local filesystem should mirror the remote filesystem in the HL Workspace
     for file in syncable_files_fixture:
