@@ -358,7 +358,6 @@ def test_flow_eval_resolves_to_default_with_callable(
         humanloop_client.flows.delete(id=flow_response.id)
 
 
-@pytest.mark.skip(reason="Skip until agents are in prod")
 def test_agent_eval_works_upserting(
     get_humanloop_client: GetHumanloopClientFn,
     eval_dataset: ResourceIdentifiers,
