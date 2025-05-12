@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 from humanloop.sync.sync_client import SyncClient
 from humanloop.error import HumanloopRuntimeError
+from typing import Literal
 
 
 @pytest.fixture
@@ -87,8 +88,8 @@ def test_cache_functionality(sync_client: SyncClient):
     # Save a test file
     content = "test content"
     path = "test/path"
-    file_type = "prompt"
-    sync_client._save_serialized_file(content, path, file_type)  # type: ignore [arg-type] Ignore because we're deliberately testing an invalid literal
+    file_type: Literal["prompt", "agent"] = "prompt"
+    sync_client._save_serialized_file(content, path, file_type)
 
     # First read should hit disk
     sync_client.get_file_content(path, file_type)

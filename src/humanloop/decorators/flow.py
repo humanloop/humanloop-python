@@ -67,7 +67,7 @@ def flow(
                         "messages": func_args.get("messages"),
                         "trace_parent_id": trace_id,
                     }
-                    this_flow_log: FlowLogResponse = client.flows.log(
+                    this_flow_log: FlowLogResponse = client.flows._log(  # type: ignore [attr-defined]
                         path=decorator_context.path,
                         flow=decorator_context.version,
                         log_status="incomplete",
