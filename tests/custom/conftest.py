@@ -1,9 +1,10 @@
 from typing import Generator
 import typing
+import os
+from dotenv import load_dotenv
 from unittest.mock import MagicMock
 
 import pytest
-from humanloop.base_client import BaseHumanloop
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
@@ -18,9 +19,10 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import Tracer
+from tests.custom.types import GetHumanloopClientFn
 
 if typing.TYPE_CHECKING:
-    from humanloop.client import BaseHumanloop
+    from humanloop.client import Humanloop
 
 
 @pytest.fixture(scope="function")
@@ -80,10 +82,25 @@ def opentelemetry_test_configuration(
         instrumentor.uninstrument()
 
 
+
+@pytest.fixture(scope="session")
+def get_humanloop_client() -> GetHumanloopClientFn:
+    load_dotenv()
+    if not os.getenv("HUMANLOOP_API_KEY"):
+        pytest.fail("HUMANLOOP_API_KEY is not set for integration tests")
+
+    def _get_humanloop_test_client(use_local_files: bool = False) -> Humanloop:
+        return Humanloop(
+            api_key=os.getenv("HUMANLOOP_API_KEY"),
+            use_local_files=use_local_files,
+        )
+
+    return _get_humanloop_test_client
+
+
 @pytest.fixture(scope="function")
 def opentelemetry_hl_test_configuration(
     opentelemetry_test_provider: TracerProvider,
-    humanloop_client: BaseHumanloop,
 ) -> Generator[tuple[Tracer, InMemorySpanExporter], None, None]:
     """Configure OTel backend with HumanloopSpanProcessor.
 

@@ -1,3 +1,4 @@
+from typing import Callable
 from contextlib import contextmanager, redirect_stdout
 from dataclasses import dataclass
 import os
@@ -17,6 +18,7 @@ class TestIdentifiers:
     file_path: str
 
 
+
 @pytest.fixture()
 def capture_stdout() -> ContextManager[TextIO]:
     @contextmanager
@@ -34,17 +36,6 @@ def openai_key() -> str:
     if not os.getenv("OPENAI_API_KEY"):
         pytest.fail("OPENAI_API_KEY is not set for integration tests")
     return os.getenv("OPENAI_API_KEY")  # type: ignore [return-value]
-
-
-@pytest.fixture(scope="session")
-def humanloop_test_client() -> Humanloop:
-    dotenv.load_dotenv()
-    if not os.getenv("HUMANLOOP_API_KEY"):
-        pytest.fail("HUMANLOOP_API_KEY is not set for integration tests")
-    return Humanloop(
-        api_key=os.getenv("HUMANLOOP_API_KEY"),
-        base_url="http://0.0.0.0:80/v5",
-    )
 
 
 @pytest.fixture(scope="function")

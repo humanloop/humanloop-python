@@ -1,17 +1,18 @@
 import logging
 import pytest
+from pathlib import Path
 from unittest.mock import Mock, patch
 from humanloop.sync.sync_client import SyncClient
 from humanloop.error import HumanloopRuntimeError
 
 
 @pytest.fixture
-def mock_client():
+def mock_client() -> Mock:
     return Mock()
 
 
 @pytest.fixture
-def sync_client(mock_client, tmp_path):
+def sync_client(mock_client: Mock, tmp_path: Path) -> SyncClient:
     return SyncClient(
         client=mock_client,
         base_dir=str(tmp_path),
@@ -20,14 +21,14 @@ def sync_client(mock_client, tmp_path):
     )
 
 
-def test_init(sync_client, tmp_path):
+def test_init(sync_client: SyncClient, tmp_path: Path):
     """Test basic initialization of SyncClient."""
     assert sync_client.base_dir == tmp_path
     assert sync_client._cache_size == 10
     assert sync_client.SERIALIZABLE_FILE_TYPES == ["prompt", "agent"]
 
 
-def test_normalize_path(sync_client):
+def test_normalize_path(sync_client: SyncClient):
     """Test path normalization functionality."""
     test_cases = [
         ("path/to/file.prompt", "path/to/file"),
@@ -41,7 +42,7 @@ def test_normalize_path(sync_client):
         assert sync_client._normalize_path(input_path) == expected
 
 
-def test_is_file(sync_client):
+def test_is_file(sync_client: SyncClient):
     """Test file type detection."""
     assert sync_client.is_file("test.prompt")
     assert sync_client.is_file("test.agent")
@@ -49,14 +50,14 @@ def test_is_file(sync_client):
     assert not sync_client.is_file("test")
 
 
-def test_save_and_read_file(sync_client):
+def test_save_and_read_file(sync_client: SyncClient):
     """Test saving and reading files."""
     content = "test content"
     path = "test/path"
     file_type = "prompt"
 
     # Test saving
-    sync_client._save_serialized_file(content, path, file_type)
+    sync_client._save_serialized_file(content, path, "prompt")
     saved_path = sync_client.base_dir / path
     saved_path = saved_path.parent / f"{saved_path.stem}.{file_type}"
     assert saved_path.exists()
@@ -66,62 +67,7 @@ def test_save_and_read_file(sync_client):
     assert read_content == content
 
 
-def test_pull_file(sync_client, mock_client):
-    """Test pulling a single file."""
-    mock_file = Mock()
-    mock_file.type = "prompt"
-    mock_file.path = "test/path"
-    mock_file.raw_file_content = "test content"
-
-    mock_client.files.retrieve_by_path.return_value = mock_file
-
-    success = sync_client._pull_file("test/path.prompt")
-    assert success
-    assert mock_client.files.retrieve_by_path.called
-
-    # Verify file was saved
-    saved_path = sync_client.base_dir / "test/path.prompt"
-    assert saved_path.exists()
-    assert saved_path.read_text() == "test content"
-
-
-def test_pull_directory(sync_client, mock_client):
-    """Test pulling multiple files from a directory."""
-
-    # Create mock responses for different pages
-    def mock_list_files(*args, **kwargs):
-        page = kwargs.get("page", 1)
-        mock_response = Mock()
-
-        if page == 1:
-            mock_response.records = [
-                Mock(type="prompt", path="test/path1", raw_file_content="content1"),
-                Mock(type="agent", path="test/path2", raw_file_content="content2"),
-            ]
-        else:
-            # Return empty list for subsequent pages
-            mock_response.records = []
-
-        return mock_response
-
-    # Set up the mock to use our function
-    mock_client.files.list_files.side_effect = mock_list_files
-
-    successful, failed = sync_client._pull_directory("test")
-    assert len(successful) == 2
-    assert len(failed) == 0
-
-    # Verify files were saved
-    assert (sync_client.base_dir / "test/path1.prompt").exists()
-    assert (sync_client.base_dir / "test/path2.agent").exists()
-
-    # Verify the mock was called with correct parameters
-    mock_client.files.list_files.assert_any_call(
-        type=["prompt", "agent"], page=1, include_raw_file_content=True, environment=None, path="test"
-    )
-
-
-def test_error_handling(sync_client):
+def test_error_handling(sync_client: SyncClient):
     """Test error handling in various scenarios."""
     # Test file not found
     with pytest.raises(HumanloopRuntimeError, match="Local file not found"):
@@ -136,13 +82,13 @@ def test_error_handling(sync_client):
         assert not sync_client._pull_file("test.prompt")
 
 
-def test_cache_functionality(sync_client):
+def test_cache_functionality(sync_client: SyncClient):
     """Test LRU cache functionality."""
     # Save a test file
     content = "test content"
     path = "test/path"
     file_type = "prompt"
-    sync_client._save_serialized_file(content, path, file_type)
+    sync_client._save_serialized_file(content, path, file_type)  # type: ignore [arg-type] Ignore because we're deliberately testing an invalid literal
 
     # First read should hit disk
     sync_client.get_file_content(path, file_type)

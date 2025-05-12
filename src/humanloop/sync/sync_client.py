@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
 
 # Set up logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("humanloop.sdk.sync")
 logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 formatter = logging.Formatter("%(message)s")
