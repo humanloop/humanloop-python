@@ -24,6 +24,8 @@ def sync_client(mock_client: Mock, tmp_path: Path) -> SyncClient:
 
 def test_init(sync_client: SyncClient, tmp_path: Path):
     """Test basic initialization of SyncClient."""
+    # GIVEN a SyncClient instance
+    # THEN it should be initialized with correct base directory, cache size and file types
     assert sync_client.base_dir == tmp_path
     assert sync_client._cache_size == 10
     assert sync_client.SERIALIZABLE_FILE_TYPES == ["prompt", "agent"]
@@ -31,6 +33,7 @@ def test_init(sync_client: SyncClient, tmp_path: Path):
 
 def test_normalize_path(sync_client: SyncClient):
     """Test path normalization functionality."""
+    # GIVEN various file paths with different formats
     test_cases = [
         ("path/to/file.prompt", "path/to/file"),
         ("path\\to\\file.agent", "path/to/file"),
@@ -40,11 +43,17 @@ def test_normalize_path(sync_client: SyncClient):
     ]
 
     for input_path, expected in test_cases:
-        assert sync_client._normalize_path(input_path) == expected
+        # WHEN they are normalized
+        normalized = sync_client._normalize_path(input_path)
+        # THEN they should be converted to the expected format
+        assert normalized == expected
 
 
 def test_is_file(sync_client: SyncClient):
     """Test file type detection."""
+    # GIVEN various file paths
+    # WHEN checking if they are valid file types
+    # THEN only .prompt and .agent files should return True
     assert sync_client.is_file("test.prompt")
     assert sync_client.is_file("test.agent")
     assert not sync_client.is_file("test.txt")
@@ -53,54 +62,68 @@ def test_is_file(sync_client: SyncClient):
 
 def test_save_and_read_file(sync_client: SyncClient):
     """Test saving and reading files."""
+    # GIVEN a file content and path
     content = "test content"
     path = "test/path"
     file_type = "prompt"
 
-    # Test saving
+    # WHEN saving the file
     sync_client._save_serialized_file(content, path, "prompt")
     saved_path = sync_client.base_dir / path
     saved_path = saved_path.parent / f"{saved_path.stem}.{file_type}"
+
+    # THEN the file should exist on disk
     assert saved_path.exists()
 
-    # Test reading
+    # WHEN reading the file
     read_content = sync_client.get_file_content(path, file_type)
+
+    # THEN the content should match
     assert read_content == content
 
 
 def test_error_handling(sync_client: SyncClient):
     """Test error handling in various scenarios."""
-    # Test file not found
+    # GIVEN a nonexistent file
+    # WHEN trying to read it
+    # THEN a HumanloopRuntimeError should be raised
     with pytest.raises(HumanloopRuntimeError, match="Local file not found"):
         sync_client.get_file_content("nonexistent", "prompt")
 
-    # Test invalid file type
+    # GIVEN an invalid file type
+    # WHEN trying to pull the file
+    # THEN a ValueError should be raised
     with pytest.raises(ValueError, match="Unsupported file type"):
         sync_client._pull_file("test.txt")
 
-    # Test API error
+    # GIVEN an API error
+    # WHEN trying to pull a file
+    # THEN it should return False
     with patch.object(sync_client.client.files, "retrieve_by_path", side_effect=Exception("API Error")):
         assert not sync_client._pull_file("test.prompt")
 
 
 def test_cache_functionality(sync_client: SyncClient):
     """Test LRU cache functionality."""
-    # Save a test file
+    # GIVEN a test file
     content = "test content"
     path = "test/path"
     file_type: Literal["prompt", "agent"] = "prompt"
     sync_client._save_serialized_file(content, path, file_type)
 
-    # First read should hit disk
+    # WHEN reading the file for the first time
     sync_client.get_file_content(path, file_type)
+    # THEN it should hit disk (implicitly verified by no cache hit)
 
-    # Modify file on disk
+    # WHEN modifying the file on disk
     saved_path = sync_client.base_dir / f"{path}.{file_type}"
     saved_path.write_text("modified content")
 
-    # Second read should use cache
+    # THEN subsequent reads should use cache
     assert sync_client.get_file_content(path, file_type) == content
 
-    # Clear cache and verify new content is read
+    # WHEN clearing the cache
     sync_client.clear_cache()
+
+    # THEN new content should be read from disk
     assert sync_client.get_file_content(path, file_type) == "modified content"

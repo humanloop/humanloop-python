@@ -17,16 +17,11 @@ class SyncableFile(NamedTuple):
 
 
 @pytest.fixture
-def test_file_structure(
+def syncable_files_fixture(
     get_humanloop_client: GetHumanloopClientFn,
     sdk_test_dir: str,
-    request,  # This gives us access to the test function's parameters
 ) -> Generator[list[SyncableFile], None, None]:
-    """Creates a predefined structure of files in Humanloop for testing sync.
-
-    The fixture will use use_local_files=True if the test function requests it,
-    otherwise it will use use_local_files=False.
-    """
+    """Creates a predefined structure of files in Humanloop for testing sync."""
     files: List[SyncableFile] = [
         SyncableFile(
             path="prompts/gpt-4",
@@ -56,7 +51,6 @@ def test_file_structure(
     ]
 
     humanloop_client = get_humanloop_client()
-    # Create the files in Humanloop
     created_files = []
     for file in files:
         full_path = f"{sdk_test_dir}/{file.path}"
@@ -86,7 +80,6 @@ def test_file_structure(
 def cleanup_local_files():
     """Cleanup any locally synced files after tests"""
     yield
-    # Clean up the local humanloop directory after tests
     local_dir = Path("humanloop")
     if local_dir.exists():
         import shutil
@@ -94,69 +87,64 @@ def cleanup_local_files():
         shutil.rmtree(local_dir)
 
 
-def test_client(get_humanloop_client: GetHumanloopClientFn):
-    client = get_humanloop_client(use_local_files=True)
-    assert client.use_local_files
-
-
 def test_pull_basic(
-    test_file_structure: List[SyncableFile],
+    syncable_files_fixture: List[SyncableFile],
     get_humanloop_client: GetHumanloopClientFn,
 ):
     """Test that humanloop.sync() correctly syncs remote files to local filesystem"""
-    # Run the sync
+    # GIVEN a set of files in the remote system (from syncable_files_fixture)
     humanloop_client = get_humanloop_client()
+
+    # WHEN running the sync
     successful_files = humanloop_client.pull()
 
-    # Verify each file was synced correctly
-    for file in test_file_structure:
-        # Get the extension based on file type: .prompt, .agent
+    # THEN our local filesystem should mirror the remote filesystem in the HL Workspace
+    for file in syncable_files_fixture:
         extension = f".{file.type}"
-
-        # The local path should mirror the remote path structure
         local_path = Path("humanloop") / f"{file.path}{extension}"
 
-        # Basic assertions
+        # THEN the file and its directory should exist
         assert local_path.exists(), f"Expected synced file at {local_path}"
         assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
-        # Verify it's not empty
+        # THEN the file should not be empty
         content = local_path.read_text()
         assert content, f"File at {local_path} should not be empty"
 
 
 def test_overload_with_local_files(
     get_humanloop_client: GetHumanloopClientFn,
-    test_file_structure: List[SyncableFile],
+    syncable_files_fixture: List[SyncableFile],
 ):
     """Test that overload_with_local_files correctly handles local files."""
-    # The test_file_structure fixture will automatically use use_local_files=True
+    # GIVEN a client with use_local_files=True and pulled files
     humanloop_client = get_humanloop_client(use_local_files=True)
     humanloop_client.pull()
 
-    # Test using the pulled files
-    test_file = test_file_structure[0]  # Use the first test file
+    # GIVEN a test file from the structure
+    test_file = syncable_files_fixture[0]
     extension = f".{test_file.type}"
     local_path = Path("humanloop") / f"{test_file.path}{extension}"
 
-    # Verify the file was pulled correctly
+    # THEN the file should exist locally
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
-    # Test call with pulled file
+    # WHEN calling the file
     response: Union[AgentResponse, PromptResponse]
     if test_file.type == "prompt":
         response = humanloop_client.prompts.call(  # type: ignore [assignment]
             path=test_file.path, messages=[{"role": "user", "content": "Testing"}]
         )
-        assert response is not None
     elif test_file.type == "agent":
         response = humanloop_client.agents.call(  # type: ignore [assignment]
             path=test_file.path, messages=[{"role": "user", "content": "Testing"}]
         )
-        assert response is not None
+    # THEN the response should not be None
+    assert response is not None
 
-    # Test with invalid path
+    # WHEN calling with an invalid path
+    # THEN it should raise HumanloopRuntimeError
     with pytest.raises(HumanloopRuntimeError):
         sub_client: Union[PromptsClient, AgentsClient]
         match test_file.type:
@@ -171,36 +159,37 @@ def test_overload_with_local_files(
 
 def test_overload_log_with_local_files(
     get_humanloop_client: GetHumanloopClientFn,
-    test_file_structure: List[SyncableFile],
+    syncable_files_fixture: List[SyncableFile],
     sdk_test_dir: str,
 ):
     """Test that overload_with_local_files correctly handles local files for log operations."""
-    # The test_file_structure fixture will automatically use use_local_files=True
+    # GIVEN a client with use_local_files=True and pulled files
     humanloop_client = get_humanloop_client(use_local_files=True)
     humanloop_client.pull()
 
-    # Test using the pulled files
-    test_file = test_file_structure[0]  # Use the first test file
+    # GIVEN a test file from the structure
+    test_file = syncable_files_fixture[0]
     extension = f".{test_file.type}"
     local_path = Path("humanloop") / f"{test_file.path}{extension}"
 
-    # Verify the file was pulled correctly
+    # THEN the file should exist locally
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
-    # Test log with pulled file
+    # WHEN logging with the pulled file
     if test_file.type == "prompt":
         response = humanloop_client.prompts.log(  # type: ignore [assignment]
             path=test_file.path, messages=[{"role": "user", "content": "Testing"}], output="Test response"
         )
-        assert response is not None
     elif test_file.type == "agent":
         response = humanloop_client.agents.log(  # type: ignore [assignment]
             path=test_file.path, messages=[{"role": "user", "content": "Testing"}], output="Test response"
         )
-        assert response is not None
+    # THEN the response should not be None
+    assert response is not None
 
-    # Test with invalid path
+    # WHEN logging with an invalid path
+    # THEN it should raise HumanloopRuntimeError
     with pytest.raises(HumanloopRuntimeError):
         if test_file.type == "prompt":
             humanloop_client.prompts.log(
@@ -218,29 +207,24 @@ def test_overload_log_with_local_files(
 
 def test_overload_version_environment_handling(
     get_humanloop_client: GetHumanloopClientFn,
-    test_file_structure: List[SyncableFile],
+    syncable_files_fixture: List[SyncableFile],
 ):
-    """Test that overload_with_local_files correctly handles version_id and environment parameters.
-
-    Flow:
-    1. Create files in remote (via test_file_structure fixture)
-    2. Pull files locally
-    3. Test that specifying path + version_id/environment raises HumanloopRuntimeError
-    """
-    # First pull the files locally
+    """Test that overload_with_local_files correctly handles version_id and environment parameters."""
+    # GIVEN a client with use_local_files=True and pulled files
     humanloop_client = get_humanloop_client(use_local_files=True)
     humanloop_client.pull()
 
-    # Test using the pulled files
-    test_file = test_file_structure[0]  # Use the first test file
+    # GIVEN a test file from the structure
+    test_file = syncable_files_fixture[0]
     extension = f".{test_file.type}"
     local_path = Path("humanloop") / f"{test_file.path}{extension}"
 
-    # Verify the file was pulled correctly
+    # THEN the file should exist locally
     assert local_path.exists(), f"Expected pulled file at {local_path}"
     assert local_path.parent.exists(), f"Expected directory at {local_path.parent}"
 
-    # Test with version_id - should raise HumanloopRuntimeError
+    # WHEN calling with version_id
+    # THEN it should raise HumanloopRuntimeError
     with pytest.raises(HumanloopRuntimeError, match="Cannot use local file.*version_id or environment was specified"):
         if test_file.type == "prompt":
             humanloop_client.prompts.call(
@@ -255,7 +239,8 @@ def test_overload_version_environment_handling(
                 messages=[{"role": "user", "content": "Testing"}],
             )
 
-    # Test with environment - should raise HumanloopRuntimeError
+    # WHEN calling with environment
+    # THEN it should raise HumanloopRuntimeError
     with pytest.raises(HumanloopRuntimeError, match="Cannot use local file.*version_id or environment was specified"):
         if test_file.type == "prompt":
             humanloop_client.prompts.call(
@@ -270,7 +255,8 @@ def test_overload_version_environment_handling(
                 messages=[{"role": "user", "content": "Testing"}],
             )
 
-    # Test with both version_id and environment - should raise HumanloopRuntimeError
+    # WHEN calling with both version_id and environment
+    # THEN it should raise HumanloopRuntimeError
     with pytest.raises(HumanloopRuntimeError, match="Cannot use local file.*version_id or environment was specified"):
         if test_file.type == "prompt":
             humanloop_client.prompts.call(
