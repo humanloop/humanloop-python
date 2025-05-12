@@ -5,5 +5,6 @@ poetry.toml
 .ruff_cache/
 .vscode
 .env
+.env.test.local
 tests/assets/*.jsonl
 tests/assets/*.parquet
