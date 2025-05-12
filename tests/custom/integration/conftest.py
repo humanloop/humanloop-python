@@ -41,7 +41,10 @@ def humanloop_test_client() -> Humanloop:
     dotenv.load_dotenv()
     if not os.getenv("HUMANLOOP_API_KEY"):
         pytest.fail("HUMANLOOP_API_KEY is not set for integration tests")
-    return Humanloop(api_key=os.getenv("HUMANLOOP_API_KEY"))
+    return Humanloop(
+        api_key=os.getenv("HUMANLOOP_API_KEY"),
+        base_url="http://0.0.0.0:80/v5",
+    )
 
 
 @pytest.fixture(scope="function")

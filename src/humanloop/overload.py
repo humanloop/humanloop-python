@@ -1,3 +1,4 @@
+from collections import defaultdict
 import inspect
 import logging
 import types
@@ -99,10 +100,13 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
 
 
 def overload_call(client: PromptsClient) -> PromptsClient:
-    client._call = client.call  # type: ignore [attr-defined]
+    if not hasattr(client, "_overloads"):
+        client._overloads = defaultdict(list)  # type: ignore [attr-defined]
+    if len(client._overloads["call"]) == 0:  # type: ignore [attr-defined]
+        client._overloads["call"].append(client.call)  # type: ignore [attr-defined]
 
     def _overload_call(self, **kwargs) -> PromptCallResponse:
-        # None if not logging inside a decorator
+        # trace_id is None if logging outside a decorator
         trace_id = get_trace_id()
         if trace_id is not None:
             if "trace_parent_id" in kwargs:
@@ -116,14 +120,13 @@ def overload_call(client: PromptsClient) -> PromptsClient:
             }
 
         try:
-            response = self._call(**kwargs)
+            response = client._overloads["call"][0](**kwargs)  # type: ignore [attr-defined]
         except Exception as e:
             # Re-raising as HumanloopRuntimeError so the decorators don't catch it
             raise HumanloopRuntimeError from e
 
         return response
 
-    # Replace the original log method with the overloaded one
     client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
     return client
 
@@ -168,13 +171,34 @@ def overload_with_local_files(
     Raises:
         HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
     """
-    original_call = client._call if hasattr(client, "_call") else client.call
-    original_log = client._log if hasattr(client, "_log") else client.log
+    if not hasattr(client, "_overloads"):
+        client._overloads = defaultdict(list)  # type: ignore [union-attr]
+    # If the method has been overloaded, don't re-add the method
+    if isinstance(client, PromptsClient):
+        if len(client._overloads["call"]) == 1:  # type: ignore [attr-defined]
+            client._overloads["call"].append(client.call)  # type: ignore [attr-defined]
+        else:
+            raise RuntimeError(f"Unexpected overload order of operations for {client}.call")
+    elif isinstance(client, AgentsClient):
+        if len(client._overloads["call"]) == 0:
+            client._overloads["call"].append(client.call)
+        else:
+            raise RuntimeError(f"Unexpected overload order of operations for {client}.call")
+    else:
+        raise NotImplementedError(f"Unsupported client type: {type(client)}")
+    if len(client._overloads["log"]) == 0:
+        client._overloads["log"].append(client.log)
+    else:
+        raise RuntimeError(f"Unexpected overload order of operations for {client}.log")
+
     file_type = _get_file_type_from_client(client)
 
     def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
         if "id" in kwargs and "path" in kwargs:
-            raise HumanloopRuntimeError(f"Can only specify one of `id` or `path` when {function_name}ing a {file_type}")
+            raise HumanloopRuntimeError(
+                "Can only specify one of `id` or `path` when "
+                f"{'logging' if function_name == 'log' else 'calling'} a {file_type}"
+            )
         # Handle local files if enabled
         if use_local_files and "path" in kwargs:
             # Check if version_id or environment is specified
@@ -204,9 +228,9 @@ def overload_with_local_files(
 
         try:
             if function_name == "call":
-                return original_call(**kwargs)
+                return client._overloads["call"][1](**kwargs)  # type: ignore [attr-defined, union-attr]
             elif function_name == "log":
-                return original_log(**kwargs)
+                return client._overloads["log"][0](**kwargs)  # type: ignore [attr-defined, union-attr]
             else:
                 raise ValueError(f"Unsupported function name: {function_name}")
         except Exception as e:

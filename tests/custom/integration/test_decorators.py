@@ -3,7 +3,6 @@ from typing import Any
 
 from openai import OpenAI
 from humanloop.client import Humanloop
-from humanloop.types.chat_message import ChatMessage
 
 
 def test_prompt_decorator(
