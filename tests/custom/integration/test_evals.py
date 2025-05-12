@@ -3,15 +3,15 @@ from typing import Any
 
 import pytest
 from humanloop.error import HumanloopRuntimeError
-from tests.custom.integration.conftest import TestIdentifiers
+from tests.custom.integration.conftest import ResourceIdentifiers
 from tests.custom.types import GetHumanloopClientFn
 
 
 def test_eval_run_works_on_online_files(
     get_humanloop_client: GetHumanloopClientFn,
-    output_not_null_evaluator: TestIdentifiers,
-    eval_dataset: TestIdentifiers,
-    eval_prompt: TestIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    eval_prompt: ResourceIdentifiers,
 ) -> None:
     humanloop_client = get_humanloop_client()
     humanloop_client.evaluations.run(  # type: ignore [attr-defined]
@@ -39,9 +39,9 @@ def test_eval_run_works_on_online_files(
 
 def test_eval_run_version_id(
     get_humanloop_client: GetHumanloopClientFn,
-    output_not_null_evaluator: TestIdentifiers,
-    eval_dataset: TestIdentifiers,
-    eval_prompt: TestIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    eval_prompt: ResourceIdentifiers,
     test_prompt_config: dict[str, Any],
 ) -> None:
     humanloop_client = get_humanloop_client()
@@ -88,9 +88,9 @@ def test_eval_run_version_id(
 
 def test_eval_run_environment(
     get_humanloop_client: GetHumanloopClientFn,
-    output_not_null_evaluator: TestIdentifiers,
-    eval_dataset: TestIdentifiers,
-    eval_prompt: TestIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    eval_prompt: ResourceIdentifiers,
     test_prompt_config: dict[str, Any],
     id_for_staging_environment: str,
 ) -> None:
@@ -141,9 +141,9 @@ def test_eval_run_environment(
 @pytest.mark.parametrize("version_lookup", ["version_id", "environment"])
 def test_eval_run_version_lookup_fails_with_path(
     get_humanloop_client: GetHumanloopClientFn,
-    eval_prompt: TestIdentifiers,
-    eval_dataset: TestIdentifiers,
-    output_not_null_evaluator: TestIdentifiers,
+    eval_prompt: ResourceIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
     version_lookup: str,
 ):
     # GIVEN an eval run where we try to evaluate a non-default version
@@ -172,9 +172,9 @@ def test_eval_run_version_lookup_fails_with_path(
 
 def test_eval_run_with_version_upsert(
     get_humanloop_client: GetHumanloopClientFn,
-    eval_prompt: TestIdentifiers,
-    eval_dataset: TestIdentifiers,
-    output_not_null_evaluator: TestIdentifiers,
+    eval_prompt: ResourceIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
     test_prompt_config: dict[str, Any],
 ):
     humanloop_client = get_humanloop_client()
@@ -210,8 +210,8 @@ def test_eval_run_with_version_upsert(
 
 def test_flow_eval_does_not_work_without_callable(
     get_humanloop_client: GetHumanloopClientFn,
-    eval_dataset: TestIdentifiers,
-    output_not_null_evaluator: TestIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
 ):
     with pytest.raises(HumanloopRuntimeError) as e:
         humanloop_client = get_humanloop_client()
@@ -241,8 +241,8 @@ def test_flow_eval_does_not_work_without_callable(
 
 def test_flow_eval_works_with_callable(
     get_humanloop_client: GetHumanloopClientFn,
-    eval_dataset: TestIdentifiers,
-    output_not_null_evaluator: TestIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
     sdk_test_dir: str,
 ):
     humanloop_client = get_humanloop_client()
@@ -290,8 +290,8 @@ def test_flow_eval_works_with_callable(
 
 def test_cannot_evaluate_agent_with_callable(
     get_humanloop_client: GetHumanloopClientFn,
-    eval_dataset: TestIdentifiers,
-    output_not_null_evaluator: TestIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
 ):
     with pytest.raises(ValueError) as e:
         humanloop_client = get_humanloop_client()
@@ -316,8 +316,8 @@ def test_cannot_evaluate_agent_with_callable(
 
 def test_flow_eval_resolves_to_default_with_callable(
     get_humanloop_client: GetHumanloopClientFn,
-    output_not_null_evaluator: TestIdentifiers,
-    eval_dataset: TestIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
+    eval_dataset: ResourceIdentifiers,
     sdk_test_dir: str,
 ) -> None:
     humanloop_client = get_humanloop_client()
@@ -361,8 +361,8 @@ def test_flow_eval_resolves_to_default_with_callable(
 @pytest.mark.skip(reason="Skip until agents are in prod")
 def test_agent_eval_works_upserting(
     get_humanloop_client: GetHumanloopClientFn,
-    eval_dataset: TestIdentifiers,
-    output_not_null_evaluator: TestIdentifiers,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
     sdk_test_dir: str,
 ):
     humanloop_client = get_humanloop_client()

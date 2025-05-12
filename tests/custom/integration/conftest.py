@@ -8,12 +8,11 @@ from typing import TextIO
 import uuid
 import pytest
 import dotenv
-from humanloop.client import Humanloop
 from tests.custom.types import GetHumanloopClientFn
 
 
 @dataclass
-class TestIdentifiers:
+class ResourceIdentifiers:
     file_id: str
     file_path: str
 
@@ -40,6 +39,7 @@ def openai_key() -> str:
 @pytest.fixture(scope="function")
 def sdk_test_dir(get_humanloop_client: GetHumanloopClientFn) -> Generator[str, None, None]:
     humanloop_client = get_humanloop_client()
+
     def cleanup_directory(directory_id: str):
         directory_response = humanloop_client.directories.get(id=directory_id)
         for subdirectory in directory_response.subdirectories:
@@ -95,7 +95,9 @@ def test_prompt_config() -> dict[str, Any]:
 
 
 @pytest.fixture(scope="function")
-def eval_dataset(get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str) -> Generator[TestIdentifiers, None, None]:
+def eval_dataset(
+    get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str
+) -> Generator[ResourceIdentifiers, None, None]:
     humanloop_client = get_humanloop_client()
     dataset_path = f"{sdk_test_dir}/eval_dataset"
     try:
@@ -119,7 +121,7 @@ def eval_dataset(get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str) 
                 },
             ],
         )
-        yield TestIdentifiers(file_id=response.id, file_path=response.path)
+        yield ResourceIdentifiers(file_id=response.id, file_path=response.path)
         humanloop_client.datasets.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create dataset {dataset_path}: {e}")
@@ -128,7 +130,7 @@ def eval_dataset(get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str) 
 @pytest.fixture(scope="function")
 def eval_prompt(
     get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
-) -> Generator[TestIdentifiers, None, None]:
+) -> Generator[ResourceIdentifiers, None, None]:
     humanloop_client = get_humanloop_client()
     prompt_path = f"{sdk_test_dir}/eval_prompt"
     try:
@@ -136,7 +138,7 @@ def eval_prompt(
             path=prompt_path,
             **test_prompt_config,
         )
-        yield TestIdentifiers(file_id=response.id, file_path=response.path)
+        yield ResourceIdentifiers(file_id=response.id, file_path=response.path)
         humanloop_client.prompts.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create prompt {prompt_path}: {e}")
@@ -145,7 +147,7 @@ def eval_prompt(
 @pytest.fixture(scope="function")
 def output_not_null_evaluator(
     get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str
-) -> Generator[TestIdentifiers, None, None]:
+) -> Generator[ResourceIdentifiers, None, None]:
     humanloop_client = get_humanloop_client()
     evaluator_path = f"{sdk_test_dir}/output_not_null_evaluator"
     try:
@@ -161,14 +163,14 @@ def output_not_null(log: dict) -> bool:
                 "evaluator_type": "python",
             },
         )
-        yield TestIdentifiers(file_id=response.id, file_path=response.path)
+        yield ResourceIdentifiers(file_id=response.id, file_path=response.path)
         humanloop_client.evaluators.delete(id=response.id)
     except Exception as e:
         pytest.fail(f"Failed to create evaluator {evaluator_path}: {e}")
 
 
 @pytest.fixture(scope="function")
-def id_for_staging_environment(get_humanloop_client: GetHumanloopClientFn, eval_prompt: TestIdentifiers) -> str:
+def id_for_staging_environment(get_humanloop_client: GetHumanloopClientFn, eval_prompt: ResourceIdentifiers) -> str:
     humanloop_client = get_humanloop_client()
     response = humanloop_client.prompts.list_environments(id=eval_prompt.file_id)
     for environment in response:
