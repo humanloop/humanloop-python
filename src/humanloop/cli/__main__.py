@@ -1,6 +1,5 @@
 import click
 import logging
-from pathlib import Path
 from typing import Optional, Callable
 from functools import wraps
 from dotenv import load_dotenv, find_dotenv
@@ -8,7 +7,6 @@ import os
 import sys
 from humanloop import Humanloop
 from humanloop.sync.sync_client import SyncClient
-from datetime import datetime
 import time
 
 # Set up logging
@@ -26,37 +24,69 @@ ERROR_COLOR = "red"
 INFO_COLOR = "blue"
 WARNING_COLOR = "yellow"
 
-def get_client(api_key: Optional[str] = None, env_file: Optional[str] = None, base_url: Optional[str] = None) -> Humanloop:
-    """Get a Humanloop client instance.
-    
-    If no API key is provided, it will be loaded from the .env file, or the environment variable HUMANLOOP_API_KEY.
+
+def load_api_key(env_file: Optional[str] = None) -> str:
+    """Load API key from provided value, .env file, or environment variable.
+
+    Args:
+        api_key: Optional API key provided directly
+        env_file: Optional path to .env file
+
+    Returns:
+        str: The loaded API key
 
     Raises:
-        click.ClickException: If no API key is found.
+        click.ClickException: If no API key is found
+    """
+    # Try loading from .env file
+    if env_file:
+        load_dotenv(env_file)
+    else:
+        # Try to find .env file in current directory or parent directories
+        env_path = find_dotenv()
+        if env_path:
+            load_dotenv(env_path)
+        elif os.path.exists(".env"):
+            load_dotenv(".env")
+        else:
+            load_dotenv()
+
+    # Get API key from environment
+    api_key = os.getenv("HUMANLOOP_API_KEY")
+    if not api_key:
+        raise click.ClickException(
+            click.style(
+                "No API key found. Set HUMANLOOP_API_KEY in .env file or environment, or use --api-key", fg=ERROR_COLOR
+            )
+        )
+
+    return api_key
+
+
+def get_client(
+    api_key: Optional[str] = None, env_file: Optional[str] = None, base_url: Optional[str] = None
+) -> Humanloop:
+    """Get a Humanloop client instance.
+
+    Args:
+        api_key: Optional API key provided directly
+        env_file: Optional path to .env file
+        base_url: Optional base URL for the API
+
+    Returns:
+        Humanloop: Configured client instance
+
+    Raises:
+        click.ClickException: If no API key is found
     """
     if not api_key:
-        if env_file:
-            load_dotenv(env_file)
-        else:
-            env_path = find_dotenv()
-            if env_path:
-                load_dotenv(env_path)
-            else:
-                if os.path.exists(".env"):
-                    load_dotenv(".env")
-                else:
-                    load_dotenv()
-            
-            api_key = os.getenv("HUMANLOOP_API_KEY")
-            if not api_key:
-                raise click.ClickException(
-                    click.style("No API key found. Set HUMANLOOP_API_KEY in .env file or environment, or use --api-key", fg=ERROR_COLOR)
-                )
-
+        api_key = load_api_key(env_file)
     return Humanloop(api_key=api_key, base_url=base_url)
+
 
 def common_options(f: Callable) -> Callable:
     """Decorator for common CLI options."""
+
     @click.option(
         "--api-key",
         help="Humanloop API key. If not provided, uses HUMANLOOP_API_KEY from .env or environment.",
@@ -84,13 +114,16 @@ def common_options(f: Callable) -> Callable:
     @wraps(f)
     def wrapper(*args, **kwargs):
         return f(*args, **kwargs)
+
     return wrapper
+
 
 def handle_sync_errors(f: Callable) -> Callable:
     """Decorator for handling sync operation errors.
-    
+
     If an error occurs in any operation that uses this decorator, it will be logged and the program will exit with a non-zero exit code.
     """
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
@@ -98,18 +131,21 @@ def handle_sync_errors(f: Callable) -> Callable:
         except Exception as e:
             click.echo(click.style(str(f"Error: {e}"), fg=ERROR_COLOR))
             sys.exit(1)
+
     return wrapper
+
 
 @click.group(
     help="Humanloop CLI for managing sync operations.",
     context_settings={
         "help_option_names": ["-h", "--help"],
         "max_content_width": 100,
-    }
+    },
 )
-def cli(): # Does nothing because used as a group for other subcommands (pull, push, etc.)
+def cli():  # Does nothing because used as a group for other subcommands (pull, push, etc.)
     """Humanloop CLI for managing sync operations."""
     pass
+
 
 @cli.command()
 @click.option(
@@ -140,14 +176,14 @@ def cli(): # Does nothing because used as a group for other subcommands (pull, p
 @handle_sync_errors
 @common_options
 def pull(
-    path: Optional[str], 
-    environment: Optional[str], 
-    api_key: Optional[str], 
-    env_file: Optional[str], 
-    base_dir: str, 
-    base_url: Optional[str], 
+    path: Optional[str],
+    environment: Optional[str],
+    api_key: Optional[str],
+    env_file: Optional[str],
+    base_dir: str,
+    base_url: Optional[str],
     verbose: bool,
-    quiet: bool
+    quiet: bool,
 ):
     """Pull Prompt and Agent files from Humanloop to your local filesystem.
 
@@ -178,29 +214,30 @@ def pull(
     Currently only supports syncing Prompt and Agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
     sync_client = SyncClient(client, base_dir=base_dir, log_level=logging.DEBUG if verbose else logging.WARNING)
-    
+
     click.echo(click.style("Pulling files from Humanloop...", fg=INFO_COLOR))
     click.echo(click.style(f"Path: {path or '(root)'}", fg=INFO_COLOR))
     click.echo(click.style(f"Environment: {environment or '(default)'}", fg=INFO_COLOR))
-    
+
     start_time = time.time()
     successful_files, failed_files = sync_client.pull(path, environment)
     duration_ms = int((time.time() - start_time) * 1000)
-    
+
     # Determine if the operation was successful based on failed_files
     is_successful = not failed_files
     duration_color = SUCCESS_COLOR if is_successful else ERROR_COLOR
     click.echo(click.style(f"Pull completed in {duration_ms}ms", fg=duration_color))
-    
+
     if successful_files and not quiet:
         click.echo(click.style(f"\nSuccessfully pulled {len(successful_files)} files:", fg=SUCCESS_COLOR))
-        for file in successful_files:   
+        for file in successful_files:
             click.echo(click.style(f"  ✓ {file}", fg=SUCCESS_COLOR))
-            
+
     if failed_files:
         click.echo(click.style(f"\nFailed to pull {len(failed_files)} files:", fg=ERROR_COLOR))
         for file in failed_files:
             click.echo(click.style(f"  ✗ {file}", fg=ERROR_COLOR))
 
+
 if __name__ == "__main__":
-    cli() 
+    cli()
