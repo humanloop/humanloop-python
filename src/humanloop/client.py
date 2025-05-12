@@ -18,7 +18,7 @@ from humanloop.evals.types import (
 )
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.overload import overload_call, overload_log, overload_with_local_files
+from humanloop.overload import overload_client
 from humanloop.decorators.flow import flow as flow_decorator_factory
 from humanloop.decorators.prompt import prompt_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
@@ -150,20 +150,14 @@ class Humanloop(BaseHumanloop):
 
         # Overload the .log method of the clients to be aware of Evaluation Context
         # and the @flow decorator providing the trace_id
-        self.prompts = overload_log(client=self.prompts)
-        self.prompts = overload_call(client=self.prompts)
-        self.prompts = overload_with_local_files(  # type: ignore [assignment]
-            client=self.prompts,
-            sync_client=self._sync_client,
-            use_local_files=self.use_local_files,
+        self.prompts = overload_client(
+            client=self.prompts, sync_client=self._sync_client, use_local_files=self.use_local_files
         )
-        self.agents = overload_with_local_files(  # type: ignore [assignment]
-            client=self.agents,
-            sync_client=self._sync_client,
-            use_local_files=self.use_local_files,
+        self.agents = overload_client(
+            client=self.agents, sync_client=self._sync_client, use_local_files=self.use_local_files
         )
-        self.flows = overload_log(client=self.flows)
-        self.tools = overload_log(client=self.tools)
+        self.flows = overload_client(client=self.flows)
+        self.tools = overload_client(client=self.tools)
 
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider

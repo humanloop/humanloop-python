@@ -1,23 +1,21 @@
-from collections import defaultdict
 import inspect
 import logging
 import types
-import warnings
-from typing import TypeVar, Union
-from pathlib import Path
+from typing import Any, Dict, Optional, Union, Callable
+
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
     get_trace_id,
 )
 from humanloop.error import HumanloopRuntimeError
-
-from humanloop.evaluators.client import EvaluatorsClient
-from humanloop.flows.client import FlowsClient
+from humanloop.sync.sync_client import SyncClient
 from humanloop.prompts.client import PromptsClient
+from humanloop.flows.client import FlowsClient
+from humanloop.datasets.client import DatasetsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.tools.client import ToolsClient
-from humanloop.sync.sync_client import SyncClient
+from humanloop.evaluators.client import EvaluatorsClient
 from humanloop.types import FileType
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
@@ -27,33 +25,40 @@ from humanloop.types.prompt_call_response import PromptCallResponse
 
 logger = logging.getLogger("humanloop.sdk")
 
+ResponseType = Union[
+    CreatePromptLogResponse,
+    CreateToolLogResponse,
+    CreateFlowLogResponse,
+    CreateEvaluatorLogResponse,
+    PromptCallResponse,
+]
 
-CLIENT_TYPE = TypeVar("CLIENT_TYPE", PromptsClient, FlowsClient, EvaluatorsClient, ToolsClient)
+
+def _get_file_type_from_client(
+    client: Union[PromptsClient, AgentsClient, ToolsClient, FlowsClient, DatasetsClient, EvaluatorsClient],
+) -> FileType:
+    """Get the file type based on the client type."""
+    if isinstance(client, PromptsClient):
+        return "prompt"
+    elif isinstance(client, AgentsClient):
+        return "agent"
+    elif isinstance(client, ToolsClient):
+        return "tool"
+    elif isinstance(client, FlowsClient):
+        return "flow"
+    elif isinstance(client, DatasetsClient):
+        return "dataset"
+    elif isinstance(client, EvaluatorsClient):
+        return "evaluator"
+
+    raise ValueError(f"Unsupported client type: {type(client)}")
 
 
-def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
-    """
-    Wrap the `log` method of the provided Humanloop client to use EVALUATION_CONTEXT.
-
-    This makes the overloaded log actions be aware of whether the created Log is
-    part of an Evaluation (e.g. one started by eval_utils.run_eval).
-    """
-    # Copy the original log method in a hidden attribute
-    client._log = client.log  # type: ignore [attr-defined]
-
-    def _overload_log(
-        # It's safe to only consider kwargs since the original
-        # log method bans positional arguments
-        self,
-        **kwargs,
-    ) -> Union[
-        CreatePromptLogResponse,
-        CreateToolLogResponse,
-        CreateFlowLogResponse,
-        CreateEvaluatorLogResponse,
-    ]:
-        trace_id = get_trace_id()
-        if trace_id is not None and type(client) is FlowsClient:
+def _handle_tracing_context(kwargs: Dict[str, Any], client: Any) -> Dict[str, Any]:
+    """Handle tracing context for both log and call methods."""
+    trace_id = get_trace_id()
+    if trace_id is not None:
+        if "flow" in str(type(client).__name__).lower():
             context = get_decorator_context()
             if context is None:
                 raise HumanloopRuntimeError("Internal error: trace_id context is set outside a decorator context.")
@@ -61,189 +66,143 @@ def overload_log(client: CLIENT_TYPE) -> CLIENT_TYPE:
                 f"Using `flows.log()` is not allowed: Flow decorator "
                 f"for File {context.path} manages the tracing and trace completion."
             )
-        if trace_id is not None:
-            if "trace_parent_id" in kwargs:
-                logger.warning(
-                    "Ignoring trace_parent_id argument at line %d: the Flow decorator manages tracing.",
-                    inspect.currentframe().f_lineno,  # type: ignore [union-attr]
-                )
-            kwargs = {
-                **kwargs,
-                "trace_parent_id": trace_id,
-            }
-        evaluation_context = get_evaluation_context()
-        if evaluation_context is not None:
-            kwargs_eval, eval_callback = evaluation_context.log_args_with_context(
-                path=kwargs.get("path"), log_args=kwargs
+
+        if "trace_parent_id" in kwargs:
+            logger.warning(
+                "Ignoring trace_parent_id argument at line %d: the Flow decorator manages tracing.",
+                inspect.currentframe().f_lineno,  # type: ignore [union-attr]
             )
-            try:
-                response = self._log(**kwargs_eval)
-            except Exception as e:
-                # Re-raising as HumanloopRuntimeError so the decorators don't catch it
-                raise HumanloopRuntimeError from e
-            if eval_callback is not None:
-                eval_callback(response.id)
-        else:
-            try:
-                response = self._log(**kwargs)
-            except Exception as e:
-                # Re-raising as HumanloopRuntimeError so the decorators don't catch it
-                raise HumanloopRuntimeError from e
-
-        return response
-
-    # Replace the original log method with the overloaded one
-    client.log = types.MethodType(_overload_log, client)  # type: ignore [assignment]
-    # Return the client with the overloaded log method
-    logger.debug("Overloaded the .call method of %s", client)
-    return client
+        kwargs = {
+            **kwargs,
+            "trace_parent_id": trace_id,
+        }
+    return kwargs
 
 
-def overload_call(client: PromptsClient) -> PromptsClient:
-    if not hasattr(client, "_overloads"):
-        client._overloads = defaultdict(list)  # type: ignore [attr-defined]
-    if len(client._overloads["call"]) == 0:  # type: ignore [attr-defined]
-        client._overloads["call"].append(client.call)  # type: ignore [attr-defined]
-
-    def _overload_call(self, **kwargs) -> PromptCallResponse:
-        # trace_id is None if logging outside a decorator
-        trace_id = get_trace_id()
-        if trace_id is not None:
-            if "trace_parent_id" in kwargs:
-                logger.warning(
-                    "Ignoring trace_parent_id argument at line %d: the Flow decorator manages tracing.",
-                    inspect.currentframe().f_lineno,  # type: ignore [union-attr]
-                )
-            kwargs = {
-                **kwargs,
-                "trace_parent_id": trace_id,
-            }
-
-        try:
-            response = client._overloads["call"][0](**kwargs)  # type: ignore [attr-defined]
-        except Exception as e:
-            # Re-raising as HumanloopRuntimeError so the decorators don't catch it
-            raise HumanloopRuntimeError from e
-
-        return response
-
-    client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
-    return client
-
-
-def _get_file_type_from_client(client: Union[PromptsClient, AgentsClient]) -> FileType:
-    """Get the file type based on the client type."""
-    if isinstance(client, PromptsClient):
-        return "prompt"
-    elif isinstance(client, AgentsClient):
-        return "agent"
-    else:
-        raise ValueError(f"Unsupported client type: {type(client)}")
-
-
-def overload_with_local_files(
-    client: Union[PromptsClient, AgentsClient],
-    sync_client: SyncClient,
+def _handle_local_files(
+    kwargs: Dict[str, Any],
+    client: Any,
+    sync_client: Optional[SyncClient],
     use_local_files: bool,
-) -> Union[PromptsClient, AgentsClient]:
-    """Overload call and log methods to handle local files when use_local_files is True.
+) -> Dict[str, Any]:
+    """Handle local file loading if enabled."""
+    if not use_local_files or "path" not in kwargs or sync_client is None:
+        return kwargs
 
-    When use_local_files is True, the following prioritization strategy is used:
-    1. Direct Parameters: If {file_type} parameters are provided directly (as a PromptKernelRequestParams or AgentKernelRequestParams object),
-       these take precedence and the local file is ignored.
-    2. Version/Environment: If version_id or environment is specified, the remote version is used instead
-       of the local file.
-    3. Local File: If neither of the above are specified, attempts to use the local file at the given path.
+    if "id" in kwargs:
+        raise HumanloopRuntimeError("Can only specify one of `id` or `path`")
 
-    For example, with a prompt client:
-    - If prompt={model: "gpt-4", ...} is provided, uses those parameters directly
-    - If version_id="123" is provided, uses that remote version
-    - Otherwise, tries to load from the local file at the given path
+    # Check if version_id or environment is specified
+    use_remote = any(["version_id" in kwargs, "environment" in kwargs])
+    normalized_path = sync_client._normalize_path(kwargs["path"])
 
-    Args:
-        client: The client to overload (PromptsClient or AgentsClient)
-        sync_client: The sync client used for file operations
-        use_local_files: Whether to enable local file handling
-
-    Returns:
-        The client with overloaded methods
-
-    Raises:
-        HumanloopRuntimeError: If use_local_files is True and local file cannot be accessed
-    """
-    if not hasattr(client, "_overloads"):
-        client._overloads = defaultdict(list)  # type: ignore [union-attr]
-    # If the method has been overloaded, don't re-add the method
-    if isinstance(client, PromptsClient):
-        if len(client._overloads["call"]) == 1:  # type: ignore [attr-defined]
-            client._overloads["call"].append(client.call)  # type: ignore [attr-defined]
-        else:
-            raise RuntimeError(f"Unexpected overload order of operations for {client}.call")
-    elif isinstance(client, AgentsClient):
-        if len(client._overloads["call"]) == 0:
-            client._overloads["call"].append(client.call)
-        else:
-            raise RuntimeError(f"Unexpected overload order of operations for {client}.call")
-    else:
-        raise NotImplementedError(f"Unsupported client type: {type(client)}")
-    if len(client._overloads["log"]) == 0:
-        client._overloads["log"].append(client.log)
-    else:
-        raise RuntimeError(f"Unexpected overload order of operations for {client}.log")
+    if use_remote:
+        raise HumanloopRuntimeError(
+            f"Cannot use local file for `{normalized_path}` as version_id or environment was specified. "
+            "Please either remove version_id/environment to use local files, or set use_local_files=False to use remote files."
+        )
 
     file_type = _get_file_type_from_client(client)
+    # If file_type is already specified in kwargs, it means user provided a PromptKernelRequestParams object
+    if file_type in kwargs and not isinstance(kwargs[file_type], str):
+        logger.warning(
+            f"Ignoring local file for `{normalized_path}` as {file_type} parameters were directly provided. "
+            "Using provided parameters instead."
+        )
+        return kwargs
 
-    def _overload(self, function_name: str, **kwargs) -> PromptCallResponse:
-        if "id" in kwargs and "path" in kwargs:
+    try:
+        file_content = sync_client.get_file_content(normalized_path, file_type)
+        kwargs[file_type] = file_content
+    except HumanloopRuntimeError as e:
+        raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
+
+    return kwargs
+
+
+def _handle_evaluation_context(kwargs: Dict[str, Any]) -> tuple[Dict[str, Any], Optional[Callable[[str], None]]]:
+    """Handle evaluation context for logging."""
+    evaluation_context = get_evaluation_context()
+    if evaluation_context is not None:
+        return evaluation_context.log_args_with_context(path=kwargs.get("path"), log_args=kwargs)
+    return kwargs, None
+
+
+def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> ResponseType:
+    try:
+        # Special handling for flows - prevent direct log usage
+        if type(self) is FlowsClient and get_trace_id() is not None:
+            context = get_decorator_context()
+            if context is None:
+                raise HumanloopRuntimeError("Internal error: trace_id context is set outside a decorator context.")
             raise HumanloopRuntimeError(
-                "Can only specify one of `id` or `path` when "
-                f"{'logging' if function_name == 'log' else 'calling'} a {file_type}"
+                f"Using `flows.log()` is not allowed: Flow decorator "
+                f"for File {context.path} manages the tracing and trace completion."
             )
-        # Handle local files if enabled
-        if use_local_files and "path" in kwargs:
-            # Check if version_id or environment is specified
-            use_remote = any(["version_id" in kwargs, "environment" in kwargs])
-            normalized_path = sync_client._normalize_path(kwargs["path"])
 
-            if use_remote:
-                # Don't allow user to specify path + version_id/environment because it's ambiguous
-                raise HumanloopRuntimeError(
-                    f"Cannot use local file for `{normalized_path}` as version_id or environment was specified. "
-                    "Please either remove version_id/environment to use local files, or set use_local_files=False to use remote files."
-                )
-            else:
-                # Only use local file if no version info is specified
-                try:
-                    # If file_type is already specified in kwargs, it means user provided a PromptKernelRequestParams object
-                    if file_type in kwargs and not isinstance(kwargs[file_type], str):
-                        logger.warning(
-                            f"Ignoring local file for `{normalized_path}` as {file_type} parameters were directly provided. "
-                            "Using provided parameters instead."
-                        )
-                    else:
-                        file_content = sync_client.get_file_content(normalized_path, file_type)
-                        kwargs[file_type] = file_content
-                except HumanloopRuntimeError as e:
-                    # Re-raise with more context
-                    raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
+        kwargs = _handle_tracing_context(kwargs, self)
 
-        try:
-            if function_name == "call":
-                return client._overloads["call"][1](**kwargs)  # type: ignore [attr-defined, union-attr]
-            elif function_name == "log":
-                return client._overloads["log"][0](**kwargs)  # type: ignore [attr-defined, union-attr]
-            else:
-                raise ValueError(f"Unsupported function name: {function_name}")
-        except Exception as e:
-            # Re-raising as HumanloopRuntimeError so the decorators don't catch it
-            raise HumanloopRuntimeError from e
+        # Handle local files for Prompts and Agents clients
+        if _get_file_type_from_client(self) in ["prompt", "agent"]:
+            if sync_client is None:
+                logger.error("sync_client is None but client has log method and use_local_files=%s", use_local_files)
+                raise HumanloopRuntimeError("sync_client is required for clients that support local file operations")
+            kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
 
-    def _overload_call(self, **kwargs) -> PromptCallResponse:
-        return _overload(self, "call", **kwargs)
+        kwargs, eval_callback = _handle_evaluation_context(kwargs)
+        response = self._log(**kwargs)  # Use stored original method
+        if eval_callback is not None:
+            eval_callback(response.id)
+        return response
+    except HumanloopRuntimeError:
+        # Re-raise HumanloopRuntimeError without wrapping to preserve the message
+        raise
+    except Exception as e:
+        # Only wrap non-HumanloopRuntimeError exceptions
+        raise HumanloopRuntimeError from e
 
-    def _overload_log(self, **kwargs) -> PromptCallResponse:
-        return _overload(self, "log", **kwargs)
 
-    client.call = types.MethodType(_overload_call, client)  # type: ignore [assignment]
-    client.log = types.MethodType(_overload_log, client)  # type: ignore [assignment]
+def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> PromptCallResponse:
+    try:
+        kwargs = _handle_tracing_context(kwargs, self)
+        kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
+        return self._call(**kwargs)  # Use stored original method
+    except HumanloopRuntimeError:
+        # Re-raise HumanloopRuntimeError without wrapping to preserve the message
+        raise
+    except Exception as e:
+        # Only wrap non-HumanloopRuntimeError exceptions
+        raise HumanloopRuntimeError from e
+
+
+def overload_client(
+    client: Any,
+    sync_client: Optional[SyncClient] = None,
+    use_local_files: bool = False,
+) -> Any:
+    """Overloads client methods to add tracing, local file handling, and evaluation context."""
+    # Store original log method as _log for all clients
+    if hasattr(client, "log") and not hasattr(client, "_log"):
+        client._log = client.log  # type: ignore [attr-defined]
+
+        # Create a closure to capture sync_client and use_local_files
+        def log_wrapper(self: Any, **kwargs) -> ResponseType:
+            return _overload_log(self, sync_client, use_local_files, **kwargs)
+
+        client.log = types.MethodType(log_wrapper, client)
+
+    # Overload call method for Prompt and Agent clients
+    if _get_file_type_from_client(client) in ["prompt", "agent"]:
+        if sync_client is None and use_local_files:
+            logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
+            raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
+        if hasattr(client, "call") and not hasattr(client, "_call"):
+            client._call = client.call  # type: ignore [attr-defined]
+
+            # Create a closure to capture sync_client and use_local_files
+            def call_wrapper(self: Any, **kwargs) -> PromptCallResponse:
+                return _overload_call(self, sync_client, use_local_files, **kwargs)
+
+            client.call = types.MethodType(call_wrapper, client)
+
     return client

@@ -46,16 +46,18 @@ def sdk_test_dir(get_humanloop_client: GetHumanloopClientFn) -> Generator[str, N
             cleanup_directory(subdirectory.id)
         for file in directory_response.files:
             match file.type:
-                case "prompt":
-                    humanloop_client.prompts.delete(id=file.id)
                 case "agent":
                     humanloop_client.agents.delete(id=file.id)
+                case "prompt":
+                    humanloop_client.prompts.delete(id=file.id)
                 case "dataset":
                     humanloop_client.datasets.delete(id=file.id)
                 case "evaluator":
                     humanloop_client.evaluators.delete(id=file.id)
                 case "flow":
                     humanloop_client.flows.delete(id=file.id)
+                case "tool":
+                    humanloop_client.tools.delete(id=file.id)
                 case _:
                     raise ValueError(f"Unknown file type: {file.type}")
         humanloop_client.directories.delete(id=directory_response.id)

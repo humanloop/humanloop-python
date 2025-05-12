@@ -1,7 +1,7 @@
 from typing import Generator, List, NamedTuple, Union
 from pathlib import Path
 import pytest
-from humanloop import Humanloop, FileType, AgentResponse, PromptResponse
+from humanloop import FileType, AgentResponse, PromptResponse
 from humanloop.prompts.client import PromptsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.error import HumanloopRuntimeError
@@ -20,8 +20,13 @@ class SyncableFile(NamedTuple):
 def test_file_structure(
     get_humanloop_client: GetHumanloopClientFn,
     sdk_test_dir: str,
+    request,  # This gives us access to the test function's parameters
 ) -> Generator[list[SyncableFile], None, None]:
-    """Creates a predefined structure of files in Humanloop for testing sync"""
+    """Creates a predefined structure of files in Humanloop for testing sync.
+
+    The fixture will use use_local_files=True if the test function requests it,
+    otherwise it will use use_local_files=False.
+    """
     files: List[SyncableFile] = [
         SyncableFile(
             path="prompts/gpt-4",
@@ -50,8 +55,7 @@ def test_file_structure(
         ),
     ]
 
-    humanloop_client: Humanloop = get_humanloop_client()
-
+    humanloop_client = get_humanloop_client()
     # Create the files in Humanloop
     created_files = []
     for file in files:
@@ -73,6 +77,8 @@ def test_file_structure(
             )
         )
 
+    humanloop_client.pull()
+
     yield created_files
 
 
@@ -88,9 +94,14 @@ def cleanup_local_files():
         shutil.rmtree(local_dir)
 
 
+def test_client(get_humanloop_client: GetHumanloopClientFn):
+    client = get_humanloop_client(use_local_files=True)
+    assert client.use_local_files
+
+
 def test_pull_basic(
-    get_humanloop_client: GetHumanloopClientFn,
     test_file_structure: List[SyncableFile],
+    get_humanloop_client: GetHumanloopClientFn,
 ):
     """Test that humanloop.sync() correctly syncs remote files to local filesystem"""
     # Run the sync
@@ -118,14 +129,8 @@ def test_overload_with_local_files(
     get_humanloop_client: GetHumanloopClientFn,
     test_file_structure: List[SyncableFile],
 ):
-    """Test that overload_with_local_files correctly handles local files.
-
-    Flow:
-    1. Create files in remote (via test_file_structure fixture)
-    2. Pull files locally
-    3. Test using the pulled files
-    """
-    # First pull the files locally
+    """Test that overload_with_local_files correctly handles local files."""
+    # The test_file_structure fixture will automatically use use_local_files=True
     humanloop_client = get_humanloop_client(use_local_files=True)
     humanloop_client.pull()
 
@@ -169,18 +174,8 @@ def test_overload_log_with_local_files(
     test_file_structure: List[SyncableFile],
     sdk_test_dir: str,
 ):
-    """Test that overload_with_local_files correctly handles local files for log operations.
-
-    Flow:
-    1. Create files in remote (via test_file_structure fixture)
-    2. Pull files locally
-    3. Test logging using the pulled files
-
-    :param humanloop_test_client: The Humanloop client with local files enabled
-    :param test_file_structure: List of test files created in remote
-    :param cleanup_local_files: Fixture to clean up local files after test
-    """
-    # First pull the files locally
+    """Test that overload_with_local_files correctly handles local files for log operations."""
+    # The test_file_structure fixture will automatically use use_local_files=True
     humanloop_client = get_humanloop_client(use_local_files=True)
     humanloop_client.pull()
 
