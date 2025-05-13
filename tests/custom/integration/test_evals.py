@@ -2,6 +2,7 @@ import time
 from typing import Any
 
 import pytest
+
 from humanloop.error import HumanloopRuntimeError
 from tests.custom.integration.conftest import ResourceIdentifiers
 from tests.custom.types import GetHumanloopClientFn

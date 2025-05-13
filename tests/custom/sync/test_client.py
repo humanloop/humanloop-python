@@ -1,10 +1,12 @@
 import logging
-import pytest
 from pathlib import Path
-from unittest.mock import Mock, patch
-from humanloop.sync.sync_client import SyncClient, SerializableFileType
-from humanloop.error import HumanloopRuntimeError
 from typing import Literal
+from unittest.mock import Mock, patch
+
+import pytest
+
+from humanloop.error import HumanloopRuntimeError
+from humanloop.sync.sync_client import SerializableFileType, SyncClient
 
 
 @pytest.fixture

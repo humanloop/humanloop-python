@@ -1,6 +1,7 @@
-from typing import Protocol, NamedTuple
-from humanloop.client import Humanloop
+from typing import NamedTuple, Protocol
+
 from humanloop import FileType
+from humanloop.client import Humanloop
 
 
 class GetHumanloopClientFn(Protocol):

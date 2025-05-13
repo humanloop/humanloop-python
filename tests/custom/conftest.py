@@ -1,12 +1,9 @@
-from typing import Generator
 import os
-from dotenv import load_dotenv
+from typing import Generator
 from unittest.mock import MagicMock
 
 import pytest
-from humanloop.client import Humanloop
-from humanloop.otel.exporter import HumanloopSpanExporter
-from humanloop.otel.processor import HumanloopSpanProcessor
+from dotenv import load_dotenv
 from openai.types.chat.chat_completion_message_param import ChatCompletionMessageParam
 from opentelemetry.instrumentation.anthropic import AnthropicInstrumentor
 from opentelemetry.instrumentation.cohere import CohereInstrumentor
@@ -19,6 +16,10 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 from opentelemetry.trace import Tracer
+
+from humanloop.client import Humanloop
+from humanloop.otel.exporter import HumanloopSpanExporter
+from humanloop.otel.processor import HumanloopSpanProcessor
 from tests.custom.types import GetHumanloopClientFn
 
 

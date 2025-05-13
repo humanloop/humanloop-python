@@ -1,7 +1,9 @@
 from pathlib import Path
 from unittest import mock
+
 import pytest
 from click.testing import CliRunner
+
 from humanloop.cli.__main__ import cli
 from tests.custom.types import SyncableFile
 

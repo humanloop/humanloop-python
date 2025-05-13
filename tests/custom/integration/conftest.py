@@ -1,16 +1,18 @@
-from contextlib import contextmanager, redirect_stdout
-from dataclasses import dataclass
+import io
 import os
 import time
-from typing import Any, ContextManager, Generator, List, Union
-import io
-from typing import TextIO
 import uuid
-import pytest
+from contextlib import contextmanager, redirect_stdout
+from dataclasses import dataclass
+from typing import ContextManager, Generator, List, TextIO, Union
+
 import dotenv
-from humanloop import AgentResponse, PromptResponse
-from tests.custom.types import GetHumanloopClientFn, SyncableFile
+import pytest
 from click.testing import CliRunner
+
+from humanloop import AgentResponse, PromptResponse
+from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
+from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 
 @dataclass
@@ -78,7 +80,7 @@ def sdk_test_dir(get_humanloop_client: GetHumanloopClientFn) -> Generator[str, N
 
 
 @pytest.fixture(scope="function")
-def test_prompt_config() -> dict[str, Any]:
+def test_prompt_config() -> PromptKernelRequestParams:
     return {
         "provider": "openai",
         "model": "gpt-4o-mini",
@@ -94,6 +96,25 @@ def test_prompt_config() -> dict[str, Any]:
             },
         ],
     }
+
+
+@pytest.fixture(scope="function")
+def prompt(
+    get_humanloop_client: GetHumanloopClientFn,
+    sdk_test_dir: str,
+    test_prompt_config: PromptKernelRequestParams,
+) -> Generator[ResourceIdentifiers, None, None]:
+    humanloop_client = get_humanloop_client()
+    prompt_path = f"{sdk_test_dir}/prompt"
+    try:
+        response = humanloop_client.prompts.upsert(
+            path=prompt_path,
+            **test_prompt_config,
+        )
+        yield ResourceIdentifiers(file_id=response.id, file_path=response.path)
+        humanloop_client.prompts.delete(id=response.id)
+    except Exception as e:
+        pytest.fail(f"Failed to create prompt {prompt_path}: {e}")
 
 
 @pytest.fixture(scope="function")
@@ -131,7 +152,10 @@ def eval_dataset(
 
 @pytest.fixture(scope="function")
 def eval_prompt(
-    get_humanloop_client: GetHumanloopClientFn, sdk_test_dir: str, openai_key: str, test_prompt_config: dict[str, Any]
+    get_humanloop_client: GetHumanloopClientFn,
+    sdk_test_dir: str,
+    openai_key: str,
+    test_prompt_config: PromptKernelRequestParams,
 ) -> Generator[ResourceIdentifiers, None, None]:
     humanloop_client = get_humanloop_client()
     prompt_path = f"{sdk_test_dir}/eval_prompt"

@@ -2,6 +2,7 @@ import time
 from typing import Any
 
 from openai import OpenAI
+
 from tests.custom.integration.conftest import GetHumanloopClientFn
 
 

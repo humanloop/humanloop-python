@@ -1,10 +1,12 @@
-from typing import List, Union
 from pathlib import Path
+from typing import List, Union
+
 import pytest
+
 from humanloop import AgentResponse, PromptResponse
-from humanloop.prompts.client import PromptsClient
 from humanloop.agents.client import AgentsClient
 from humanloop.error import HumanloopRuntimeError
+from humanloop.prompts.client import PromptsClient
 from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 

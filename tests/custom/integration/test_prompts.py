@@ -1,14 +1,15 @@
-from humanloop.client import Humanloop
-
-from tests.integration.conftest import TestIdentifiers
+from humanloop.requests.prompt_kernel_request import PromptKernelRequestParams
+from tests.custom.integration.conftest import ResourceIdentifiers
+from tests.custom.types import GetHumanloopClientFn
 
 
 def test_prompts_call(
-    humanloop_test_client: Humanloop,
-    prompt: TestIdentifiers,
-    test_prompt_config: TestIdentifiers,
+    get_humanloop_client: GetHumanloopClientFn,
+    prompt: ResourceIdentifiers,
+    test_prompt_config: PromptKernelRequestParams,
 ) -> None:
-    response = humanloop_test_client.prompts.call(  # type: ignore [attr-defined]
+    humanloop_client = get_humanloop_client()
+    response = humanloop_client.prompts.call(  # type: ignore [attr-defined]
         path=prompt.file_path,
         prompt={**test_prompt_config},  # type: ignore [misc, arg-type, typeddict-item, dict-item, list-item]
         inputs={"question": "What is the capital of the France?"},
@@ -24,11 +25,12 @@ def test_prompts_call(
 
 
 def test_prompts_call_stream(
-    humanloop_test_client: Humanloop,
-    prompt: TestIdentifiers,
-    test_prompt_config: TestIdentifiers,
+    get_humanloop_client: GetHumanloopClientFn,
+    prompt: ResourceIdentifiers,
+    test_prompt_config: PromptKernelRequestParams,
 ) -> None:
-    response = humanloop_test_client.prompts.call_stream(  # type: ignore [attr-defined]
+    humanloop_client = get_humanloop_client()
+    response = humanloop_client.prompts.call_stream(  # type: ignore [attr-defined]
         path=prompt.file_path,
         prompt={**test_prompt_config},  # type: ignore [misc, arg-type, typeddict-item, dict-item, list-item]
         inputs={"question": "What is the capital of the France?"},
