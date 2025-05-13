@@ -1,6 +1,7 @@
 import os
 import typing
 from typing import Any, List, Optional, Sequence, Tuple
+import logging
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -30,6 +31,8 @@ from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
 from humanloop.sync.sync_client import SyncClient, DEFAULT_CACHE_SIZE
+
+logger = logging.getLogger("humanloop.sdk")
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -105,7 +108,7 @@ class Humanloop(BaseHumanloop):
         opentelemetry_tracer_provider: Optional[TracerProvider] = None,
         opentelemetry_tracer: Optional[Tracer] = None,
         use_local_files: bool = False,
-        files_directory: str = "humanloop",
+        local_files_directory: str = "humanloop",
         cache_size: int = DEFAULT_CACHE_SIZE,
     ):
         """
@@ -128,7 +131,7 @@ class Humanloop(BaseHumanloop):
         opentelemetry_tracer_provider: Optional tracer provider for telemetry
         opentelemetry_tracer: Optional tracer for telemetry
         use_local_files: Whether to use local files for prompts and agents
-        files_directory: Directory for local files (default: "humanloop")
+        local_files_directory: Directory for local files (default: "humanloop")
         cache_size: Maximum number of files to cache when use_local_files is True (default: DEFAULT_CACHE_SIZE).
                    This parameter has no effect if use_local_files is False.
         """
@@ -142,7 +145,16 @@ class Humanloop(BaseHumanloop):
         )
 
         self.use_local_files = use_local_files
-        self._sync_client = SyncClient(client=self, base_dir=files_directory, cache_size=cache_size)
+
+        # Warn user if cache_size is non-default but use_local_files is False — has no effect and will therefore be ignored
+        if not self.use_local_files and cache_size != DEFAULT_CACHE_SIZE:
+            logger.warning(
+                f"The specified cache_size={cache_size} will have no effect because use_local_files=False. "
+                f"File caching is only active when local files are enabled."
+            )
+
+        # Check if cache_size is non-default but use_local_files is False
+        self._sync_client = SyncClient(client=self, base_dir=local_files_directory, cache_size=cache_size)
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
