@@ -2,7 +2,7 @@ import click
 import logging
 from typing import Optional, Callable
 from functools import wraps
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 import os
 import sys
 from humanloop import Humanloop
@@ -26,10 +26,9 @@ WARNING_COLOR = "yellow"
 
 
 def load_api_key(env_file: Optional[str] = None) -> str:
-    """Load API key from provided value, .env file, or environment variable.
+    """Load API key from .env file or environment variable.
 
     Args:
-        api_key: Optional API key provided directly
         env_file: Optional path to .env file
 
     Returns:
@@ -38,18 +37,17 @@ def load_api_key(env_file: Optional[str] = None) -> str:
     Raises:
         click.ClickException: If no API key is found
     """
-    # Try loading from .env file
+    # Try specific .env file if provided, otherwise default to .env in current directory
     if env_file:
-        load_dotenv(env_file)
+        if not load_dotenv(env_file):  # load_dotenv returns False if file not found/invalid
+            raise click.ClickException(
+                click.style(
+                    f"Failed to load environment file: {env_file} (file not found or invalid format)",
+                    fg=ERROR_COLOR,
+                )
+            )
     else:
-        # Try to find .env file in current directory or parent directories
-        env_path = find_dotenv()
-        if env_path:
-            load_dotenv(env_path)
-        elif os.path.exists(".env"):
-            load_dotenv(".env")
-        else:
-            load_dotenv()
+        load_dotenv()  # Attempt to load from default .env in current directory
 
     # Get API key from environment
     api_key = os.getenv("HUMANLOOP_API_KEY")
@@ -151,8 +149,9 @@ def cli():  # Does nothing because used as a group for other subcommands (pull, 
 @click.option(
     "--path",
     "-p",
-    help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory/') "
-    "or a specific file (e.g. 'my/directory/my_prompt.prompt'). When pulling a directory, all files within that directory and its subdirectories will be included.",
+    help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory') "
+    "or a specific file (e.g. 'my/directory/my_prompt.prompt'). When pulling a directory, all files within that directory and its subdirectories will be included. "
+    "If not specified, pulls from the root of the workspace.",
     default=None,
 )
 @click.option(
@@ -190,7 +189,7 @@ def pull(
     \b
     This command will:
     1. Fetch Prompt and Agent files from your Humanloop workspace
-    2. Save them to your local filesystem (default: humanloop/)
+    2. Save them to your local filesystem (default directory: humanloop/)
     3. Maintain the same directory structure as in Humanloop
     4. Add appropriate file extensions (.prompt or .agent)
 

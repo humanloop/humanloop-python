@@ -22,15 +22,20 @@ from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
 from humanloop.types.create_tool_log_response import CreateToolLogResponse
 from humanloop.types.prompt_call_response import PromptCallResponse
+from humanloop.types.agent_call_response import AgentCallResponse
 
 logger = logging.getLogger("humanloop.sdk")
 
-ResponseType = Union[
+LogResponseType = Union[
     CreatePromptLogResponse,
     CreateToolLogResponse,
     CreateFlowLogResponse,
     CreateEvaluatorLogResponse,
+]
+
+CallResponseType = Union[
     PromptCallResponse,
+    AgentCallResponse,
 ]
 
 
@@ -128,7 +133,7 @@ def _handle_evaluation_context(kwargs: Dict[str, Any]) -> tuple[Dict[str, Any], 
     return kwargs, None
 
 
-def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> ResponseType:
+def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> LogResponseType:
     try:
         # Special handling for flows - prevent direct log usage
         if type(self) is FlowsClient and get_trace_id() is not None:
@@ -162,7 +167,7 @@ def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files:
         raise HumanloopRuntimeError from e
 
 
-def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> PromptCallResponse:
+def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> CallResponseType:
     try:
         kwargs = _handle_tracing_context(kwargs, self)
         kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
@@ -186,7 +191,7 @@ def overload_client(
         client._log = client.log  # type: ignore [attr-defined]
 
         # Create a closure to capture sync_client and use_local_files
-        def log_wrapper(self: Any, **kwargs) -> ResponseType:
+        def log_wrapper(self: Any, **kwargs) -> LogResponseType:
             return _overload_log(self, sync_client, use_local_files, **kwargs)
 
         client.log = types.MethodType(log_wrapper, client)
@@ -200,7 +205,7 @@ def overload_client(
             client._call = client.call  # type: ignore [attr-defined]
 
             # Create a closure to capture sync_client and use_local_files
-            def call_wrapper(self: Any, **kwargs) -> PromptCallResponse:
+            def call_wrapper(self: Any, **kwargs) -> CallResponseType:
                 return _overload_call(self, sync_client, use_local_files, **kwargs)
 
             client.call = types.MethodType(call_wrapper, client)

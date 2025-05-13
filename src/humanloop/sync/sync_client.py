@@ -33,8 +33,10 @@ def format_api_error(error: Exception) -> str:
     try:
         # Extract the body part and parse as JSON
         body_str = error_msg.split("body: ")[1]
-        # Convert Python dict string to valid JSON by replacing single quotes with double quotes
-        body_str = body_str.replace("'", '"')
+        # Convert Python dict string to valid JSON by:
+        # 1. Escaping double quotes
+        # 2. Replacing single quotes with double quotes
+        body_str = body_str.replace('"', '\\"').replace("'", '"')
         body = json.loads(body_str)
 
         # Get the detail from the body
@@ -52,7 +54,7 @@ def format_api_error(error: Exception) -> str:
         return error_msg
 
 
-_SERIALIZABLE_FILE_TYPES_TYPE = typing.Literal["prompt", "agent"]
+SerializableFileType = typing.Literal["prompt", "agent"]
 
 
 class SyncClient:
@@ -68,7 +70,7 @@ class SyncClient:
     """
 
     # File types that can be serialized to/from the filesystem
-    SERIALIZABLE_FILE_TYPES = ["prompt", "agent"]
+    SERIALIZABLE_FILE_TYPES = frozenset(typing.get_args(SerializableFileType))
 
     def __init__(
         self,
@@ -92,19 +94,18 @@ class SyncClient:
         logger.setLevel(log_level)
 
         # Create a new cached version of get_file_content with the specified cache size
-        # @TODO: @ale, maybe move the cache to the client?
         self.get_file_content = lru_cache(maxsize=cache_size)(  # type: ignore [assignment]
             self._get_file_content_implementation,
         )
 
-    def _get_file_content_implementation(self, path: str, file_type: FileType) -> str:
+    def _get_file_content_implementation(self, path: str, file_type: SerializableFileType) -> str:
         """Implementation of get_file_content without the cache decorator.
 
         This is the actual implementation that gets wrapped by lru_cache.
 
         Args:
             path: The normalized path to the file (without extension)
-            file_type: The type of file (Prompt or Agent)
+            file_type: The type of file to get the content of (SerializableFileType)
 
         Returns:
             The raw file content
@@ -132,7 +133,7 @@ class SyncClient:
         except Exception as e:
             raise HumanloopRuntimeError(f"Error reading local file {local_path}: {str(e)}")
 
-    def get_file_content(self, path: str, file_type: FileType) -> str:
+    def get_file_content(self, path: str, file_type: SerializableFileType) -> str:
         """Get the raw file content of a file from cache or filesystem.
 
         This method uses an LRU cache to store file contents. When the cache is full,
@@ -152,7 +153,6 @@ class SyncClient:
 
     def clear_cache(self) -> None:
         """Clear the LRU cache."""
-        # @TODO: @ale, why not put the cache on the client? This is a bit of a hack.
         self.get_file_content.cache_clear()  # type: ignore [attr-defined]
 
     def _normalize_path(self, path: str) -> str:
@@ -170,14 +170,14 @@ class SyncClient:
         return "/".join(part for part in normalized.replace("\\", "/").split("/") if part)
 
     def is_file(self, path: str) -> bool:
-        """Check if the path is a file by checking for .prompt or .agent extension."""
-        return path.endswith(".prompt") or path.endswith(".agent")
+        """Check if the path is a file by checking for .{file_type} extension for serializable file types."""
+        return path.endswith(tuple(f".{file_type}" for file_type in self.SERIALIZABLE_FILE_TYPES))
 
     def _save_serialized_file(
         self,
         serialized_content: str,
         file_path: str,
-        file_type: typing.Literal["prompt", "agent"],
+        file_type: SerializableFileType,
     ) -> None:
         """Save serialized file to local filesystem."""
         try:
@@ -192,25 +192,15 @@ class SyncClient:
             # Write raw file content to file
             with open(new_path, "w") as f:
                 f.write(serialized_content)
-
-            # Clear the cache when a file is saved
-            self.clear_cache()
         except Exception as e:
-            logger.error(f"Failed to sync {file_type} {file_path}: {str(e)}")
+            logger.error(f"Failed to write {file_type} {file_path} to disk: {str(e)}")
             raise
 
-    def _pull_file(
-        self,
-        path: str | None = None,
-        environment: str | None = None,
-    ) -> bool:
+    def _pull_file(self, path: str | None = None, environment: str | None = None) -> bool:
         """Pull a specific file from Humanloop to local filesystem.
 
         Returns:
             True if the file was successfully pulled, False otherwise
-
-        Raises:
-            HumanloopRuntimeError: If there's an error communicating with the API
         """
         try:
             file = self.client.files.retrieve_by_path(
@@ -218,27 +208,23 @@ class SyncClient:
                 environment=environment,
                 include_raw_file_content=True,
             )
-        except Exception as e:
-            logger.error(f"Failed to pull file {path}: {format_api_error(e)}")
-            return False
+            
+            if file.type not in self.SERIALIZABLE_FILE_TYPES:
+                logger.error(f"Unsupported file type: {file.type}")
+                return False
 
-        if file.type not in self.SERIALIZABLE_FILE_TYPES:
-            raise ValueError(f"Unsupported file type: {file.type}")
+            if not file.raw_file_content:  # type: ignore [union-attr]
+                logger.error(f"No content found for {file.type} {path}")
+                return False
 
-        file_type: _SERIALIZABLE_FILE_TYPES_TYPE = typing.cast(
-            _SERIALIZABLE_FILE_TYPES_TYPE,
-            file.type,
-        )
-
-        try:
             self._save_serialized_file(
-                serialized_content=file.raw_file_content,  # type: ignore [union-attr, arg-type]
+                serialized_content=file.raw_file_content,  # type: ignore [union-attr]
                 file_path=file.path,
-                file_type=file_type,
+                file_type=typing.cast(SerializableFileType, file.type),
             )
             return True
         except Exception as e:
-            logger.error(f"Failed to save file {path}: {str(e)}")
+            logger.error(f"Failed to pull file {path}: {str(e)}")
             return False
 
     def _pull_directory(
@@ -251,7 +237,8 @@ class SyncClient:
         Returns:
             Tuple of two lists:
             - First list contains paths of successfully synced files
-            - Second list contains paths of files that failed to sync
+            - Second list contains paths of files that failed to sync. 
+              Failures can occur due to missing content in the response or errors during local file writing.
 
         Raises:
             HumanloopRuntimeError: If there's an error communicating with the API
@@ -266,7 +253,7 @@ class SyncClient:
             try:
                 logger.debug(f"`{path}`: Requesting page {page} of files")
                 response = self.client.files.list_files(
-                    type=["prompt", "agent"],
+                    type=list(self.SERIALIZABLE_FILE_TYPES),
                     page=page,
                     include_raw_file_content=True,
                     environment=environment,
@@ -281,20 +268,20 @@ class SyncClient:
 
                 # Process each file
                 for file in response.records:
-                    # Skip if not a Prompt or Agent
+                    # Skip if not a serializable file type
                     if file.type not in self.SERIALIZABLE_FILE_TYPES:
                         logger.warning(f"Skipping unsupported file type: {file.type}")
                         continue
 
-                    file_type: _SERIALIZABLE_FILE_TYPES_TYPE = typing.cast(
-                        _SERIALIZABLE_FILE_TYPES_TYPE,
+                    file_type: SerializableFileType = typing.cast(
+                        SerializableFileType,
                         file.type,
                     )
 
                     # Skip if no raw file content
-                    # @TODO: @ale, inconsistent, other places we are throwing if file is not serialisable
                     if not getattr(file, "raw_file_content", None) or not file.raw_file_content:  # type: ignore [union-attr]
-                        logger.warning(f"No content found for {file.type} {getattr(file, 'id', '<unknown>')}")
+                        logger.warning(f"No content found for {file.type} {file.path}")
+                        failed_files.append(file.path)
                         continue
 
                     try:
@@ -367,6 +354,9 @@ class SyncClient:
                 else:
                     logger.debug(f"Pulling directory: {normalized_path}")
                     successful_files, failed_files = self._pull_directory(normalized_path, environment)
+
+            # Clear the cache at the end of each pull operation
+            self.clear_cache()
 
             duration_ms = int((time.time() - start_time) * 1000)
             logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
