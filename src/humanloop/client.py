@@ -1,6 +1,7 @@
 import os
 import typing
-from typing import Any, List, Optional, Sequence
+from typing import Any, List, Optional, Sequence, Tuple
+import logging
 
 import httpx
 from opentelemetry.sdk.resources import Resource
@@ -18,7 +19,7 @@ from humanloop.evals.types import (
 )
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.overload import overload_call, overload_log
+from humanloop.overload import overload_client
 from humanloop.decorators.flow import flow as flow_decorator_factory
 from humanloop.decorators.prompt import prompt_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
@@ -29,6 +30,9 @@ from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
+from humanloop.sync.sync_client import SyncClient, DEFAULT_CACHE_SIZE
+
+logger = logging.getLogger("humanloop.sdk")
 
 
 class ExtendedEvalsClient(EvaluationsClient):
@@ -87,8 +91,9 @@ class Humanloop(BaseHumanloop):
     """
     See docstring of :class:`BaseHumanloop`.
 
-    This class extends the base client with custom evaluation utilities
-    and decorators for declaring Files in code.
+    This class extends the base client with custom evaluation utilities,
+    decorators for declaring Files in code, and utilities for syncing
+    files between Humanloop and local filesystem.
     """
 
     def __init__(
@@ -102,6 +107,9 @@ class Humanloop(BaseHumanloop):
         httpx_client: typing.Optional[httpx.Client] = None,
         opentelemetry_tracer_provider: Optional[TracerProvider] = None,
         opentelemetry_tracer: Optional[Tracer] = None,
+        use_local_files: bool = False,
+        local_files_directory: str = "humanloop",
+        cache_size: int = DEFAULT_CACHE_SIZE,
     ):
         """
         Extends the base client with custom evaluation utilities and
@@ -111,6 +119,27 @@ class Humanloop(BaseHumanloop):
         You can provide a TracerProvider and a Tracer to integrate
         with your existing telemetry system. If not provided,
         an internal TracerProvider will be used.
+
+        Parameters
+        ----------
+        base_url: Optional base URL for the API
+        environment: The environment to use (default: DEFAULT)
+        api_key: Your Humanloop API key (default: from HUMANLOOP_API_KEY env var)
+        timeout: Optional timeout for API requests
+        follow_redirects: Whether to follow redirects
+        httpx_client: Optional custom httpx client
+        opentelemetry_tracer_provider: Optional tracer provider for telemetry
+        opentelemetry_tracer: Optional tracer for telemetry
+        use_local_files: Whether to use local files for prompts and agents
+        local_files_directory: Base directory where local prompt and agent files are stored (default: "humanloop").
+                      This is relative to the current working directory. For example:
+                      - "humanloop" will look for files in "./humanloop/"
+                      - "data/humanloop" will look for files in "./data/humanloop/"
+                      When using paths in the API, they must be relative to this directory. For example,
+                      if local_files_directory="humanloop" and you have a file at "humanloop/samples/test.prompt",
+                      you would reference it as "samples/test" in your code.
+        cache_size: Maximum number of files to cache when use_local_files is True (default: DEFAULT_CACHE_SIZE).
+                   This parameter has no effect if use_local_files is False.
         """
         super().__init__(
             base_url=base_url,
@@ -121,6 +150,17 @@ class Humanloop(BaseHumanloop):
             httpx_client=httpx_client,
         )
 
+        self.use_local_files = use_local_files
+
+        # Warn user if cache_size is non-default but use_local_files is False — has no effect and will therefore be ignored
+        if not self.use_local_files and cache_size != DEFAULT_CACHE_SIZE:
+            logger.warning(
+                f"The specified cache_size={cache_size} will have no effect because use_local_files=False. "
+                f"File caching is only active when local files are enabled."
+            )
+
+        # Check if cache_size is non-default but use_local_files is False
+        self._sync_client = SyncClient(client=self, base_dir=local_files_directory, cache_size=cache_size)
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
@@ -128,10 +168,14 @@ class Humanloop(BaseHumanloop):
 
         # Overload the .log method of the clients to be aware of Evaluation Context
         # and the @flow decorator providing the trace_id
-        self.prompts = overload_log(client=self.prompts)
-        self.prompts = overload_call(client=self.prompts)
-        self.flows = overload_log(client=self.flows)
-        self.tools = overload_log(client=self.tools)
+        self.prompts = overload_client(
+            client=self.prompts, sync_client=self._sync_client, use_local_files=self.use_local_files
+        )
+        self.agents = overload_client(
+            client=self.agents, sync_client=self._sync_client, use_local_files=self.use_local_files
+        )
+        self.flows = overload_client(client=self.flows)
+        self.tools = overload_client(client=self.tools)
 
         if opentelemetry_tracer_provider is not None:
             self._tracer_provider = opentelemetry_tracer_provider
@@ -350,6 +394,53 @@ class Humanloop(BaseHumanloop):
             path=path,
             attributes=attributes,
         )
+
+    def pull(self, path: str | None = None, environment: str | None = None) -> Tuple[List[str], List[str]]:
+        """Pull Prompt and Agent files from Humanloop to local filesystem.
+
+        This method will:
+        1. Fetch Prompt and Agent files from your Humanloop workspace
+        2. Save them to your local filesystem (directory specified by `local_files_directory`, default: "humanloop")
+        3. Maintain the same directory structure as in Humanloop
+        4. Add appropriate file extensions (`.prompt` or `.agent`)
+
+        The path parameter can be used in two ways:
+        - If it points to a specific file (e.g. "path/to/file.prompt" or "path/to/file.agent"), only that file will be pulled
+        - If it points to a directory (e.g. "path/to/directory"), all Prompt and Agent files in that directory and its subdirectories will be pulled
+        - If no path is provided, all Prompt and Agent files will be pulled
+
+        The operation will overwrite existing files with the latest version from Humanloop
+        but will not delete local files that don't exist in the remote workspace.
+
+        Currently only supports syncing Prompt and Agent files. Other file types will be skipped.
+
+        For example, with the default `local_files_directory="humanloop"`, files will be saved as:
+        ```
+        ./humanloop/
+        ├── my_project/
+        │   ├── prompts/
+        │   │   ├── my_prompt.prompt
+        │   │   └── nested/
+        │   │       └── another_prompt.prompt
+        │   └── agents/
+        │       └── my_agent.agent
+        └── another_project/
+            └── prompts/
+                └── other_prompt.prompt
+        ```
+
+        If you specify `local_files_directory="data/humanloop"`, files will be saved in ./data/humanloop/ instead.
+
+        :param path: Optional path to either a specific file (e.g. "path/to/file.prompt") or a directory (e.g. "path/to/directory").
+                    If not provided, all Prompt and Agent files will be pulled.
+        :param environment: The environment to pull the files from.
+        :return: Tuple of two lists:
+             - First list contains paths of successfully synced files
+             - Second list contains paths of files that failed to sync (due to API errors, missing content,
+               or filesystem issues)
+        :raises HumanloopRuntimeError: If there's an error communicating with the API
+        """
+        return self._sync_client.pull(environment=environment, path=path)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):
