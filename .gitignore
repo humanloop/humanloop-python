@@ -5,7 +5,7 @@ poetry.toml
 .ruff_cache/
 .vscode
 .env
-.env.test
 tests/assets/*.jsonl
 tests/assets/*.parquet
+# Ignore humanloop directory which could mistakenly be committed when testing sync functionality as it's used as the default sync directory
 humanloop

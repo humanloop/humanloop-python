@@ -64,7 +64,7 @@ def load_api_key(env_file: Optional[str] = None) -> str:
 def get_client(
     api_key: Optional[str] = None, env_file: Optional[str] = None, base_url: Optional[str] = None
 ) -> Humanloop:
-    """Get a Humanloop client instance.
+    """Instantiate a Humanloop client for the CLI.
 
     Args:
         api_key: Optional API key provided directly

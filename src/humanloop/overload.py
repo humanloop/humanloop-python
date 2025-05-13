@@ -108,6 +108,9 @@ def _handle_local_files(
         )
 
     file_type = _get_file_type_from_client(client)
+    if file_type not in SyncClient.SERIALIZABLE_FILE_TYPES:
+        raise HumanloopRuntimeError(f"Local files are not supported for `{file_type}` files.")
+
     # If file_type is already specified in kwargs, it means user provided a PromptKernelRequestParams object
     if file_type in kwargs and not isinstance(kwargs[file_type], str):
         logger.warning(
@@ -117,7 +120,7 @@ def _handle_local_files(
         return kwargs
 
     try:
-        file_content = sync_client.get_file_content(normalized_path, file_type)
+        file_content = sync_client.get_file_content(normalized_path, file_type)  # type: ignore [arg-type] file_type was checked above
         kwargs[file_type] = file_content
     except HumanloopRuntimeError as e:
         raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
@@ -186,7 +189,7 @@ def overload_client(
     use_local_files: bool = False,
 ) -> Any:
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
-    # Store original log method as _log for all clients. Used in flow decorator 
+    # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
         client._log = client.log  # type: ignore [attr-defined]
 

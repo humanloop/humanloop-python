@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List, Tuple, TYPE_CHECKING
 from functools import lru_cache
 import typing
-from humanloop.types import FileType
 import time
 from humanloop.error import HumanloopRuntimeError
 import json
@@ -164,6 +163,14 @@ class SyncClient:
         # Convert to Path object to handle platform-specific separators
         path_obj = Path(path)
 
+        # Paths are considered absolute on unix-like systems if they start with a forward slash.
+        # This is because we want to ensure seamless toggling between the local and remote filesystems.
+        if path_obj.is_absolute():
+            raise HumanloopRuntimeError(
+                f"Absolute paths are not supported: `{path}`. "
+                f"Paths should be relative to the base directory (`{self.base_dir}`)."
+            )
+
         # Remove extension, convert to string with forward slashes, and remove leading/trailing slashes
         normalized = str(path_obj.with_suffix(""))
         # Replace all backslashes and normalize multiple forward slashes
@@ -208,7 +215,7 @@ class SyncClient:
                 environment=environment,
                 include_raw_file_content=True,
             )
-            
+
             if file.type not in self.SERIALIZABLE_FILE_TYPES:
                 logger.error(f"Unsupported file type: {file.type}")
                 return False
@@ -237,7 +244,7 @@ class SyncClient:
         Returns:
             Tuple of two lists:
             - First list contains paths of successfully synced files
-            - Second list contains paths of files that failed to sync. 
+            - Second list contains paths of files that failed to sync.
               Failures can occur due to missing content in the response or errors during local file writing.
 
         Raises:
