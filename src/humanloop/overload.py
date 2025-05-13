@@ -120,7 +120,7 @@ def _handle_local_files(
         return kwargs
 
     try:
-        file_content = sync_client.get_file_content(normalized_path, file_type)  # type: ignore [arg-type]
+        file_content = sync_client.get_file_content(normalized_path, file_type)  # type: ignore[arg-type] # file_type was checked above
         kwargs[file_type] = file_content
     except HumanloopRuntimeError as e:
         raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
