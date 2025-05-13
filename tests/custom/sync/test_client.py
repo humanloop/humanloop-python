@@ -2,7 +2,7 @@ import logging
 import pytest
 from pathlib import Path
 from unittest.mock import Mock, patch
-from humanloop.sync.sync_client import SyncClient
+from humanloop.sync.sync_client import SyncClient, SerializableFileType
 from humanloop.error import HumanloopRuntimeError
 from typing import Literal
 
@@ -65,7 +65,7 @@ def test_save_and_read_file(sync_client: SyncClient):
     # GIVEN a file content and path
     content = "test content"
     path = "test/path"
-    file_type = "prompt"
+    file_type: SerializableFileType = "prompt" 
 
     # WHEN saving the file
     sync_client._save_serialized_file(content, path, "prompt")
