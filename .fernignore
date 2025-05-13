@@ -13,10 +13,13 @@ mypy.ini
 README.md
 src/humanloop/decorators
 src/humanloop/otel
+src/humanloop/sync
+src/humanloop/cli
+pytest.ini
 
 ## Tests
 
-tests/
+tests/custom
 
 ## CI
 
