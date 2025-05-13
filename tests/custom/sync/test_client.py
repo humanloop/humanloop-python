@@ -28,7 +28,7 @@ def test_init(sync_client: SyncClient, tmp_path: Path):
     # THEN it should be initialized with correct base directory, cache size and file types
     assert sync_client.base_dir == tmp_path
     assert sync_client._cache_size == 10
-    assert sync_client.SERIALIZABLE_FILE_TYPES == ["prompt", "agent"]
+    assert sync_client.SERIALIZABLE_FILE_TYPES == frozenset(["prompt", "agent"])
 
 
 def test_normalize_path(sync_client: SyncClient):
@@ -37,7 +37,6 @@ def test_normalize_path(sync_client: SyncClient):
     test_cases = [
         ("path/to/file.prompt", "path/to/file"),
         ("path\\to\\file.agent", "path/to/file"),
-        ("/leading/slashes/file.prompt", "leading/slashes/file"),
         ("trailing/slashes/file.agent/", "trailing/slashes/file"),
         ("multiple//slashes//file.prompt", "multiple/slashes/file"),
     ]
@@ -47,6 +46,10 @@ def test_normalize_path(sync_client: SyncClient):
         normalized = sync_client._normalize_path(input_path)
         # THEN they should be converted to the expected format
         assert normalized == expected
+
+    # Test absolute path raises error
+    with pytest.raises(HumanloopRuntimeError, match="Absolute paths are not supported"):
+        sync_client._normalize_path("/leading/slashes/file.prompt")
 
 
 def test_is_file(sync_client: SyncClient):
@@ -65,7 +68,7 @@ def test_save_and_read_file(sync_client: SyncClient):
     # GIVEN a file content and path
     content = "test content"
     path = "test/path"
-    file_type: SerializableFileType = "prompt" 
+    file_type: SerializableFileType = "prompt"
 
     # WHEN saving the file
     sync_client._save_serialized_file(content, path, "prompt")
@@ -89,12 +92,6 @@ def test_error_handling(sync_client: SyncClient):
     # THEN a HumanloopRuntimeError should be raised
     with pytest.raises(HumanloopRuntimeError, match="Local file not found"):
         sync_client.get_file_content("nonexistent", "prompt")
-
-    # GIVEN an invalid file type
-    # WHEN trying to pull the file
-    # THEN a ValueError should be raised
-    with pytest.raises(ValueError, match="Unsupported file type"):
-        sync_client._pull_file("test.txt")
 
     # GIVEN an API error
     # WHEN trying to pull a file

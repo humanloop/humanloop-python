@@ -203,7 +203,7 @@ class SyncClient:
             logger.error(f"Failed to write {file_type} {file_path} to disk: {str(e)}")
             raise
 
-    def _pull_file(self, path: str | None = None, environment: str | None = None) -> bool:
+    def _pull_file(self, path: str, environment: str | None = None) -> bool:
         """Pull a specific file from Humanloop to local filesystem.
 
         Returns:
@@ -262,6 +262,7 @@ class SyncClient:
                 response = self.client.files.list_files(
                     type=list(self.SERIALIZABLE_FILE_TYPES),
                     page=page,
+                    size=100,
                     include_raw_file_content=True,
                     environment=environment,
                     path=path,
