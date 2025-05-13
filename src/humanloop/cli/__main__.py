@@ -99,8 +99,9 @@ def common_options(f: Callable) -> Callable:
         show_default=False,
     )
     @click.option(
-        "--base-dir",
-        help="Base directory for pulled files (default: humanloop/)",
+        "--local-files-directory",
+        "--local-dir",
+        help="Directory (relative to the current working directory) where Humanloop files are stored locally (default: humanloop/).",
         default="humanloop",
         type=click.Path(),
     )
@@ -151,7 +152,7 @@ def cli():  # Does nothing because used as a group for other subcommands (pull, 
     "-p",
     help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory') "
     "or a specific file (e.g. 'my/directory/my_prompt.prompt'). When pulling a directory, all files within that directory and its subdirectories will be included. "
-    "If not specified, pulls from the root of the workspace.",
+    "If not specified, pulls from the root of the remote workspace.",
     default=None,
 )
 @click.option(
@@ -179,7 +180,7 @@ def pull(
     environment: Optional[str],
     api_key: Optional[str],
     env_file: Optional[str],
-    base_dir: str,
+    local_files_directory: str,
     base_url: Optional[str],
     verbose: bool,
     quiet: bool,
@@ -189,13 +190,13 @@ def pull(
     \b
     This command will:
     1. Fetch Prompt and Agent files from your Humanloop workspace
-    2. Save them to your local filesystem (default directory: humanloop/)
+    2. Save them to your local filesystem (directory specified by --local-files-directory, default: humanloop/)
     3. Maintain the same directory structure as in Humanloop
     4. Add appropriate file extensions (.prompt or .agent)
 
     \b
-    The files will be saved with the following structure:
-    humanloop/
+    For example, with the default --local-files-directory=humanloop, files will be saved as:
+    ./humanloop/
     ├── my_project/
     │   ├── prompts/
     │   │   ├── my_prompt.prompt
@@ -207,12 +208,17 @@ def pull(
         └── prompts/
             └── other_prompt.prompt
 
+    \b
+    If you specify --local-files-directory=data/humanloop, files will be saved in ./data/humanloop/ instead.
+
     If a file exists both locally and in the Humanloop workspace, the local file will be overwritten
     with the version from Humanloop. Files that only exist locally will not be affected.
 
     Currently only supports syncing Prompt and Agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
-    sync_client = SyncClient(client, base_dir=base_dir, log_level=logging.DEBUG if verbose else logging.WARNING)
+    sync_client = SyncClient(
+        client, base_dir=local_files_directory, log_level=logging.DEBUG if verbose else logging.WARNING
+    )
 
     click.echo(click.style("Pulling files from Humanloop...", fg=INFO_COLOR))
     click.echo(click.style(f"Path: {path or '(root)'}", fg=INFO_COLOR))

@@ -163,8 +163,8 @@ class SyncClient:
         # Convert to Path object to handle platform-specific separators
         path_obj = Path(path)
 
-        # Paths are considered absolute on unix-like systems if they start with a forward slash.
-        # This is because we want to ensure seamless toggling between the local and remote filesystems.
+        # Reject absolute paths to ensure all paths are relative to base_dir.
+        # This maintains consistency with the remote filesystem where paths are relative to project root.
         if path_obj.is_absolute():
             raise HumanloopRuntimeError(
                 f"Absolute paths are not supported: `{path}`. "
@@ -329,7 +329,7 @@ class SyncClient:
         Returns:
             Tuple of two lists:
             - First list contains paths of successfully synced files
-            - Second list contains paths of files that failed to sync
+            - Second list contains paths of files that failed to sync (e.g. failed to write to disk or missing raw content)
 
         Raises:
             HumanloopRuntimeError: If there's an error communicating with the API

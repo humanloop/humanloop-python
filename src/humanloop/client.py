@@ -131,7 +131,13 @@ class Humanloop(BaseHumanloop):
         opentelemetry_tracer_provider: Optional tracer provider for telemetry
         opentelemetry_tracer: Optional tracer for telemetry
         use_local_files: Whether to use local files for prompts and agents
-        local_files_directory: Directory for local files (default: "humanloop")
+        local_files_directory: Base directory where local prompt and agent files are stored (default: "humanloop").
+                      This is relative to the current working directory. For example:
+                      - "humanloop" will look for files in "./humanloop/"
+                      - "data/humanloop" will look for files in "./data/humanloop/"
+                      When using paths in the API, they must be relative to this directory. For example,
+                      if local_files_directory="humanloop" and you have a file at "humanloop/samples/test.prompt",
+                      you would reference it as "samples/test" in your code.
         cache_size: Maximum number of files to cache when use_local_files is True (default: DEFAULT_CACHE_SIZE).
                    This parameter has no effect if use_local_files is False.
         """
@@ -389,40 +395,50 @@ class Humanloop(BaseHumanloop):
             attributes=attributes,
         )
 
-    def pull(self, environment: str | None = None, path: str | None = None) -> Tuple[List[str], List[str]]:
+    def pull(self, path: str | None = None, environment: str | None = None) -> Tuple[List[str], List[str]]:
         """Pull Prompt and Agent files from Humanloop to local filesystem.
 
         This method will:
         1. Fetch Prompt and Agent files from your Humanloop workspace
-        2. Save them to the local filesystem using the client's files_directory (set during initialization)
+        2. Save them to your local filesystem (directory specified by `local_files_directory`, default: "humanloop")
         3. Maintain the same directory structure as in Humanloop
-        4. Add appropriate file extensions (.prompt or .agent)
+        4. Add appropriate file extensions (`.prompt` or `.agent`)
 
         The path parameter can be used in two ways:
         - If it points to a specific file (e.g. "path/to/file.prompt" or "path/to/file.agent"), only that file will be pulled
-        - If it points to a directory (e.g. "path/to/directory"), all Prompt and Agent files in that directory will be pulled
+        - If it points to a directory (e.g. "path/to/directory"), all Prompt and Agent files in that directory and its subdirectories will be pulled
         - If no path is provided, all Prompt and Agent files will be pulled
 
         The operation will overwrite existing files with the latest version from Humanloop
         but will not delete local files that don't exist in the remote workspace.
 
-        Currently only supports syncing prompt and agent files. Other file types will be skipped.
+        Currently only supports syncing Prompt and Agent files. Other file types will be skipped.
 
-        The files will be saved with the following structure:
+        For example, with the default `local_files_directory="humanloop"`, files will be saved as:
         ```
-        {files_directory}/
-        ├── prompts/
-        │   ├── my_prompt.prompt
-        │   └── nested/
-        │       └── another_prompt.prompt
-        └── agents/
-            └── my_agent.agent
+        ./humanloop/
+        ├── my_project/
+        │   ├── prompts/
+        │   │   ├── my_prompt.prompt
+        │   │   └── nested/
+        │   │       └── another_prompt.prompt
+        │   └── agents/
+        │       └── my_agent.agent
+        └── another_project/
+            └── prompts/
+                └── other_prompt.prompt
         ```
 
-        :param environment: The environment to pull the files from.
+        If you specify `local_files_directory="data/humanloop"`, files will be saved in ./data/humanloop/ instead.
+
         :param path: Optional path to either a specific file (e.g. "path/to/file.prompt") or a directory (e.g. "path/to/directory").
                     If not provided, all Prompt and Agent files will be pulled.
-        :return: List of successfully processed file paths.
+        :param environment: The environment to pull the files from.
+        :return: Tuple of two lists:
+             - First list contains paths of successfully synced files
+             - Second list contains paths of files that failed to sync (due to API errors, missing content,
+               or filesystem issues)
+        :raises HumanloopRuntimeError: If there's an error communicating with the API
         """
         return self._sync_client.pull(environment=environment, path=path)
 
