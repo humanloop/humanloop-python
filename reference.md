@@ -39,7 +39,7 @@ from humanloop import Humanloop
 import datetime
 client = Humanloop(api_key="YOUR_API_KEY", )
 client.prompts.log(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are {{person}}. Answer questions as this person. Do not break character.'}]}, messages=[{'role': "user", 'content': 'What really happened at Roswell?'}], inputs={'person': 'Trump'
-}, created_at=datetime.datetime.fromisoformat("2024-07-19 00:29:35.178000+00:00", ), provider_latency=6.5931549072265625, output_message={'content': "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.", 'role': "assistant"}, prompt_tokens=100, output_tokens=220, prompt_cost=1e-05, output_cost=0.0002, finish_reason='stop', )
+}, created_at=datetime.datetime.fromisoformat("2024-07-18 23:29:35.178000+00:00", ), provider_latency=6.5931549072265625, output_message={'content': "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.", 'role': "assistant"}, prompt_tokens=100, output_tokens=220, prompt_cost=1e-05, output_cost=0.0002, finish_reason='stop', )
 
 ```
 </dd>
@@ -6906,7 +6906,7 @@ client = Humanloop(api_key="YOUR_API_KEY", )
 client.flows.log(id='fl_6o701g4jmcanPVHxdqD0O', flow={'attributes': {'prompt': {'template': 'You are a helpful assistant helping with medical anamnesis', 'model': 'gpt-4o', 'temperature': 0.8}
 , 'tool': {'name': 'retrieval_tool_v3', 'description': 'Retrieval tool for MedQA.', 'source_code': 'def retrieval_tool(question: str) -> str:\n    pass\n'}
 }}, inputs={'question': 'Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath.'
-}, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 22:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 22:40:39+00:00", ), )
+}, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 21:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 21:40:39+00:00", ), )
 
 ```
 </dd>

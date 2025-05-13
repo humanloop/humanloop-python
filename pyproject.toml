@@ -3,7 +3,7 @@ name = "humanloop"
 
 [tool.poetry]
 name = "humanloop"
-version = "0.8.38"
+version = "0.8.39"
 description = ""
 readme = "README.md"
 authors = []
@@ -35,6 +35,7 @@ Repository = 'https://github.com/humanloop/humanloop-python'
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4"
+click = "^8.0.0"
 deepdiff = "^8.2.0"
 httpx = ">=0.21.2"
 httpx-sse = "0.4.0"
@@ -52,6 +53,7 @@ parse = ">=1"
 protobuf = ">=5.29.3"
 pydantic = ">= 1.9.2"
 pydantic-core = "^2.18.2"
+python-dotenv = "^1.1.0"
 typing_extensions = ">= 4.0.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -70,7 +72,7 @@ pandas = "^2.2.0"
 parse-type = ">=0.6.4"
 pyarrow = "^19.0.0"
 pytest-retry = "^1.6.3"
-python-dotenv = "^1.0.1"
+pytest-xdist = "^3.6.1"
 replicate = "^1.0.3"
 ruff = "==0.11.5"
 types-jsonschema = "^4.23.0.20240813"

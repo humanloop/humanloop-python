@@ -183,7 +183,7 @@ class FlowsClient:
         client.flows.log(id='fl_6o701g4jmcanPVHxdqD0O', flow={'attributes': {'prompt': {'template': 'You are a helpful assistant helping with medical anamnesis', 'model': 'gpt-4o', 'temperature': 0.8}
         , 'tool': {'name': 'retrieval_tool_v3', 'description': 'Retrieval tool for MedQA.', 'source_code': 'def retrieval_tool(question: str) -> str:\n    pass\n'}
         }}, inputs={'question': 'Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath.'
-        }, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 22:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 22:40:39+00:00", ), )
+        }, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 21:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 21:40:39+00:00", ), )
         """
         _response = self._raw_client.log(
             version_id=version_id,
@@ -941,7 +941,7 @@ class AsyncFlowsClient:
             await client.flows.log(id='fl_6o701g4jmcanPVHxdqD0O', flow={'attributes': {'prompt': {'template': 'You are a helpful assistant helping with medical anamnesis', 'model': 'gpt-4o', 'temperature': 0.8}
             , 'tool': {'name': 'retrieval_tool_v3', 'description': 'Retrieval tool for MedQA.', 'source_code': 'def retrieval_tool(question: str) -> str:\n    pass\n'}
             }}, inputs={'question': 'Patient with a history of diabetes and hypertension presents with chest pain and shortness of breath.'
-            }, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 22:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 22:40:39+00:00", ), )
+            }, output='The patient is likely experiencing a myocardial infarction. Immediate medical attention is required.', log_status="incomplete", start_time=datetime.datetime.fromisoformat("2024-07-08 21:40:35+00:00", ), end_time=datetime.datetime.fromisoformat("2024-07-08 21:40:39+00:00", ), )
         asyncio.run(main())
         """
         _response = await self._raw_client.log(
