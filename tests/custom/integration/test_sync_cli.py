@@ -24,7 +24,7 @@ def test_pull_without_api_key(cli_runner: CliRunner, no_humanloop_api_key_in_env
     THEN it should fail with appropriate error message
     """
     # WHEN running pull command
-    result = cli_runner.invoke(cli, ["pull", "--base-dir", "humanloop"])
+    result = cli_runner.invoke(cli, ["pull", "--local-files-directory", "humanloop"])
 
     # THEN it should fail with appropriate error message
     assert result.exit_code == 1  # Our custom error code for API key issues
@@ -41,7 +41,7 @@ def test_pull_basic(
     base_dir = str(tmp_path / "humanloop")
 
     # WHEN running pull command
-    result = cli_runner.invoke(cli, ["pull", "--base-dir", base_dir, "--verbose"])
+    result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir, "--verbose"])
 
     # THEN it should succeed
     assert result.exit_code == 0
@@ -77,9 +77,7 @@ def test_pull_with_specific_path(
     ]  # Retrieve the prefix of the first file's path which corresponds to the sdk_test_dir used within syncable_files_fixture
 
     # WHEN running pull command with path
-    result = cli_runner.invoke(
-        cli, ["pull", "--base-dir", base_dir, "--path", test_path, "--verbose", "--base-url", "http://localhost:80/v5"]
-    )
+    result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir, "--path", test_path, "--verbose"])
 
     # THEN it should succeed and show the path
     assert result.exit_code == 0
@@ -109,13 +107,11 @@ def test_pull_with_environment(
         cli,
         [
             "pull",
-            "--base-dir",
+            "--local-files-directory",
             base_dir,
             "--environment",
             environment,
             "--verbose",
-            "--base-url",
-            "http://localhost:80/v5",
         ],
     )
 
@@ -133,7 +129,7 @@ def test_pull_with_quiet_mode(
     base_dir = str(tmp_path / "humanloop")
 
     # WHEN running pull command with quiet mode
-    result = cli_runner.invoke(cli, ["pull", "--base-dir", base_dir, "--quiet"])
+    result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir, "--quiet"])
 
     # THEN it should succeed but not show file list
     assert result.exit_code == 0
@@ -170,7 +166,7 @@ def test_pull_with_invalid_environment(cli_runner: CliRunner, tmp_path: Path):
         cli,
         [
             "pull",
-            "--base-dir",
+            "--local-files-directory",
             base_dir,
             "--environment",
             environment,
