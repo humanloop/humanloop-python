@@ -343,7 +343,7 @@ class SyncClient:
         )
 
         try:
-            if path is None:
+            if normalized_path is None or path is None: # path being None means normalized_path is None, but we check both for improved type safety
                 # Pull all files from the root
                 logger.debug("Pulling all files from root")
                 successful_files, failed_files = self._pull_directory(

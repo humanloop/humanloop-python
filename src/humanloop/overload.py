@@ -75,7 +75,7 @@ def _handle_tracing_context(kwargs: Dict[str, Any], client: Any) -> Dict[str, An
         if "trace_parent_id" in kwargs:
             logger.warning(
                 "Ignoring trace_parent_id argument at line %d: the Flow decorator manages tracing.",
-                inspect.currentframe().f_lineno,  # type: ignore [union-attr]
+                inspect.currentframe().f_lineno,  # type: ignore[union-attr]
             )
         kwargs = {
             **kwargs,
@@ -120,7 +120,7 @@ def _handle_local_files(
         return kwargs
 
     try:
-        file_content = sync_client.get_file_content(normalized_path, file_type)  # type: ignore [arg-type] file_type was checked above
+        file_content = sync_client.get_file_content(normalized_path, file_type)  # type: ignore [arg-type]
         kwargs[file_type] = file_content
     except HumanloopRuntimeError as e:
         raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
@@ -191,7 +191,7 @@ def overload_client(
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
     # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
-        client._log = client.log  # type: ignore [attr-defined]
+        client._log = client.log  # type: ignore[attr-defined]
 
         # Create a closure to capture sync_client and use_local_files
         def log_wrapper(self: Any, **kwargs) -> LogResponseType:
@@ -205,7 +205,7 @@ def overload_client(
             logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
             raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
         if hasattr(client, "call") and not hasattr(client, "_call"):
-            client._call = client.call  # type: ignore [attr-defined]
+            client._call = client.call  # type: ignore[attr-defined]
 
             # Create a closure to capture sync_client and use_local_files
             def call_wrapper(self: Any, **kwargs) -> CallResponseType:
