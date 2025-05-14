@@ -1,13 +1,15 @@
-import click
 import logging
-from typing import Optional, Callable
-from functools import wraps
-from dotenv import load_dotenv
 import os
 import sys
+import time
+from functools import wraps
+from typing import Callable, Optional
+
+import click
+from dotenv import load_dotenv
+
 from humanloop import Humanloop
 from humanloop.sync.sync_client import SyncClient
-import time
 
 # Set up logging
 logger = logging.getLogger(__name__)
