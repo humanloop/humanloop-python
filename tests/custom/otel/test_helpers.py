@@ -1,6 +1,7 @@
 import pytest
-from humanloop.otel.helpers import read_from_opentelemetry_span, write_to_opentelemetry_span
 from opentelemetry.sdk.trace import Span
+
+from humanloop.otel.helpers import read_from_opentelemetry_span, write_to_opentelemetry_span
 
 
 def test_read_empty(test_span: Span):
