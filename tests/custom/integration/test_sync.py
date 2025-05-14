@@ -1,3 +1,4 @@
+import typing
 from pathlib import Path
 from typing import List, Union
 
@@ -80,15 +81,17 @@ def test_overload_with_local_files(
     # WHEN calling with an invalid path
     # THEN it should raise HumanloopRuntimeError
     with pytest.raises(HumanloopRuntimeError):
-        sub_client: Union[PromptsClient, AgentsClient]
-        match test_file.type:
-            case "prompt":
-                sub_client = humanloop_client.prompts
-            case "agent":
-                sub_client = humanloop_client.agents
-            case _:
-                raise ValueError(f"Invalid file type: {test_file.type}")
-        sub_client.call(path="invalid/path")
+        try:
+            sub_client: Union[PromptsClient, AgentsClient] = typing.cast(
+                Union[PromptsClient, AgentsClient],
+                {
+                    "prompt": humanloop_client.prompts,
+                    "agent": humanloop_client.agents,
+                }[test_file.type],
+            )
+            sub_client.call(path="invalid/path")
+        except KeyError:
+            raise NotImplementedError(f"Unknown file type: {test_file.type}")
 
 
 def test_overload_log_with_local_files(

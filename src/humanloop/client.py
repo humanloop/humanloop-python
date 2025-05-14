@@ -395,7 +395,7 @@ class Humanloop(BaseHumanloop):
             attributes=attributes,
         )
 
-    def pull(self, path: str | None = None, environment: str | None = None) -> Tuple[List[str], List[str]]:
+    def pull(self, path: Optional[str] = None, environment: Optional[str] = None) -> Tuple[List[str], List[str]]:
         """Pull Prompt and Agent files from Humanloop to local filesystem.
 
         This method will:

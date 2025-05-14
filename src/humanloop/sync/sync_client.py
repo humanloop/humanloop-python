@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Tuple, TYPE_CHECKING
+from typing import List, Optional, Tuple, TYPE_CHECKING, Union
 from functools import lru_cache
 import typing
 import time
@@ -203,7 +203,7 @@ class SyncClient:
             logger.error(f"Failed to write {file_type} {file_path} to disk: {str(e)}")
             raise
 
-    def _pull_file(self, path: str, environment: str | None = None) -> bool:
+    def _pull_file(self, path: str, environment: Optional[str] = None) -> bool:
         """Pull a specific file from Humanloop to local filesystem.
 
         Returns:
@@ -236,8 +236,8 @@ class SyncClient:
 
     def _pull_directory(
         self,
-        path: str | None = None,
-        environment: str | None = None,
+        path: Optional[str] = None,
+        environment: Optional[str] = None,
     ) -> Tuple[List[str], List[str]]:
         """Sync Prompt and Agent files from Humanloop to local filesystem.
 
@@ -316,7 +316,7 @@ class SyncClient:
 
         return successful_files, failed_files
 
-    def pull(self, path: str | None = None, environment: str | None = None) -> Tuple[List[str], List[str]]:
+    def pull(self, path: Optional[str] = None, environment: Optional[str] = None) -> Tuple[List[str], List[str]]:
         """Pull files from Humanloop to local filesystem.
 
         If the path ends with .prompt or .agent, pulls that specific file.
@@ -343,7 +343,9 @@ class SyncClient:
         )
 
         try:
-            if normalized_path is None or path is None: # path being None means normalized_path is None, but we check both for improved type safety
+            if (
+                normalized_path is None or path is None
+            ):  # path being None means normalized_path is None, but we check both for improved type safety
                 # Pull all files from the root
                 logger.debug("Pulling all files from root")
                 successful_files, failed_files = self._pull_directory(

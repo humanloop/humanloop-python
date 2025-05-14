@@ -1,10 +1,10 @@
-import io
 import os
 import time
+import typing
 import uuid
-from contextlib import contextmanager, redirect_stdout
+from collections.abc import Generator
 from dataclasses import dataclass
-from typing import ContextManager, Generator, List, TextIO, Union
+from typing import Union
 
 import dotenv
 import pytest
@@ -21,17 +21,6 @@ class ResourceIdentifiers:
     file_path: str
 
 
-@pytest.fixture()
-def capture_stdout() -> ContextManager[TextIO]:
-    @contextmanager
-    def _context_manager():
-        f = io.StringIO()
-        with redirect_stdout(f):
-            yield f
-
-    return _context_manager  # type: ignore [return-value]
-
-
 @pytest.fixture(scope="session")
 def openai_key() -> str:
     dotenv.load_dotenv()
@@ -44,26 +33,26 @@ def openai_key() -> str:
 def sdk_test_dir(get_humanloop_client: GetHumanloopClientFn) -> Generator[str, None, None]:
     humanloop_client = get_humanloop_client()
 
+    def _get_subclient(file_type: str):
+        try:
+            return {
+                "agent": humanloop_client.agents,
+                "prompt": humanloop_client.prompts,
+                "dataset": humanloop_client.datasets,
+                "evaluator": humanloop_client.evaluators,
+                "flow": humanloop_client.flows,
+                "tool": humanloop_client.tools,
+            }[file_type]
+        except KeyError:
+            raise NotImplementedError(f"Unknown file type: {file_type}")
+
     def cleanup_directory(directory_id: str):
         directory_response = humanloop_client.directories.get(id=directory_id)
         for subdirectory in directory_response.subdirectories:
             cleanup_directory(subdirectory.id)
         for file in directory_response.files:
-            match file.type:
-                case "agent":
-                    humanloop_client.agents.delete(id=file.id)
-                case "prompt":
-                    humanloop_client.prompts.delete(id=file.id)
-                case "dataset":
-                    humanloop_client.datasets.delete(id=file.id)
-                case "evaluator":
-                    humanloop_client.evaluators.delete(id=file.id)
-                case "flow":
-                    humanloop_client.flows.delete(id=file.id)
-                case "tool":
-                    humanloop_client.tools.delete(id=file.id)
-                case _:
-                    raise ValueError(f"Unknown file type: {file.type}")
+            subclient = _get_subclient(typing.cast(str, file.type))
+            subclient.delete(id=file.id)
         humanloop_client.directories.delete(id=directory_response.id)
 
     path = f"SDK_INTEGRATION_TEST_{uuid.uuid4()}"
@@ -211,7 +200,7 @@ def syncable_files_fixture(
     sdk_test_dir: str,
 ) -> Generator[list[SyncableFile], None, None]:
     """Creates a predefined structure of files in Humanloop for testing sync."""
-    files: List[SyncableFile] = [
+    files: list[SyncableFile] = [
         SyncableFile(
             path="prompts/gpt-4",
             type="prompt",
