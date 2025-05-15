@@ -20,6 +20,7 @@ pytest.ini
 ## Tests
 
 tests/custom
+tests/__init__.py
 
 ## CI
 
