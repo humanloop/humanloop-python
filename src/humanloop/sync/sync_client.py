@@ -103,7 +103,7 @@ class SyncClient:
         This is the actual implementation that gets wrapped by lru_cache.
 
         Args:
-            path: The normalized path to the file (without extension)
+            path: The API path to the file (e.g. `path/to/file`)
             file_type: The type of file to get the content of (SerializableFileType)
 
         Returns:
@@ -154,10 +154,10 @@ class SyncClient:
         """Clear the LRU cache."""
         self.get_file_content.cache_clear()  # type: ignore [attr-defined]
 
-    def _normalize_path(self, path: str) -> str:
+    def _normalize_path(self, path: str, strip_extension: bool = False) -> str:
         """Normalize the path by:
         1. Converting to a Path object to handle platform-specific separators
-        2. Removing any file extensions
+        2. Removing any file extensions if strip_extension is True
         3. Converting to a string with forward slashes and no leading/trailing slashes
         """
         # Convert to Path object to handle platform-specific separators
@@ -172,7 +172,10 @@ class SyncClient:
             )
 
         # Remove extension, convert to string with forward slashes, and remove leading/trailing slashes
-        normalized = str(path_obj.with_suffix(""))
+        if strip_extension:
+            normalized = str(path_obj.with_suffix(""))
+        else:
+            normalized = str(path_obj)
         # Replace all backslashes and normalize multiple forward slashes
         return "/".join(part for part in normalized.replace("\\", "/").split("/") if part)
 
@@ -319,12 +322,17 @@ class SyncClient:
     def pull(self, path: Optional[str] = None, environment: Optional[str] = None) -> Tuple[List[str], List[str]]:
         """Pull files from Humanloop to local filesystem.
 
-        If the path ends with .prompt or .agent, pulls that specific file.
+        If the path ends with `.prompt` or `.agent`, pulls that specific file.
         Otherwise, pulls all files under the specified path.
         If no path is provided, pulls all files from the root.
 
         Args:
-            path: The path to pull from (either a specific file or directory)
+            path: The path to pull from. Can be:
+            - A specific file with extension (e.g. "path/to/file.prompt")
+            - A directory without extension (e.g. "path/to/directory")
+            - None to pull all files from root
+
+            Paths should not contain leading or trailing slashes
             environment: The environment to pull from
 
         Returns:
@@ -336,40 +344,53 @@ class SyncClient:
             HumanloopRuntimeError: If there's an error communicating with the API
         """
         start_time = time.time()
-        normalized_path = self._normalize_path(path) if path else None
 
-        logger.info(
-            f"Starting pull operation: path={normalized_path or '(root)'}, environment={environment or '(default)'}"
-        )
+        if path is None:
+            api_path = None
+            is_file_path = False
+        else:
+            path = path.strip()
+            # Check if path has leading/trailing slashes
+            if path != path.strip("/"):
+                raise HumanloopRuntimeError(
+                    f"Invalid path: {path}. Path should not contain leading/trailing slashes. "
+                    f'Valid examples: "path/to/file.prompt" or "path/to/directory"'
+                )
+
+            # Check if it's a file path (has extension)
+            is_file_path = self.is_file(path)
+
+            # For API communication, we need path without extension
+            api_path = self._normalize_path(path, strip_extension=True)
+
+        logger.info(f"Starting pull: path={api_path or '(root)'}, environment={environment or '(default)'}")
 
         try:
-            if (
-                normalized_path is None or path is None
-            ):  # path being None means normalized_path is None, but we check both for improved type safety
-                # Pull all files from the root
+            if api_path is None:
+                # Pull all from root
                 logger.debug("Pulling all files from root")
                 successful_files, failed_files = self._pull_directory(
                     path=None,
                     environment=environment,
                 )
             else:
-                if self.is_file(path.strip()):
-                    logger.debug(f"Pulling file: {normalized_path}")
-                    if self._pull_file(path=normalized_path, environment=environment):
-                        successful_files = [path]
+                if is_file_path:
+                    logger.debug(f"Pulling file: {api_path}")
+                    if self._pull_file(api_path, environment):
+                        successful_files = [api_path]
                         failed_files = []
                     else:
                         successful_files = []
-                        failed_files = [path]
+                        failed_files = [api_path]
                 else:
-                    logger.debug(f"Pulling directory: {normalized_path}")
-                    successful_files, failed_files = self._pull_directory(normalized_path, environment)
+                    logger.debug(f"Pulling directory: {api_path}")
+                    successful_files, failed_files = self._pull_directory(api_path, environment)
 
             # Clear the cache at the end of each pull operation
             self.clear_cache()
 
             duration_ms = int((time.time() - start_time) * 1000)
-            logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files succeeded")
+            logger.info(f"Pull completed in {duration_ms}ms: {len(successful_files)} files pulled")
 
             return successful_files, failed_files
         except Exception as e:

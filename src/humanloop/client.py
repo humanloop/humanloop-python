@@ -431,6 +431,11 @@ class Humanloop(BaseHumanloop):
 
         If you specify `local_files_directory="data/humanloop"`, files will be saved in ./data/humanloop/ instead.
 
+        Important note about paths:
+        - Paths should not contain leading or trailing slashes
+        - When specifying a file path, include the file extension (`.prompt` or `.agent`)
+        - When specifying a directory path, do not include a trailing slash
+
         :param path: Optional path to either a specific file (e.g. "path/to/file.prompt") or a directory (e.g. "path/to/directory").
                     If not provided, all Prompt and Agent files will be pulled.
         :param environment: The environment to pull the files from.

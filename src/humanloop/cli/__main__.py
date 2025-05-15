@@ -154,6 +154,7 @@ def cli():  # Does nothing because used as a group for other subcommands (pull, 
     "-p",
     help="Path in the Humanloop workspace to pull from (file or directory). You can pull an entire directory (e.g. 'my/directory') "
     "or a specific file (e.g. 'my/directory/my_prompt.prompt'). When pulling a directory, all files within that directory and its subdirectories will be included. "
+    "Paths should not contain leading or trailing slashes. "
     "If not specified, pulls from the root of the remote workspace.",
     default=None,
 )
