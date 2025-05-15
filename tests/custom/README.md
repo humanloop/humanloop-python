@@ -15,5 +15,5 @@ This directory contains custom tests for the Humanloop Python SDK. While the mai
 pytest tests/custom/
 
 # Run specific test file
-pytest tests/custom/sync/test_sync_client.py
+pytest tests/custom/sync/test_client.py
 ```
