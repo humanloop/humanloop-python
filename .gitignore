@@ -7,5 +7,3 @@ poetry.toml
 .env
 tests/assets/*.jsonl
 tests/assets/*.parquet
-# Ignore humanloop directory which could mistakenly be committed when testing sync functionality as it's used as the default sync directory
-humanloop
