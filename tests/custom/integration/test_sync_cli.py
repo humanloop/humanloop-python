@@ -147,7 +147,7 @@ def test_pull_with_quiet_mode(
 def test_pull_with_invalid_path(
     cli_runner: CliRunner,
 ):
-    # GIVEN an invalid base directory
+    # GIVEN an invalid path
     path = "nonexistent/path"
 
     # WHEN running pull command
