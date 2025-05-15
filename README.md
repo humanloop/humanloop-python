@@ -187,6 +187,44 @@ for chunk in response:
     yield chunk
 ```
 
+## File Synchronization
+
+Humanloop allows you to clone files from your Humanloop workspace to your local filesystem using the CLI.
+
+```bash
+# Pull all files
+humanloop pull
+
+# Pull from a directory
+humanloop pull --path="examples/chat"
+
+# Pull a specific file
+humanloop pull --path="examples/chat/basic.prompt"
+
+# Pull versions deployed to specific environment
+humanloop pull --environment="production"
+```
+
+To use local files in your code:
+
+```python
+# Enable local file support
+client = Humanloop(
+    api_key="YOUR_API_KEY",
+    use_local_files=True
+)
+
+# Use a local prompt file
+response = client.prompts.call(
+    path="examples/chat/basic",  # No file extension needed
+    inputs={"query": "Hello world"}
+)
+```
+
+For detailed instructions on syncing, see our [Guide to Syncing and Using Local Files](https://humanloop.com/docs/v5/guides/propmts/syncing-local-files).
+
+For information about the `.prompt` and `.agent` file formats, see our [File Format Reference](https://humanloop.com/docs/v5/reference/prompt-and-agent-files). 
+
 ## Pagination
 
 Paginated requests will return a `SyncPager` or `AsyncPager`, which can be used as generators for the underlying object.
