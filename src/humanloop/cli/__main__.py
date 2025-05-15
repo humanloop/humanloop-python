@@ -219,6 +219,7 @@ def pull(
 
     Currently only supports syncing Prompt and Agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
+    # Although pull() is available on the Humanloop client, we instantiate SyncClient separately as we need to control its log level
     sync_client = SyncClient(
         client, base_dir=local_files_directory, log_level=logging.DEBUG if verbose else logging.WARNING
     )

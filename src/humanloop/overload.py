@@ -87,23 +87,27 @@ def _handle_tracing_context(kwargs: Dict[str, Any], client: Any) -> Dict[str, An
 def _handle_local_files(
     kwargs: Dict[str, Any],
     client: Any,
-    sync_client: Optional[SyncClient],
-    use_local_files: bool,
+    sync_client: SyncClient,
 ) -> Dict[str, Any]:
-    """Handle local file loading if enabled."""
-    if not use_local_files or "path" not in kwargs or sync_client is None:
-        return kwargs
-
+    """Handle local file loading."""
     if "id" in kwargs:
         raise HumanloopRuntimeError("Can only specify one of `id` or `path`")
+    
+    path = kwargs["path"]
+
+    if sync_client.is_file(path):
+        file_type = _get_file_type_from_client(client)
+        raise HumanloopRuntimeError(
+            f"Path should not include file extension: `{path}`. "
+            f"Use `{path.rsplit('.', 1)[0]}` instead. "
+        )
 
     # Check if version_id or environment is specified
     use_remote = any(["version_id" in kwargs, "environment" in kwargs])
-    normalized_path = sync_client._normalize_path(kwargs["path"])
 
     if use_remote:
         raise HumanloopRuntimeError(
-            f"Cannot use local file for `{normalized_path}` as version_id or environment was specified. "
+            f"Cannot use local file for `{path}` as version_id or environment was specified. "
             "Please either remove version_id/environment to use local files, or set use_local_files=False to use remote files."
         )
 
@@ -111,21 +115,21 @@ def _handle_local_files(
     if file_type not in SyncClient.SERIALIZABLE_FILE_TYPES:
         raise HumanloopRuntimeError(f"Local files are not supported for `{file_type}` files.")
 
-    # If file_type is already specified in kwargs, it means user provided a PromptKernelRequestParams object
+    # If file_type is already specified in kwargs (prompt or agent), it means user provided a Prompt- or AgentKernelRequestParams object
     if file_type in kwargs and not isinstance(kwargs[file_type], str):
         logger.warning(
-            f"Ignoring local file for `{normalized_path}` as {file_type} parameters were directly provided. "
+            f"Ignoring local file for `{path}` as {file_type} parameters were directly provided. "
             "Using provided parameters instead."
         )
         return kwargs
 
     try:
-        file_content = sync_client.get_file_content(normalized_path, file_type)  # type: ignore[arg-type] # file_type was checked above
+        file_content = sync_client.get_file_content(path, file_type)  # type: ignore[arg-type] # file_type was checked above
         kwargs[file_type] = file_content
-    except HumanloopRuntimeError as e:
-        raise HumanloopRuntimeError(f"Failed to use local file for `{normalized_path}`: {str(e)}")
 
-    return kwargs
+        return kwargs
+    except HumanloopRuntimeError as e:
+        raise HumanloopRuntimeError(f"Failed to use local file for `{path}`: {str(e)}")
 
 
 def _handle_evaluation_context(kwargs: Dict[str, Any]) -> tuple[Dict[str, Any], Optional[Callable[[str], None]]]:
@@ -151,11 +155,11 @@ def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files:
         kwargs = _handle_tracing_context(kwargs, self)
 
         # Handle local files for Prompts and Agents clients
-        if _get_file_type_from_client(self) in ["prompt", "agent"]:
+        if use_local_files and _get_file_type_from_client(self) in SyncClient.SERIALIZABLE_FILE_TYPES:
             if sync_client is None:
                 logger.error("sync_client is None but client has log method and use_local_files=%s", use_local_files)
                 raise HumanloopRuntimeError("sync_client is required for clients that support local file operations")
-            kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
+            kwargs = _handle_local_files(kwargs, self, sync_client)
 
         kwargs, eval_callback = _handle_evaluation_context(kwargs)
         response = self._log(**kwargs)  # Use stored original method
@@ -173,7 +177,11 @@ def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files:
 def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> CallResponseType:
     try:
         kwargs = _handle_tracing_context(kwargs, self)
-        kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
+        if use_local_files and _get_file_type_from_client(self) in SyncClient.SERIALIZABLE_FILE_TYPES:
+            if sync_client is None:
+                logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
+                raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
+            kwargs = _handle_local_files(kwargs, self, sync_client)
         return self._call(**kwargs)  # Use stored original method
     except HumanloopRuntimeError:
         # Re-raise HumanloopRuntimeError without wrapping to preserve the message
@@ -200,7 +208,7 @@ def overload_client(
         client.log = types.MethodType(log_wrapper, client)
 
     # Overload call method for Prompt and Agent clients
-    if _get_file_type_from_client(client) in ["prompt", "agent"]:
+    if _get_file_type_from_client(client) in SyncClient.SERIALIZABLE_FILE_TYPES:
         if sync_client is None and use_local_files:
             logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
             raise HumanloopRuntimeError("sync_client is required for clients that support call operations")

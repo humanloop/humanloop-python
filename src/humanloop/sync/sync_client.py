@@ -181,7 +181,8 @@ class SyncClient:
 
     def is_file(self, path: str) -> bool:
         """Check if the path is a file by checking for .{file_type} extension for serializable file types."""
-        return path.endswith(tuple(f".{file_type}" for file_type in self.SERIALIZABLE_FILE_TYPES))
+        clean_path = path.strip()
+        return any(clean_path.endswith(f".{file_type}") for file_type in self.SERIALIZABLE_FILE_TYPES)
 
     def _save_serialized_file(
         self,
