@@ -1,30 +1,31 @@
 import inspect
 import logging
 import types
-from typing import Any, Dict, Optional, Union, Callable
+from typing import Any, Callable, Dict, Optional, Union, TypeVar, Protocol
 
+from humanloop.agents.client import AgentsClient
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
     get_trace_id,
 )
-from humanloop.error import HumanloopRuntimeError
-from humanloop.sync.sync_client import SyncClient
-from humanloop.prompts.client import PromptsClient
-from humanloop.flows.client import FlowsClient
 from humanloop.datasets.client import DatasetsClient
-from humanloop.agents.client import AgentsClient
-from humanloop.tools.client import ToolsClient
+from humanloop.error import HumanloopRuntimeError
 from humanloop.evaluators.client import EvaluatorsClient
+from humanloop.flows.client import FlowsClient
+from humanloop.prompts.client import PromptsClient
+from humanloop.sync.sync_client import SyncClient
+from humanloop.tools.client import ToolsClient
 from humanloop.types import FileType
+from humanloop.types.agent_call_response import AgentCallResponse
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
 from humanloop.types.create_tool_log_response import CreateToolLogResponse
 from humanloop.types.prompt_call_response import PromptCallResponse
-from humanloop.types.agent_call_response import AgentCallResponse
 
 logger = logging.getLogger("humanloop.sdk")
+
 
 LogResponseType = Union[
     CreatePromptLogResponse,
@@ -37,6 +38,9 @@ CallResponseType = Union[
     PromptCallResponse,
     AgentCallResponse,
 ]
+
+
+T = TypeVar("T", bound=Union[PromptsClient, AgentsClient, ToolsClient, FlowsClient, DatasetsClient, EvaluatorsClient])
 
 
 def _get_file_type_from_client(
@@ -184,20 +188,23 @@ def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files
 
 
 def overload_client(
-    client: Any,
+    client: T,
     sync_client: Optional[SyncClient] = None,
     use_local_files: bool = False,
-) -> Any:
+) -> T:
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
     # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
-        client._log = client.log  # type: ignore[attr-defined]
+        # Store original method - using getattr/setattr to avoid type errors
+        original_log = getattr(client, "log")
+        setattr(client, "_log", original_log)
 
         # Create a closure to capture sync_client and use_local_files
         def log_wrapper(self: Any, **kwargs) -> LogResponseType:
             return _overload_log(self, sync_client, use_local_files, **kwargs)
 
-        client.log = types.MethodType(log_wrapper, client)
+        # Replace the log method
+        setattr(client, "log", types.MethodType(log_wrapper, client))
 
     # Overload call method for Prompt and Agent clients
     if _get_file_type_from_client(client) in ["prompt", "agent"]:
@@ -205,12 +212,15 @@ def overload_client(
             logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
             raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
         if hasattr(client, "call") and not hasattr(client, "_call"):
-            client._call = client.call  # type: ignore[attr-defined]
+            # Store original method - using getattr/setattr to avoid type errors
+            original_call = getattr(client, "call")
+            setattr(client, "_call", original_call)
 
             # Create a closure to capture sync_client and use_local_files
             def call_wrapper(self: Any, **kwargs) -> CallResponseType:
                 return _overload_call(self, sync_client, use_local_files, **kwargs)
 
-            client.call = types.MethodType(call_wrapper, client)
+            # Replace the call method
+            setattr(client, "call", types.MethodType(call_wrapper, client))
 
     return client
