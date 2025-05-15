@@ -1,7 +1,7 @@
 import inspect
 import logging
 import types
-from typing import Any, Callable, Dict, Optional, Union, TypeVar, Protocol
+from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
 from humanloop.agents.client import AgentsClient
 from humanloop.context import (
@@ -59,13 +59,13 @@ def _get_file_type_from_client(
         return "dataset"
     elif isinstance(client, EvaluatorsClient):
         return "evaluator"
+    else:
+        raise ValueError(f"Unsupported client type: {type(client)}")
 
-    raise ValueError(f"Unsupported client type: {type(client)}")
 
-
-def _handle_tracing_context(kwargs: Dict[str, Any], client: Any) -> Dict[str, Any]:
+def _handle_tracing_context(kwargs: Dict[str, Any], client: T) -> Dict[str, Any]:
     """Handle tracing context for both log and call methods."""
-    trace_id = get_trace_id()
+    trace_id = get_trace_id()   
     if trace_id is not None:
         if "flow" in str(type(client).__name__).lower():
             context = get_decorator_context()
@@ -90,7 +90,7 @@ def _handle_tracing_context(kwargs: Dict[str, Any], client: Any) -> Dict[str, An
 
 def _handle_local_files(
     kwargs: Dict[str, Any],
-    client: Any,
+    client: T,
     sync_client: Optional[SyncClient],
     use_local_files: bool,
 ) -> Dict[str, Any]:
@@ -140,7 +140,7 @@ def _handle_evaluation_context(kwargs: Dict[str, Any]) -> tuple[Dict[str, Any], 
     return kwargs, None
 
 
-def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> LogResponseType:
+def _overload_log(self: T, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> LogResponseType:
     try:
         # Special handling for flows - prevent direct log usage
         if type(self) is FlowsClient and get_trace_id() is not None:
@@ -162,7 +162,7 @@ def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files:
             kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
 
         kwargs, eval_callback = _handle_evaluation_context(kwargs)
-        response = self._log(**kwargs)  # Use stored original method
+        response = self._log(**kwargs)  # type: ignore[union-attr] # Use stored original method
         if eval_callback is not None:
             eval_callback(response.id)
         return response
@@ -174,11 +174,11 @@ def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files:
         raise HumanloopRuntimeError from e
 
 
-def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> CallResponseType:
+def _overload_call(self: T, sync_client: Optional[SyncClient], use_local_files: bool, **kwargs) -> CallResponseType:
     try:
         kwargs = _handle_tracing_context(kwargs, self)
         kwargs = _handle_local_files(kwargs, self, sync_client, use_local_files)
-        return self._call(**kwargs)  # Use stored original method
+        return self._call(**kwargs)  # type: ignore[union-attr] # Use stored original method
     except HumanloopRuntimeError:
         # Re-raise HumanloopRuntimeError without wrapping to preserve the message
         raise
@@ -200,7 +200,7 @@ def overload_client(
         setattr(client, "_log", original_log)
 
         # Create a closure to capture sync_client and use_local_files
-        def log_wrapper(self: Any, **kwargs) -> LogResponseType:
+        def log_wrapper(self: T, **kwargs) -> LogResponseType:
             return _overload_log(self, sync_client, use_local_files, **kwargs)
 
         # Replace the log method
@@ -217,7 +217,7 @@ def overload_client(
             setattr(client, "_call", original_call)
 
             # Create a closure to capture sync_client and use_local_files
-            def call_wrapper(self: Any, **kwargs) -> CallResponseType:
+            def call_wrapper(self: T, **kwargs) -> CallResponseType:
                 return _overload_call(self, sync_client, use_local_files, **kwargs)
 
             # Replace the call method
