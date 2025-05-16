@@ -221,7 +221,7 @@ def pull(
     client = get_client(api_key, env_file, base_url)
     # Although pull() is available on the Humanloop client, we instantiate FileSyncer separately to control its log level.
     # This allows CLI users to toggle between detailed logging (--verbose) and minimal output without affecting the
-    # main Humanloop client logger. The FileSyncer uses its own logger namespace (humanloop.sdk.sync), making this
+    # main Humanloop client logger. The FileSyncer uses its own logger namespace (humanloop.sdk.file_syncer), making this
     # modification isolated from the client's OpenTelemetry setup. This client instance is short-lived and only
     # exists for the duration of the CLI command execution.
     file_syncer = FileSyncer(
