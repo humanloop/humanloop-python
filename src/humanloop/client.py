@@ -166,6 +166,7 @@ class Humanloop(BaseHumanloop):
 
         # Overload the .log method of the clients to be aware of Evaluation Context
         # and the @flow decorator providing the trace_id
+        # Additionally, call and log methods are overloaded in the prompts and agents client to support the use of local files
         self.prompts = overload_client(
             client=self.prompts, sync_client=self._sync_client, use_local_files=self.use_local_files
         )
