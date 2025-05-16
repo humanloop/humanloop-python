@@ -5,6 +5,7 @@
 
 src/humanloop/evals
 src/humanloop/prompt_utils.py
+src/humanloop/path_utils.py
 src/humanloop/client.py
 src/humanloop/overload.py
 src/humanloop/context.py

@@ -180,8 +180,15 @@ class SyncClient:
         return "/".join(part for part in normalized.replace("\\", "/").split("/") if part)
 
     def is_file(self, path: str) -> bool:
-        """Check if the path is a file by checking for .{file_type} extension for serializable file types."""
-        clean_path = path.strip()
+        """Check if the path is a file by checking for .{file_type} extension for serializable file types.
+        
+        Files are identified by having a supported extension (.prompt or .agent).
+        This method performs case-insensitive comparison and handles whitespace.
+
+        Returns: 
+            bool: True if the path ends with a supported file extension
+        """
+        clean_path = path.strip().lower()  # Convert to lowercase for case-insensitive comparison
         return any(clean_path.endswith(f".{file_type}") for file_type in self.SERIALIZABLE_FILE_TYPES)
 
     def _save_serialized_file(

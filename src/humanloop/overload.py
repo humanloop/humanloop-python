@@ -92,14 +92,25 @@ def _handle_local_files(
     """Handle local file loading."""
     if "id" in kwargs:
         raise HumanloopRuntimeError("Can only specify one of `id` or `path`")
-    
+
     path = kwargs["path"]
 
+    # Check if the path has a file type extension (.prompt/.agent)
     if sync_client.is_file(path):
         file_type = _get_file_type_from_client(client)
+
+        # Safely extract the extension and path by handling potential errors
+        try:
+            parts = path.rsplit(".", 1)
+            path_without_extension = parts[0] if len(parts) > 0 else path
+        except Exception:
+            # Fallback to original path if any error occurs
+            path_without_extension = path
+
         raise HumanloopRuntimeError(
-            f"Path should not include file extension: `{path}`. "
-            f"Use `{path.rsplit('.', 1)[0]}` instead. "
+            f"Path '{path}' includes a file extension which is not supported in API calls. "
+            f"When referencing files via the path parameter, use the format without extensions: '{path_without_extension}'. "
+            f"Note: File extensions are only used when pulling specific files via the CLI."
         )
 
     # Check if version_id or environment is specified

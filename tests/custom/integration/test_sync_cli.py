@@ -37,7 +37,7 @@ def test_pull_without_api_key(cli_runner: CliRunner, no_humanloop_api_key_in_env
 def test_pull_basic(
     cli_runner: CliRunner,
     syncable_files_fixture: list[SyncableFile],
-    tmp_path: Path,  # this path is used as a temporary store for files locally
+    tmp_path: Path,  # This path is used as a temporary store for files locally
 ):
     # GIVEN a base directory for pulled files
     base_dir = str(tmp_path / "humanloop")

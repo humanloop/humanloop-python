@@ -64,14 +64,42 @@ def test_normalize_path(sync_client: SyncClient):
 
 
 def test_is_file(sync_client: SyncClient):
-    """Test file type detection."""
-    # GIVEN various file paths
-    # WHEN checking if they are valid file types
-    # THEN only .prompt and .agent files should return True
+    """Test file type detection with case insensitivity."""
+    # GIVEN a SyncClient instance
+
+    # WHEN checking various file paths with different extensions and cases
+    # THEN .prompt and .agent files (of any case) should return True
+
+    # Standard lowercase extensions
     assert sync_client.is_file("test.prompt")
     assert sync_client.is_file("test.agent")
+
+    # Uppercase extensions (case insensitivity)
+    assert sync_client.is_file("test.PROMPT")
+    assert sync_client.is_file("test.AGENT")
+    assert sync_client.is_file("test.Prompt")
+    assert sync_client.is_file("test.Agent")
+
+    # With whitespace
+    assert sync_client.is_file(" test.prompt ")
+    assert sync_client.is_file(" test.agent ")
+
+    # WHEN checking paths with invalid or no extensions
+    # THEN they should return False
+
+    # Invalid file types
     assert not sync_client.is_file("test.txt")
+    assert not sync_client.is_file("test.json")
+    assert not sync_client.is_file("test.py")
+
+    # No extension
     assert not sync_client.is_file("test")
+    assert not sync_client.is_file("prompt")
+    assert not sync_client.is_file("agent")
+
+    # Partial extensions
+    assert not sync_client.is_file("test.prom")
+    assert not sync_client.is_file("test.age")
 
 
 def test_save_and_read_file(sync_client: SyncClient):

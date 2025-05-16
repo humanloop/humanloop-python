@@ -81,6 +81,7 @@ def get_client(
     """
     if not api_key:
         api_key = load_api_key(env_file)
+    print(api_key)
     return Humanloop(api_key=api_key, base_url=base_url)
 
 
