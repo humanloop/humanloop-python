@@ -221,7 +221,7 @@ response = client.prompts.call(
 )
 ```
 
-For detailed instructions on syncing, see our [Guide to Syncing and Using Local Files](https://humanloop.com/docs/v5/guides/propmts/syncing-local-files).
+For detailed instructions on syncing, see our [Guide to Syncing and Using Local Files](https://humanloop.com/docs/v5/guides/prompts/syncing-local-files).
 
 For information about the `.prompt` and `.agent` file formats, see our [File Format Reference](https://humanloop.com/docs/v5/reference/prompt-and-agent-files). 
 
