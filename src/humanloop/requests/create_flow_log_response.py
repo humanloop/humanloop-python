@@ -26,5 +26,5 @@ class CreateFlowLogResponseParams(typing_extensions.TypedDict):
 
     log_status: typing_extensions.NotRequired[LogStatus]
     """
-    Status of the Flow Log. When a Flow Log is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+    Status of the Flow Log. When a Flow Log is marked as `complete`, no more Logs can be added to it.
     """

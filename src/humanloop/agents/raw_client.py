@@ -92,7 +92,6 @@ class RawAgentsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -200,9 +199,6 @@ class RawAgentsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -270,7 +266,6 @@ class RawAgentsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -352,7 +347,7 @@ class RawAgentsClient:
             The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -425,7 +420,6 @@ class RawAgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -499,9 +493,6 @@ class RawAgentsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -561,7 +552,6 @@ class RawAgentsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -640,7 +630,6 @@ class RawAgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -714,9 +703,6 @@ class RawAgentsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -776,7 +762,6 @@ class RawAgentsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -2071,7 +2056,6 @@ class AsyncRawAgentsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -2179,9 +2163,6 @@ class AsyncRawAgentsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -2249,7 +2230,6 @@ class AsyncRawAgentsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -2331,7 +2311,7 @@ class AsyncRawAgentsClient:
             The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -2404,7 +2384,6 @@ class AsyncRawAgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -2478,9 +2457,6 @@ class AsyncRawAgentsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -2540,7 +2516,6 @@ class AsyncRawAgentsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -2619,7 +2594,6 @@ class AsyncRawAgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -2693,9 +2667,6 @@ class AsyncRawAgentsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -2755,7 +2726,6 @@ class AsyncRawAgentsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,

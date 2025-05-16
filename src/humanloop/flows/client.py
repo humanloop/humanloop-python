@@ -81,9 +81,6 @@ class FlowsClient:
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
-        If you create the Flow Log with a `log_status` of `incomplete`, you should later update it to `complete`
-        in order to trigger Evaluators.
-
         Parameters
         ----------
         version_id : typing.Optional[str]
@@ -144,7 +141,7 @@ class FlowsClient:
             Any additional metadata to record.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Log is updated from `incomplete` to `complete`, it becomes available to Monitoring Evaluators. Flow Logs cannot have an unspecified status: they must start as `incomplete` to allow children to be added. Provide `complete` if you don't intend to add children to the trace.
+            Status of the Flow Log. When a Log is updated from `incomplete` to `complete`, no more Logs can be added to it.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -258,7 +255,7 @@ class FlowsClient:
             The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -837,9 +834,6 @@ class AsyncFlowsClient:
         You can use query parameters `version_id`, or `environment`, to target
         an existing version of the Flow. Otherwise, the default deployed version will be chosen.
 
-        If you create the Flow Log with a `log_status` of `incomplete`, you should later update it to `complete`
-        in order to trigger Evaluators.
-
         Parameters
         ----------
         version_id : typing.Optional[str]
@@ -900,7 +894,7 @@ class AsyncFlowsClient:
             Any additional metadata to record.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Log is updated from `incomplete` to `complete`, it becomes available to Monitoring Evaluators. Flow Logs cannot have an unspecified status: they must start as `incomplete` to allow children to be added. Provide `complete` if you don't intend to add children to the trace.
+            Status of the Flow Log. When a Log is updated from `incomplete` to `complete`, no more Logs can be added to it.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -1017,7 +1011,7 @@ class AsyncFlowsClient:
             The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
