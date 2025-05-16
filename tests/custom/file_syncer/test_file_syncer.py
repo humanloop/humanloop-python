@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from humanloop.error import HumanloopRuntimeError
-from humanloop.sync.file_syncer import SerializableFileType, FileSyncer
+from humanloop.sync.file_syncer import FileSyncer, SerializableFileType
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def mock_client() -> Mock:
 def file_syncer(mock_client: Mock, tmp_path: Path) -> FileSyncer:
     return FileSyncer(
         client=mock_client,
-        base_dir=tmp_path,
+        base_dir=str(tmp_path),
         cache_size=10,
         log_level=logging.DEBUG,  # DEBUG level for testing  # noqa: F821
     )
