@@ -109,7 +109,8 @@ def _handle_local_files(
         Updated kwargs with file content in prompt/agent field
 
     Raises:
-        HumanloopRuntimeError: On validation or file loading failures
+        HumanloopRuntimeError: On validation or file loading failures.
+        For example, an invalid path format (absolute paths, leading/trailing slashes, etc.) or a file not being found.
     """
     if "id" in kwargs:
         raise HumanloopRuntimeError("Can only specify one of `id` or `path`")
@@ -133,7 +134,7 @@ def _handle_local_files(
         # Always raise error when file extension is detected (based on the outer if condition)
         raise HumanloopRuntimeError(
             f"Path '{path}' includes a file extension which is not supported in API calls. "
-            f"When referencing files via the path parameter, use the format without extensions: '{path_without_extension}'. "
+            f"When referencing files via the `path` parameter, use the path without extensions: '{path_without_extension}'. "
             f"Note: File extensions are only used when pulling specific files via the CLI."
         )
 
@@ -150,7 +151,8 @@ def _handle_local_files(
     if file_type not in FileSyncer.SERIALIZABLE_FILE_TYPES:
         raise HumanloopRuntimeError(f"Local files are not supported for `{file_type.capitalize()}` files: '{path}'.")
 
-    # If file_type is already specified in kwargs (prompt or agent), it means user provided a Prompt- or AgentKernelRequestParams object
+    # If file_type is already specified in kwargs (`prompt` or `agent`), it means user provided a Prompt- or AgentKernelRequestParams object
+    # In this case, we should prioritize the user-provided value over the local file content.
     if file_type in kwargs and not isinstance(kwargs[file_type], str):
         logger.warning(
             f"Ignoring local file for `{path}` as {file_type} parameters were directly provided. "
@@ -189,7 +191,7 @@ def _overload_log(self: T, file_syncer: Optional[FileSyncer], use_local_files: b
 
         kwargs = _handle_tracing_context(kwargs, self)
 
-        # Handle loading files from local filesystem when using Prompts and Agents clients
+        # Handle loading files from local filesystem when using Prompt and Agent clients
         # This enables users to define prompts/agents in local files rather than fetching from the Humanloop API
         if use_local_files and _get_file_type_from_client(self) in FileSyncer.SERIALIZABLE_FILE_TYPES:
             # Developer note: file_syncer should always be provided during SDK initialization when
@@ -220,6 +222,7 @@ def _overload_log(self: T, file_syncer: Optional[FileSyncer], use_local_files: b
 def _overload_call(self: T, file_syncer: Optional[FileSyncer], use_local_files: bool, **kwargs) -> CallResponseType:
     try:
         kwargs = _handle_tracing_context(kwargs, self)
+        # If `use_local_files` flag is True, we should use local file content for `call` operations on Prompt and Agent clients.
         if use_local_files and _get_file_type_from_client(self) in FileSyncer.SERIALIZABLE_FILE_TYPES:
             # Same file_syncer requirement as in _overload_log - see developer note there
             if file_syncer is None:
