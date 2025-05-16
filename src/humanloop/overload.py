@@ -4,7 +4,6 @@ import types
 from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
 from humanloop.agents.client import AgentsClient
-from humanloop.client import ExtendedPromptsClient
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
@@ -188,7 +187,7 @@ ClientTemplateType = TypeVar(
     "ClientTemplateType",
     bound=Union[
         FlowsClient,
-        ExtendedPromptsClient,
+        PromptsClient,
         AgentsClient,
         ToolsClient,
     ],
