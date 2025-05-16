@@ -1,28 +1,30 @@
 import inspect
 import logging
 import types
-from typing import Any, Dict, Optional, Union, Callable
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional, Union
 
+from humanloop import path_utils
+from humanloop.agents.client import AgentsClient
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
     get_trace_id,
 )
-from humanloop.error import HumanloopRuntimeError
-from humanloop.sync.sync_client import SyncClient
-from humanloop.prompts.client import PromptsClient
-from humanloop.flows.client import FlowsClient
 from humanloop.datasets.client import DatasetsClient
-from humanloop.agents.client import AgentsClient
-from humanloop.tools.client import ToolsClient
+from humanloop.error import HumanloopRuntimeError
 from humanloop.evaluators.client import EvaluatorsClient
+from humanloop.flows.client import FlowsClient
+from humanloop.prompts.client import PromptsClient
+from humanloop.sync.sync_client import SyncClient
+from humanloop.tools.client import ToolsClient
 from humanloop.types import FileType
+from humanloop.types.agent_call_response import AgentCallResponse
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
 from humanloop.types.create_tool_log_response import CreateToolLogResponse
 from humanloop.types.prompt_call_response import PromptCallResponse
-from humanloop.types.agent_call_response import AgentCallResponse
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -95,16 +97,21 @@ def _handle_local_files(
 
     path = kwargs["path"]
 
-    # Check if the path has a file type extension (.prompt/.agent)
-    if sync_client.is_file(path):
-        file_type = _get_file_type_from_client(client)
+    # First check for path format issues (absolute paths or leading/trailing slashes)
+    normalized_path = path.strip("/")
+    if Path(path).is_absolute() or path != normalized_path:
+        raise HumanloopRuntimeError(
+            f"Path '{path}' format is invalid. "
+            f"Paths must follow the standard API format 'path/to/resource' without leading or trailing slashes. "
+            f"Please use '{normalized_path}' instead."
+        )
 
-        # Safely extract the extension and path by handling potential errors
+    # Then check for file extensions
+    if sync_client.is_file(path):
         try:
             parts = path.rsplit(".", 1)
             path_without_extension = parts[0] if len(parts) > 0 else path
         except Exception:
-            # Fallback to original path if any error occurs
             path_without_extension = path
 
         raise HumanloopRuntimeError(
@@ -124,7 +131,7 @@ def _handle_local_files(
 
     file_type = _get_file_type_from_client(client)
     if file_type not in SyncClient.SERIALIZABLE_FILE_TYPES:
-        raise HumanloopRuntimeError(f"Local files are not supported for `{file_type}` files.")
+        raise HumanloopRuntimeError(f"Local files are not supported for `{file_type.capitalize()}` files: '{path}'.")
 
     # If file_type is already specified in kwargs (prompt or agent), it means user provided a Prompt- or AgentKernelRequestParams object
     if file_type in kwargs and not isinstance(kwargs[file_type], str):

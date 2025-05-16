@@ -54,9 +54,9 @@ def test_path_validation(
         f"//{test_file.path}//",  # Multiple leading and trailing slashes
     ]
 
-    # THEN appropriate error should be raised
+    # THEN appropriate error should be raised about slashes
     for path in slash_paths:
-        with pytest.raises(HumanloopRuntimeError, match=""):
+        with pytest.raises(HumanloopRuntimeError, match="Path .* format is invalid"):
             if test_file.type == "prompt":
                 humanloop_client.prompts.call(path=path, messages=[{"role": "user", "content": "Testing"}])
             elif test_file.type == "agent":
@@ -68,9 +68,9 @@ def test_path_validation(
         f"/{test_file.path}.{test_file.type}",  # Extension and leading slash
     ]
 
-    # THEN the extension error should be prioritized (more specific validation first)
+    # THEN the format validation error should be raised first (before extension validation)
     for path in combined_paths:
-        with pytest.raises(HumanloopRuntimeError, match="includes a file extension which is not supported"):
+        with pytest.raises(HumanloopRuntimeError, match="Path .* format is invalid"):
             if test_file.type == "prompt":
                 humanloop_client.prompts.call(path=path, messages=[{"role": "user", "content": "Testing"}])
             elif test_file.type == "agent":

@@ -1,11 +1,13 @@
-import logging
-from pathlib import Path
-from typing import List, Optional, Tuple, TYPE_CHECKING, Union
-from functools import lru_cache
-import typing
-import time
-from humanloop.error import HumanloopRuntimeError
 import json
+import logging
+import time
+import typing
+from functools import lru_cache
+from pathlib import Path
+from typing import TYPE_CHECKING, List, Optional, Tuple
+
+from humanloop import path_utils
+from humanloop.error import HumanloopRuntimeError
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
@@ -154,30 +156,6 @@ class SyncClient:
         """Clear the LRU cache."""
         self.get_file_content.cache_clear()  # type: ignore [attr-defined]
 
-    def _normalize_path(self, path: str, strip_extension: bool = False) -> str:
-        """Normalize the path by:
-        1. Converting to a Path object to handle platform-specific separators
-        2. Removing any file extensions if strip_extension is True
-        3. Converting to a string with forward slashes and no leading/trailing slashes
-        """
-        # Convert to Path object to handle platform-specific separators
-        path_obj = Path(path)
-
-        # Reject absolute paths to ensure all paths are relative to base_dir.
-        # This maintains consistency with the remote filesystem where paths are relative to project root.
-        if path_obj.is_absolute():
-            raise HumanloopRuntimeError(
-                f"Absolute paths are not supported: `{path}`. "
-                f"Paths should be relative to the base directory (`{self.base_dir}`)."
-            )
-
-        # Remove extension, convert to string with forward slashes, and remove leading/trailing slashes
-        if strip_extension:
-            normalized = str(path_obj.with_suffix(""))
-        else:
-            normalized = str(path_obj)
-        # Replace all backslashes and normalize multiple forward slashes
-        return "/".join(part for part in normalized.replace("\\", "/").split("/") if part)
 
     def is_file(self, path: str) -> bool:
         """Check if the path is a file by checking for .{file_type} extension for serializable file types.
@@ -369,7 +347,7 @@ class SyncClient:
             is_file_path = self.is_file(path)
 
             # For API communication, we need path without extension
-            api_path = self._normalize_path(path, strip_extension=True)
+            api_path = path_utils.normalize_path(path, strip_extension=True)
 
         logger.info(f"Starting pull: path={api_path or '(root)'}, environment={environment or '(default)'}")
 

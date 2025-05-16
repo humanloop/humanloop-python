@@ -44,10 +44,58 @@ def test_pull_with_invalid_path(
     with pytest.raises(HumanloopRuntimeError, match=f"Directory `{non_existent_path}` does not exist"):
         humanloop_client.pull(path=non_existent_path)
 
+
 def test_pull_with_invalid_environment(
     get_humanloop_client: GetHumanloopClientFn,
 ):
     """Test that humanloop.sync() raises an error when the environment is invalid"""
     humanloop_client = get_humanloop_client()
-    with pytest.raises(HumanloopRuntimeError, match="Invalid environment"):
+    with pytest.raises(HumanloopRuntimeError, match="Environment .* does not exist"):
         humanloop_client.pull(environment="invalid_environment")
+
+
+# def test_pull_with_environment(
+#     get_humanloop_client: GetHumanloopClientFn,
+#     syncable_files_fixture: list[SyncableFile],
+# ):
+#     """Test that humanloop.sync() correctly syncs files from a specific environment"""
+#     # NOTE: This test is currently not feasible to implement because:
+#     # 1. We have no way of deploying to an environment using its name, only by ID
+#     # 2. There's no API endpoint to retrieve environments for an organization
+#     #
+#     # If implemented, this test would:
+#     # 1. Deploy one of the syncable files to a specific environment (e.g., "production" as it's non-default)
+#     # 2. Pull files filtering by the production environment
+#     # 3. Check if the deployed file is present in the local filesystem
+#     # 4. Verify that none of the other syncable files (that weren't deployed to production) are present
+#     #    This would confirm that environment filtering works correctly
+
+
+def test_pull_with_path_filter(
+    get_humanloop_client: GetHumanloopClientFn,
+    syncable_files_fixture: list[SyncableFile],
+    sdk_test_dir: str,
+):
+    """Test that humanloop.sync() correctly filters files by path when pulling"""
+    # GIVEN a client
+    humanloop_client = get_humanloop_client()
+
+    # First clear any existing files to ensure clean state
+    import shutil
+
+    if Path("humanloop").exists():
+        shutil.rmtree("humanloop")
+
+    # WHEN pulling only files from the sdk_test_dir path
+    humanloop_client.pull(path=sdk_test_dir)
+
+    # THEN count the total number of files synced
+    synced_file_count = 0
+    for path in Path("humanloop").glob("**/*"):
+        if path.is_file():
+            synced_file_count += 1
+
+    # The count should match our fixture length
+    assert synced_file_count == len(syncable_files_fixture), (
+        f"Expected {len(syncable_files_fixture)} files, got {synced_file_count}"
+    )
