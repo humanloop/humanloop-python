@@ -195,16 +195,15 @@ def overload_client(
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
     # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
-        # Store original method - using getattr/setattr to avoid type errors
-        original_log = getattr(client, "log")
-        setattr(client, "_log", original_log)
+        # Store original method with type ignore
+        client._log = client.log  # type: ignore
 
         # Create a closure to capture sync_client and use_local_files
         def log_wrapper(self: Any, **kwargs) -> LogResponseType:
             return _overload_log(self, sync_client, use_local_files, **kwargs)
 
-        # Replace the log method
-        setattr(client, "log", types.MethodType(log_wrapper, client))
+        # Replace the log method with type ignore
+        client.log = types.MethodType(log_wrapper, client)  # type: ignore
 
     # Overload call method for Prompt and Agent clients
     if _get_file_type_from_client(client) in ["prompt", "agent"]:
@@ -212,15 +211,14 @@ def overload_client(
             logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
             raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
         if hasattr(client, "call") and not hasattr(client, "_call"):
-            # Store original method - using getattr/setattr to avoid type errors
-            original_call = getattr(client, "call")
-            setattr(client, "_call", original_call)
+            # Store original method with type ignore
+            client._call = client.call  # type: ignore
 
             # Create a closure to capture sync_client and use_local_files
             def call_wrapper(self: Any, **kwargs) -> CallResponseType:
                 return _overload_call(self, sync_client, use_local_files, **kwargs)
 
-            # Replace the call method
-            setattr(client, "call", types.MethodType(call_wrapper, client))
+            # Replace the call method with type ignore
+            client.call = types.MethodType(call_wrapper, client)  # type: ignore
 
     return client
