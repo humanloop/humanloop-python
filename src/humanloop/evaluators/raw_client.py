@@ -26,7 +26,6 @@ from ..types.file_environment_response import FileEnvironmentResponse
 from ..types.file_sort_by import FileSortBy
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_evaluators import ListEvaluators
-from ..types.log_status import LogStatus
 from ..types.paginated_data_evaluator_response import PaginatedDataEvaluatorResponse
 from ..types.sort_order import SortOrder
 from .requests.create_evaluator_log_request_judgment import CreateEvaluatorLogRequestJudgmentParams
@@ -61,7 +60,6 @@ class RawEvaluatorsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -132,9 +130,6 @@ class RawEvaluatorsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -194,7 +189,6 @@ class RawEvaluatorsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
@@ -1047,7 +1041,6 @@ class AsyncRawEvaluatorsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1118,9 +1111,6 @@ class AsyncRawEvaluatorsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -1180,7 +1170,6 @@ class AsyncRawEvaluatorsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "parent_id": parent_id,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,

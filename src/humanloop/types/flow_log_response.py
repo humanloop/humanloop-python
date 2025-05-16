@@ -89,7 +89,7 @@ class FlowLogResponse(UncheckedBaseModel):
 
     log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
     """
-    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+    Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
     """
 
     source_datapoint_id: typing.Optional[str] = pydantic.Field(default=None)
