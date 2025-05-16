@@ -206,7 +206,7 @@ class SyncClient:
         """Pull a specific file from Humanloop to local filesystem.
 
         Returns:
-            True if the file was successfully pulled, False otherwise
+            True if the file was successfully pulled, False otherwise (e.g. if the file was not found)
         """
         try:
             file = self.client.files.retrieve_by_path(
