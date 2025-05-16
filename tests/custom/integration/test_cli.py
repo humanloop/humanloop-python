@@ -20,13 +20,13 @@ def no_env_file_loading():
         yield
 
 
-def test_pull_without_api_key(cli_runner: CliRunner, no_humanloop_api_key_in_env, no_env_file_loading):
-    """GIVEN no API key in environment
-    WHEN running pull command
-    THEN it should fail with appropriate error message
-    """
+def test_pull_without_api_key(cli_runner: CliRunner, no_humanloop_api_key_in_env, no_env_file_loading, tmp_path: Path):
+    """Test error handling when no API key is available."""
+    # GIVEN a base directory
+    base_dir = str(tmp_path)
+
     # WHEN running pull command
-    result = cli_runner.invoke(cli, ["pull", "--local-files-directory", "humanloop"])
+    result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir])
 
     # THEN it should fail with appropriate error message
     assert result.exit_code == 1  # Our custom error code for API key issues
@@ -37,10 +37,11 @@ def test_pull_without_api_key(cli_runner: CliRunner, no_humanloop_api_key_in_env
 def test_pull_basic(
     cli_runner: CliRunner,
     syncable_files_fixture: list[SyncableFile],
-    tmp_path: Path,  # this path is used as a temporary store for files locally
+    tmp_path: Path,
 ):
+    """Test basic file pulling functionality."""
     # GIVEN a base directory for pulled files
-    base_dir = str(tmp_path / "humanloop")
+    base_dir = str(tmp_path)
 
     # WHEN running pull command
     result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir, "--verbose"])
@@ -64,19 +65,11 @@ def test_pull_with_specific_path(
     syncable_files_fixture: list[SyncableFile],
     tmp_path: Path,
 ):
-    """GIVEN a specific path to pull
-    WHEN running pull command with path
-    THEN it should pull only files from that path
-    """
+    """Test pulling files from a specific path."""
     # GIVEN a base directory and specific path
-    base_dir = str(tmp_path / "humanloop")
-    test_path = syncable_files_fixture[
-        0
-    ].path.split(
-        "/"
-    )[
-        0
-    ]  # Retrieve the prefix of the first file's path which corresponds to the sdk_test_dir used within syncable_files_fixture
+    base_dir = str(tmp_path)
+    # Retrieve the prefix of the first file's path which corresponds to the sdk_test_dir used within syncable_files_fixture
+    test_path = syncable_files_fixture[0].path.split("/")[0]
 
     # WHEN running pull command with path
     result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir, "--path", test_path, "--verbose"])
@@ -100,8 +93,9 @@ def test_pull_with_environment(
     syncable_files_fixture: list[SyncableFile],
     tmp_path: Path,
 ):
+    """Test pulling files from a specific environment."""
     # GIVEN a base directory and environment
-    base_dir = str(tmp_path / "humanloop")
+    base_dir = str(tmp_path)
     environment = "staging"
 
     # WHEN running pull command with environment
@@ -127,8 +121,9 @@ def test_pull_with_quiet_mode(
     syncable_files_fixture: list[SyncableFile],
     tmp_path: Path,
 ):
+    """Test pulling files with quiet mode enabled."""
     # GIVEN a base directory and quiet mode
-    base_dir = str(tmp_path / "humanloop")
+    base_dir = str(tmp_path)
 
     # WHEN running pull command with quiet mode
     result = cli_runner.invoke(cli, ["pull", "--local-files-directory", base_dir, "--quiet"])
@@ -146,12 +141,15 @@ def test_pull_with_quiet_mode(
 
 def test_pull_with_invalid_path(
     cli_runner: CliRunner,
+    tmp_path: Path,
 ):
-    # GIVEN an invalid base directory
+    """Test error handling when pulling from an invalid path."""
+    # GIVEN an invalid path
     path = "nonexistent/path"
+    base_dir = str(tmp_path)
 
     # WHEN running pull command
-    result = cli_runner.invoke(cli, ["pull", "--path", path])
+    result = cli_runner.invoke(cli, ["pull", "--path", path, "--local-files-directory", base_dir])
 
     # THEN it should fail
     assert result.exit_code == 1
@@ -159,9 +157,10 @@ def test_pull_with_invalid_path(
 
 
 def test_pull_with_invalid_environment(cli_runner: CliRunner, tmp_path: Path):
+    """Test error handling when pulling from an invalid environment."""
     # GIVEN an invalid environment
     environment = "nonexistent"
-    base_dir = str(tmp_path / "humanloop")
+    base_dir = str(tmp_path)
 
     # WHEN running pull command
     result = cli_runner.invoke(
