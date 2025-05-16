@@ -8,9 +8,7 @@ def normalize_path(path: str, strip_extension: bool = False) -> str:
 
     # Handle extension
     if strip_extension:
-        normalized = str(path_obj.with_suffix(""))
-    else:
-        normalized = str(path_obj)
+        path_obj = path_obj.with_suffix("")
 
-    # Normalize separators
-    return "/".join(part for part in normalized.replace("\\", "/").split("/") if part)
+    # Use as_posix() to normalize separators consistently
+    return path_obj.as_posix()

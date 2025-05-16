@@ -108,12 +108,10 @@ def _handle_local_files(
 
     # Then check for file extensions
     if sync_client.is_file(path):
-        try:
-            parts = path.rsplit(".", 1)
-            path_without_extension = parts[0] if len(parts) > 0 else path
-        except Exception:
-            path_without_extension = path
+        # Extract the path without extension to suggest correct format in the error message
+        path_without_extension = str(Path(path).with_suffix(""))
 
+        # Always raise error when file extension is detected (based on the outer if condition)
         raise HumanloopRuntimeError(
             f"Path '{path}' includes a file extension which is not supported in API calls. "
             f"When referencing files via the path parameter, use the format without extensions: '{path_without_extension}'. "
