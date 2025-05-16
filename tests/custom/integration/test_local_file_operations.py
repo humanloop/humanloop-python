@@ -7,10 +7,61 @@ from humanloop.requests.chat_message import ChatMessageParams
 from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 
+@pytest.mark.parametrize(
+    "path_generator,expected_error,test_case_description",
+    [
+        # Extension path test cases
+        # Using lambdas to defer path generation until we have access to the test_file fixture
+        (
+            lambda test_file: f"{test_file.path}.{test_file.type}",
+            "includes a file extension which is not supported",
+            "Standard extension",
+        ),
+        (
+            lambda test_file: f"{test_file.path}.{test_file.type.upper()}",
+            "includes a file extension which is not supported",
+            "Uppercase extension",
+        ),
+        (
+            lambda test_file: f"{test_file.path}.{test_file.type.capitalize()}",
+            "includes a file extension which is not supported",
+            "Mixed case extension",
+        ),
+        (
+            lambda test_file: f" {test_file.path}.{test_file.type} ",
+            "includes a file extension which is not supported",
+            "With whitespace",
+        ),
+        # Slash path test cases
+        (lambda test_file: f"{test_file.path}/", "Path .* format is invalid", "Trailing slash"),
+        (lambda test_file: f"/{test_file.path}", "Path .* format is invalid", "Leading slash"),
+        (lambda test_file: f"/{test_file.path}/", "Path .* format is invalid", "Both leading and trailing slashes"),
+        (
+            lambda test_file: f"//{test_file.path}//",
+            "Path .* format is invalid",
+            "Multiple leading and trailing slashes",
+        ),
+        # Combined path test cases
+        (
+            lambda test_file: f"{test_file.path}.{test_file.type}/",
+            "Path .* format is invalid",
+            "Extension and trailing slash",
+        ),
+        (
+            lambda test_file: f"/{test_file.path}.{test_file.type}",
+            "Path .* format is invalid",
+            "Extension and leading slash",
+        ),
+    ],
+    ids=lambda x: x[2] if isinstance(x, tuple) else x,  # Use test_case_description as the test ID in pytest output
+)
 def test_path_validation(
     get_humanloop_client: GetHumanloopClientFn,
     syncable_files_fixture: list[SyncableFile],
     tmp_path: Path,
+    path_generator: callable,
+    expected_error: str,
+    test_case_description: str,
 ):
     """Test validation of path formats for local file operations."""
     # GIVEN a client with local files enabled and remote files pulled
@@ -18,51 +69,15 @@ def test_path_validation(
     humanloop_client.pull()
     test_file = syncable_files_fixture[0]
 
-    # WHEN using paths with file extensions (of any case/format)
-    extension_paths = [
-        f"{test_file.path}.{test_file.type}",  # Standard extension
-        f"{test_file.path}.{test_file.type.upper()}",  # Uppercase extension
-        f"{test_file.path}.{test_file.type.capitalize()}",  # Mixed case extension
-        f" {test_file.path}.{test_file.type} ",  # With whitespace
-    ]
+    # WHEN using the test path
+    test_path = path_generator(test_file)
 
-    # THEN appropriate error should be raised about file extensions
-    for path in extension_paths:
-        with pytest.raises(HumanloopRuntimeError, match="includes a file extension which is not supported"):
-            if test_file.type == "prompt":
-                humanloop_client.prompts.call(path=path, messages=[{"role": "user", "content": "Testing"}])
-            elif test_file.type == "agent":
-                humanloop_client.agents.call(path=path, messages=[{"role": "user", "content": "Testing"}])
-
-    # WHEN using paths with leading/trailing slashes
-    slash_paths = [
-        f"{test_file.path}/",  # Trailing slash
-        f"/{test_file.path}",  # Leading slash
-        f"/{test_file.path}/",  # Both leading and trailing slashes
-        f"//{test_file.path}//",  # Multiple leading and trailing slashes
-    ]
-
-    # THEN appropriate error should be raised about slashes
-    for path in slash_paths:
-        with pytest.raises(HumanloopRuntimeError, match="Path .* format is invalid"):
-            if test_file.type == "prompt":
-                humanloop_client.prompts.call(path=path, messages=[{"role": "user", "content": "Testing"}])
-            elif test_file.type == "agent":
-                humanloop_client.agents.call(path=path, messages=[{"role": "user", "content": "Testing"}])
-
-    # WHEN using paths with both extensions and slashes
-    combined_paths = [
-        f"{test_file.path}.{test_file.type}/",  # Extension and trailing slash
-        f"/{test_file.path}.{test_file.type}",  # Extension and leading slash
-    ]
-
-    # THEN the format validation error should be raised first (before extension validation)
-    for path in combined_paths:
-        with pytest.raises(HumanloopRuntimeError, match="Path .* format is invalid"):
-            if test_file.type == "prompt":
-                humanloop_client.prompts.call(path=path, messages=[{"role": "user", "content": "Testing"}])
-            elif test_file.type == "agent":
-                humanloop_client.agents.call(path=path, messages=[{"role": "user", "content": "Testing"}])
+    # THEN appropriate error should be raised
+    with pytest.raises(HumanloopRuntimeError, match=expected_error):
+        if test_file.type == "prompt":
+            humanloop_client.prompts.call(path=test_path, messages=[{"role": "user", "content": "Testing"}])
+        elif test_file.type == "agent":
+            humanloop_client.agents.call(path=test_path, messages=[{"role": "user", "content": "Testing"}])
 
 
 def test_local_file_call(
