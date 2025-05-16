@@ -203,13 +203,13 @@ def overload_client(
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
     # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
-        client._log = client.log  # type: ignore[attr-defined]
+        client._log = client.log  # type: ignore[attr-defined, union]
 
         # Create a closure to capture sync_client and use_local_files
         def log_wrapper(self: Any, **kwargs) -> LogResponseType:
             return _overload_log(self, sync_client, use_local_files, **kwargs)
 
-        client.log = types.MethodType(log_wrapper, client)
+        client.log = types.MethodType(log_wrapper, client)  # type: ignore[assignment]
 
     # Overload call method for Prompt and Agent clients
     if _get_file_type_from_client(client) in ["prompt", "agent"]:
@@ -217,12 +217,12 @@ def overload_client(
             logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
             raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
         if hasattr(client, "call") and not hasattr(client, "_call"):
-            client._call = client.call  # type: ignore[attr-defined]
+            client._call = client.call  # type: ignore[attr-defined, union-attr]
 
             # Create a closure to capture sync_client and use_local_files
             def call_wrapper(self: Any, **kwargs) -> CallResponseType:
                 return _overload_call(self, sync_client, use_local_files, **kwargs)
 
-            client.call = types.MethodType(call_wrapper, client)
+            client.call = types.MethodType(call_wrapper, client)  # type: ignore[assignment]
 
     return client
