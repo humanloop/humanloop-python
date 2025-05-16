@@ -12,7 +12,11 @@ from humanloop.error import HumanloopRuntimeError
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
 
-# Set up logging
+# Set up isolated logger for sync operations
+# This logger uses the "humanloop.sdk.sync" namespace, separate from the main client's logger,
+# allowing CLI commands and other consumers to control sync logging verbosity independently.
+# This approach ensures that increasing verbosity for sync operations doesn't affect
+# other components of the system.
 logger = logging.getLogger("humanloop.sdk.sync")
 logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
@@ -80,18 +84,25 @@ class SyncClient:
         cache_size: int = DEFAULT_CACHE_SIZE,
         log_level: int = logging.WARNING,
     ):
-        """
+        """Initialize the SyncClient.
+
         Parameters
         ----------
         client: Humanloop client instance
         base_dir: Base directory for synced files (default: "humanloop")
         cache_size: Maximum number of files to cache (default: DEFAULT_CACHE_SIZE)
         log_level: Log level for logging (default: WARNING)
+            Note: The SyncClient uses an isolated logger (humanloop.sdk.sync) separate from
+            the main Humanloop client logger. This allows controlling the verbosity of
+            sync operations independently from other client operations, which is particularly
+            useful in CLI contexts where users may want detailed sync logs without affecting
+            the main client's log level.
         """
         self.client = client
         self.base_dir = Path(base_dir)
         self._cache_size = cache_size
 
+        # Set log level for the isolated SyncClient logger
         logger.setLevel(log_level)
 
         # Create a new cached version of get_file_content with the specified cache size
@@ -156,14 +167,13 @@ class SyncClient:
         """Clear the LRU cache."""
         self.get_file_content.cache_clear()  # type: ignore [attr-defined]
 
-
     def is_file(self, path: str) -> bool:
         """Check if the path is a file by checking for .{file_type} extension for serializable file types.
-        
+
         Files are identified by having a supported extension (.prompt or .agent).
         This method performs case-insensitive comparison and handles whitespace.
 
-        Returns: 
+        Returns:
             bool: True if the path ends with a supported file extension
         """
         clean_path = path.strip().lower()  # Convert to lowercase for case-insensitive comparison

@@ -10,5 +10,6 @@ def normalize_path(path: str, strip_extension: bool = False) -> str:
     if strip_extension:
         path_obj = path_obj.with_suffix("")
 
-    # Use as_posix() to normalize separators consistently
+    # Convert path to string with forward slashes, regardless of OS
+    # This ensures consistent path format (e.g., "path/to/resource") across Windows/Unix
     return path_obj.as_posix()

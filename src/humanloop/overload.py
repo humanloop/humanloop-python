@@ -91,7 +91,23 @@ def _handle_local_files(
     client: Any,
     sync_client: SyncClient,
 ) -> Dict[str, Any]:
-    """Handle local file loading."""
+    """Load prompt/agent file content from local filesystem into API request.
+
+    Retrieves the file content at the specified path and adds it to kwargs
+    under the appropriate field ('prompt' or 'agent'), allowing local files
+    to be used in API calls instead of fetching from Humanloop API.
+
+    Args:
+        kwargs: API call arguments
+        client: Client instance making the call
+        sync_client: SyncClient handling local file operations
+
+    Returns:
+        Updated kwargs with file content in prompt/agent field
+
+    Raises:
+        HumanloopRuntimeError: On validation or file loading failures
+    """
     if "id" in kwargs:
         raise HumanloopRuntimeError("Can only specify one of `id` or `path`")
 
@@ -170,11 +186,19 @@ def _overload_log(self: Any, sync_client: Optional[SyncClient], use_local_files:
 
         kwargs = _handle_tracing_context(kwargs, self)
 
-        # Handle local files for Prompts and Agents clients
+        # Handle loading files from local filesystem when using Prompts and Agents clients
+        # This enables users to define prompts/agents in local files rather than fetching from the Humanloop API
         if use_local_files and _get_file_type_from_client(self) in SyncClient.SERIALIZABLE_FILE_TYPES:
+            # Developer note: sync_client should always be provided during SDK initialization when
+            # use_local_files=True. If we hit this error, there's likely an initialization issue
+            # in Humanloop.__init__ where the sync_client wasn't properly created or passed to the
+            # overload_client function.
             if sync_client is None:
                 logger.error("sync_client is None but client has log method and use_local_files=%s", use_local_files)
-                raise HumanloopRuntimeError("sync_client is required for clients that support local file operations")
+                raise HumanloopRuntimeError(
+                    "SDK initialization error: sync_client is missing but required for local file operations. "
+                    "This is likely a bug in the SDK initialization - please report this issue to the Humanloop team."
+                )
             kwargs = _handle_local_files(kwargs, self, sync_client)
 
         kwargs, eval_callback = _handle_evaluation_context(kwargs)
@@ -194,6 +218,7 @@ def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files
     try:
         kwargs = _handle_tracing_context(kwargs, self)
         if use_local_files and _get_file_type_from_client(self) in SyncClient.SERIALIZABLE_FILE_TYPES:
+            # Same sync_client requirement as in _overload_log - see developer note there
             if sync_client is None:
                 logger.error("sync_client is None but client has call method and use_local_files=%s", use_local_files)
                 raise HumanloopRuntimeError("sync_client is required for clients that support call operations")
