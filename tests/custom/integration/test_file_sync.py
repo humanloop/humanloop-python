@@ -11,11 +11,11 @@ def test_pull_basic(
     get_humanloop_client: GetHumanloopClientFn,
     tmp_path: Path,
 ):
-    """Test basic file syncing from remote to local filesystem."""
+    """Test basic file pulling from remote to local filesystem."""
     # GIVEN a set of files in the remote system (from syncable_files_fixture)
     humanloop_client = get_humanloop_client(local_files_directory=str(tmp_path))
 
-    # WHEN running the sync
+    # WHEN running the pull operation
     humanloop_client.pull()
 
     # THEN our local filesystem should mirror the remote filesystem in the HL Workspace
@@ -80,23 +80,23 @@ def test_pull_with_path_filter(
     sdk_test_dir: str,
     tmp_path: Path,
 ):
-    """Test that filtering by path correctly limits which files are synced."""
+    """Test that filtering by path correctly limits which files are pulled."""
     # GIVEN a client
     humanloop_client = get_humanloop_client(local_files_directory=str(tmp_path))
 
     # WHEN pulling only files from the sdk_test_dir path
     humanloop_client.pull(path=sdk_test_dir)
 
-    # THEN count the total number of files synced
-    synced_file_count = 0
+    # THEN count the total number of files pulled
+    pulled_file_count = 0
     for path in tmp_path.glob("**/*"):
         if path.is_file():
             # Check that the file is not empty
             content = path.read_text()
             assert content, f"File at {path} should not be empty"
-            synced_file_count += 1
+            pulled_file_count += 1
 
     # The count should match our fixture length
-    assert synced_file_count == len(syncable_files_fixture), (
-        f"Expected {len(syncable_files_fixture)} files, got {synced_file_count}"
+    assert pulled_file_count == len(syncable_files_fixture), (
+        f"Expected {len(syncable_files_fixture)} files, got {pulled_file_count}"
     )

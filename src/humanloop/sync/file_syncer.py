@@ -12,12 +12,12 @@ from humanloop.error import HumanloopRuntimeError
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop
 
-# Set up isolated logger for sync operations
-# This logger uses the "humanloop.sdk.sync" namespace, separate from the main client's logger,
+# Set up isolated logger for file sync operations
+# This logger uses the "humanloop.sdk.file_syncer" namespace, separate from the main client's logger,
 # allowing CLI commands and other consumers to control sync logging verbosity independently.
 # This approach ensures that increasing verbosity for sync operations doesn't affect
 # other components of the system.
-logger = logging.getLogger("humanloop.sdk.sync")
+logger = logging.getLogger("humanloop.sdk.file_syncer")
 logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler()
 formatter = logging.Formatter("%(message)s")
@@ -62,16 +62,17 @@ def format_api_error(error: Exception) -> str:
 SerializableFileType = typing.Literal["prompt", "agent"]
 
 
-class SyncClient:
-    """Client for managing synchronization between local filesystem and Humanloop.
+class FileSyncer:
+    """Client for synchronizing Prompt and Agent files between Humanloop workspace and local filesystem.
 
-    This client provides file synchronization between Humanloop and the local filesystem,
-    with built-in caching for improved performance. The cache uses Python's LRU (Least
-    Recently Used) cache to automatically manage memory usage by removing least recently
-    accessed files when the cache is full.
+    This client enables a local development workflow by:
+    1. Pulling files from Humanloop workspace to local filesystem
+    2. Maintaining the same directory structure locally as in Humanloop
+    3. Storing files in human-readable, version-control friendly formats (.prompt and .agent)
+    4. Supporting local file access in the SDK when configured with use_local_files=True
 
-    The cache is automatically updated when files are pulled or saved, and can be
-    manually cleared using the clear_cache() method.
+    Files maintain their relative paths from the Humanloop workspace (with appropriate extensions added),
+    allowing for seamless reference between local and remote environments using the same path identifiers.
     """
 
     # File types that can be serialized to/from the filesystem
@@ -84,7 +85,7 @@ class SyncClient:
         cache_size: int = DEFAULT_CACHE_SIZE,
         log_level: int = logging.WARNING,
     ):
-        """Initialize the SyncClient.
+        """Initialize the FileSyncer.
 
         Parameters
         ----------
@@ -92,7 +93,7 @@ class SyncClient:
         base_dir: Base directory for synced files (default: "humanloop")
         cache_size: Maximum number of files to cache (default: DEFAULT_CACHE_SIZE)
         log_level: Log level for logging (default: WARNING)
-            Note: The SyncClient uses an isolated logger (humanloop.sdk.sync) separate from
+            Note: The FileSyncer uses an isolated logger (humanloop.sdk.file_syncer) separate from
             the main Humanloop client logger. This allows controlling the verbosity of
             sync operations independently from other client operations, which is particularly
             useful in CLI contexts where users may want detailed sync logs without affecting
@@ -102,7 +103,7 @@ class SyncClient:
         self.base_dir = Path(base_dir)
         self._cache_size = cache_size
 
-        # Set log level for the isolated SyncClient logger
+        # Set log level for the isolated FileSyncer logger
         logger.setLevel(log_level)
 
         # Create a new cached version of get_file_content with the specified cache size
@@ -242,8 +243,8 @@ class SyncClient:
 
         Returns:
             Tuple of two lists:
-            - First list contains paths of successfully synced files
-            - Second list contains paths of files that failed to sync.
+            - First list contains paths of successfully pulled files
+            - Second list contains paths of files that failed to pull.
               Failures can occur due to missing content in the response or errors during local file writing.
 
         Raises:
@@ -333,8 +334,8 @@ class SyncClient:
 
         Returns:
             Tuple of two lists:
-            - First list contains paths of successfully synced files
-            - Second list contains paths of files that failed to sync (e.g. failed to write to disk or missing raw content)
+            - First list contains paths of successfully pulled files
+            - Second list contains paths of files that failed to pull (e.g. failed to write to disk or missing raw content)
 
         Raises:
             HumanloopRuntimeError: If there's an error communicating with the API

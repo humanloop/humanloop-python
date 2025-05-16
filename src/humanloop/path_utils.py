@@ -6,10 +6,7 @@ def normalize_path(path: str, strip_extension: bool = False) -> str:
 
     This function is primarily used when interacting with the Humanloop API to ensure paths
     follow the standard format: 'path/to/resource' without leading/trailing slashes.
-    It's used in several contexts:
-    1. When pulling files from Humanloop to local filesystem (see SyncClient.pull)
-    2. When making API calls that reference files by path
-    3. When handling local file operations that need to match API path conventions
+    It's used when pulling files from Humanloop to local filesystem (see FileSyncer.pull)
 
     The function:
     - Converts Windows backslashes to forward slashes

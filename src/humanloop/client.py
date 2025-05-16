@@ -28,7 +28,7 @@ from humanloop.otel.processor import HumanloopSpanProcessor
 from humanloop.overload import overload_client
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
-from humanloop.sync.sync_client import DEFAULT_CACHE_SIZE, SyncClient
+from humanloop.sync.file_syncer import DEFAULT_CACHE_SIZE, FileSyncer
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -158,7 +158,7 @@ class Humanloop(BaseHumanloop):
             )
 
         # Check if cache_size is non-default but use_local_files is False
-        self._sync_client = SyncClient(client=self, base_dir=local_files_directory, cache_size=cache_size)
+        self._file_syncer = FileSyncer(client=self, base_dir=local_files_directory, cache_size=cache_size)
         eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
         eval_client.client = self
         self.evaluations = eval_client
@@ -168,10 +168,10 @@ class Humanloop(BaseHumanloop):
         # and the @flow decorator providing the trace_id
         # Additionally, call and log methods are overloaded in the prompts and agents client to support the use of local files
         self.prompts = overload_client(
-            client=self.prompts, sync_client=self._sync_client, use_local_files=self.use_local_files
+            client=self.prompts, file_syncer=self._file_syncer, use_local_files=self.use_local_files
         )
         self.agents = overload_client(
-            client=self.agents, sync_client=self._sync_client, use_local_files=self.use_local_files
+            client=self.agents, file_syncer=self._file_syncer, use_local_files=self.use_local_files
         )
         self.flows = overload_client(client=self.flows)
         self.tools = overload_client(client=self.tools)
@@ -439,7 +439,7 @@ class Humanloop(BaseHumanloop):
                or filesystem issues)
         :raises HumanloopRuntimeError: If there's an error communicating with the API
         """
-        return self._sync_client.pull(environment=environment, path=path)
+        return self._file_syncer.pull(environment=environment, path=path)
 
 
 class AsyncHumanloop(AsyncBaseHumanloop):

@@ -9,7 +9,7 @@ import click
 from dotenv import load_dotenv
 
 from humanloop import Humanloop
-from humanloop.sync.sync_client import SyncClient
+from humanloop.sync.file_syncer import FileSyncer
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -219,12 +219,12 @@ def pull(
 
     Currently only supports syncing Prompt and Agent files. Other file types will be skipped."""
     client = get_client(api_key, env_file, base_url)
-    # Although pull() is available on the Humanloop client, we instantiate SyncClient separately to control its log level.
+    # Although pull() is available on the Humanloop client, we instantiate FileSyncer separately to control its log level.
     # This allows CLI users to toggle between detailed logging (--verbose) and minimal output without affecting the
-    # main Humanloop client logger. The SyncClient uses its own logger namespace (humanloop.sdk.sync), making this
+    # main Humanloop client logger. The FileSyncer uses its own logger namespace (humanloop.sdk.sync), making this
     # modification isolated from the client's OpenTelemetry setup. This client instance is short-lived and only
     # exists for the duration of the CLI command execution.
-    sync_client = SyncClient(
+    file_syncer = FileSyncer(
         client, base_dir=local_files_directory, log_level=logging.DEBUG if verbose else logging.WARNING
     )
 
@@ -233,7 +233,7 @@ def pull(
     click.echo(click.style(f"Environment: {environment or '(default)'}", fg=INFO_COLOR))
 
     start_time = time.time()
-    successful_files, failed_files = sync_client.pull(path, environment)
+    successful_files, failed_files = file_syncer.pull(path, environment)
     duration_ms = int((time.time() - start_time) * 1000)
 
     # Determine if the operation was successful based on failed_files

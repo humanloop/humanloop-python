@@ -4,7 +4,6 @@ import pytest
 
 from humanloop.error import HumanloopRuntimeError
 from humanloop.requests.chat_message import ChatMessageParams
-from humanloop.types.chat_role import ChatRole
 from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 
