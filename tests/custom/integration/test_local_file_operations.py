@@ -3,6 +3,8 @@ from pathlib import Path
 import pytest
 
 from humanloop.error import HumanloopRuntimeError
+from humanloop.requests.chat_message import ChatMessageParams
+from humanloop.types.chat_role import ChatRole
 from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 
@@ -99,9 +101,8 @@ you respond with just the capital name, lowercase, with no punctuation or additi
     client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
 
     # WHEN calling the API with the local file path (without extension)
-    response = client.prompts.call(
-        path=test_path, messages=[{"role": "user", "content": "What is the capital of France?"}]
-    )
+    call_messages = [ChatMessageParams(role="user", content="What is the capital of France?")]
+    response = client.prompts.call(path=test_path, messages=call_messages)
 
     # THEN the response should be successful
     assert response is not None
@@ -109,7 +110,7 @@ you respond with just the capital name, lowercase, with no punctuation or additi
     assert len(response.logs) > 0
 
     # AND the response should contain the expected output format (lowercase city name)
-    assert "paris" in response.logs[0].output.lower()
+    assert response.logs[0].output is not None and "paris" in response.logs[0].output.lower()
 
     # AND the prompt used should match our expected path
     assert response.prompt is not None
@@ -150,11 +151,11 @@ You are a helpful assistant that answers questions about geography.
     client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
 
     # GIVEN message content to log
-    test_messages = [{"role": "user", "content": "What is the capital of France?"}]
     test_output = "Paris is the capital of France."
 
     # WHEN logging the data with the local file path
-    response = client.prompts.log(path=test_path, messages=test_messages, output=test_output)
+    messages = [ChatMessageParams(role="user", content="What is the capital of France?")]
+    response = client.prompts.log(path=test_path, messages=messages, output=test_output)
 
     # THEN the log should be successful
     assert response is not None
@@ -179,6 +180,8 @@ def test_overload_version_environment_handling(
     humanloop_client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
     humanloop_client.pull()
 
+    test_message = [ChatMessageParams(role="user", content="Testing")]
+
     # GIVEN a test file that exists locally
     test_file = syncable_files_fixture[0]
     extension = f".{test_file.type}"
@@ -195,13 +198,13 @@ def test_overload_version_environment_handling(
             humanloop_client.prompts.call(
                 path=test_file.path,
                 version_id=test_file.version_id,
-                messages=[{"role": "user", "content": "Testing"}],
+                messages=test_message,
             )
         elif test_file.type == "agent":
             humanloop_client.agents.call(
                 path=test_file.path,
                 version_id=test_file.version_id,
-                messages=[{"role": "user", "content": "Testing"}],
+                messages=test_message,
             )
 
     # WHEN calling with environment
@@ -211,13 +214,13 @@ def test_overload_version_environment_handling(
             humanloop_client.prompts.call(
                 path=test_file.path,
                 environment="production",
-                messages=[{"role": "user", "content": "Testing"}],
+                messages=test_message,
             )
         elif test_file.type == "agent":
             humanloop_client.agents.call(
                 path=test_file.path,
                 environment="production",
-                messages=[{"role": "user", "content": "Testing"}],
+                messages=test_message,
             )
 
     # WHEN calling with both version_id and environment
@@ -228,14 +231,14 @@ def test_overload_version_environment_handling(
                 path=test_file.path,
                 version_id=test_file.version_id,
                 environment="staging",
-                messages=[{"role": "user", "content": "Testing"}],
+                messages=test_message,
             )
         elif test_file.type == "agent":
             humanloop_client.agents.call(
                 path=test_file.path,
                 version_id=test_file.version_id,
                 environment="staging",
-                messages=[{"role": "user", "content": "Testing"}],
+                messages=test_message,
             )
 
 
@@ -280,8 +283,9 @@ def test_overload_version_environment_handling(
 #     client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
 #
 #     # WHEN calling the API with the local file path (without extension)
+#     agent_call_messages = [ChatMessageParams(role="user", content="What is the capital of France?")]
 #     response = client.agents.call(
-#         path=test_path, messages=[{"role": "user", "content": "What is the capital of France?"}]
+#         path=test_path, messages=agent_call_messages
 #     )
 #
 #     # THEN the response should be successful
@@ -290,16 +294,16 @@ def test_overload_version_environment_handling(
 #     assert len(response.logs) > 0
 #
 #     # AND the response should contain the expected output format (lowercase city name)
-#     assert "paris" in response.logs[0].output.lower()
+#     assert response.logs[0].output is not None and "paris" in response.logs[0].output.lower()
 #
 #     # AND the agent used should match our expected path
 #     assert response.agent is not None
 #     assert response.agent.path == test_path
 #
 #     # WHEN logging with the local agent file
-#     test_messages = [{"role": "user", "content": "What is the capital of Germany?"}]
 #     test_output = "Berlin is the capital of Germany."
-#     log_response = client.agents.log(path=test_path, messages=test_messages, output=test_output)
+#     agent_messages = [ChatMessageParams(role="user", content="What is the capital of Germany?")]
+#     log_response = client.agents.log(path=test_path, messages=agent_messages, output=test_output)
 #
 #     # THEN the log should be successful
 #     assert log_response is not None
