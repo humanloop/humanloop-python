@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Callable
 
 import pytest
 
@@ -59,7 +60,7 @@ def test_path_validation(
     get_humanloop_client: GetHumanloopClientFn,
     syncable_files_fixture: list[SyncableFile],
     tmp_path: Path,
-    path_generator: callable,
+    path_generator: Callable[[SyncableFile], str],
     expected_error: str,
     test_case_description: str,
 ):
