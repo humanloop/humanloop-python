@@ -1,28 +1,29 @@
 import inspect
 import logging
 import types
-from typing import Any, Dict, Optional, Union, Callable
+from typing import Any, Callable, Dict, Optional, TypeVar, Union
 
+from humanloop.agents.client import AgentsClient
+from humanloop.client import ExtendedPromptsClient
 from humanloop.context import (
     get_decorator_context,
     get_evaluation_context,
     get_trace_id,
 )
-from humanloop.error import HumanloopRuntimeError
-from humanloop.sync.sync_client import SyncClient
-from humanloop.prompts.client import PromptsClient
-from humanloop.flows.client import FlowsClient
 from humanloop.datasets.client import DatasetsClient
-from humanloop.agents.client import AgentsClient
-from humanloop.tools.client import ToolsClient
+from humanloop.error import HumanloopRuntimeError
 from humanloop.evaluators.client import EvaluatorsClient
+from humanloop.flows.client import FlowsClient
+from humanloop.prompts.client import PromptsClient
+from humanloop.sync.sync_client import SyncClient
+from humanloop.tools.client import ToolsClient
 from humanloop.types import FileType
+from humanloop.types.agent_call_response import AgentCallResponse
 from humanloop.types.create_evaluator_log_response import CreateEvaluatorLogResponse
 from humanloop.types.create_flow_log_response import CreateFlowLogResponse
 from humanloop.types.create_prompt_log_response import CreatePromptLogResponse
 from humanloop.types.create_tool_log_response import CreateToolLogResponse
 from humanloop.types.prompt_call_response import PromptCallResponse
-from humanloop.types.agent_call_response import AgentCallResponse
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -183,11 +184,22 @@ def _overload_call(self: Any, sync_client: Optional[SyncClient], use_local_files
         raise HumanloopRuntimeError from e
 
 
+ClientTemplateType = TypeVar(
+    "ClientTemplateType",
+    bound=Union[
+        FlowsClient,
+        ExtendedPromptsClient,
+        AgentsClient,
+        ToolsClient,
+    ],
+)
+
+
 def overload_client(
-    client: Any,
+    client: ClientTemplateType,
     sync_client: Optional[SyncClient] = None,
     use_local_files: bool = False,
-) -> Any:
+) -> ClientTemplateType:
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
     # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
