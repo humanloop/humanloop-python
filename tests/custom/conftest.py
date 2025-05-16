@@ -86,10 +86,11 @@ def get_humanloop_client() -> GetHumanloopClientFn:
     if not os.getenv("HUMANLOOP_API_KEY"):
         pytest.fail("HUMANLOOP_API_KEY is not set for integration tests")
 
-    def _get_humanloop_client(use_local_files: bool = False) -> Humanloop:
+    def _get_humanloop_client(use_local_files: bool = False, local_files_directory: str = "humanloop") -> Humanloop:
         return Humanloop(
             api_key=os.getenv("HUMANLOOP_API_KEY"),
             use_local_files=use_local_files,
+            local_files_directory=local_files_directory,
         )
 
     return _get_humanloop_client

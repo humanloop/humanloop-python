@@ -1,6 +1,4 @@
 from pathlib import Path
-import os
-import tempfile
 
 import pytest
 
@@ -8,25 +6,14 @@ from humanloop.error import HumanloopRuntimeError
 from tests.custom.types import GetHumanloopClientFn, SyncableFile
 
 
-@pytest.fixture
-def cleanup_local_files():
-    """Cleanup any locally synced files after tests"""
-    yield
-    local_dir = Path("humanloop")
-    if local_dir.exists():
-        import shutil
-
-        shutil.rmtree(local_dir)
-
-
 def test_path_validation(
     get_humanloop_client: GetHumanloopClientFn,
     syncable_files_fixture: list[SyncableFile],
-    cleanup_local_files,
+    tmp_path: Path,
 ):
-    """Test path validation rules for local file usage."""
+    """Test validation of path formats for local file operations."""
     # GIVEN a client with local files enabled and remote files pulled
-    humanloop_client = get_humanloop_client(use_local_files=True)
+    humanloop_client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
     humanloop_client.pull()
     test_file = syncable_files_fixture[0]
 
@@ -79,10 +66,10 @@ def test_path_validation(
 
 def test_local_file_call(
     get_humanloop_client: GetHumanloopClientFn,
-    cleanup_local_files,
     sdk_test_dir: str,
+    tmp_path: Path,
 ):
-    """Test using a local file for call operations with the overloaded client."""
+    """Test calling the API with a local prompt file."""
     # GIVEN a local prompt file with proper system tag
     prompt_content = """---
 model: gpt-4o
@@ -102,16 +89,14 @@ you respond with just the capital name, lowercase, with no punctuation or additi
 </system>
 """
 
-    # Create local file structure
-    humanloop_dir = Path("humanloop")
-    humanloop_dir.mkdir(exist_ok=True)
+    # Create local file structure in temporary directory
     test_path = f"{sdk_test_dir}/capital_prompt"
-    file_path = humanloop_dir / f"{test_path}.prompt"
+    file_path = tmp_path / f"{test_path}.prompt"
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text(prompt_content)
 
     # GIVEN a client with local files enabled
-    client = get_humanloop_client(use_local_files=True)
+    client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
 
     # WHEN calling the API with the local file path (without extension)
     response = client.prompts.call(
@@ -133,10 +118,10 @@ you respond with just the capital name, lowercase, with no punctuation or additi
 
 def test_local_file_log(
     get_humanloop_client: GetHumanloopClientFn,
-    cleanup_local_files,
     sdk_test_dir: str,
+    tmp_path: Path,
 ):
-    """Test using a local file for log operations with the overloaded client."""
+    """Test logging data with a local prompt file."""
     # GIVEN a local prompt file with proper system tag
     prompt_content = """---
 model: gpt-4o
@@ -155,16 +140,14 @@ You are a helpful assistant that answers questions about geography.
 </system>
 """
 
-    # Create local file structure
-    humanloop_dir = Path("humanloop")
-    humanloop_dir.mkdir(exist_ok=True)
+    # Create local file structure in temporary directory
     test_path = f"{sdk_test_dir}/geography_prompt"
-    file_path = humanloop_dir / f"{test_path}.prompt"
+    file_path = tmp_path / f"{test_path}.prompt"
     file_path.parent.mkdir(parents=True, exist_ok=True)
     file_path.write_text(prompt_content)
 
     # GIVEN a client with local files enabled
-    client = get_humanloop_client(use_local_files=True)
+    client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
 
     # GIVEN message content to log
     test_messages = [{"role": "user", "content": "What is the capital of France?"}]
@@ -189,16 +172,17 @@ You are a helpful assistant that answers questions about geography.
 def test_overload_version_environment_handling(
     get_humanloop_client: GetHumanloopClientFn,
     syncable_files_fixture: list[SyncableFile],
+    tmp_path: Path,
 ):
-    """Test that overload_with_local_files correctly handles version_id and environment parameters."""
+    """Test handling of version_id and environment parameters with local files."""
     # GIVEN a client with use_local_files=True and pulled files
-    humanloop_client = get_humanloop_client(use_local_files=True)
+    humanloop_client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
     humanloop_client.pull()
 
     # GIVEN a test file that exists locally
     test_file = syncable_files_fixture[0]
     extension = f".{test_file.type}"
-    local_path = Path("humanloop") / f"{test_file.path}{extension}"
+    local_path = tmp_path / f"{test_file.path}{extension}"
 
     # THEN the file should exist locally
     assert local_path.exists(), f"Expected pulled file at {local_path}"
@@ -257,10 +241,10 @@ def test_overload_version_environment_handling(
 
 # def test_agent_local_file_usage(
 #     get_humanloop_client: GetHumanloopClientFn,
-#     cleanup_local_files,
 #     sdk_test_dir: str,
+#     tmp_path: Path,
 # ):
-#     """Test using a local agent file for call operations with the overloaded client."""
+#     """Test using a local agent file for API calls."""
 #     # NOTE: This test has been disabled as it fails intermittently in automated test runs
 #     # but works correctly when tested manually. The issue appears to be related to test
 #     # environment differences rather than actual code functionality.
@@ -279,54 +263,52 @@ def test_overload_version_environment_handling(
 # endpoint: chat
 # tools: []
 # ---
-
+#
 # <system>
 # You are a helpful agent that provides concise answers. When asked about capitals of countries,
 # you respond with just the capital name, lowercase, with no punctuation or additional text.
 # </system>
 # """
-
-#     # Create local file structure
-#     humanloop_dir = Path("humanloop")
-#     humanloop_dir.mkdir(exist_ok=True)
+#
+#     # Create local file structure in temporary directory
 #     test_path = f"{sdk_test_dir}/capital_agent"
-#     file_path = humanloop_dir / f"{test_path}.agent"
+#     file_path = tmp_path / f"{test_path}.agent"
 #     file_path.parent.mkdir(parents=True, exist_ok=True)
 #     file_path.write_text(agent_content)
-
+#
 #     # GIVEN a client with local files enabled
-#     client = get_humanloop_client(use_local_files=True)
-
+#     client = get_humanloop_client(use_local_files=True, local_files_directory=str(tmp_path))
+#
 #     # WHEN calling the API with the local file path (without extension)
 #     response = client.agents.call(
 #         path=test_path, messages=[{"role": "user", "content": "What is the capital of France?"}]
 #     )
-
+#
 #     # THEN the response should be successful
 #     assert response is not None
 #     assert response.logs is not None
 #     assert len(response.logs) > 0
-
+#
 #     # AND the response should contain the expected output format (lowercase city name)
 #     assert "paris" in response.logs[0].output.lower()
-
+#
 #     # AND the agent used should match our expected path
 #     assert response.agent is not None
 #     assert response.agent.path == test_path
-
+#
 #     # WHEN logging with the local agent file
 #     test_messages = [{"role": "user", "content": "What is the capital of Germany?"}]
 #     test_output = "Berlin is the capital of Germany."
 #     log_response = client.agents.log(path=test_path, messages=test_messages, output=test_output)
-
+#
 #     # THEN the log should be successful
 #     assert log_response is not None
 #     assert log_response.agent_id is not None
 #     assert log_response.id is not None  # log ID
-
+#
 #     # WHEN retrieving the logged agent details
 #     agent_details = client.agents.get(id=log_response.agent_id)
-
+#
 #     # THEN the details should match our expected path
 #     assert agent_details is not None
 #     assert test_path in agent_details.path
