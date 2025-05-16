@@ -187,9 +187,11 @@ for chunk in response:
     yield chunk
 ```
 
-## File Synchronization
+## Local File Development
 
-Humanloop allows you to clone files from your Humanloop workspace to your local filesystem using the CLI.
+Humanloop allows you to clone files from your Humanloop workspace to your local filesystem and use them in your code.
+
+### Syncing Files with the CLI
 
 ```bash
 # Pull all files
@@ -205,6 +207,8 @@ humanloop pull --path="examples/chat/basic.prompt"
 humanloop pull --environment="production"
 ```
 
+### Using Local Files in the SDK
+
 To use local files in your code:
 
 ```python
@@ -216,14 +220,14 @@ client = Humanloop(
 
 # Use a local prompt file
 response = client.prompts.call(
-    path="examples/chat/basic",  # No file extension needed
+    path="examples/chat/basic",
     inputs={"query": "Hello world"}
 )
 ```
 
-For detailed instructions on syncing, see our [Guide to Syncing and Using Local Files](https://humanloop.com/docs/v5/guides/prompts/syncing-local-files).
+For detailed instructions on syncing, see our [Guide to Syncing and Using Local Files](https://humanloop.com/docs/v5/guides/prompts/syncing-files).
 
-For information about the `.prompt` and `.agent` file formats, see our [File Format Reference](https://humanloop.com/docs/v5/reference/prompt-and-agent-files). 
+For information about the `.prompt` and `.agent` file formats, see our [File Format Reference](https://humanloop.com/docs/v5/reference/prompt-and-agent-files).
 
 ## Pagination
 
@@ -291,6 +295,7 @@ client.prompts.log(..., request_options={
 
 You can override the `httpx` client to customize it for your use-case. Some common use-cases include support for proxies
 and transports.
+
 ```python
 import httpx
 from humanloop import Humanloop
