@@ -1,11 +1,12 @@
-import logging
-from pathlib import Path
-from typing import List, Optional, Tuple, TYPE_CHECKING, Union
-from functools import lru_cache
-import typing
-import time
-from humanloop.error import HumanloopRuntimeError
 import json
+import logging
+import time
+import typing
+from functools import lru_cache
+from pathlib import Path
+from typing import TYPE_CHECKING, List, Optional, Tuple
+
+from humanloop.error import HumanloopRuntimeError
 
 if TYPE_CHECKING:
     from humanloop.base_client import BaseHumanloop

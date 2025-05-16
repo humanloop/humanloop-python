@@ -1,36 +1,34 @@
+import logging
 import os
 import typing
 from typing import Any, List, Optional, Sequence, Tuple
-import logging
 
 import httpx
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import Tracer
 
-from humanloop.core.client_wrapper import SyncClientWrapper
-
-from humanloop.evals import run_eval
-from humanloop.evals.types import (
-    DatasetEvalConfig,
-    EvaluatorEvalConfig,
-    EvaluatorCheck,
-    FileEvalConfig,
-)
-
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
-from humanloop.overload import overload_client
+from humanloop.core.client_wrapper import SyncClientWrapper
 from humanloop.decorators.flow import flow as flow_decorator_factory
 from humanloop.decorators.prompt import prompt_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
 from humanloop.environment import HumanloopEnvironment
+from humanloop.evals import run_eval
+from humanloop.evals.types import (
+    DatasetEvalConfig,
+    EvaluatorCheck,
+    EvaluatorEvalConfig,
+    FileEvalConfig,
+)
 from humanloop.evaluations.client import EvaluationsClient
 from humanloop.otel import instrument_provider
 from humanloop.otel.exporter import HumanloopSpanExporter
 from humanloop.otel.processor import HumanloopSpanProcessor
+from humanloop.overload import overload_client
 from humanloop.prompt_utils import populate_template
 from humanloop.prompts.client import PromptsClient
-from humanloop.sync.sync_client import SyncClient, DEFAULT_CACHE_SIZE
+from humanloop.sync.sync_client import DEFAULT_CACHE_SIZE, SyncClient
 
 logger = logging.getLogger("humanloop.sdk")
 
@@ -168,6 +166,7 @@ class Humanloop(BaseHumanloop):
 
         # Overload the .log method of the clients to be aware of Evaluation Context
         # and the @flow decorator providing the trace_id
+        # Additionally, call and log methods are overloaded in the prompts and agents client to support the use of local files
         self.prompts = overload_client(
             client=self.prompts, sync_client=self._sync_client, use_local_files=self.use_local_files
         )
