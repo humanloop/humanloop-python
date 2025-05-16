@@ -203,7 +203,7 @@ def overload_client(
     """Overloads client methods to add tracing, local file handling, and evaluation context."""
     # Store original log method as _log for all clients. Used in flow decorator
     if hasattr(client, "log") and not hasattr(client, "_log"):
-        client._log = client.log  # type: ignore[attr-defined, union]
+        client._log = client.log  # type: ignore[attr-defined, union-attr]
 
         # Create a closure to capture sync_client and use_local_files
         def log_wrapper(self: Any, **kwargs) -> LogResponseType:
