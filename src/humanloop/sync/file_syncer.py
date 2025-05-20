@@ -258,7 +258,7 @@ class FileSyncer:
 
         while True:
             try:
-                logger.debug(f"`{path}`: Requesting page {page} of files")
+                logger.debug(f"{path or '(root)'}: Requesting page {page} of files")
                 response = self.client.files.list_files(
                     type=list(self.SERIALIZABLE_FILE_TYPES),
                     page=page,
@@ -269,10 +269,10 @@ class FileSyncer:
                 )
 
                 if len(response.records) == 0:
-                    logger.debug(f"Finished reading files for path `{path}`")
+                    logger.debug(f"Finished reading files for path {path or '(root)'}")
                     break
 
-                logger.debug(f"`{path}`: Read page {page} containing {len(response.records)} files")
+                logger.debug(f"{path or '(root)'}: Read page {page} containing {len(response.records)} files")
 
                 # Process each file
                 for file in response.records:
@@ -365,7 +365,7 @@ class FileSyncer:
         try:
             if api_path is None:
                 # Pull all from root
-                logger.debug("Pulling all files from root")
+                logger.debug("Pulling all files from (root)")
                 successful_files, failed_files = self._pull_directory(
                     path=None,
                     environment=environment,
@@ -380,7 +380,7 @@ class FileSyncer:
                         successful_files = []
                         failed_files = [api_path]
                 else:
-                    logger.debug(f"Pulling directory: {api_path}")
+                    logger.debug(f"Pulling directory: {api_path or '(root)'}")
                     successful_files, failed_files = self._pull_directory(api_path, environment)
 
             # Clear the cache at the end of each pull operation
