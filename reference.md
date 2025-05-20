@@ -178,7 +178,6 @@ Controls how the model uses tools. The following options are supported:
 The Prompt configuration to use. Two formats are supported:
 - An object representing the details of the Prompt configuration
 - A string representing the raw contents of a .prompt file
-
 A new Prompt version will be created if the provided details do not match any existing version.
     
 </dd>
@@ -709,7 +708,6 @@ Controls how the model uses tools. The following options are supported:
 The Prompt configuration to use. Two formats are supported:
 - An object representing the details of the Prompt configuration
 - A string representing the raw contents of a .prompt file
-
 A new Prompt version will be created if the provided details do not match any existing version.
     
 </dd>
@@ -974,7 +972,6 @@ Controls how the model uses tools. The following options are supported:
 The Prompt configuration to use. Two formats are supported:
 - An object representing the details of the Prompt configuration
 - A string representing the raw contents of a .prompt file
-
 A new Prompt version will be created if the provided details do not match any existing version.
     
 </dd>
@@ -8383,7 +8380,6 @@ Controls how the model uses tools. The following options are supported:
 The Agent configuration to use. Two formats are supported:
 - An object representing the details of the Agent configuration
 - A string representing the raw contents of a .agent file
-
 A new Agent version will be created if the provided details do not match any existing version.
     
 </dd>
@@ -8791,7 +8787,6 @@ Controls how the model uses tools. The following options are supported:
 The Agent configuration to use. Two formats are supported:
 - An object representing the details of the Agent configuration
 - A string representing the raw contents of a .agent file
-
 A new Agent version will be created if the provided details do not match any existing version.
     
 </dd>
@@ -9042,7 +9037,6 @@ Controls how the model uses tools. The following options are supported:
 The Agent configuration to use. Two formats are supported:
 - An object representing the details of the Agent configuration
 - A string representing the raw contents of a .agent file
-
 A new Agent version will be created if the provided details do not match any existing version.
     
 </dd>

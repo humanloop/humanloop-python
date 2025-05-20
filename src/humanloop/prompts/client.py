@@ -162,7 +162,6 @@ class PromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
-
             A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
@@ -452,113 +451,116 @@ class PromptsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[PromptCallStreamResponse]:
         """
-        Call a Prompt.
+                Call a Prompt.
 
-        Calling a Prompt calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+                Calling a Prompt calls the model provider before logging
+                the request, responses and metadata to Humanloop.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Prompt. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Prompt details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Prompt details in the request body. In this case, we will check if the details correspond
+                to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+                in the case where you are storing or deriving your Prompt details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Prompt to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Prompt.
+                id : typing.Optional[str]
+                    ID for an existing Prompt.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptsCallStreamRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[PromptsCallStreamRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
-            The Prompt configuration to use. Two formats are supported:
-            - An object representing the details of the Prompt configuration
-            - A string representing the raw contents of a .prompt file
+                prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
+                    The Prompt configuration to use. Two formats are supported:
+                    - An object representing the details of the Prompt configuration
+                    - A string representing the raw contents of a .prompt file
+        <<<<<<< HEAD
 
-            A new Prompt version will be created if the provided details do not match any existing version.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Prompt version will be created if the provided details do not match any existing version.
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        prompts_call_stream_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                prompts_call_stream_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        num_samples : typing.Optional[int]
-            The number of generations.
+                num_samples : typing.Optional[int]
+                    The number of generations.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        logprobs : typing.Optional[int]
-            Include the log probabilities of the top n tokens in the provider_response
+                logprobs : typing.Optional[int]
+                    Include the log probabilities of the top n tokens in the provider_response
 
-        suffix : typing.Optional[str]
-            The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+                suffix : typing.Optional[str]
+                    The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Yields
-        ------
-        typing.Iterator[PromptCallStreamResponse]
+                Yields
+                ------
+                typing.Iterator[PromptCallStreamResponse]
 
 
-        Examples
-        --------
-        from humanloop import Humanloop
-        client = Humanloop(api_key="YOUR_API_KEY", )
-        response = client.prompts.call_stream()
-        for chunk in response:
-            yield chunk
+                Examples
+                --------
+                from humanloop import Humanloop
+                client = Humanloop(api_key="YOUR_API_KEY", )
+                response = client.prompts.call_stream()
+                for chunk in response:
+                    yield chunk
         """
         with self._raw_client.call_stream(
             version_id=version_id,
@@ -617,114 +619,117 @@ class PromptsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptCallResponse:
         """
-        Call a Prompt.
+                Call a Prompt.
 
-        Calling a Prompt calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+                Calling a Prompt calls the model provider before logging
+                the request, responses and metadata to Humanloop.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Prompt. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Prompt details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Prompt details in the request body. In this case, we will check if the details correspond
+                to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+                in the case where you are storing or deriving your Prompt details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Prompt to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Prompt.
+                id : typing.Optional[str]
+                    ID for an existing Prompt.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptsCallRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[PromptsCallRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptsCallRequestPromptParams]
-            The Prompt configuration to use. Two formats are supported:
-            - An object representing the details of the Prompt configuration
-            - A string representing the raw contents of a .prompt file
+                prompt : typing.Optional[PromptsCallRequestPromptParams]
+                    The Prompt configuration to use. Two formats are supported:
+                    - An object representing the details of the Prompt configuration
+                    - A string representing the raw contents of a .prompt file
+        <<<<<<< HEAD
 
-            A new Prompt version will be created if the provided details do not match any existing version.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Prompt version will be created if the provided details do not match any existing version.
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        prompts_call_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                prompts_call_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        num_samples : typing.Optional[int]
-            The number of generations.
+                num_samples : typing.Optional[int]
+                    The number of generations.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        logprobs : typing.Optional[int]
-            Include the log probabilities of the top n tokens in the provider_response
+                logprobs : typing.Optional[int]
+                    Include the log probabilities of the top n tokens in the provider_response
 
-        suffix : typing.Optional[str]
-            The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+                suffix : typing.Optional[str]
+                    The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        PromptCallResponse
+                Returns
+                -------
+                PromptCallResponse
 
 
-        Examples
-        --------
-        from humanloop import Humanloop
-        client = Humanloop(api_key="YOUR_API_KEY", )
-        client.prompts.call(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are stockbot. Return latest prices.'}], 'tools': [{'name': 'get_stock_price', 'description': 'Get current stock price', 'parameters': {'type': 'object'
-        , 'properties': {'ticker_symbol': {'type': 'string', 'name': 'Ticker Symbol', 'description': 'Ticker symbol of the stock'}}
-        , 'required': []
-        }}]}, messages=[{'role': "user", 'content': 'latest apple'}], )
+                Examples
+                --------
+                from humanloop import Humanloop
+                client = Humanloop(api_key="YOUR_API_KEY", )
+                client.prompts.call(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are stockbot. Return latest prices.'}], 'tools': [{'name': 'get_stock_price', 'description': 'Get current stock price', 'parameters': {'type': 'object'
+                , 'properties': {'ticker_symbol': {'type': 'string', 'name': 'Ticker Symbol', 'description': 'Ticker symbol of the stock'}}
+                , 'required': []
+                }}]}, messages=[{'role': "user", 'content': 'latest apple'}], )
         """
         _response = self._raw_client.call(
             version_id=version_id,
@@ -1525,143 +1530,146 @@ class AsyncPromptsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreatePromptLogResponse:
         """
-        Log to a Prompt.
+                Log to a Prompt.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise, the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Prompt. Otherwise, the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Prompt details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Prompt details in the request body. In this case, we will check if the details correspond
+                to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+                in the case where you are storing or deriving your Prompt details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Prompt to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        run_id : typing.Optional[str]
-            Unique identifier for the Run to associate the Log to.
+                run_id : typing.Optional[str]
+                    Unique identifier for the Run to associate the Log to.
 
-        path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Prompt.
+                id : typing.Optional[str]
+                    ID for an existing Prompt.
 
-        output_message : typing.Optional[ChatMessageParams]
-            The message returned by the provider.
+                output_message : typing.Optional[ChatMessageParams]
+                    The message returned by the provider.
 
-        prompt_tokens : typing.Optional[int]
-            Number of tokens in the prompt used to generate the output.
+                prompt_tokens : typing.Optional[int]
+                    Number of tokens in the prompt used to generate the output.
 
-        reasoning_tokens : typing.Optional[int]
-            Number of reasoning tokens used to generate the output.
+                reasoning_tokens : typing.Optional[int]
+                    Number of reasoning tokens used to generate the output.
 
-        output_tokens : typing.Optional[int]
-            Number of tokens in the output generated by the model.
+                output_tokens : typing.Optional[int]
+                    Number of tokens in the output generated by the model.
 
-        prompt_cost : typing.Optional[float]
-            Cost in dollars associated to the tokens in the prompt.
+                prompt_cost : typing.Optional[float]
+                    Cost in dollars associated to the tokens in the prompt.
 
-        output_cost : typing.Optional[float]
-            Cost in dollars associated to the tokens in the output.
+                output_cost : typing.Optional[float]
+                    Cost in dollars associated to the tokens in the output.
 
-        finish_reason : typing.Optional[str]
-            Reason the generation finished.
+                finish_reason : typing.Optional[str]
+                    Reason the generation finished.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptLogRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[PromptLogRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptLogRequestPromptParams]
-            The Prompt configuration to use. Two formats are supported:
-            - An object representing the details of the Prompt configuration
-            - A string representing the raw contents of a .prompt file
+                prompt : typing.Optional[PromptLogRequestPromptParams]
+                    The Prompt configuration to use. Two formats are supported:
+                    - An object representing the details of the Prompt configuration
+                    - A string representing the raw contents of a .prompt file
+        <<<<<<< HEAD
 
-            A new Prompt version will be created if the provided details do not match any existing version.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Prompt version will be created if the provided details do not match any existing version.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        output : typing.Optional[str]
-            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+                output : typing.Optional[str]
+                    Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
 
-        created_at : typing.Optional[dt.datetime]
-            User defined timestamp for when the log was created.
+                created_at : typing.Optional[dt.datetime]
+                    User defined timestamp for when the log was created.
 
-        error : typing.Optional[str]
-            Error message if the log is an error.
+                error : typing.Optional[str]
+                    Error message if the log is an error.
 
-        provider_latency : typing.Optional[float]
-            Duration of the logged event in seconds.
+                provider_latency : typing.Optional[float]
+                    Duration of the logged event in seconds.
 
-        stdout : typing.Optional[str]
-            Captured log and debug statements.
+                stdout : typing.Optional[str]
+                    Captured log and debug statements.
 
-        provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Raw request sent to provider.
+                provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Raw request sent to provider.
 
-        provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Raw response received the provider.
+                provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Raw response received the provider.
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        prompt_log_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                prompt_log_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        CreatePromptLogResponse
-            Successful Response
+                Returns
+                -------
+                CreatePromptLogResponse
+                    Successful Response
 
-        Examples
-        --------
-        from humanloop import AsyncHumanloop
-        import datetime
-        import asyncio
-        client = AsyncHumanloop(api_key="YOUR_API_KEY", )
-        async def main() -> None:
-            await client.prompts.log(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are {{person}}. Answer questions as this person. Do not break character.'}]}, messages=[{'role': "user", 'content': 'What really happened at Roswell?'}], inputs={'person': 'Trump'
-            }, created_at=datetime.datetime.fromisoformat("2024-07-18 23:29:35.178000+00:00", ), provider_latency=6.5931549072265625, output_message={'content': "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.", 'role': "assistant"}, prompt_tokens=100, output_tokens=220, prompt_cost=1e-05, output_cost=0.0002, finish_reason='stop', )
-        asyncio.run(main())
+                Examples
+                --------
+                from humanloop import AsyncHumanloop
+                import datetime
+                import asyncio
+                client = AsyncHumanloop(api_key="YOUR_API_KEY", )
+                async def main() -> None:
+                    await client.prompts.log(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are {{person}}. Answer questions as this person. Do not break character.'}]}, messages=[{'role': "user", 'content': 'What really happened at Roswell?'}], inputs={'person': 'Trump'
+                    }, created_at=datetime.datetime.fromisoformat("2024-07-18 23:29:35.178000+00:00", ), provider_latency=6.5931549072265625, output_message={'content': "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.", 'role': "assistant"}, prompt_tokens=100, output_tokens=220, prompt_cost=1e-05, output_cost=0.0002, finish_reason='stop', )
+                asyncio.run(main())
         """
         _response = await self._raw_client.log(
             version_id=version_id,
@@ -1883,116 +1891,119 @@ class AsyncPromptsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[PromptCallStreamResponse]:
         """
-        Call a Prompt.
+                Call a Prompt.
 
-        Calling a Prompt calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+                Calling a Prompt calls the model provider before logging
+                the request, responses and metadata to Humanloop.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Prompt. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Prompt details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Prompt details in the request body. In this case, we will check if the details correspond
+                to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+                in the case where you are storing or deriving your Prompt details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Prompt to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Prompt.
+                id : typing.Optional[str]
+                    ID for an existing Prompt.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptsCallStreamRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[PromptsCallStreamRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
-            The Prompt configuration to use. Two formats are supported:
-            - An object representing the details of the Prompt configuration
-            - A string representing the raw contents of a .prompt file
+                prompt : typing.Optional[PromptsCallStreamRequestPromptParams]
+                    The Prompt configuration to use. Two formats are supported:
+                    - An object representing the details of the Prompt configuration
+                    - A string representing the raw contents of a .prompt file
+        <<<<<<< HEAD
 
-            A new Prompt version will be created if the provided details do not match any existing version.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Prompt version will be created if the provided details do not match any existing version.
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        prompts_call_stream_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                prompts_call_stream_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        num_samples : typing.Optional[int]
-            The number of generations.
+                num_samples : typing.Optional[int]
+                    The number of generations.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        logprobs : typing.Optional[int]
-            Include the log probabilities of the top n tokens in the provider_response
+                logprobs : typing.Optional[int]
+                    Include the log probabilities of the top n tokens in the provider_response
 
-        suffix : typing.Optional[str]
-            The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+                suffix : typing.Optional[str]
+                    The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Yields
-        ------
-        typing.AsyncIterator[PromptCallStreamResponse]
+                Yields
+                ------
+                typing.AsyncIterator[PromptCallStreamResponse]
 
 
-        Examples
-        --------
-        from humanloop import AsyncHumanloop
-        import asyncio
-        client = AsyncHumanloop(api_key="YOUR_API_KEY", )
-        async def main() -> None:
-            response = await client.prompts.call_stream()
-            async for chunk in response:
-                yield chunk
-        asyncio.run(main())
+                Examples
+                --------
+                from humanloop import AsyncHumanloop
+                import asyncio
+                client = AsyncHumanloop(api_key="YOUR_API_KEY", )
+                async def main() -> None:
+                    response = await client.prompts.call_stream()
+                    async for chunk in response:
+                        yield chunk
+                asyncio.run(main())
         """
         async with self._raw_client.call_stream(
             version_id=version_id,
@@ -2052,117 +2063,120 @@ class AsyncPromptsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> PromptCallResponse:
         """
-        Call a Prompt.
+                Call a Prompt.
 
-        Calling a Prompt calls the model provider before logging
-        the request, responses and metadata to Humanloop.
+                Calling a Prompt calls the model provider before logging
+                the request, responses and metadata to Humanloop.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Prompt. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Prompt. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Prompt details in the request body. In this case, we will check if the details correspond
-        to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
-        in the case where you are storing or deriving your Prompt details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Prompt details in the request body. In this case, we will check if the details correspond
+                to an existing version of the Prompt. If they do not, we will create a new version. This is helpful
+                in the case where you are storing or deriving your Prompt details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Prompt to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Prompt to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Prompt, including the name. This locates the Prompt in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Prompt.
+                id : typing.Optional[str]
+                    ID for an existing Prompt.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[PromptsCallRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[PromptsCallRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        prompt : typing.Optional[PromptsCallRequestPromptParams]
-            The Prompt configuration to use. Two formats are supported:
-            - An object representing the details of the Prompt configuration
-            - A string representing the raw contents of a .prompt file
+                prompt : typing.Optional[PromptsCallRequestPromptParams]
+                    The Prompt configuration to use. Two formats are supported:
+                    - An object representing the details of the Prompt configuration
+                    - A string representing the raw contents of a .prompt file
+        <<<<<<< HEAD
 
-            A new Prompt version will be created if the provided details do not match any existing version.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Prompt version will be created if the provided details do not match any existing version.
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        prompts_call_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                prompts_call_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        num_samples : typing.Optional[int]
-            The number of generations.
+                num_samples : typing.Optional[int]
+                    The number of generations.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        logprobs : typing.Optional[int]
-            Include the log probabilities of the top n tokens in the provider_response
+                logprobs : typing.Optional[int]
+                    Include the log probabilities of the top n tokens in the provider_response
 
-        suffix : typing.Optional[str]
-            The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
+                suffix : typing.Optional[str]
+                    The suffix that comes after a completion of inserted text. Useful for completions that act like inserts.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        PromptCallResponse
+                Returns
+                -------
+                PromptCallResponse
 
 
-        Examples
-        --------
-        from humanloop import AsyncHumanloop
-        import asyncio
-        client = AsyncHumanloop(api_key="YOUR_API_KEY", )
-        async def main() -> None:
-            await client.prompts.call(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are stockbot. Return latest prices.'}], 'tools': [{'name': 'get_stock_price', 'description': 'Get current stock price', 'parameters': {'type': 'object'
-            , 'properties': {'ticker_symbol': {'type': 'string', 'name': 'Ticker Symbol', 'description': 'Ticker symbol of the stock'}}
-            , 'required': []
-            }}]}, messages=[{'role': "user", 'content': 'latest apple'}], )
-        asyncio.run(main())
+                Examples
+                --------
+                from humanloop import AsyncHumanloop
+                import asyncio
+                client = AsyncHumanloop(api_key="YOUR_API_KEY", )
+                async def main() -> None:
+                    await client.prompts.call(path='persona', prompt={'model': 'gpt-4', 'template': [{'role': "system", 'content': 'You are stockbot. Return latest prices.'}], 'tools': [{'name': 'get_stock_price', 'description': 'Get current stock price', 'parameters': {'type': 'object'
+                    , 'properties': {'ticker_symbol': {'type': 'string', 'name': 'Ticker Symbol', 'description': 'Ticker symbol of the stock'}}
+                    , 'required': []
+                    }}]}, messages=[{'role': "user", 'content': 'latest apple'}], )
+                asyncio.run(main())
         """
         _response = await self._raw_client.call(
             version_id=version_id,
