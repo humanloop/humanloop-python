@@ -10,7 +10,6 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2, update_forward_refs
 from ..core.unchecked_base_model import UncheckedBaseModel
 from .chat_message import ChatMessage
 from .evaluator_log_response_judgment import EvaluatorLogResponseJudgment
-from .log_status import LogStatus
 
 
 class EvaluatorLogResponse(UncheckedBaseModel):
@@ -76,11 +75,6 @@ class EvaluatorLogResponse(UncheckedBaseModel):
     metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = pydantic.Field(default=None)
     """
     Any additional metadata to record.
-    """
-
-    log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
-    """
-    Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
     """
 
     parent_id: typing.Optional[str] = pydantic.Field(default=None)

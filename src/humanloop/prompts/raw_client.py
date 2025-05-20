@@ -32,7 +32,6 @@ from ..types.file_sort_by import FileSortBy
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_prompts import ListPrompts
 from ..types.log_response import LogResponse
-from ..types.log_status import LogStatus
 from ..types.model_endpoints import ModelEndpoints
 from ..types.model_providers import ModelProviders
 from ..types.paginated_data_prompt_response import PaginatedDataPromptResponse
@@ -92,7 +91,6 @@ class RawPromptsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -164,6 +162,7 @@ class RawPromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
+
             A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
@@ -201,9 +200,6 @@ class RawPromptsClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
-
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -272,7 +268,6 @@ class RawPromptsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -338,7 +333,6 @@ class RawPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[LogResponse]:
         """
@@ -421,9 +415,6 @@ class RawPromptsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -463,7 +454,6 @@ class RawPromptsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
             },
             headers={
                 "content-type": "application/json",
@@ -513,7 +503,6 @@ class RawPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -569,6 +558,7 @@ class RawPromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
+
             A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -585,9 +575,6 @@ class RawPromptsClient:
 
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
-
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -654,7 +641,6 @@ class RawPromptsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -735,7 +721,6 @@ class RawPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -791,6 +776,7 @@ class RawPromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
+
             A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -807,9 +793,6 @@ class RawPromptsClient:
 
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
-
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -876,7 +859,6 @@ class RawPromptsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -2049,7 +2031,6 @@ class AsyncRawPromptsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -2121,6 +2102,7 @@ class AsyncRawPromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
+
             A new Prompt version will be created if the provided details do not match any existing version.
 
         start_time : typing.Optional[dt.datetime]
@@ -2158,9 +2140,6 @@ class AsyncRawPromptsClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
-
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -2229,7 +2208,6 @@ class AsyncRawPromptsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -2295,7 +2273,6 @@ class AsyncRawPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[LogResponse]:
         """
@@ -2378,9 +2355,6 @@ class AsyncRawPromptsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -2420,7 +2394,6 @@ class AsyncRawPromptsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
             },
             headers={
                 "content-type": "application/json",
@@ -2470,7 +2443,6 @@ class AsyncRawPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -2526,6 +2498,7 @@ class AsyncRawPromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
+
             A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -2542,9 +2515,6 @@ class AsyncRawPromptsClient:
 
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
-
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -2611,7 +2581,6 @@ class AsyncRawPromptsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -2692,7 +2661,6 @@ class AsyncRawPromptsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -2748,6 +2716,7 @@ class AsyncRawPromptsClient:
             The Prompt configuration to use. Two formats are supported:
             - An object representing the details of the Prompt configuration
             - A string representing the raw contents of a .prompt file
+
             A new Prompt version will be created if the provided details do not match any existing version.
 
         inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -2764,9 +2733,6 @@ class AsyncRawPromptsClient:
 
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
-
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
 
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
@@ -2833,7 +2799,6 @@ class AsyncRawPromptsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,

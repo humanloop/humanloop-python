@@ -8,6 +8,7 @@ EventType = typing.Union[
         "agent_turn_suspend",
         "agent_turn_continue",
         "agent_turn_end",
+        "agent_turn_error",
         "agent_start",
         "agent_update",
         "agent_end",
@@ -15,7 +16,6 @@ EventType = typing.Union[
         "tool_update",
         "tool_end",
         "error",
-        "agent_generation_error",
     ],
     typing.Any,
 ]

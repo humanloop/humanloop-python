@@ -3,15 +3,12 @@
 import typing
 
 import pydantic
-import typing_extensions
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-from ..core.serialization import FieldMetadata
 from ..core.unchecked_base_model import UncheckedBaseModel
 
 
 class ProviderApiKeys(UncheckedBaseModel):
     openai: typing.Optional[str] = None
-    ai_21: typing_extensions.Annotated[typing.Optional[str], FieldMetadata(alias="ai21")] = None
     mock: typing.Optional[str] = None
     anthropic: typing.Optional[str] = None
     deepseek: typing.Optional[str] = None
@@ -19,6 +16,7 @@ class ProviderApiKeys(UncheckedBaseModel):
     cohere: typing.Optional[str] = None
     openai_azure: typing.Optional[str] = None
     openai_azure_endpoint: typing.Optional[str] = None
+    google: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(extra="allow", frozen=True)  # type: ignore # Pydantic v2

@@ -30,7 +30,6 @@ from ..types.files_tool_type import FilesToolType
 from ..types.http_validation_error import HttpValidationError
 from ..types.list_tools import ListTools
 from ..types.log_response import LogResponse
-from ..types.log_status import LogStatus
 from ..types.paginated_data_tool_response import PaginatedDataToolResponse
 from ..types.sort_order import SortOrder
 from ..types.tool_call_response import ToolCallResponse
@@ -57,7 +56,6 @@ class RawToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -111,9 +109,6 @@ class RawToolsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -158,7 +153,6 @@ class RawToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -218,7 +212,6 @@ class RawToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -291,9 +284,6 @@ class RawToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -345,7 +335,6 @@ class RawToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -402,7 +391,6 @@ class RawToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> HttpResponse[LogResponse]:
         """
@@ -454,9 +442,6 @@ class RawToolsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -481,7 +466,6 @@ class RawToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
             },
             headers={
                 "content-type": "application/json",
@@ -1493,7 +1477,6 @@ class AsyncRawToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1547,9 +1530,6 @@ class AsyncRawToolsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -1594,7 +1574,6 @@ class AsyncRawToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -1654,7 +1633,6 @@ class AsyncRawToolsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1727,9 +1705,6 @@ class AsyncRawToolsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -1781,7 +1756,6 @@ class AsyncRawToolsClient:
                 "inputs": inputs,
                 "source": source,
                 "metadata": metadata,
-                "log_status": log_status,
                 "source_datapoint_id": source_datapoint_id,
                 "trace_parent_id": trace_parent_id,
                 "user": user,
@@ -1838,7 +1812,6 @@ class AsyncRawToolsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AsyncHttpResponse[LogResponse]:
         """
@@ -1890,9 +1863,6 @@ class AsyncRawToolsClient:
         end_time : typing.Optional[dt.datetime]
             When the logged event ended.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1917,7 +1887,6 @@ class AsyncRawToolsClient:
                 "metadata": metadata,
                 "start_time": start_time,
                 "end_time": end_time,
-                "log_status": log_status,
             },
             headers={
                 "content-type": "application/json",

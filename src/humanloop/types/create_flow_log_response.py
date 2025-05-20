@@ -30,7 +30,7 @@ class CreateFlowLogResponse(UncheckedBaseModel):
 
     log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
     """
-    Status of the Flow Log. When a Flow Log is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+    Status of the Flow Log. When a Flow Log is marked as `complete`, no more Logs can be added to it.
     """
 
     if IS_PYDANTIC_V2:

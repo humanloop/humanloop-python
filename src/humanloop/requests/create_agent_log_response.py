@@ -26,5 +26,5 @@ class CreateAgentLogResponseParams(typing_extensions.TypedDict):
 
     log_status: typing_extensions.NotRequired[LogStatus]
     """
-    Status of the Agent Log. When a Agent Log is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Agent Logs.
+    Status of the Agent Log. When a Agent Log is marked as `complete`, no more Logs can be added to it.
     """
