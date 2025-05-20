@@ -92,7 +92,6 @@ class AgentsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -200,9 +199,6 @@ class AgentsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Any additional metadata to record.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
-
         source_datapoint_id : typing.Optional[str]
             Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
@@ -267,7 +263,6 @@ class AgentsClient:
             inputs=inputs,
             source=source,
             metadata=metadata,
-            log_status=log_status,
             source_datapoint_id=source_datapoint_id,
             trace_parent_id=trace_parent_id,
             user=user,
@@ -320,7 +315,7 @@ class AgentsClient:
             The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -364,7 +359,6 @@ class AgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -377,112 +371,113 @@ class AgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Iterator[AgentCallStreamResponse]:
         """
-        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
+                Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
-        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+                If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+                pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
 
-        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
-        according to its configuration.
+                The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+                according to its configuration.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Agent. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. A new version is created if it does not match
-        any existing ones. This is helpful in the case where you are storing or deriving
-        your Agent details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Agent details in the request body. A new version is created if it does not match
+                any existing ones. This is helpful in the case where you are storing or deriving
+                your Agent details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Agent to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Agent to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Agent.
+                id : typing.Optional[str]
+                    ID for an existing Agent.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[AgentsCallStreamRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[AgentsCallStreamRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallStreamRequestAgentParams]
-            The Agent configuration to use. Two formats are supported:
-            - An object representing the details of the Agent configuration
-            - A string representing the raw contents of a .agent file
-            A new Agent version will be created if the provided details do not match any existing version.
+                agent : typing.Optional[AgentsCallStreamRequestAgentParams]
+                    The Agent configuration to use. Two formats are supported:
+                    - An object representing the details of the Agent configuration
+                    - A string representing the raw contents of a .agent file
+        <<<<<<< HEAD
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Agent version will be created if the provided details do not match any existing version.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        agents_call_stream_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                agents_call_stream_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
+                include_trace_children : typing.Optional[bool]
+                    If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Yields
-        ------
-        typing.Iterator[AgentCallStreamResponse]
+                Yields
+                ------
+                typing.Iterator[AgentCallStreamResponse]
 
 
-        Examples
-        --------
-        from humanloop import Humanloop
-        client = Humanloop(api_key="YOUR_API_KEY", )
-        response = client.agents.call_stream()
-        for chunk in response:
-            yield chunk
+                Examples
+                --------
+                from humanloop import Humanloop
+                client = Humanloop(api_key="YOUR_API_KEY", )
+                response = client.agents.call_stream()
+                for chunk in response:
+                    yield chunk
         """
         with self._raw_client.call_stream(
             version_id=version_id,
@@ -497,7 +492,6 @@ class AgentsClient:
             metadata=metadata,
             start_time=start_time,
             end_time=end_time,
-            log_status=log_status,
             source_datapoint_id=source_datapoint_id,
             trace_parent_id=trace_parent_id,
             user=user,
@@ -526,7 +520,6 @@ class AgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -539,110 +532,111 @@ class AgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AgentCallResponse:
         """
-        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
+                Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
-        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+                If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+                pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
 
-        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
-        according to its configuration.
+                The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+                according to its configuration.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Agent. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. A new version is created if it does not match
-        any existing ones. This is helpful in the case where you are storing or deriving
-        your Agent details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Agent details in the request body. A new version is created if it does not match
+                any existing ones. This is helpful in the case where you are storing or deriving
+                your Agent details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Agent to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Agent to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Agent.
+                id : typing.Optional[str]
+                    ID for an existing Agent.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[AgentsCallRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[AgentsCallRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallRequestAgentParams]
-            The Agent configuration to use. Two formats are supported:
-            - An object representing the details of the Agent configuration
-            - A string representing the raw contents of a .agent file
-            A new Agent version will be created if the provided details do not match any existing version.
+                agent : typing.Optional[AgentsCallRequestAgentParams]
+                    The Agent configuration to use. Two formats are supported:
+                    - An object representing the details of the Agent configuration
+                    - A string representing the raw contents of a .agent file
+        <<<<<<< HEAD
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Agent version will be created if the provided details do not match any existing version.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        agents_call_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                agents_call_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
+                include_trace_children : typing.Optional[bool]
+                    If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        AgentCallResponse
+                Returns
+                -------
+                AgentCallResponse
 
 
-        Examples
-        --------
-        from humanloop import Humanloop
-        client = Humanloop(api_key="YOUR_API_KEY", )
-        client.agents.call(path='Banking/Teller Agent', messages=[{'role': "user", 'content': "I'd like to deposit $1000 to my savings account from my checking account."}], )
+                Examples
+                --------
+                from humanloop import Humanloop
+                client = Humanloop(api_key="YOUR_API_KEY", )
+                client.agents.call(path='Banking/Teller Agent', messages=[{'role': "user", 'content': "I'd like to deposit $1000 to my savings account from my checking account."}], )
         """
         _response = self._raw_client.call(
             version_id=version_id,
@@ -657,7 +651,6 @@ class AgentsClient:
             metadata=metadata,
             start_time=start_time,
             end_time=end_time,
-            log_status=log_status,
             source_datapoint_id=source_datapoint_id,
             trace_parent_id=trace_parent_id,
             user=user,
@@ -1509,7 +1502,6 @@ class AsyncAgentsClient:
         inputs: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         source: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1519,145 +1511,146 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateAgentLogResponse:
         """
-        Create an Agent Log.
+                Create an Agent Log.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Agent. Otherwise, the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Agent. Otherwise, the default deployed version will be chosen.
 
-        If you create the Agent Log with a `log_status` of `incomplete`, you should later update it to `complete`
-        in order to trigger Evaluators.
+                If you create the Agent Log with a `log_status` of `incomplete`, you should later update it to `complete`
+                in order to trigger Evaluators.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Agent to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Agent to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        run_id : typing.Optional[str]
-            Unique identifier for the Run to associate the Log to.
+                run_id : typing.Optional[str]
+                    Unique identifier for the Run to associate the Log to.
 
-        path : typing.Optional[str]
-            Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Agent.
+                id : typing.Optional[str]
+                    ID for an existing Agent.
 
-        output_message : typing.Optional[ChatMessageParams]
-            The message returned by the provider.
+                output_message : typing.Optional[ChatMessageParams]
+                    The message returned by the provider.
 
-        prompt_tokens : typing.Optional[int]
-            Number of tokens in the prompt used to generate the output.
+                prompt_tokens : typing.Optional[int]
+                    Number of tokens in the prompt used to generate the output.
 
-        reasoning_tokens : typing.Optional[int]
-            Number of reasoning tokens used to generate the output.
+                reasoning_tokens : typing.Optional[int]
+                    Number of reasoning tokens used to generate the output.
 
-        output_tokens : typing.Optional[int]
-            Number of tokens in the output generated by the model.
+                output_tokens : typing.Optional[int]
+                    Number of tokens in the output generated by the model.
 
-        prompt_cost : typing.Optional[float]
-            Cost in dollars associated to the tokens in the prompt.
+                prompt_cost : typing.Optional[float]
+                    Cost in dollars associated to the tokens in the prompt.
 
-        output_cost : typing.Optional[float]
-            Cost in dollars associated to the tokens in the output.
+                output_cost : typing.Optional[float]
+                    Cost in dollars associated to the tokens in the output.
 
-        finish_reason : typing.Optional[str]
-            Reason the generation finished.
+                finish_reason : typing.Optional[str]
+                    Reason the generation finished.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[AgentLogRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[AgentLogRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentLogRequestAgentParams]
-            The Agent configuration to use. Two formats are supported:
-            - An object representing the details of the Agent configuration
-            - A string representing the raw contents of a .agent file
-            A new Agent version will be created if the provided details do not match any existing version.
+                agent : typing.Optional[AgentLogRequestAgentParams]
+                    The Agent configuration to use. Two formats are supported:
+                    - An object representing the details of the Agent configuration
+                    - A string representing the raw contents of a .agent file
+        <<<<<<< HEAD
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Agent version will be created if the provided details do not match any existing version.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        output : typing.Optional[str]
-            Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        created_at : typing.Optional[dt.datetime]
-            User defined timestamp for when the log was created.
+                output : typing.Optional[str]
+                    Generated output from your model for the provided inputs. Can be `None` if logging an error, or if creating a parent Log with the intention to populate it later.
 
-        error : typing.Optional[str]
-            Error message if the log is an error.
+                created_at : typing.Optional[dt.datetime]
+                    User defined timestamp for when the log was created.
 
-        provider_latency : typing.Optional[float]
-            Duration of the logged event in seconds.
+                error : typing.Optional[str]
+                    Error message if the log is an error.
 
-        stdout : typing.Optional[str]
-            Captured log and debug statements.
+                provider_latency : typing.Optional[float]
+                    Duration of the logged event in seconds.
 
-        provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Raw request sent to provider.
+                stdout : typing.Optional[str]
+                    Captured log and debug statements.
 
-        provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Raw response received the provider.
+                provider_request : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Raw request sent to provider.
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+                provider_response : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Raw response received the provider.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        agent_log_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                agent_log_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        CreateAgentLogResponse
-            Successful Response
+                Returns
+                -------
+                CreateAgentLogResponse
+                    Successful Response
 
-        Examples
-        --------
-        from humanloop import AsyncHumanloop
-        import asyncio
-        client = AsyncHumanloop(api_key="YOUR_API_KEY", )
-        async def main() -> None:
-            await client.agents.log(path='Banking/Teller Agent', agent={'provider': "anthropic", 'endpoint': "chat", 'model': 'claude-3-7-sonnet-latest', 'reasoning_effort': 1024, 'template': [{'role': "system", 'content': 'You are a helpful digital assistant, helping users navigate our digital banking platform.'}], 'max_iterations': 3, 'tools': [{'type': 'file', 'link': {'file_id': 'pr_1234567890', 'version_id': 'prv_1234567890'}, 'on_agent_call': "continue"}, {'type': 'inline', 'json_schema': {'name': 'stop', 'description': 'Call this tool when you have finished your task.', 'parameters': {'type': 'object'
-            , 'properties': {'output': {'type': 'string', 'description': 'The final output to return to the user.'}}
-            , 'additionalProperties': False
-            , 'required': ['output']
-            }, 'strict': True}, 'on_agent_call': "stop"}]}, )
-        asyncio.run(main())
+                Examples
+                --------
+                from humanloop import AsyncHumanloop
+                import asyncio
+                client = AsyncHumanloop(api_key="YOUR_API_KEY", )
+                async def main() -> None:
+                    await client.agents.log(path='Banking/Teller Agent', agent={'provider': "anthropic", 'endpoint': "chat", 'model': 'claude-3-7-sonnet-latest', 'reasoning_effort': 1024, 'template': [{'role': "system", 'content': 'You are a helpful digital assistant, helping users navigate our digital banking platform.'}], 'max_iterations': 3, 'tools': [{'type': 'file', 'link': {'file_id': 'pr_1234567890', 'version_id': 'prv_1234567890'}, 'on_agent_call': "continue"}, {'type': 'inline', 'json_schema': {'name': 'stop', 'description': 'Call this tool when you have finished your task.', 'parameters': {'type': 'object'
+                    , 'properties': {'output': {'type': 'string', 'description': 'The final output to return to the user.'}}
+                    , 'additionalProperties': False
+                    , 'required': ['output']
+                    }, 'strict': True}, 'on_agent_call': "stop"}]}, )
+                asyncio.run(main())
         """
         _response = await self._raw_client.log(
             version_id=version_id,
@@ -1687,7 +1680,6 @@ class AsyncAgentsClient:
             inputs=inputs,
             source=source,
             metadata=metadata,
-            log_status=log_status,
             source_datapoint_id=source_datapoint_id,
             trace_parent_id=trace_parent_id,
             user=user,
@@ -1740,7 +1732,7 @@ class AsyncAgentsClient:
             The error message of the Flow Log. Provide None to unset existing `error` value. Provide either this, `output_message` or `output`.
 
         log_status : typing.Optional[LogStatus]
-            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Flow Logs.
+            Status of the Flow Log. When a Flow Log is updated to `complete`, no more Logs can be added to it. You cannot update a Flow Log's status from `complete` to `incomplete`.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1787,7 +1779,6 @@ class AsyncAgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1800,115 +1791,116 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.AsyncIterator[AgentCallStreamResponse]:
         """
-        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
+                Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
-        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+                If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+                pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
 
-        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
-        according to its configuration.
+                The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+                according to its configuration.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Agent. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. A new version is created if it does not match
-        any existing ones. This is helpful in the case where you are storing or deriving
-        your Agent details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Agent details in the request body. A new version is created if it does not match
+                any existing ones. This is helpful in the case where you are storing or deriving
+                your Agent details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Agent to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Agent to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Agent.
+                id : typing.Optional[str]
+                    ID for an existing Agent.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[AgentsCallStreamRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[AgentsCallStreamRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallStreamRequestAgentParams]
-            The Agent configuration to use. Two formats are supported:
-            - An object representing the details of the Agent configuration
-            - A string representing the raw contents of a .agent file
-            A new Agent version will be created if the provided details do not match any existing version.
+                agent : typing.Optional[AgentsCallStreamRequestAgentParams]
+                    The Agent configuration to use. Two formats are supported:
+                    - An object representing the details of the Agent configuration
+                    - A string representing the raw contents of a .agent file
+        <<<<<<< HEAD
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Agent version will be created if the provided details do not match any existing version.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        agents_call_stream_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                agents_call_stream_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
+                include_trace_children : typing.Optional[bool]
+                    If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Yields
-        ------
-        typing.AsyncIterator[AgentCallStreamResponse]
+                Yields
+                ------
+                typing.AsyncIterator[AgentCallStreamResponse]
 
 
-        Examples
-        --------
-        from humanloop import AsyncHumanloop
-        import asyncio
-        client = AsyncHumanloop(api_key="YOUR_API_KEY", )
-        async def main() -> None:
-            response = await client.agents.call_stream()
-            async for chunk in response:
-                yield chunk
-        asyncio.run(main())
+                Examples
+                --------
+                from humanloop import AsyncHumanloop
+                import asyncio
+                client = AsyncHumanloop(api_key="YOUR_API_KEY", )
+                async def main() -> None:
+                    response = await client.agents.call_stream()
+                    async for chunk in response:
+                        yield chunk
+                asyncio.run(main())
         """
         async with self._raw_client.call_stream(
             version_id=version_id,
@@ -1923,7 +1915,6 @@ class AsyncAgentsClient:
             metadata=metadata,
             start_time=start_time,
             end_time=end_time,
-            log_status=log_status,
             source_datapoint_id=source_datapoint_id,
             trace_parent_id=trace_parent_id,
             user=user,
@@ -1953,7 +1944,6 @@ class AsyncAgentsClient:
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         start_time: typing.Optional[dt.datetime] = OMIT,
         end_time: typing.Optional[dt.datetime] = OMIT,
-        log_status: typing.Optional[LogStatus] = OMIT,
         source_datapoint_id: typing.Optional[str] = OMIT,
         trace_parent_id: typing.Optional[str] = OMIT,
         user: typing.Optional[str] = OMIT,
@@ -1966,113 +1956,114 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> AgentCallResponse:
         """
-        Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
+                Call an Agent. The Agent will run on the Humanloop runtime and return a completed Agent Log.
 
-        If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
-        pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
+                If the Agent requires a tool call that cannot be ran by Humanloop, execution will halt. To continue,
+                pass the ID of the incomplete Log and the required tool call to the /agents/continue endpoint.
 
-        The agent will run for the maximum number of iterations, or until it encounters a stop condition,
-        according to its configuration.
+                The agent will run for the maximum number of iterations, or until it encounters a stop condition,
+                according to its configuration.
 
-        You can use query parameters `version_id`, or `environment`, to target
-        an existing version of the Agent. Otherwise the default deployed version will be chosen.
+                You can use query parameters `version_id`, or `environment`, to target
+                an existing version of the Agent. Otherwise the default deployed version will be chosen.
 
-        Instead of targeting an existing version explicitly, you can instead pass in
-        Agent details in the request body. A new version is created if it does not match
-        any existing ones. This is helpful in the case where you are storing or deriving
-        your Agent details in code.
+                Instead of targeting an existing version explicitly, you can instead pass in
+                Agent details in the request body. A new version is created if it does not match
+                any existing ones. This is helpful in the case where you are storing or deriving
+                your Agent details in code.
 
-        Parameters
-        ----------
-        version_id : typing.Optional[str]
-            A specific Version ID of the Agent to log to.
+                Parameters
+                ----------
+                version_id : typing.Optional[str]
+                    A specific Version ID of the Agent to log to.
 
-        environment : typing.Optional[str]
-            Name of the Environment identifying a deployed version to log to.
+                environment : typing.Optional[str]
+                    Name of the Environment identifying a deployed version to log to.
 
-        path : typing.Optional[str]
-            Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
+                path : typing.Optional[str]
+                    Path of the Agent, including the name. This locates the Agent in the Humanloop filesystem and is used as as a unique identifier. For example: `folder/name` or just `name`.
 
-        id : typing.Optional[str]
-            ID for an existing Agent.
+                id : typing.Optional[str]
+                    ID for an existing Agent.
 
-        messages : typing.Optional[typing.Sequence[ChatMessageParams]]
-            The messages passed to the to provider chat endpoint.
+                messages : typing.Optional[typing.Sequence[ChatMessageParams]]
+                    The messages passed to the to provider chat endpoint.
 
-        tool_choice : typing.Optional[AgentsCallRequestToolChoiceParams]
-            Controls how the model uses tools. The following options are supported:
-            - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
-            - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
-            - `'required'` means the model must call one or more of the provided tools.
-            - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
+                tool_choice : typing.Optional[AgentsCallRequestToolChoiceParams]
+                    Controls how the model uses tools. The following options are supported:
+                    - `'none'` means the model will not call any tool and instead generates a message; this is the default when no tools are provided as part of the Prompt.
+                    - `'auto'` means the model can decide to call one or more of the provided tools; this is the default when tools are provided as part of the Prompt.
+                    - `'required'` means the model must call one or more of the provided tools.
+                    - `{'type': 'function', 'function': {name': <TOOL_NAME>}}` forces the model to use the named function.
 
-        agent : typing.Optional[AgentsCallRequestAgentParams]
-            The Agent configuration to use. Two formats are supported:
-            - An object representing the details of the Agent configuration
-            - A string representing the raw contents of a .agent file
-            A new Agent version will be created if the provided details do not match any existing version.
+                agent : typing.Optional[AgentsCallRequestAgentParams]
+                    The Agent configuration to use. Two formats are supported:
+                    - An object representing the details of the Agent configuration
+                    - A string representing the raw contents of a .agent file
+        <<<<<<< HEAD
 
-        inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            The inputs passed to the prompt template.
+        =======
+        >>>>>>> 190233f (Merge branch 'master' into flow-complete-dx)
+                    A new Agent version will be created if the provided details do not match any existing version.
 
-        source : typing.Optional[str]
-            Identifies where the model was called from.
+                inputs : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    The inputs passed to the prompt template.
 
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Any additional metadata to record.
+                source : typing.Optional[str]
+                    Identifies where the model was called from.
 
-        start_time : typing.Optional[dt.datetime]
-            When the logged event started.
+                metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+                    Any additional metadata to record.
 
-        end_time : typing.Optional[dt.datetime]
-            When the logged event ended.
+                start_time : typing.Optional[dt.datetime]
+                    When the logged event started.
 
-        log_status : typing.Optional[LogStatus]
-            Status of a Log. Set to `incomplete` if you intend to update and eventually complete the Log and want the File's monitoring Evaluators to wait until you mark it as `complete`. If log_status is not provided, observability will pick up the Log as soon as possible. Updating this from specified to unspecified is undefined behavior.
+                end_time : typing.Optional[dt.datetime]
+                    When the logged event ended.
 
-        source_datapoint_id : typing.Optional[str]
-            Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
+                source_datapoint_id : typing.Optional[str]
+                    Unique identifier for the Datapoint that this Log is derived from. This can be used by Humanloop to associate Logs to Evaluations. If provided, Humanloop will automatically associate this Log to Evaluations that require a Log for this Datapoint-Version pair.
 
-        trace_parent_id : typing.Optional[str]
-            The ID of the parent Log to nest this Log under in a Trace.
+                trace_parent_id : typing.Optional[str]
+                    The ID of the parent Log to nest this Log under in a Trace.
 
-        user : typing.Optional[str]
-            End-user ID related to the Log.
+                user : typing.Optional[str]
+                    End-user ID related to the Log.
 
-        agents_call_request_environment : typing.Optional[str]
-            The name of the Environment the Log is associated to.
+                agents_call_request_environment : typing.Optional[str]
+                    The name of the Environment the Log is associated to.
 
-        save : typing.Optional[bool]
-            Whether the request/response payloads will be stored on Humanloop.
+                save : typing.Optional[bool]
+                    Whether the request/response payloads will be stored on Humanloop.
 
-        log_id : typing.Optional[str]
-            This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
+                log_id : typing.Optional[str]
+                    This will identify a Log. If you don't provide a Log ID, Humanloop will generate one for you.
 
-        provider_api_keys : typing.Optional[ProviderApiKeysParams]
-            API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
+                provider_api_keys : typing.Optional[ProviderApiKeysParams]
+                    API keys required by each provider to make API calls. The API keys provided here are not stored by Humanloop. If not specified here, Humanloop will fall back to the key saved to your organization.
 
-        return_inputs : typing.Optional[bool]
-            Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
+                return_inputs : typing.Optional[bool]
+                    Whether to return the inputs in the response. If false, the response will contain an empty dictionary under inputs. This is useful for reducing the size of the response. Defaults to true.
 
-        include_trace_children : typing.Optional[bool]
-            If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
+                include_trace_children : typing.Optional[bool]
+                    If true, populate `trace_children` for the returned Agent Log. Only applies when not streaming. Defaults to false.
 
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
+                request_options : typing.Optional[RequestOptions]
+                    Request-specific configuration.
 
-        Returns
-        -------
-        AgentCallResponse
+                Returns
+                -------
+                AgentCallResponse
 
 
-        Examples
-        --------
-        from humanloop import AsyncHumanloop
-        import asyncio
-        client = AsyncHumanloop(api_key="YOUR_API_KEY", )
-        async def main() -> None:
-            await client.agents.call(path='Banking/Teller Agent', messages=[{'role': "user", 'content': "I'd like to deposit $1000 to my savings account from my checking account."}], )
-        asyncio.run(main())
+                Examples
+                --------
+                from humanloop import AsyncHumanloop
+                import asyncio
+                client = AsyncHumanloop(api_key="YOUR_API_KEY", )
+                async def main() -> None:
+                    await client.agents.call(path='Banking/Teller Agent', messages=[{'role': "user", 'content': "I'd like to deposit $1000 to my savings account from my checking account."}], )
+                asyncio.run(main())
         """
         _response = await self._raw_client.call(
             version_id=version_id,
@@ -2087,7 +2078,6 @@ class AsyncAgentsClient:
             metadata=metadata,
             start_time=start_time,
             end_time=end_time,
-            log_status=log_status,
             source_datapoint_id=source_datapoint_id,
             trace_parent_id=trace_parent_id,
             user=user,

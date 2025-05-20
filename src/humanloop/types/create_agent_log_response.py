@@ -30,7 +30,7 @@ class CreateAgentLogResponse(UncheckedBaseModel):
 
     log_status: typing.Optional[LogStatus] = pydantic.Field(default=None)
     """
-    Status of the Agent Log. When a Agent Log is marked as `complete`, no more Logs can be added to it. Monitoring Evaluators will only run on `complete` Agent Logs.
+    Status of the Agent Log. When a Agent Log is marked as `complete`, no more Logs can be added to it.
     """
 
     if IS_PYDANTIC_V2:

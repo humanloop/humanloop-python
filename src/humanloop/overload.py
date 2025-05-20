@@ -238,6 +238,17 @@ def _overload_call(self: T, file_syncer: Optional[FileSyncer], use_local_files: 
         raise HumanloopRuntimeError from e
 
 
+ClientTemplateType = TypeVar(
+    "ClientTemplateType",
+    bound=Union[
+        FlowsClient,
+        PromptsClient,
+        AgentsClient,
+        ToolsClient,
+    ],
+)
+
+
 def overload_client(
     client: T,
     file_syncer: Optional[FileSyncer] = None,
@@ -253,8 +264,7 @@ def overload_client(
         def log_wrapper(self: T, **kwargs) -> LogResponseType:
             return _overload_log(self, file_syncer, use_local_files, **kwargs)
 
-        # Replace the log method with type ignore
-        client.log = types.MethodType(log_wrapper, client)  # type: ignore
+        client.log = types.MethodType(log_wrapper, client)  # type: ignore [method-assign, union-attr]
 
     # Overload call method for Prompt and Agent clients
     if _get_file_type_from_client(client) in FileSyncer.SERIALIZABLE_FILE_TYPES:
@@ -262,14 +272,13 @@ def overload_client(
             logger.error("file_syncer is None but client has call method and use_local_files=%s", use_local_files)
             raise HumanloopRuntimeError("file_syncer is required for clients that support call operations")
         if hasattr(client, "call") and not hasattr(client, "_call"):
-            # Store original method with type ignore
-            client._call = client.call  # type: ignore
+            client._call = client.call  # type: ignore [method-assign, union-attr]
 
             # Create a closure to capture file_syncer and use_local_files
             def call_wrapper(self: T, **kwargs) -> CallResponseType:
                 return _overload_call(self, file_syncer, use_local_files, **kwargs)
 
             # Replace the call method with type ignore
-            client.call = types.MethodType(call_wrapper, client)  # type: ignore
+            client.call = types.MethodType(call_wrapper, client)  # type: ignore [method-assign]
 
     return client
