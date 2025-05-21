@@ -133,7 +133,7 @@ def _handle_local_files(
 
         # Always raise error when file extension is detected (based on the outer if condition)
         raise HumanloopRuntimeError(
-            f"Path '{path}' includes a file extension which is not supported in API calls. "
+            f"Path '{path}' should not include any file extension in API calls. "
             f"When referencing files via the `path` parameter, use the path without extensions: '{path_without_extension}'. "
             f"Note: File extensions are only used when pulling specific files via the CLI."
         )

@@ -15,22 +15,22 @@ from tests.custom.types import GetHumanloopClientFn, SyncableFile
         # Using lambdas to defer path generation until we have access to the test_file fixture
         (
             lambda test_file: f"{test_file.path}.{test_file.type}",
-            "includes a file extension which is not supported",
+            "should not include any file extension in API calls",
             "Standard extension",
         ),
         (
             lambda test_file: f"{test_file.path}.{test_file.type.upper()}",
-            "includes a file extension which is not supported",
+            "should not include any file extension in API calls",
             "Uppercase extension",
         ),
         (
             lambda test_file: f"{test_file.path}.{test_file.type.capitalize()}",
-            "includes a file extension which is not supported",
+            "should not include any file extension in API calls",
             "Mixed case extension",
         ),
         (
             lambda test_file: f" {test_file.path}.{test_file.type} ",
-            "includes a file extension which is not supported",
+            "should not include any file extension in API calls",
             "With whitespace",
         ),
         # Slash path test cases
