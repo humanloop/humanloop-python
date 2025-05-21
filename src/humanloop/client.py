@@ -10,8 +10,10 @@ from opentelemetry.trace import Tracer
 
 from humanloop.base_client import AsyncBaseHumanloop, BaseHumanloop
 from humanloop.core.client_wrapper import SyncClientWrapper
-from humanloop.decorators.flow import flow as flow_decorator_factory
-from humanloop.decorators.prompt import prompt_decorator_factory
+from humanloop.decorators.flow import a_flow_decorator_factory as a_flow_decorator_factory
+from humanloop.decorators.flow import flow_decorator_factory as flow_decorator_factory
+from humanloop.decorators.prompt import a_prompt_decorator_factory, prompt_decorator_factory
+from humanloop.decorators.tool import a_tool_decorator_factory as a_tool_decorator_factory
 from humanloop.decorators.tool import tool_decorator_factory as tool_decorator_factory
 from humanloop.environment import HumanloopEnvironment
 from humanloop.evals import run_eval
@@ -273,6 +275,50 @@ class Humanloop(BaseHumanloop):
         """
         return prompt_decorator_factory(path=path)
 
+    def a_prompt(
+        self,
+        *,
+        path: str,
+    ):
+        """Auto-instrument LLM providers and create [Prompt](https://humanloop.com/docs/explanation/prompts)
+        Logs on Humanloop from them, for async functions.
+
+        ```python
+        @a_prompt(path="My Async Prompt")
+        async def call_llm_async(messages):
+            client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response = await client.chat.completions.create(
+                model="gpt-4o",
+                temperature=0.8,
+                frequency_penalty=0.5,
+                max_tokens=200,
+                messages=messages,
+            )
+            return response.choices[0].message.content
+
+        Calling the function above creates a new Log on Humanloop
+        against this Prompt version:
+        {
+            provider: "openai",
+            model: "gpt-4o",
+            endpoint: "chat",
+            max_tokens: 200,
+            temperature: 0.8,
+            frequency_penalty: 0.5,
+        }
+        ```
+
+        If a different model, endpoint, or hyperparameter is used, a new
+        Prompt version is created.
+
+        :param path: The path where the Prompt is created. If not
+            provided, the function name is used as the path and the File
+            is created in the root of your Humanloop organization workspace.
+
+        :param prompt_kernel: Attributes that define the Prompt. See `class:DecoratorPromptKernelRequestParams`
+        """
+        return a_prompt_decorator_factory(path=path)
+
     def tool(
         self,
         *,
@@ -325,6 +371,64 @@ class Humanloop(BaseHumanloop):
         :param attributes: Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
         """
         return tool_decorator_factory(
+            opentelemetry_tracer=self._opentelemetry_tracer,
+            path=path,
+            attributes=attributes,
+            setup_values=setup_values,
+        )
+
+    def a_tool(
+        self,
+        *,
+        path: str,
+        attributes: Optional[dict[str, Any]] = None,
+        setup_values: Optional[dict[str, Any]] = None,
+    ):
+        """Manage async [Tool](https://humanloop.com/docs/explanation/tools) Files through code.
+
+        The decorator inspects the wrapped async function's source code to infer the Tool's
+        JSON Schema. If the function declaration changes, a new Tool version
+        is upserted with an updated JSON Schema.
+
+        For example:
+
+        ```python
+        # Adding @a_tool on this function
+        @humanloop_client.a_tool(path="async_calculator")
+        async def async_calculator(a: int, b: Optional[int]) -> int:
+            \"\"\"Add two numbers together asynchronously.\"\"\"
+            return a + b
+
+        # Creates a Tool with this JSON Schema:
+        {
+            strict: True,
+            function: {
+                "name": "async_calculator",
+                "description": "Add two numbers together asynchronously.",
+                "parameters": {
+                    type: "object",
+                    properties: {
+                        a: {type: "integer"},
+                        b: {type: "integer"}
+                    },
+                    required: ["a"],
+                },
+            }
+        }
+        ```
+
+        The return value of the decorated function must be JSON serializable.
+
+        If the function raises an exception, the created Log will have `output`
+        set to null, and the `error` field populated.
+
+        :param path: The path of the File in the Humanloop workspace.
+
+        :param setup_values: Values needed to setup the Tool, defined in [JSON Schema](https://json-schema.org/)
+
+        :param attributes: Additional fields to describe the Tool. Helpful to separate Tool versions from each other with details on how they were created or used.
+        """
+        return a_tool_decorator_factory(
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,
             attributes=attributes,
@@ -388,6 +492,70 @@ class Humanloop(BaseHumanloop):
         :param attributes: Additional fields to describe the Flow. Helpful to separate Flow versions from each other with details on how they were created or used.
         """
         return flow_decorator_factory(
+            client=self,
+            opentelemetry_tracer=self._opentelemetry_tracer,
+            path=path,
+            attributes=attributes,
+        )
+
+    def a_flow(
+        self,
+        *,
+        path: str,
+        attributes: Optional[dict[str, Any]] = None,
+    ):
+        """Trace SDK logging calls through [Flows](https://humanloop.com/docs/explanation/flows) for async functions.
+
+        Use it as the entrypoint of your async LLM feature. Logging calls like `prompts.call(...)`,
+        `tools.call(...)`, or other Humanloop decorators will be automatically added to the trace.
+
+        For example:
+
+        ```python
+        @a_prompt(template="You are an assistant on the following topics: {{topics}}.")
+        async def call_llm_async(messages):
+            client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+            response = await client.chat.completions.create(
+                model="gpt-4o",
+                temperature=0.8,
+                frequency_penalty=0.5,
+                max_tokens=200,
+                messages=messages,
+            )
+            return response.choices[0].message.content
+
+        @a_flow(attributes={"version": "v1"})
+        async def async_agent():
+            while True:
+                messages = []
+                user_input = input("You: ")
+                if user_input == "exit":
+                    break
+                messages.append({"role": "user", "content": user_input})
+                response = await call_llm_async(messages)
+                messages.append({"role": "assistant", "content": response})
+                print(f"Assistant: {response}")
+        ```
+
+        Each call to async_agent will create a trace corresponding to the conversation
+        session. Multiple Prompt Logs will be created as the LLM is called. They
+        will be added to the trace, allowing you to see the whole conversation
+        in the UI.
+
+        If the function returns a ChatMessage-like object, the Log will
+        populate the `output_message` field. Otherwise, it will serialize
+        the return value and populate the `output` field.
+
+        If an exception is raised, the output fields will be set to None
+        and the error message will be set in the Log's `error` field.
+
+        :param path: The path to the Flow. If not provided, the function name
+            will be used as the path and the File will be created in the root
+            of your organization workspace.
+
+        :param attributes: Additional fields to describe the Flow. Helpful to separate Flow versions from each other with details on how they were created or used.
+        """
+        return a_flow_decorator_factory(
             client=self,
             opentelemetry_tracer=self._opentelemetry_tracer,
             path=path,

@@ -5,7 +5,6 @@ from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.trace import SpanKind
 from opentelemetry.util.types import AttributeValue
 
-
 NestedDict = dict[str, Union["NestedDict", AttributeValue]]
 NestedList = list[Union["NestedList", NestedDict]]
 

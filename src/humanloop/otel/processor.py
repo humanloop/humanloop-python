@@ -1,15 +1,14 @@
 import logging
 
-
 from opentelemetry.sdk.trace import ReadableSpan, Span
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
 from humanloop.context import get_decorator_context, get_evaluation_context, get_trace_id
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
+    HUMANLOOP_FILE_PATH_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
-    HUMANLOOP_FILE_PATH_KEY,
 )
 from humanloop.otel.helpers import is_llm_provider_call
 

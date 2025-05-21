@@ -8,8 +8,8 @@ Functions in this module should be accessed via the Humanloop client. They shoul
 not be called directly.
 """
 
+import asyncio
 import copy
-from dataclasses import dataclass
 import inspect
 import json
 import logging
@@ -19,11 +19,14 @@ import threading
 import time
 import typing
 from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
 from logging import INFO
 from typing import (
+    Any,
     Callable,
+    Coroutine,
     Dict,
     List,
     Literal,
@@ -34,19 +37,21 @@ from typing import (
     Union,
 )
 
+from pydantic import ValidationError
+
 from humanloop import EvaluatorResponse, FlowResponse, PromptResponse, ToolResponse
 from humanloop.agents.client import AgentsClient
-from humanloop.core.api_error import ApiError
 from humanloop.context import (
     EvaluationContext,
     get_evaluation_context,
     set_evaluation_context,
 )
+from humanloop.core.api_error import ApiError
 from humanloop.error import HumanloopRuntimeError
 from humanloop.evals.types import (
     DatasetEvalConfig,
-    EvaluatorEvalConfig,
     EvaluatorCheck,
+    EvaluatorEvalConfig,
     FileEvalConfig,
 )
 
@@ -71,15 +76,13 @@ from humanloop.types import FlowKernelRequest as Flow
 from humanloop.types import NumericEvaluatorStatsResponse as NumericStats
 from humanloop.types import PromptKernelRequest as Prompt
 from humanloop.types import ToolKernelRequest as Tool
-from humanloop.types.agent_response import AgentResponse
 from humanloop.types.agent_kernel_request import AgentKernelRequest as Agent
+from humanloop.types.agent_response import AgentResponse
 from humanloop.types.datapoint_response import DatapointResponse
 from humanloop.types.dataset_response import DatasetResponse
 from humanloop.types.evaluation_run_response import EvaluationRunResponse
 from humanloop.types.log_response import LogResponse
 from humanloop.types.run_stats_response import RunStatsResponse
-from pydantic import ValidationError
-
 
 if typing.TYPE_CHECKING:
     from humanloop.client import BaseHumanloop
@@ -115,6 +118,9 @@ CLIENT_TYPE = TypeVar(
     EvaluatorsClient,
     AgentsClient,
 )
+
+T = TypeVar("T")  # Add TypeVar T definition
+
 
 
 def print_error(message: str) -> None:
@@ -819,19 +825,58 @@ def _get_new_run(
     return evaluation, run
 
 
+def run_coroutine_sync(coroutine: Coroutine[Any, Any, T], timeout: float = 30) -> T:
+    """Run a coroutine in a new event loop and return its result synchronously."""
+
+    def run_in_new_loop():
+        new_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(new_loop)
+        try:
+            return new_loop.run_until_complete(asyncio.wait_for(coroutine, timeout=timeout))
+        finally:
+            new_loop.close()
+
+    # If we're already in an event loop, run in a new thread
+    try:
+        asyncio.get_running_loop()
+        # We're in an event loop, run in thread
+        import concurrent.futures
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(run_in_new_loop).result()
+    except RuntimeError:
+        # No event loop running, we can use run_in_new_loop directly
+        return run_in_new_loop()
+
+
 def _call_function(
     function: Callable,
     type: FileType,
     datapoint: DatapointResponse,
 ) -> str:
     datapoint_dict = datapoint.dict()
+
+    # Determine if the function is a coroutine function (async def)
+    is_awaitable = asyncio.iscoroutinefunction(function)
+
     if "messages" in datapoint_dict and datapoint_dict["messages"] is not None:
-        output = function(
-            **datapoint_dict["inputs"],
-            messages=datapoint_dict["messages"],
-        )
+        if is_awaitable:
+            coroutine = function(
+                **datapoint_dict["inputs"],
+                messages=datapoint_dict["messages"],
+            )
+            output = run_coroutine_sync(coroutine)
+        else:
+            output = function(
+                **datapoint_dict["inputs"],
+                messages=datapoint_dict["messages"],
+            )
     else:
-        output = function(**datapoint_dict["inputs"])
+        if is_awaitable:
+            coroutine = function(**datapoint_dict["inputs"])
+            output = run_coroutine_sync(coroutine)
+        else:
+            output = function(**datapoint_dict["inputs"])
 
     if not isinstance(output, str):
         try:
