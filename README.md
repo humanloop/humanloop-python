@@ -45,7 +45,7 @@ client.prompts.log(
     ),
     provider_latency=6.5931549072265625,
     output_message={
-        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+        "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
         "role": "assistant",
     },
     prompt_tokens=100,
@@ -92,7 +92,7 @@ async def main() -> None:
         ),
         provider_latency=6.5931549072265625,
         output_message={
-            "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it’s a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They’re unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it’s something big, very very big. Tremendous, in fact.",
+            "content": "Well, you know, there is so much secrecy involved in government, folks, it's unbelievable. They don't want to tell you everything. They don't tell me everything! But about Roswell, it's a very popular question. I know, I just know, that something very, very peculiar happened there. Was it a weather balloon? Maybe. Was it something extraterrestrial? Could be. I'd love to go down and open up all the classified documents, believe me, I would. But they don't let that happen. The Deep State, folks, the Deep State. They're unbelievable. They want to keep everything a secret. But whatever the truth is, I can tell you this: it's something big, very very big. Tremendous, in fact.",
             "role": "assistant",
         },
         prompt_tokens=100,
@@ -187,29 +187,26 @@ for chunk in response:
     yield chunk
 ```
 
-## Local File Development
+## Store Humanloop Files in Code
 
-Humanloop allows you to clone files from your Humanloop workspace to your local filesystem and use them in your code.
+Humanloop allows you to maintain Prompts and Agents in your local filesystem and version control, while still leveraging Humanloop's prompt management capabilities.
 
 ### Syncing Files with the CLI
 
 ```bash
-# Pull all files
-humanloop pull
+# Basic usage
+humanloop pull                               # Pull all files to 'humanloop/' directory
+humanloop pull --path="examples/chat"        # Pull specific directory
+humanloop pull --environment="production"    # Pull from specific environment
+humanloop pull --local-files-directory="ai"  # Specify local destination (default: "humanloop")
 
-# Pull from a directory
-humanloop pull --path="examples/chat"
-
-# Pull a specific file
-humanloop pull --path="examples/chat/basic.prompt"
-
-# Pull versions deployed to specific environment
-humanloop pull --environment="production"
+# View available options
+humanloop pull --help
 ```
 
 ### Using Local Files in the SDK
 
-To use local files in your code:
+To use local Files in your code:
 
 ```python
 # Enable local file support
@@ -218,16 +215,18 @@ client = Humanloop(
     use_local_files=True
 )
 
-# Use a local prompt file
+# Call a local Prompt file
 response = client.prompts.call(
-    path="examples/chat/basic",
+    path="examples/chat/basic",  # Looks for humanloop/examples/chat/basic.prompt
     inputs={"query": "Hello world"}
 )
+
+# The same path-based approach works with prompts.log(), agents.call(), and agents.log()
 ```
 
-For detailed instructions on syncing, see our [Guide to Syncing and Using Local Files](https://humanloop.com/docs/v5/guides/prompts/store-prompts-in-code).
+For detailed instructions, see our [Guide on Storing Files in Code](https://humanloop.com/docs/v5/guides/prompts/store-prompts-in-code).
 
-For information about the `.prompt` and `.agent` file formats, see our [File Format Reference](https://humanloop.com/docs/v5/reference/serialized-files).
+For information about file formats, see our [File Format Reference](https://humanloop.com/docs/v5/reference/serialized-files).
 
 ## Pagination
 
