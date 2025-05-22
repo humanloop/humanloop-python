@@ -122,7 +122,6 @@ CLIENT_TYPE = TypeVar(
 T = TypeVar("T")  # Add TypeVar T definition
 
 
-
 def print_error(message: str) -> None:
     """Print a formatted error message to stdout."""
     sys.stdout.write(f"{RED}{message}{RESET}")
@@ -459,7 +458,7 @@ def _resolve_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple
     except ApiError:
         if not version or not path or file_id:
             raise HumanloopRuntimeError(
-                "File does not exist on Humanloop. Please provide a `file.path` and a version to create a new version.",
+                "File does not exist on Humanloop. Please provide a `file.path` and a `file.version` to create a new version.",
             )
         return _upsert_file(file_config=file_config, client=client), callable or None
 
