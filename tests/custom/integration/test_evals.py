@@ -1,3 +1,4 @@
+import asyncio
 import time
 from typing import Any
 
@@ -409,4 +410,100 @@ def test_agent_eval_works_upserting(
     assert evaluations_response.items and len(evaluations_response.items) == 1
     evaluation_id = evaluations_response.items[0].id
     runs_response = humanloop_client.evaluations.list_runs_for_evaluation(id=evaluation_id)  # type: ignore [attr-defined, arg-type]
+    assert runs_response.runs[0].status == "completed"
+
+
+async def test_async_eval_a_flow_decorator(
+    get_humanloop_client: GetHumanloopClientFn,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+    flow_path = f"{sdk_test_dir}/Test Async Flow"
+
+    # GIVEN an async flow with a decorator
+    @humanloop_client.a_flow(path=flow_path, attributes={"foo": "bar"})
+    async def my_async_flow(question: str) -> str:
+        # Simulate async operation
+        await asyncio.sleep(0.1)
+        return "async result!"
+
+    # WHEN we run an evaluation with the async flow
+    humanloop_client.evaluations.run(  # type: ignore [attr-defined]
+        name="test_async_eval_run",
+        file={
+            "path": flow_path,
+            "type": "flow",
+            "callable": my_async_flow,
+        },
+        dataset={
+            "path": eval_dataset.file_path,
+        },
+        evaluators=[
+            {
+                "path": output_not_null_evaluator.file_path,
+            }
+        ],
+    )
+
+    # Get the flow to verify it exists
+    flow = humanloop_client.files.retrieve_by_path(path=flow_path)
+    assert flow is not None
+
+    # THEN the evaluation finishes successfully
+    evaluations_response = humanloop_client.evaluations.list(file_id=flow.id)
+    assert evaluations_response.items and len(evaluations_response.items) == 1
+    evaluation_id = evaluations_response.items[0].id
+    runs_response = humanloop_client.evaluations.list_runs_for_evaluation(id=evaluation_id)
+    assert runs_response.runs[0].status == "completed"
+
+
+async def test_eval_simple_async_callable(
+    get_humanloop_client: GetHumanloopClientFn,
+    eval_dataset: ResourceIdentifiers,
+    output_not_null_evaluator: ResourceIdentifiers,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+
+    flow_path = f"{sdk_test_dir}/Test Async Flow"
+
+    # GIVEN a simple async callable
+    async def my_async_callable(question: str) -> str:
+        return "It's complicated don't worry about it!"
+
+    # WHEN we run an evaluation with the async callable
+    humanloop_client.evaluations.run(  # type: ignore [attr-defined]
+        name="test_async_eval_run",
+        file={
+            "path": flow_path,
+            "type": "flow",
+            "version": {
+                "attributes": {
+                    "foo": "bar",
+                },
+            },
+            "callable": my_async_callable,
+        },
+        dataset={
+            "path": eval_dataset.file_path,
+        },
+        evaluators=[
+            {
+                "path": output_not_null_evaluator.file_path,
+            }
+        ],
+    )
+
+    # THEN the Flow is created
+    flow = humanloop_client.files.retrieve_by_path(path=flow_path)
+    assert flow is not None
+
+    # THEN the evaluation finishes successfully
+    evaluations_response = humanloop_client.evaluations.list(file_id=flow.id)
+    assert evaluations_response.items and len(evaluations_response.items) == 1
+    # THEN the evaluation is completed
+    evaluation_id = evaluations_response.items[0].id
+    runs_response = humanloop_client.evaluations.list_runs_for_evaluation(id=evaluation_id)
     assert runs_response.runs[0].status == "completed"

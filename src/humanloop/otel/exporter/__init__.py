@@ -1,23 +1,21 @@
 import logging
-
 import time
 import typing
 from queue import Empty as EmptyQueue
 from queue import Queue
 from threading import Thread
-from typing import Optional, Sequence
+from typing import Callable, Optional, Sequence
 
+import requests
 from opentelemetry.sdk.trace import ReadableSpan
 from opentelemetry.sdk.trace.export import SpanExporter, SpanExportResult
 
-import requests
-from typing import Callable
 from humanloop.context import get_evaluation_context
 from humanloop.evals.run import HumanloopRuntimeError
 from humanloop.otel.constants import (
+    HUMANLOOP_FILE_PATH_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
-    HUMANLOOP_FILE_PATH_KEY,
 )
 from humanloop.otel.exporter.proto import serialize_span
 from humanloop.otel.helpers import (
@@ -26,7 +24,6 @@ from humanloop.otel.helpers import (
     read_from_opentelemetry_span,
     write_to_opentelemetry_span,
 )
-
 
 if typing.TYPE_CHECKING:
     from humanloop.client import Humanloop

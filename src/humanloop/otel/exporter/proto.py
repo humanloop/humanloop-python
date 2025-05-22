@@ -1,13 +1,15 @@
-from opentelemetry.proto.common.v1.common_pb2 import KeyValue, AnyValue, InstrumentationScope
+from google.protobuf.json_format import MessageToJson
+from opentelemetry.proto.common.v1.common_pb2 import AnyValue, InstrumentationScope, KeyValue
 from opentelemetry.proto.trace.v1.trace_pb2 import (
-    TracesData,
     ResourceSpans,
     ScopeSpans,
+    TracesData,
+)
+from opentelemetry.proto.trace.v1.trace_pb2 import (
     Span as ProtoBufferSpan,
 )
-from google.protobuf.json_format import MessageToJson
-
 from opentelemetry.sdk.trace import ReadableSpan
+
 from humanloop.otel.helpers import is_llm_provider_call
 
 

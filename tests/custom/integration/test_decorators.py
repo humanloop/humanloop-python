@@ -1,7 +1,8 @@
+import asyncio
 import time
 from typing import Any
 
-from openai import OpenAI
+from openai import AsyncOpenAI, OpenAI
 
 from tests.custom.integration.conftest import GetHumanloopClientFn
 
@@ -131,14 +132,17 @@ def test_flow_decorator_populates_output_message(
     try:
         humanloop_client = get_humanloop_client()
 
+        # GIVEN a flow that returns a ChatMessage like dict
         @humanloop_client.flow(path=f"{sdk_test_dir}/test_flow_log_output_message")
         def my_flow(question: str) -> dict[str, Any]:
             return {"role": "user", "content": question}
 
+        # WHEN the flow is called
         assert "france" in my_flow("What is the capital of the France?")["content"].lower()
 
         time.sleep(5)
 
+        # THEN the Flow is created and the Log has output_message populated
         flow_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_flow_log_output_message")
         assert flow_response is not None
         flow_logs_response = humanloop_client.logs.list(file_id=flow_response.id, page=1, size=50)
@@ -152,3 +156,155 @@ def test_flow_decorator_populates_output_message(
         flow_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_flow_log_output_message")
         if flow_response is not None:
             humanloop_client.flows.delete(id=flow_response.id)
+
+
+async def test_async_flow_decorator(
+    get_humanloop_client: GetHumanloopClientFn,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+
+    # GIVEN an async flow that returns a string
+    @humanloop_client.a_flow(path=f"{sdk_test_dir}/test_async_flow")
+    async def my_flow(question: str) -> str:
+        return "baz!"
+
+    # WHEN the flow is called
+    assert "baz!" == await my_flow("test")
+
+    # Wait for the flow and log to propagate to integration backend
+    await asyncio.sleep(3)
+
+    # THEN the file exists on Humanloop
+    flow_file_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_async_flow")
+    assert flow_file_response is not None
+
+    # THEN a Log exists on the File
+    flow_logs_response = humanloop_client.logs.list(
+        file_id=flow_file_response.id,
+        page=1,
+        size=50,
+    )
+    assert flow_logs_response.items is not None and len(flow_logs_response.items) == 1
+    assert flow_logs_response.items[0].output == "baz!" and flow_logs_response.items[0].inputs == {"question": "test"}
+
+
+async def test_async_tool_decorator(
+    get_humanloop_client: GetHumanloopClientFn,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+
+    # GIVEN an async tool that returns a string
+    @humanloop_client.a_tool(path=f"{sdk_test_dir}/test_async_tool")
+    async def my_tool(question: str) -> str:
+        return "baz!"
+
+    # THEN the tool has a json_schema
+    assert hasattr(my_tool, "json_schema")
+
+    # WHEN the tool is called
+    await my_tool("test")
+
+    # Wait for the flow and log to propagate to integration backend
+    await asyncio.sleep(3)
+
+    # THEN the file exists on Humanloop
+    tool_file_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_async_tool")
+    assert tool_file_response is not None
+
+    # THEN a Log exists on the File
+    tool_logs_response = humanloop_client.logs.list(
+        file_id=tool_file_response.id,
+        page=1,
+        size=50,
+    )
+    assert tool_logs_response.items is not None and len(tool_logs_response.items) == 1
+    assert tool_logs_response.items[0].output == "baz!" and tool_logs_response.items[0].inputs == {"question": "test"}
+
+
+async def test_async_prompt_decorator(
+    get_humanloop_client: GetHumanloopClientFn,
+    openai_key: str,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+
+    # GIVEN an async prompt that calls OpenAI
+    @humanloop_client.a_prompt(path=f"{sdk_test_dir}/test_async_prompt")
+    async def my_prompt(question: str) -> str:
+        openai_client = AsyncOpenAI(api_key=openai_key)
+
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": question}],
+        )
+
+        assert response.choices[0].message.content is not None
+        return response.choices[0].message.content
+
+    # WHEN the prompt is called
+    # THEN the output is not null
+    output = await my_prompt("What is the capital of the France?")
+    assert output is not None
+
+    # Wait for the prompt and log to propagate to integration backend
+    await asyncio.sleep(3)
+
+    # THEN the file exists on Humanloop
+    prompt_file_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_async_prompt")
+    assert prompt_file_response is not None
+
+    # THEN a Log exists on the File
+    prompt_logs_response = humanloop_client.logs.list(file_id=prompt_file_response.id, page=1, size=50)
+    assert prompt_logs_response.items is not None and len(prompt_logs_response.items) == 1
+    # THEN output_message matches the one intercepted from OpenAI response
+    assert prompt_logs_response.items[0].output_message.content == output  # type: ignore [union-attr]
+
+
+async def test_async_flow_decorator_with_trace(
+    get_humanloop_client: GetHumanloopClientFn,
+    openai_key: str,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+
+    # GIVEN async flow and prompt decorators
+    @humanloop_client.a_prompt(path=f"{sdk_test_dir}/test_async_prompt_with_trace")
+    async def my_prompt(question: str) -> str:
+        openai_client = AsyncOpenAI(api_key=openai_key)
+
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": question}],
+        )
+
+        assert response.choices[0].message.content is not None
+        return response.choices[0].message.content
+
+    @humanloop_client.a_flow(path=f"{sdk_test_dir}/test_async_flow_with_trace")
+    async def my_flow(question: str) -> str:
+        return await my_prompt(question="test")
+
+    # WHEN the flow is called
+    await my_flow("test")
+
+    # Wait for the flow and log to propagate to integration backend
+    await asyncio.sleep(3)
+
+    # THEN both files exist on Humanloop
+    flow_file_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_async_flow_with_trace")
+    assert flow_file_response is not None
+    prompt_file_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_async_prompt_with_trace")
+    assert prompt_file_response is not None
+
+    # THEN a Log exists on the File
+    flow_logs_response = humanloop_client.logs.list(file_id=flow_file_response.id, page=1, size=50)
+    assert flow_logs_response.items is not None and len(flow_logs_response.items) == 1
+    assert flow_logs_response.items[0].output is not None and flow_logs_response.items[0].inputs == {"question": "test"}
+    flow_log_with_trace_response = humanloop_client.logs.get(id=flow_logs_response.items[0].id)
+    # THEN a Prompt Log is added to the Flow Log trace
+    assert (
+        flow_log_with_trace_response["trace_children"] is not None  # type: ignore [index]
+        and len(flow_log_with_trace_response["trace_children"]) == 1  # type: ignore [index]
+    )

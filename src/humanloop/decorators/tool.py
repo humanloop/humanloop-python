@@ -7,10 +7,10 @@ import typing
 from dataclasses import dataclass
 from functools import wraps
 from inspect import Parameter
-from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypeVar, TypedDict, Union
-from typing_extensions import ParamSpec
+from typing import Any, Awaitable, Callable, Literal, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, overload
 
-from opentelemetry.trace import Tracer
+from opentelemetry.trace import Span, Tracer
+from typing_extensions import ParamSpec
 
 from humanloop.context import get_evaluation_context, get_trace_id
 from humanloop.decorators.helpers import bind_args
@@ -18,9 +18,9 @@ from humanloop.evals import FileEvalConfig
 from humanloop.evals.run import HumanloopRuntimeError
 from humanloop.otel.constants import (
     HUMANLOOP_FILE_KEY,
+    HUMANLOOP_FILE_PATH_KEY,
     HUMANLOOP_FILE_TYPE_KEY,
     HUMANLOOP_LOG_KEY,
-    HUMANLOOP_FILE_PATH_KEY,
 )
 from humanloop.otel.helpers import process_output, write_to_opentelemetry_span
 from humanloop.requests.tool_function import ToolFunctionParams
@@ -55,62 +55,13 @@ def tool_decorator_factory(
         # Mypy complains about adding attribute on function, but it's nice DX
         func.json_schema = tool_kernel["function"]  # type: ignore
 
-        @wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
-            evaluation_context = get_evaluation_context()
-            if evaluation_context is not None:
-                if evaluation_context.path == path:
-                    raise HumanloopRuntimeError("Tools cannot be evaluated with the `evaluations.run()` utility.")
-            with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
-                # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,  # type: ignore [arg-type]
-                    key=HUMANLOOP_FILE_KEY,
-                    value=tool_kernel,  # type: ignore [arg-type]
-                )
-                span.set_attribute(HUMANLOOP_FILE_PATH_KEY, path)
-                span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, file_type)
-
-                log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
-                log_error: Optional[str]
-                log_output: str
-
-                func_output: Optional[R]
-                try:
-                    func_output = func(*args, **kwargs)
-                    log_output = process_output(
-                        func=func,
-                        output=func_output,
-                    )
-                    log_error = None
-                except HumanloopRuntimeError as e:
-                    # Critical error, re-raise
-                    raise e
-                except Exception as e:
-                    logger.error(f"Error calling {func.__name__}: {e}")
-                    output = None
-                    log_output = process_output(
-                        func=func,
-                        output=output,
-                    )
-                    log_error = str(e)
-
-                # Populate Tool Log attributes
-                tool_log = {
-                    "inputs": log_inputs,
-                    "output": log_output,
-                    "error": log_error,
-                    "trace_parent_id": get_trace_id(),
-                }
-                # Write the Tool Log to the Span on HL_LOG_OT_KEY
-                write_to_opentelemetry_span(
-                    span=span,  # type: ignore [arg-type]
-                    key=HUMANLOOP_LOG_KEY,
-                    value=tool_log,  # type: ignore [arg-type]
-                )
-
-                # Return the output of the decorated function
-                return func_output
+        wrapper = _wrapper_factory(
+            opentelemetry_tracer=opentelemetry_tracer,
+            func=func,
+            path=path,
+            tool_kernel=tool_kernel,
+            is_awaitable=False,
+        )
 
         wrapper.file = FileEvalConfig(  # type: ignore
             path=path,
@@ -122,6 +73,251 @@ def tool_decorator_factory(
         return wrapper
 
     return decorator
+
+
+def a_tool_decorator_factory(
+    opentelemetry_tracer: Tracer,
+    path: str,
+    attributes: Optional[dict[str, Any]] = None,
+    setup_values: Optional[dict[str, Any]] = None,
+):
+    def decorator(func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[Optional[R]]]:
+        file_type = "tool"
+
+        tool_kernel = _build_tool_kernel(
+            func=func,
+            attributes=attributes,
+            setup_values=setup_values,
+            strict=True,
+        )
+
+        # Mypy complains about adding attribute on function, but it's nice DX
+        func.json_schema = tool_kernel["function"]  # type: ignore
+
+        wrapper = _wrapper_factory(
+            opentelemetry_tracer=opentelemetry_tracer,
+            func=func,
+            path=path,
+            tool_kernel=tool_kernel,
+            is_awaitable=True,
+        )
+
+        wrapper.file = FileEvalConfig(  # type: ignore
+            path=path,
+            type=file_type,  # type: ignore [arg-type, typeddict-item]
+            version=tool_kernel,
+            callable=wrapper,
+        )
+
+        return wrapper
+
+    return decorator
+
+
+@overload
+def _wrapper_factory(
+    opentelemetry_tracer: Tracer,
+    func: Callable[P, Awaitable[R]],
+    path: str,
+    tool_kernel: ToolKernelRequestParams,
+    is_awaitable: Literal[True],
+) -> Callable[P, Awaitable[Optional[R]]]: ...
+
+
+@overload
+def _wrapper_factory(
+    opentelemetry_tracer: Tracer,
+    func: Callable[P, R],
+    path: str,
+    tool_kernel: ToolKernelRequestParams,
+    is_awaitable: Literal[False],
+) -> Callable[P, Optional[R]]: ...
+
+
+def _wrapper_factory(  # type: ignore [misc]
+    opentelemetry_tracer: Tracer,
+    func: Union[Callable[P, Awaitable[R]], Callable[P, R]],
+    path: str,
+    tool_kernel: ToolKernelRequestParams,
+    is_awaitable: bool,
+):
+    if is_awaitable:
+        func = typing.cast(Callable[P, Awaitable[R]], func)
+
+        @wraps(func)
+        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+            evaluation_context = get_evaluation_context()
+            if evaluation_context is not None:
+                if evaluation_context.path == path:
+                    raise HumanloopRuntimeError("Tools cannot be evaluated with the `evaluations.run()` utility.")
+            with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
+                span, log_inputs = _process_inputs(
+                    span=span,
+                    opentelemetry_tracer=opentelemetry_tracer,
+                    path=path,
+                    tool_kernel=tool_kernel,
+                    func=func,
+                    args=args,
+                    kwargs=kwargs,
+                )
+
+                func_output: Optional[R]
+                try:
+                    func_output = await func(*args, **kwargs)  # type: ignore [misc]
+                    error = None
+                except HumanloopRuntimeError as e:
+                    # Critical error, re-raise
+                    span.record_exception(e)
+                    raise e
+                except Exception as e:
+                    logger.error(f"Error calling {func.__name__}: {e}")
+                    error = e
+                    func_output = None
+
+                _process_output(
+                    span=span,
+                    func=func,
+                    func_output=func_output,
+                    error=error,
+                    log_inputs=log_inputs,
+                )
+
+                # Return the output of the decorated function
+                return func_output
+    else:
+        func = typing.cast(Callable[P, R], func)
+
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+            evaluation_context = get_evaluation_context()
+            if evaluation_context is not None:
+                if evaluation_context.path == path:
+                    raise HumanloopRuntimeError("Tools cannot be evaluated with the `evaluations.run()` utility.")
+            with opentelemetry_tracer.start_as_current_span("humanloop.tool") as span:
+                span, log_inputs = _process_inputs(
+                    span=span,
+                    opentelemetry_tracer=opentelemetry_tracer,
+                    path=path,
+                    tool_kernel=tool_kernel,
+                    func=func,
+                    args=args,
+                    kwargs=kwargs,
+                )
+
+                func_output: Optional[R]
+                try:
+                    func_output = func(*args, **kwargs)  # type: ignore [misc]
+                    error = None
+                except HumanloopRuntimeError as e:
+                    # Critical error, re-raise
+                    span.record_exception(e)
+                    raise e
+                except Exception as e:
+                    logger.error(f"Error calling {func.__name__}: {e}")
+                    error = e
+                    func_output = None
+
+                _process_output(
+                    span=span,
+                    func=func,
+                    func_output=func_output,
+                    error=error,
+                    log_inputs=log_inputs,
+                )
+
+                # Return the output of the decorated function
+                return func_output
+
+    return wrapper
+
+
+def _process_inputs(
+    span: Span,
+    opentelemetry_tracer: Tracer,
+    path: str,
+    tool_kernel: ToolKernelRequestParams,
+    func: Callable[P, R],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+) -> tuple[Span, dict[str, Any]]:
+    """Process inputs before executing the decorated function.
+
+    This handles setting up the OpenTelemetry span and preparing the log inputs.
+
+    Args:
+        span: The current OpenTelemetry span
+        opentelemetry_tracer: The OpenTelemetry tracer
+        path: The path to the tool
+        tool_kernel: The tool kernel request parameters
+        func: The decorated function
+        args: The positional arguments passed to the function
+        kwargs: The keyword arguments passed to the function
+
+    Returns:
+        A tuple containing the span and the log inputs
+    """
+    # Write the Tool Kernel to the Span on HL_FILE_OT_KEY
+    write_to_opentelemetry_span(
+        span=span,  # type: ignore [arg-type]
+        key=HUMANLOOP_FILE_KEY,
+        value=tool_kernel,  # type: ignore [arg-type]
+    )
+    span.set_attribute(HUMANLOOP_FILE_PATH_KEY, path)
+    span.set_attribute(HUMANLOOP_FILE_TYPE_KEY, "tool")
+
+    log_inputs: dict[str, Any] = bind_args(func, args, kwargs)
+
+    return span, log_inputs
+
+
+def _process_output(
+    span: Span,
+    func: Union[Callable[P, R], Callable[P, Awaitable[R]]],
+    func_output: Optional[R],
+    error: Optional[Exception],
+    log_inputs: dict[str, Any],
+) -> None:
+    """Process outputs after executing the decorated function.
+
+    This handles processing the function output, error logging, and writing to the OpenTelemetry span.
+
+    Args:
+        span: The current OpenTelemetry span
+        func: The decorated function
+        func_output: The output from the function execution
+        error: Any exception that occurred during function execution
+        log_inputs: The input parameters logged during processing
+    """
+    log_error: Optional[str]
+    log_output: str
+
+    if not error:
+        log_output = process_output(
+            func=func,
+            output=func_output,
+        )
+        log_error = None
+    else:
+        output = None
+        log_output = process_output(
+            func=func,
+            output=output,
+        )
+        log_error = str(error)
+
+    # Populate Tool Log attributes
+    tool_log = {
+        "inputs": log_inputs,
+        "output": log_output,
+        "error": log_error,
+        "trace_parent_id": get_trace_id(),
+    }
+    # Write the Tool Log to the Span on HL_LOG_OT_KEY
+    write_to_opentelemetry_span(
+        span=span,  # type: ignore [arg-type]
+        key=HUMANLOOP_LOG_KEY,
+        value=tool_log,  # type: ignore [arg-type]
+    )
 
 
 def _build_tool_kernel(

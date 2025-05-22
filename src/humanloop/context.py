@@ -1,13 +1,14 @@
+import threading
 from contextlib import contextmanager
 from dataclasses import dataclass
-import threading
 from typing import Any, Callable, Generator, Literal, Optional
+
 from opentelemetry import context as context_api
 
 from humanloop.error import HumanloopRuntimeError
 from humanloop.otel.constants import (
-    HUMANLOOP_CONTEXT_EVALUATION,
     HUMANLOOP_CONTEXT_DECORATOR,
+    HUMANLOOP_CONTEXT_EVALUATION,
     HUMANLOOP_CONTEXT_TRACE_ID,
 )
 

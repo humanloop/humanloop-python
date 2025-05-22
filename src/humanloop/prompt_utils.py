@@ -1,14 +1,12 @@
 import copy
-from typing import Any, Dict, List, Optional, TypeVar, Sequence
 import logging
-
 import re
+from typing import Any, Dict, List, Optional, Sequence, TypeVar
 
-from .requests.chat_message import ChatMessageParams
 from .prompts.requests.prompt_request_template import (
     PromptRequestTemplateParams,
 )
-
+from .requests.chat_message import ChatMessageParams
 
 logger = logging.getLogger(__name__)
 
