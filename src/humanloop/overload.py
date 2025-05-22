@@ -264,7 +264,7 @@ def overload_client(
         def log_wrapper(self: T, **kwargs) -> LogResponseType:
             return _overload_log(self, file_syncer, use_local_files, **kwargs)
 
-        client.log = types.MethodType(log_wrapper, client)  # type: ignore [method-assign, union-attr, assignment]
+        client.log = types.MethodType(log_wrapper, client)  # type: ignore [method-assign]
 
     # Overload call method for Prompt and Agent clients
     if _get_file_type_from_client(client) in FileSyncer.SERIALIZABLE_FILE_TYPES:
