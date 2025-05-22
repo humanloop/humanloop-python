@@ -250,3 +250,44 @@ async def test_async_prompt_decorator(
     prompt_logs_response = humanloop_client.logs.list(file_id=prompt_file_response.id, page=1, size=50)
     assert prompt_logs_response.items is not None and len(prompt_logs_response.items) == 1
     assert prompt_logs_response.items[0].output_message.content == output  # type: ignore [union-attr]
+
+
+async def test_async_flow_decorator_with_trace(
+    get_humanloop_client: GetHumanloopClientFn,
+    openai_key: str,
+    sdk_test_dir: str,
+):
+    humanloop_client = get_humanloop_client()
+
+    @humanloop_client.a_prompt(path=f"{sdk_test_dir}/test_async_prompt_with_trace")
+    async def my_prompt(question: str) -> str:
+        openai_client = AsyncOpenAI(api_key=openai_key)
+
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": question}],
+        )
+
+        assert response.choices[0].message.content is not None
+        return response.choices[0].message.content
+
+    @humanloop_client.a_flow(path=f"{sdk_test_dir}/test_async_flow_with_trace")
+    async def my_flow(question: str) -> str:
+        return await my_prompt("test")
+
+    await my_flow("test")
+
+    # Wait for the flow and log to propagate to integration backend
+    await asyncio.sleep(3)
+
+    flow_file_response = humanloop_client.files.retrieve_by_path(path=f"{sdk_test_dir}/test_async_flow_with_trace")
+    assert flow_file_response is not None
+
+    flow_logs_response = humanloop_client.logs.list(file_id=flow_file_response.id, page=1, size=50)
+    assert flow_logs_response.items is not None and len(flow_logs_response.items) == 1
+    assert flow_logs_response.items[0].output is not None and flow_logs_response.items[0].inputs == {"question": "test"}
+    flow_log_with_trace_response = humanloop_client.logs.get(id=flow_logs_response.items[0].id)
+    assert (
+        flow_log_with_trace_response["trace_children"] is not None  # type: ignore [index]
+        and len(flow_log_with_trace_response["trace_children"]) == 1  # type: ignore [index]
+    )
