@@ -41,13 +41,19 @@ class ExtendedEvalsClient(EvaluationsClient):
     """
 
     client: BaseHumanloop
+    _file_syncer: FileSyncer
+    _use_local_files: bool
 
     def __init__(
         self,
         *,
         client_wrapper: SyncClientWrapper,
+        file_syncer: Optional[FileSyncer] = None,
+        use_local_files: bool = False
     ):
         super().__init__(client_wrapper=client_wrapper)
+        self._file_syncer = file_syncer
+        self._use_local_files = use_local_files
 
     def run(
         self,
@@ -161,7 +167,11 @@ class Humanloop(BaseHumanloop):
 
         # Check if cache_size is non-default but use_local_files is False
         self._file_syncer = FileSyncer(client=self, base_dir=local_files_directory, cache_size=cache_size)
-        eval_client = ExtendedEvalsClient(client_wrapper=self._client_wrapper)
+        eval_client = ExtendedEvalsClient(
+            client_wrapper=self._client_wrapper,
+            file_syncer=self._file_syncer,
+            use_local_files=self.use_local_files,
+        )
         eval_client.client = self
         self.evaluations = eval_client
         self.prompts = ExtendedPromptsClient(client_wrapper=self._client_wrapper)
