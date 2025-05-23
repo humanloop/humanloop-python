@@ -82,6 +82,8 @@ class ExtendedEvalsClient(EvaluationsClient):
             dataset=dataset,
             evaluators=evaluators,
             workers=workers,
+            use_local_files=self._use_local_files,
+            file_syncer=self._file_syncer,
         )
 
 

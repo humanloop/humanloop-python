@@ -86,6 +86,7 @@ from humanloop.types.run_stats_response import RunStatsResponse
 
 if typing.TYPE_CHECKING:
     from humanloop.client import BaseHumanloop
+    from humanloop.sync import FileSyncer
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -144,6 +145,8 @@ def run_eval(
     dataset: DatasetEvalConfig,
     evaluators: Optional[Sequence[EvaluatorEvalConfig]] = None,
     workers: int = 4,
+    use_local_files: Optional[bool] = None,
+    file_syncer: Optional["FileSyncer"] = None,
 ) -> List[EvaluatorCheck]:
     """
     Evaluate your function for a given `Dataset` and set of `Evaluators`.
@@ -158,7 +161,9 @@ def run_eval(
     """
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
-    hl_file, function_ = _get_hl_file(client=client, file_config=file)
+    hl_file, function_ = _get_hl_file(
+        client=client, file_config=file, file_syncer=file_syncer, use_local_files=use_local_files
+    )
     # cast is safe, we can only fetch Files allowed by FileType
     type_ = typing.cast(FileType, hl_file.type)
     try:
@@ -436,7 +441,12 @@ def _safe_get_default_file_version(client: "BaseHumanloop", file_config: FileEva
         raise HumanloopRuntimeError("You must provide either the path or the id in your `file` config.")
 
 
-def _resolve_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[EvaluatedFile, Optional[Callable]]:
+def _resolve_file(
+    client: "BaseHumanloop",
+    file_config: FileEvalConfig,
+    file_syncer: Optional["FileSyncer"],
+    use_local_files: Optional[bool],
+) -> tuple[EvaluatedFile, Optional[Callable]]:
     """Resolve the File to be evaluated. Will return a FileResponse and an optional callable.
 
     If the callable is null, the File will be evaluated on Humanloop. Otherwise, the File will be evaluated locally.
@@ -497,7 +507,12 @@ def _resolve_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple
     ), None
 
 
-def _get_hl_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[EvaluatedFile, Optional[Callable]]:
+def _get_hl_file(
+    client: "BaseHumanloop",
+    file_config: FileEvalConfig,
+    file_syncer: Optional["FileSyncer"],
+    use_local_files: Optional[bool],
+) -> tuple[EvaluatedFile, Optional[Callable]]:
     """Check if the config object is valid, and resolve the File to be evaluated.
 
     The callable will be null if the evaluation will happen on Humanloop runtime.
@@ -506,7 +521,12 @@ def _get_hl_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[
     file_ = _file_or_file_inside_hl_decorator(file_config)
     file_ = _check_file_type(file_)
 
-    return _resolve_file(client=client, file_config=file_)
+    return _resolve_file(
+        client=client,
+        file_config=file_,
+        file_syncer=file_syncer,
+        use_local_files=use_local_files,
+    )
 
 
 def _callable_is_hl_utility(file_config: FileEvalConfig) -> bool:
