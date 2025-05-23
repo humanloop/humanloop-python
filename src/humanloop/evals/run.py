@@ -691,7 +691,7 @@ def _get_file_callable(file_config: FileEvalConfig) -> Optional[Callable]:
                 f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.\n\n"
             )
     elif type_ == "agent":
-        raise ValueError("Agent evaluation is only possible on the Humanloop runtime, do not provide a `callable`.")
+        raise HumanloopRuntimeError("Agent evaluation is only possible on the Humanloop runtime, do not provide a `callable`.")
     return function_
 
 
