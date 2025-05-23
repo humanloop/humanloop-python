@@ -86,6 +86,7 @@ from humanloop.types.run_stats_response import RunStatsResponse
 
 if typing.TYPE_CHECKING:
     from humanloop.client import BaseHumanloop
+    from humanloop.sync import FileSyncer
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -144,6 +145,8 @@ def run_eval(
     dataset: DatasetEvalConfig,
     evaluators: Optional[Sequence[EvaluatorEvalConfig]] = None,
     workers: int = 4,
+    use_local_files: Optional[bool] = None,
+    file_syncer: Optional["FileSyncer"] = None,
 ) -> List[EvaluatorCheck]:
     """
     Evaluate your function for a given `Dataset` and set of `Evaluators`.
@@ -158,7 +161,9 @@ def run_eval(
     """
     evaluators_worker_pool = ThreadPoolExecutor(max_workers=workers)
 
-    hl_file, function_ = _get_hl_file(client=client, file_config=file)
+    hl_file, function_ = _get_hl_file(
+        client=client, file_config=file, file_syncer=file_syncer, use_local_files=use_local_files
+    )
     # cast is safe, we can only fetch Files allowed by FileType
     type_ = typing.cast(FileType, hl_file.type)
     try:
@@ -436,17 +441,90 @@ def _safe_get_default_file_version(client: "BaseHumanloop", file_config: FileEva
         raise HumanloopRuntimeError("You must provide either the path or the id in your `file` config.")
 
 
-def _resolve_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[EvaluatedFile, Optional[Callable]]:
+def _resolve_file(
+    client: "BaseHumanloop",
+    file_config: FileEvalConfig,
+    file_syncer: Optional["FileSyncer"],
+    use_local_files: Optional[bool],
+) -> tuple[EvaluatedFile, Optional[Callable]]:
     """Resolve the File to be evaluated. Will return a FileResponse and an optional callable.
 
     If the callable is null, the File will be evaluated on Humanloop. Otherwise, the File will be evaluated locally.
     """
     file_id = file_config.get("id")
     path = file_config.get("path")
+    type_ = file_config.get("type")
     version_id = file_config.get("version_id")
     environment = file_config.get("environment")
     callable = _get_file_callable(file_config=file_config)
     version = file_config.get("version")
+
+    # Early validation for local Files 
+    if (
+        use_local_files and 
+        path
+    ): 
+        if not file_syncer: 
+            raise HumanloopRuntimeError(
+                "Internal error: FileSyncer is required when `use_local_files=True`. "
+                "This may indicate improper SDK usage. Please use the `client.evaluations.run()` method."
+            )
+        
+        # Check 1: Error if trying to use specific version with local Files
+        if version_id or environment: 
+            raise HumanloopRuntimeError(
+                f"Cannot use local File for path '{path}' when `version_id` or `environment` is specified. "
+                "Local Files always use the content from your local filesystem, not a specific version from Humanloop. "
+                "To use a specific version: either provide `id` instead of `path` with `version_id`/`environment`, "
+                "or set `use_local_files=False` to use remote Files."
+            )
+        
+        # Check 2: Version takes precedence over local Files (warn)
+        if version: 
+            print_warning(
+                f"Using provided `version` configuration instead of local file for '{path}'."
+            )
+            # Continue with normal flow — don't load local File
+
+        # Check 3: Callable takes precedence for prompts
+        elif callable and type_ == "prompt": 
+            print_warning(
+                "Both local File and callable provided for Prompt. "
+                "Using callable instead of local File."
+            )
+            # Continue with normal flow — don't load local File
+        
+        # Check 4: Unsupported File type 
+        elif type_ not in ["prompt", "agent"]:
+            raise HumanloopRuntimeError(
+                f"Local files are not supported for '{type_}' files. "
+                "Only 'prompt' and 'agent' files can be used locally."
+            )
+        
+        # Load local File 
+        else: 
+            file_content = file_syncer.get_file_content(path, type_)
+            subclient: PromptsClient | AgentsClient = _get_subclient(client=client, file_config=file_config)
+            if isinstance(subclient, PromptsClient):
+                kernel_request = subclient.deserialize(prompt=file_content)
+            elif isinstance(subclient, AgentsClient):
+                kernel_request = subclient.deserialize(agent=file_content)
+            else:
+                raise ValueError(f"Unsupported subclient type: {type(subclient)}")
+            
+            if hasattr(kernel_request, "model_dump"):
+                kernel_request_dict = kernel_request.model_dump(exclude_none=True) # Pydantic v2 
+            elif hasattr(kernel_request, "dict"): # Pydantic v1
+                kernel_request_dict = kernel_request.dict(exclude_none=True)
+            
+            upsert_config: FileEvalConfig = {
+                "path": path,
+                "type": type_,
+                "version": kernel_request_dict
+            }
+            hl_file = _upsert_file(client=client, file_config=upsert_config)
+            print_info(f"Using local {type_} file: {path}")
+            return hl_file, callable
 
     if callable and path is None and file_id is None:
         raise HumanloopRuntimeError(
@@ -497,7 +575,12 @@ def _resolve_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple
     ), None
 
 
-def _get_hl_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[EvaluatedFile, Optional[Callable]]:
+def _get_hl_file(
+    client: "BaseHumanloop",
+    file_config: FileEvalConfig,
+    file_syncer: Optional["FileSyncer"],
+    use_local_files: Optional[bool],
+) -> tuple[EvaluatedFile, Optional[Callable]]:
     """Check if the config object is valid, and resolve the File to be evaluated.
 
     The callable will be null if the evaluation will happen on Humanloop runtime.
@@ -506,7 +589,12 @@ def _get_hl_file(client: "BaseHumanloop", file_config: FileEvalConfig) -> tuple[
     file_ = _file_or_file_inside_hl_decorator(file_config)
     file_ = _check_file_type(file_)
 
-    return _resolve_file(client=client, file_config=file_)
+    return _resolve_file(
+        client=client,
+        file_config=file_,
+        file_syncer=file_syncer,
+        use_local_files=use_local_files,
+    )
 
 
 def _callable_is_hl_utility(file_config: FileEvalConfig) -> bool:
@@ -671,7 +759,7 @@ def _get_file_callable(file_config: FileEvalConfig) -> Optional[Callable]:
                 f"No `callable` provided for your {type_} file - will attempt to generate logs on Humanloop.\n\n"
             )
     elif type_ == "agent":
-        raise ValueError("Agent evaluation is only possible on the Humanloop runtime, do not provide a `callable`.")
+        raise HumanloopRuntimeError("Agent evaluation is only possible on the Humanloop runtime, do not provide a `callable`.")
     return function_
 
 
